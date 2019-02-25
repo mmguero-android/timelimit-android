@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="setup_device_needs_parent">A parent must authenticate to finish the setup</string>
+    <string name="setup_device_new_parent">New parent user</string>
+    <string name="setup_device_new_child">New child user</string>
+    <string name="setup_device_who_should_use_it">Who should use this device?</string>
+    <string name="setup_device_what_should_be_allowed">What should be allowed?</string>
+    <string name="setup_device_what_should_be_allowed_hint">You can configure this more in detail later</string>
+    <string name="setup_device_where_add_allowed">To which category should these Apps be added?</string>
+</resources>

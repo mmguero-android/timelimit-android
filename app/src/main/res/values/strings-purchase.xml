@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="purchase_intro">Please select an option</string>
+    <!-- https://support.google.com/googleplay/android-developer/answer/112622?hl=en -->
+    <string name="purchase_info_assigned_to_account">
+        The purchase is assigned to your family and is valid on all devices.
+        The family are all devices which are linked to this device now and in the future.
+        For apps and in-app products offered through Google Play, the transaction fee is equivalent to 30% of the price.
+    </string>
+    <string name="purchase_one_month">Premium version for one month</string>
+    <string name="purchase_one_year">Premium version for one year</string>
+
+    <string name="purchase_error_not_supported_by_device">The payment via Google Play is not supported by your device</string>
+    <string name="purchase_error_not_supported_by_app_variant">The payment is only possible in the version from the Play Store</string>
+    <string name="purchase_error_existing_payment">
+        You paid already.
+        You can only extend the premium version if it expired or shortly before that.
+    </string>
+    <string name="purchase_error_server_rejected">The server does not accept payments currently</string>
+
+    <string name="purchase_done_title">Purchase succeeded</string>
+    <string name="purchase_done_text">Press back to go back to the App</string>
+
+    <string name="purchase_required_dialog_title">Premium version required</string>
+    <string name="purchase_required_dialog_text">
+        The feature requires the premium version.
+        You can find the option to buy it at the App start screen in the tab \"About\".
+    </string>
+
+    <string name="purchase_required_info_only_networking">This feature is only available in the premium version.</string>
+    <string name="purchase_required_info_local_mode_free">This feature is only available in the premium version and the local mode.</string>
+
+    <string name="purchase_demo_temporarily_notice">
+        You can use the premium version temporarily.
+        After that, the features of the premium version are disabled and you can only
+        use the features of the free version or you buy the premium version to continue
+        using the features of it.
+    </string>
+</resources>

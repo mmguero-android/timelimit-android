@@ -1,0 +1,224 @@
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="io.timelimit.android.ui.setup.device.SetupDeviceFragment">
+
+    <data>
+        <variable
+            name="isAddingNewUser"
+            type="Boolean" />
+
+        <variable
+            name="isAddingChild"
+            type="Boolean" />
+
+        <variable
+            name="areThereAnyCategories"
+            type="Boolean" />
+
+        <variable
+            name="areThereAnyApps"
+            type="Boolean" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <io.timelimit.android.ui.view.SafeViewFlipper
+        android:id="@+id/flipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:padding="8dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.cardview.widget.CardView
+                    app:cardUseCompatPadding="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:padding="8dp"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceLarge"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/setup_device_who_should_use_it" />
+
+                        <RadioGroup
+                            android:id="@+id/select_user_radio_group"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <!-- this content is overwritten at runtime -->
+                            <!-- it only exists for the layout preview -->
+
+                            <RadioButton
+                                android:text="@string/setup_device_new_parent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                            <RadioButton
+                                android:text="@string/setup_device_new_child"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+                        </RadioGroup>
+
+                        <EditText
+                            android:inputType="textPersonName"
+                            android:visibility="@{safeUnbox(isAddingNewUser) ? View.VISIBLE : View.GONE}"
+                            android:id="@+id/new_user_name"
+                            android:hint="@string/add_user_hint_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:visibility="@{isAddingChild == Boolean.TRUE &amp;&amp; isAddingNewUser == Boolean.TRUE ? View.VISIBLE : View.GONE}"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:text="@string/add_user_child_password_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <io.timelimit.android.ui.view.SetPasswordView
+                            android:visibility="@{isAddingNewUser == Boolean.TRUE ? View.VISIBLE : View.GONE}"
+                            android:id="@+id/set_password_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:visibility="@{safeUnbox(isAddingChild) &amp;&amp; safeUnbox(areThereAnyApps) ? View.VISIBLE : View.GONE}"
+                    android:id="@+id/card_what_should_be_allowed"
+                    app:cardUseCompatPadding="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceLarge"
+                            android:text="@string/setup_device_what_should_be_allowed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:text="@string/setup_device_what_should_be_allowed_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <LinearLayout
+                            android:id="@+id/suggested_allowed_apps"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <!-- this are just demo items, they are replaced at runtime -->
+
+                            <CheckBox
+                                tools:ignore="HardcodedText"
+                                android:text="Launcher"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                            <CheckBox
+                                tools:ignore="HardcodedText"
+                                android:text="Phone"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:visibility="@{safeUnbox(isAddingChild) &amp;&amp; safeUnbox(areThereAnyCategories) &amp;&amp; safeUnbox(areThereAnyApps) ? View.VISIBLE : View.GONE}"
+                    android:id="@+id/card_to_what_should_apps_get_added"
+                    app:cardUseCompatPadding="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceLarge"
+                            android:text="@string/setup_device_where_add_allowed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <RadioGroup
+                            android:id="@+id/allowed_apps_category"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <!-- this will be populated at runtime -->
+
+                            <RadioButton
+                                android:text="@string/setup_category_allowed"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                            <RadioButton
+                                android:text="@string/setup_category_games"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                        </RadioGroup>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <include android:id="@+id/network_time_verification"
+                    layout="@layout/setup_network_time_verification" />
+
+                <Button
+                    android:id="@+id/confirm_btn"
+                    android:background="?selectableItemBackground"
+                    android:layout_gravity="end"
+                    android:text="@string/generic_go"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <include
+            android:id="@+id/needs_parent"
+            layout="@layout/fragment_setup_device_needs_parent" />
+
+        <include layout="@layout/circular_progress_indicator" />
+
+    </io.timelimit.android.ui.view.SafeViewFlipper>
+</layout>

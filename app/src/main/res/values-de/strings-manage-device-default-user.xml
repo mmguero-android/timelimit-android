@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_device_default_user_title">Standardbenutzer</string>
+    <string name="manage_device_default_user_info">Der Standardbenutzer ist ein Benutzer,
+        zu dem jeder an dem Gerät ohne Eingabe eines Passworts wechseln kann (um sich abzumelden).
+        Das ist sinnvoll bei Geräten, die von verschiedenen Benutzern genutzt werden können.
+    </string>
+    <string name="manage_device_default_user_status">Der Standardbenutzer ist %s</string>
+    <string name="manage_device_default_user_switch_btn">Zum Standardbenutzer wechseln</string>
+    <string name="manage_device_default_user_switch_reason_remote">Sie können nur am Gerät selbst zum Standardbenutzer wechseln</string>
+    <string name="manage_device_default_user_switch_reason_unset">Sie können nicht zum Standardbenutzer wechseln,
+        solange es keinen Standardbenutzer gibt</string>
+    <string name="manage_device_default_user_switch_reason_already_done">Sie können
+        nicht zum Standardbenutzer wechseln, wenn der Standardbenutzer bereits der aktuelle Benutzer ist
+    </string>
+    <string name="manage_device_default_user_set_btn_set">Standardbenutzer wählen</string>
+    <string name="manage_device_default_user_set_btn_change">Standardbenutzer ändern</string>
+    <string name="manage_device_default_user_selection_none">kein Standardbenutzer</string>
+    <string name="manage_device_default_user_timeout_off">Dieses Gerät wechselt nicht automatisch zum Standardbenutzer</string>
+    <string name="manage_device_default_user_timeout_on">Dieses Gerät wechselt automatisch zum Standardbenutzer, wenn es %s nicht benutzt wurde</string>
+    <string name="manage_device_default_user_timeout_btn_enable">automatischen Wechsel zum Standardbenutzer aktivieren</string>
+    <string name="manage_device_default_user_timeout_btn_change">automatischen Wechsel zum Standardbenutzer konfigurieren</string>
+    <string name="manage_device_default_user_timeout_dialog_title">automatisch zum Standardbenutzer wechseln</string>
+    <string name="manage_device_default_user_timeout_dialog_disable">nie</string>
+</resources>

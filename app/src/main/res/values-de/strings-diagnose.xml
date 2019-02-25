@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="diagnose_clock_title">Systemuhr</string>
+
+    <string name="diagnose_clock_epoch_seconds">Epochalsekunden: %d</string>
+    <string name="diagnose_clock_timezone">Zeitzone: %s</string>
+    <string name="diagnose_clock_time_of_day">Zeit des Tages: %s</string>
+    <string name="diagnose_clock_date">Datum: %s</string>
+    <string name="diagnose_clock_day_of_week">Wochentag (0 = Montag, ...): %d</string>
+    <string name="diagnose_clock_day_of_epoch">Epochaltag: %d</string>
+    <string name="diagnose_clock_minute_of_week">Minute der Woche: %d</string>
+    <string name="diagnose_clock_last_time_request">Letzte Zeitabfrage: %s</string>
+    <string name="diagnose_clock_last_time_request_disabled">Netzwerkzeit deaktiviert</string>
+    <string name="diagnose_clock_last_time_request_never">nie</string>
+    <string name="diagnose_clock_last_time_request_x_ago">vor %s</string>
+    <string name="diagnose_clock_btn_sync">Zeit abgleichen</string>
+
+    <string name="diagnose_connection_title">Verbindungsstatus</string>
+    <string name="diagnose_connection_general">Systemstatus: %s</string>
+    <string name="diagnose_connection_own_server">TimeLimit-Server: %s</string>
+    <string name="diagnose_connection_yes">verbunden</string>
+    <string name="diagnose_connection_no">nicht verbunden</string>
+
+    <string name="diagnose_sync_title">Synchronisation</string>
+    <string name="diagnose_sync_empty">Es gibt Nichts das synchronisiert werden müsste</string>
+    <string name="diagnose_sync_copy_to_clipboard">In die Zwischenablage kopieren</string>
+    <string name="diagnose_sync_copied_to_clipboard">In die Zwischenablage kopiert</string>
+    <string name="diagnose_sync_btn_clear_cache">Cache leeren</string>
+    <string name="diagnose_sync_btn_clear_cache_toast">Cache geleert</string>
+    <string name="diagnose_sync_btn_request_sync">Synchronisation anfordern</string>
+    <string name="diagnose_sync_btn_request_sync_toast">Synchronisation wurde angefordert</string>
+</resources>

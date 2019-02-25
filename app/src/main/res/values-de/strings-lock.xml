@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="lock_header_blocked">Gesperrt!</string>
+
+    <string name="lock_header_what">Was wurde gesperrt?</string>
+    <string name="lock_header_why">Warum wurde es gesperrt?</string>
+    <string name="lock_header_how_proceed">Wie geht es jetzt weiter?</string>
+
+    <string name="lock_allow_temporarily_header">Vorübergehend erlauben</string>
+    <string name="lock_allow_temporarily_text">
+        Die Nutzung von %1$s erlauben. %1$s wird wieder gesperrt, sobald die entsprechende
+        Option im Benachrichtigungsbereich gewählt oder der Bildschirm ausgeschaltet wird.
+    </string>
+
+    <string name="lock_add_to_category_title">Zu einer Kategorie hinzufügen</string>
+    <string name="lock_add_to_category_text">Verwenden Sie diese Option, wenn Sie die App kennen und Sie diese freigeben möchten</string>
+
+    <string name="lock_goto_main_title">TimeLimit öffnen</string>
+    <string name="lock_goto_main_text">TimeLimit öffnen, um die Einstellungen einzusehen und/ oder zu ändern</string>
+
+    <string name="lock_extratime_title">Extrazeit hinzufügen</string>
+
+    <string name="lock_disable_time_verification_title">Manuelle Zeitbestätigung auf diesem Gerät abschalten</string>
+    <string name="lock_disable_time_verification_text">
+        Falls keine Netzwerkzeit verfügbar, die Systemzeit dieses Gerätes nutzen.
+        Verwenden Sie diese Option, wenn dieses Gerät häufiger keine Internetverbindung hat.
+    </string>
+
+    <string name="lock_update_current_device_title">Aktuelles Gerät anpassen</string>
+    <string name="lock_update_current_device_text">Dieses Gerät als aktuelles Gerät festlegen</string>
+
+    <string name="lock_disable_temporarily_lock_title">Vorübergehende Sperrung abschalten</string>
+    <string name="lock_disable_temporarily_all_categories">Alle Kategorien</string>
+    <string name="lock_disable_temporarily_all_categories_disabled">Es wurde nur die Kategorie %s gesperrt</string>
+
+    <string name="lock_confirm_time_title">Systemzeit manuell bestätigen</string>
+    <string name="lock_confirm_time_btn">Diese Zeit ist richtig</string>
+
+    <string name="lock_reason_no_category">
+        Die App wurde zu keiner Kategorie zugeordnet. Das bedeutet, dass es keine Einschränkungs-Einstellungen gibt. Und da ist es die einfachste Lösung, die App zu sperren.
+    </string>
+    <string name="lock_reason_temporarily_blocked">
+        Diese App ist in einer Kategorie, die vorübergehend gesperrt wurde.
+    </string>
+    <string name="lock_reason_blocked_time">
+        Diese App ist in einer Kategorie, für die festgelegt wurde, dass Sie zu dieser Uhrzeit gesperrt ist.
+    </string>
+    <string name="lock_reason_time_over">
+        Diese App ist in einer Kategorie, deren maximale Nutzungszeit erreicht wurde.
+    </string>
+    <string name="lock_reason_time_over_etra_time_can_be_used_later">
+        Diese App ist in einer Kategorie, deren maximale Nutzungszeit erreicht wurde.
+        Es gab noch Extra-Zeit, aber die maximale Nutzung der Extra-Zeit wurde erreicht.
+    </string>
+    <string name="lock_reason_missing_network_time">
+        Um festzustellen, ob diese App erlaubt sein sollte, wird die Uhrzeit benötigt.
+        Die Netzwerkzeitverifizierung ist aktiviert, aber sie ist fehlgeschlagen.
+    </string>
+    <string name="lock_reason_requires_current_device">
+        Um zu verhindern, dass die Zeit auf verschiedenen Geräten mehrfach genutzt wird,
+        muss immer ein einziges Gerät für die Nutzung zeitbegrenzter Apps gewählt werden.
+        Momentan ist nicht dieses Gerät ausgewählt.
+    </string>
+
+    <string name="lock_reason_short_no_category">keine Kategorie</string>
+    <string name="lock_reason_short_temporarily_blocked">vorübergehend gesperrt</string>
+    <string name="lock_reason_short_time_over">Zeit verbraucht</string>
+    <string name="lock_reason_short_blocked_time_area">Sperrzeit</string>
+    <string name="lock_reason_short_missing_network_time">Netzwerkzeit erforderlich</string>
+    <string name="lock_reason_short_requires_current_device">nicht als aktuelles Gerät gewählt</string>
+</resources>

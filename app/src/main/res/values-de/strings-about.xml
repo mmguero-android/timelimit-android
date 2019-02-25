@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="about_version">Version %s</string>
+
+    <string name="about_contact_title">Support</string>
+    <string name="about_contact_mail">
+        https://timelimit.io/de/#support
+        \nhttps://timelimit.io/de/dokumentation/
+    </string>
+
+    <string name="about_full_version">Vollversion</string>
+    <string name="about_full_version_not_in_local_mode">
+        Die Vollversion ist im lokalen Modus nicht verfügbar.
+    </string>
+    <string name="about_full_version_expired">
+        Sie haben die Vollversion nicht erworben bzw. die Vollversion ist abgelaufen.
+    </string>
+    <string name="about_full_version_until">
+        Die Vollversion ist gültig bis %s.
+    </string>
+    <string name="about_full_version_tap_hint">
+        Zum Erwerben oder Verlängern der Vollversion hier tippen.
+    </string>
+
+    <string name="about_contained_software_title">enthaltene Software</string>
+
+    <string name="about_diagnose_title">Fehlerdiagnose</string>
+    <string name="about_diagnose_text">Tippen Sie hier, um Details anzuzeigen, die bei einer Fehlerdiagnose helfen können</string>
+</resources>

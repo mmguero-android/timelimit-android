@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="login_user_selection_text">Chose an user to authenticate</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_btn_do">Log in</string>
+    <string name="login_snackbar_wrong">The password is invalid</string>
+    <string name="login_dialog_password_text">Enter your password to sign in</string>
+    <string name="login_assign_to_device">Set myself as current user of this device</string>
+    <string name="login_keep_logged_in_checkbox">Don\'t ask again at this device</string>
+    <string name="login_keep_logged_in_not_possible">You can only disable asking for a password on devices to which you were assigned.</string>
+    <string name="login_child_without_password">You can\'t sign in as %s because there was no password configured</string>
+    <string name="login_child_without_premium">Signing in as child requires the premium version</string>
+    <string name="login_child_already_current_user">You are already the current user of this device</string>
+    <string name="login_child_info">This will set you as the current user of this device</string>
+    <string name="login_child_done_toast">The user of this device was changed</string>
+</resources>

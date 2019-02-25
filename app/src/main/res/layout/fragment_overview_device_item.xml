@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="deviceTitle"
+            type="String" />
+
+        <variable
+            name="currentDeviceUserTitle"
+            type="String" />
+
+        <variable
+            name="hasManipulation"
+            type="Boolean" />
+
+        <variable
+            name="isCurrentDevice"
+            type="Boolean" />
+
+        <variable
+            name="isMissingRequiredPermission"
+            type="Boolean" />
+
+        <variable
+            name="didUninstall"
+            type="Boolean" />
+
+        <variable
+            name="isPasswordDisabled"
+            type="boolean" />
+
+        <variable
+            name="isConnected"
+            type="boolean" />
+
+        <variable
+            name="isUsingOlderVersion"
+            type="boolean" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.cardview.widget.CardView
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:id="@+id/card"
+            android:foreground="?selectableItemBackground"
+            app:cardUseCompatPadding="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:padding="8dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_smartphone_black_24dp"
+                    tools:text="Galaxy S8"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:text="@{deviceTitle}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_account_circle_black_24dp"
+                    android:visibility="@{currentDeviceUserTitle == null ? View.GONE : View.VISIBLE}"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    tools:text="Max Mustermann"
+                    android:text="@{currentDeviceUserTitle}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:visibility="@{isPasswordDisabled ? View.VISIBLE : View.GONE}"
+                    android:drawableStart="@drawable/ic_lock_open_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:text="@string/overview_device_item_password_disabled"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    tools:ignore="UnusedAttribute"
+                    android:drawableStart="@drawable/ic_wifi_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:visibility="@{isConnected ? View.VISIBLE : View.GONE}"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:text="@string/overview_device_item_connected"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    tools:ignore="UnusedAttribute"
+                    android:drawableTint="?colorPrimary"
+                    android:textColor="?colorPrimary"
+                    android:drawableStart="@drawable/ic_update_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:visibility="@{isUsingOlderVersion ? View.VISIBLE : View.GONE}"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:text="@string/overview_device_item_older_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    tools:ignore="UnusedAttribute"
+                    android:drawableTint="@color/orange"
+                    android:textColor="@color/orange"
+                    android:drawablePadding="8dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:visibility="@{safeUnbox(hasManipulation) ? View.VISIBLE : View.GONE}"
+                    android:drawableStart="@drawable/ic_warning_black_24dp"
+                    android:text="@string/overview_device_item_manipulation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    tools:ignore="UnusedAttribute"
+                    android:drawableTint="@color/orange"
+                    android:textColor="@color/orange"
+                    android:drawablePadding="8dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:visibility="@{safeUnbox(isMissingRequiredPermission) ? View.VISIBLE : View.GONE}"
+                    android:drawableStart="@drawable/ic_warning_black_24dp"
+                    android:text="@string/overview_device_item_missing_permission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    tools:ignore="UnusedAttribute"
+                    android:drawableTint="@color/orange"
+                    android:textColor="@color/orange"
+                    android:drawablePadding="8dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:visibility="@{safeUnbox(didUninstall) ? View.VISIBLE : View.GONE}"
+                    android:drawableStart="@drawable/ic_warning_black_24dp"
+                    android:text="@string/overview_device_item_uninstall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:visibility="@{safeUnbox(isCurrentDevice) ? View.VISIBLE : View.GONE}"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:text="@string/manage_device_is_this_device"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
+</layout>

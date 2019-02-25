@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="primary_device_title">Current device</string>
+    <string name="primary_device_description">
+        The current device is the device on which limited Apps can be used
+        if a child has got multiple devices.
+        This prevents that a child uses the time limit multiple times
+        if no synchronization between the devices is possible.
+        There can only be one current device per child.
+    </string>
+
+    <string name="primary_device_status_local_mode">
+        You are using the local mode.
+        Due to that, there is no need to select a current device.
+    </string>
+    <string name="primary_device_status_no_device">There is no current device selected</string>
+    <string name="primary_device_status_other_device">\"%s\" is the current device</string>
+    <string name="primary_device_status_this_device">This device is the current device</string>
+
+    <string name="primary_device_btn_assign_this">Set this device as current device</string>
+    <string name="primary_device_btn_unassign_this">Unset this device as current device</string>
+
+    <string name="primary_device_checkbox_relax">Allow using limited Apps at devices which are not the current device</string>
+
+</resources>

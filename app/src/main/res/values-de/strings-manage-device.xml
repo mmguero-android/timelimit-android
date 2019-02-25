@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_device_added_at">Hinzugefügt: %s</string>
+    <string name="manage_device_is_this_device">Das ist das Gerät, das Sie gerade vor sich haben</string>
+
+    <string name="manage_device_current_user_title">Benutzer des Geräts</string>
+    <string name="manage_device_current_user_none">Keine Angabe - keine Begrenzungen</string>
+
+    <string name="manage_device_network_time_verification_title">Netzwerkzeitverifizierung</string>
+    <string name="manage_device_network_time_verification_description">
+        TimeLimit kann auf das Internet zurückgreifen, um Manipulationen durch ein Verstellen der Systemzeit zu verhindern.
+        Hierbei wird eine Anfrage an den TimeLimit-Server gesendet.
+    </string>
+    <string name="manage_device_network_time_disabled">
+        Deaktivieren und die Systemzeit verwenden
+    </string>
+    <string name="manage_device_network_time_if_possible">
+        Verwenden, falls möglich, ansonsten die Systemzeit nutzen
+    </string>
+    <string name="manage_device_network_time_enabled">
+        Immer verwenden, ansonsten zeitbegrenzte Kategorien sperren
+    </string>
+
+    <string name="manage_device_permissions_usagestats_title">Berechtigung zum Nutzungsdatenzugriff</string>
+    <string name="manage_device_permissions_usagestats_text">
+        Der Nutzungsdatenzugriff ermöglicht es, die Nutzung des Gerätes zu erfassen.
+        Dies wird genutzt, um zu ermitteln, welche App genutzt wird, damit die Zeit gezählt werden kann oder die App gesperrt werden kann.
+    </string>
+
+    <string name="manage_device_permission_notification_access_title">Benachrichtigungszugriff</string>
+    <string name="manage_device_permission_notification_access_text">
+        Der Benachrichtigungszugriff wird von TimeLimit genutzt, um nicht nur Apps, sondern auch
+        deren Benachrichtigungen zu sperren.
+    </string>
+
+    <string name="manage_device_permission_device_admin_title">Geräte-Administrator</string>
+    <string name="manage_device_permission_device_admin_text_disabled">
+        Die Geräte-Administrator-Berechtigung wurde nicht gewährt. TimeLimit kann jederzeit über die Systemeinstellungen beendet werden.
+    </string>
+    <string name="manage_device_permission_device_admin_text_simple">
+        Die Geräte-Administrator-Berechtigung wurde gewährt.
+        Diese muss deaktiviert werden, bevor TimeLimit über die Systemeinstellungen beendet oder deinstalliert werden kann.
+        Diese Deaktivierung kann auch durch das Kind durchgeführt werden.
+    </string>
+    <string name="manage_device_permission_device_admin_text_password">
+        Die Geräte-Administrator-Berechtigung mit der Möglichkeit, das System bei einem Manipulationsversuch zu sperren, wurde gewährt.
+        Diese muss deaktiviert werden, bevor TimeLimit über die Systemeinstellungen beendet oder deinstalliert werden kann.
+        Falls Sie sich hierüber ausgesperrt haben, wenden Sie sich an den Support.
+    </string>
+    <string name="manage_device_permission_device_admin_text_owner">
+        Die Geräte-Besitzer-Berechtigung wurde gewährt und verhindert das Beenden und Deinstallieren von TimeLimit.
+        Diese Berechtigung kann nur durch TimeLimit bzw. ein Elternteil, das TimeLimit deinstalliert, deaktiviert werden.
+    </string>
+
+    <string name="manage_device_permission_tap_top_open_settings">
+        Berühren Sie diese Option, um den entsprechenden Bereich der Systemeinstellungen zu öffnen
+    </string>
+
+    <string name="manage_device_permission_open_at_target_device">
+        Öffnen Sie diesen Bildschirm am entsprechenden Gerät, um die Berechtigung festzulegen
+    </string>
+
+    <string name="manage_device_permission_status_granted">Die Berechtigung wurde erteilt</string>
+    <string name="manage_device_permission_status_not_granted">Die Berechtigung wurde nicht erteilt</string>
+    <string name="manage_device_permission_status_not_required">Die Berechtigung wird aufgrund der alten Android-Version nicht benötigt</string>
+    <string name="manage_device_permission_status_not_supported">Diese Funktion wird von diesem Gerät nicht unterstützt</string>
+
+    <string name="manage_device_downgrade_title">Downgrade</string>
+    <string name="manage_device_downgrade_text">Auf diesem Gerät wurde eine neuere Version von TimeLimit durch eine ältere ersetzt</string>
+
+    <string name="manage_device_rename">Gerät umbenennen</string>
+    <string name="manage_device_rename_toast_empty">Der Name für ein Gerät darf nicht leer sein</string>
+</resources>

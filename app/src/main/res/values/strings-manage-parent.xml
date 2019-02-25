@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_parent_change_password_title">Change password</string>
+    <string name="manage_parent_change_password_text">Set a new password knowing the old one</string>
+    <string name="manage_parent_change_password_old_password_hint">Current password</string>
+    <string name="manage_parent_change_password_toast_success">The password was changed</string>
+    <string name="manage_parent_change_password_toast_wrong_password">The old password is invalid</string>
+
+    <string name="manage_parent_restore_password_title" translatable="false">@string/restore_parent_password_title</string>
+    <string name="manage_parent_restore_password_text_require_mail">
+        This allows to set a new password without knowing the old one.
+        Access to %s is required for this.
+    </string>
+    <string name="manage_parent_restore_password_text_not_possible">
+        The password recovery is not possible because no mail address was linked.
+    </string>
+    <string name="manage_parent_remove_user_title">Remove user</string>
+    <string name="manage_parent_remove_user_text">
+        To delete %1$s, you need the password of %1$s
+        and the password of an other parent account.
+        This should prevent that you lock out yourself.
+        If you don\'t know the password of %1$s and you can\'t use the password recovery,
+        then get in touch with the support.
+    </string>
+    <string name="manage_parent_remove_user_status_last_linked">
+        You are using the connected mode and this user is the last one with a linked mail address.
+        You must link an other user before you can delete this one.
+    </string>
+    <string name="manage_parent_remove_user_status_not_authenticated">
+        Sign in with an other user to delete %1$s.
+    </string>
+    <string name="manage_parent_remove_user_status_wrong_account">
+        You are logged in as %1$s. Sign in as an other user.
+    </string>
+    <string name="manage_parent_remove_user_status_ready">
+        Enter the password of %1$s to delete %1$s.
+    </string>
+
+    <string name="manage_parent_notifications_title">Mail notifications</string>
+    <string name="manage_parent_notifications_needs_linked_mail">You have to link a mail address to use this feature</string>
+    <string name="manage_parent_notifications_checkbox_manipulation">Manipulation warnings</string>
+</resources>

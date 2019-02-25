@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="add_user_title">Benutzer hinzufügen</string>
+    <string name="add_user_hint_name">Name des Benutzers</string>
+    <string name="add_user_type_parent">Elternteil</string>
+    <string name="add_user_type_child">Kind</string>
+    <string name="add_user_confirmation_done">Benutzer wurde erstellt</string>
+    <string name="add_user_child_password_info">Wenn Sie ein Passwort für das Kind wählen,
+        dann kann das Kind sich selbst an einem Gerät anmelden mit seinem Passwort.
+    </string>
+
+    <string name="add_user_authentication_required_text">
+        Zum Hinzufügen von Benutzern muss sich ein Elternteil anmelden
+    </string>
+
+    <string name="add_user_authentication_required_btn">Anmelden</string>
+</resources>

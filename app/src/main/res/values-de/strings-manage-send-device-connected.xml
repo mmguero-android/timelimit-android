@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_send_device_connected_title">Verbindungsstatus anzeigen</string>
+    <string name="manage_send_device_connected_info">Dies ermöglicht es Ihnen, an anderen Geräten zu sehen, ob dieses Gerät verbunden ist/ ob TimeLimit noch aktiv ist.</string>
+    <string name="manage_send_device_connected_error_offline">Sie können diese Funktion nur im vernetzten Modus verwenden</string>
+    <string name="manage_send_device_connected_error_wrong_device">Sie können diese Einstellung nur am entsprechenden Gerät ändern</string>
+    <string name="manage_send_device_connected_checkbox">Anzeigen, dass dieses Gerät verbunden ist</string>
+</resources>

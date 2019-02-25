@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_disable_time_limits_title">Disable time limits</string>
+    <string name="manage_disable_time_limits_text">All time limits and blocked time areas for %s are disabled</string>
+    <string name="manage_disable_time_limits_info_enabled">Time limits are disabled until %s</string>
+
+    <string name="manage_disable_time_limits_btn_enable">Enable time limits again</string>
+    <string name="manage_disable_time_limits_btn_10_min">for 10 minutes</string>
+    <string name="manage_disable_time_limits_btn_30_min">for 30 minutes</string>
+    <string name="manage_disable_time_limits_btn_1_hour">for 1 hour</string>
+    <string name="manage_disable_time_limits_btn_2_hour">for 2 hours</string>
+    <string name="manage_disable_time_limits_btn_4_hour">for 4 hours</string>
+    <string name="manage_disable_time_limits_btn_today">for today</string>
+    <string name="manage_disable_time_limits_btn_time">until a time</string>
+    <string name="manage_disable_time_limits_btn_date">until a date</string>
+
+    <string name="manage_disable_time_limits_dialog_until">Disable time limits until ...</string>
+    <string name="manage_disable_time_limits_toast_time_in_past">The selected time is in the past</string>
+</resources>

@@ -1,0 +1,124 @@
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="io.timelimit.android.ui.authentication.AuthenticateByMailFragment">
+
+    <data>
+        <variable
+            name="mailAddressToWhichCodeWasSent"
+            type="String" />
+
+        <variable
+            name="usingDefaultServer"
+            type="boolean" />
+
+        <import type="android.text.TextUtils" />
+        <import type="android.view.View" />
+        <import type="io.timelimit.android.BuildConfig" />
+    </data>
+
+    <ViewSwitcher
+        android:id="@+id/switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:padding="8dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:visibility="@{(usingDefaultServer &amp;&amp; BuildConfig.useGoogleApis &amp;&amp; TextUtils.isEmpty(mailAddressToWhichCodeWasSent)) ? View.VISIBLE : View.GONE}"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/authenticate_by_mail_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.gms.common.SignInButton
+                        android:id="@+id/sign_in_with_google_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:text="@string/authenticate_by_mail_google_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@color/divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1px" />
+                </LinearLayout>
+
+                <TextView
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:text="@string/authenticate_by_mail_other_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:text="@string/authenticate_by_mail_other_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:visibility="@{TextUtils.isEmpty(mailAddressToWhichCodeWasSent) ? View.VISIBLE : View.GONE}"
+                    android:id="@+id/mail_edit"
+                    android:hint="@string/authenticate_by_mail_hint_mail"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:imeOptions="actionGo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:visibility="@{TextUtils.isEmpty(mailAddressToWhichCodeWasSent) ? View.GONE : View.VISIBLE}"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    tools:text="@string/authenticate_by_mail_message_sent"
+                    android:text="@{@string/authenticate_by_mail_message_sent(mailAddressToWhichCodeWasSent)}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:visibility="@{TextUtils.isEmpty(mailAddressToWhichCodeWasSent) ? View.GONE : View.VISIBLE}"
+                    android:id="@+id/code_edit"
+                    android:imeOptions="actionGo"
+                    android:hint="@string/authenticate_by_mail_hint_code"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <include layout="@layout/circular_progress_indicator" />
+    </ViewSwitcher>
+
+</layout>

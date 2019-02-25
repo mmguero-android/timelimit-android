@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="category_time_limit_rules">Zeitbegrenzungen</string>
+    <string name="category_time_limit_rules_about">
+        Hier können Sie Zeitbegrenzungsregeln einstellen.
+        Jede Regel entspricht einem Grenzwert.
+        Regeln, bei denen mehrere Tage gewählt wurden,
+        begrenzen die Gesamtnutzungsdauer in einer Woche an den gewählten Tagen.
+        Regeln, bei denen nur ein Tag gewählt wurde, begrenzen nur diesen Tag.
+    </string>
+    <string name="category_time_limit_rules_applied_to_extra_time">gilt auch für ggf. vorhandene Extra-Zeit</string>
+    <string name="category_time_limit_rule_dialog_new">Regel erstellen</string>
+    <string name="category_time_limit_rule_dialog_edit">Regel bearbeiten</string>
+    <string name="category_time_limit_rules_apply_to_extra_time">Auch auf die Extra-Zeit anwenden</string>
+
+    <string name="category_time_limit_rules_snackbar_created">Regel wurde erstellt</string>
+    <string name="category_time_limit_rules_snackbar_updated">Regel wurde geändert</string>
+    <string name="category_time_limit_rules_snackbar_deleted">Regel wurde gelöscht</string>
+
+    <string name="category_time_limit_rules_warning_multiple_days">Diese Regel
+        wird die Gesamtnutzungsdauer in einer Woche an den gewählten Tagen einschränken.
+        Wenn Sei die Begrenzung je Tag wollen, dann erstellen Sie eine Regel je Tag.
+    </string>
+</resources>

@@ -1,0 +1,75 @@
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="io.timelimit.android.ui.manage.device.add.AddDeviceFragment">
+
+    <data>
+        <variable
+            name="token"
+            type="String" />
+
+        <variable
+            name="message"
+            type="String" />
+
+        <import type="android.view.View" />
+        <import type="android.text.TextUtils" />
+    </data>
+
+    <LinearLayout
+        android:padding="8dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textAppearance="?android:textAppearanceLarge"
+            android:text="@string/add_device"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:visibility="@{TextUtils.isEmpty(token) &amp;&amp; TextUtils.isEmpty(message) ? View.VISIBLE : View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:visibility="@{TextUtils.isEmpty(message) ? View.GONE : View.VISIBLE}"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@{message}"
+            tools:text="Das Gerät XYZ-Test wurde hinzugefügt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:visibility="@{TextUtils.isEmpty(token) ? View.GONE : View.VISIBLE}"
+            android:textColor="?colorAccent"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:text="@{token}"
+            tools:text="Alphabet Test Zeichenfolge Kopplung Sicherheit Schlüssel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:visibility="@{TextUtils.isEmpty(token) ? View.GONE : View.VISIBLE}"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/add_device_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</layout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="setup_parent_mode_create_family">Familie erstellen</string>
+    <string name="setup_parent_mode_add_device">Ein neues Gerät zu einer bestehenden Familie hinzufügen</string>
+    <string name="setup_parent_mode_explaination_user_name">
+        Die Angabe des Namens wird verwendet, um Ihnen die Zuordnung der verschiedenden Benutzer in der Familie zu ermöglichen
+    </string>
+    <string name="setup_parent_mode_field_name_hint">Ihr Vorname</string>
+    <string name="setup_parent_mode_explaination_password">
+        Das Passwort wird abgefragt, wenn Sie Änderungen an den Einstellungen von TimeLimit durchführen möchten.
+        Sie können Ihr Passwort jederzeit zurücksetzen, wenn Sie nachweisen, dass Sie einen Zugang zu %s haben.
+        Es kann für jedes Elternteil ein eigener Benutzer (mit jeweils eigenem Passwort) erstellt werden.
+    </string>
+    <string name="setup_parent_mode_explaination_device_title">Jedes Gerät bekommt einen Namen zugewiesen, damit Sie es besser zuordnen können</string>
+    <string name="setup_parent_mode_explaination_device_title_field_hint">Gerät-Name</string>
+</resources>

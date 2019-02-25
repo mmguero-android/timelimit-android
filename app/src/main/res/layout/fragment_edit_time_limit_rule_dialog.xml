@@ -1,0 +1,119 @@
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="io.timelimit.android.ui.manage.category.timelimit_rules.edit.EditTimeLimitRuleDialogFragment">
+
+    <data>
+        <variable
+            name="isNewRule"
+            type="Boolean" />
+
+        <variable
+            name="applyToExtraTime"
+            type="Boolean" />
+
+        <variable
+            name="handlers"
+            type="io.timelimit.android.ui.manage.category.timelimit_rules.edit.Handlers" />
+
+        <variable
+            name="affectsMultipleDays"
+            type="boolean" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout
+        android:padding="8dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textAppearance="?android:textAppearanceLarge"
+            tools:text="@string/category_time_limit_rule_dialog_new"
+            android:text="@{safeUnbox(isNewRule) ? @string/category_time_limit_rule_dialog_new : @string/category_time_limit_rule_dialog_edit}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include layout="@layout/view_select_days" android:id="@+id/day_selection" />
+
+        <View
+            android:background="@color/gray"
+            android:layout_width="match_parent"
+            android:layout_height="1px" />
+
+        <CheckBox
+            android:onClick="@{() -> handlers.updateApplyToExtraTime(!safeUnbox(applyToExtraTime))}"
+            android:checked="@{safeUnbox(applyToExtraTime)}"
+            android:text="@string/category_time_limit_rules_apply_to_extra_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:background="@color/gray"
+            android:layout_width="match_parent"
+            android:layout_height="1px" />
+
+        <View
+            android:background="@color/gray"
+            android:layout_width="match_parent"
+            android:layout_height="1px" />
+
+        <io.timelimit.android.ui.view.SelectTimeSpanView
+            android:id="@+id/time_span"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:visibility="@{affectsMultipleDays ? View.VISIBLE : View.GONE}"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/category_time_limit_rules_warning_multiple_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="0dp" />
+
+            <Button
+                android:onClick="@{() -> handlers.onDeleteRule()}"
+                android:visibility="@{safeUnbox(isNewRule) ? View.GONE : View.VISIBLE}"
+                android:textColor="@color/red"
+                android:background="?selectableItemBackground"
+                android:text="@string/generic_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:onClick="@{() -> handlers.onSaveRule()}"
+                tools:text="@string/generic_create"
+                android:text="@{safeUnbox(isNewRule) ? @string/generic_create : @string/generic_save}"
+                android:background="?selectableItemBackground"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

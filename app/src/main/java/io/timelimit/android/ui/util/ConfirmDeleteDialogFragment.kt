@@ -1,0 +1,41 @@
+/*
+ * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.timelimit.android.ui.util
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.timelimit.android.databinding.ConfirmDeleteDialogBinding
+
+abstract class ConfirmDeleteDialogFragment: BottomSheetDialogFragment(), ConfirmDeleteDialogFragmentHandlers {
+    lateinit var binding: ConfirmDeleteDialogBinding
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = ConfirmDeleteDialogBinding.inflate(inflater, container, false)
+
+        binding.handlers = this
+
+        return binding.root
+    }
+
+    abstract override fun onConfirmDeletion()
+}
+
+interface ConfirmDeleteDialogFragmentHandlers {
+    fun onConfirmDeletion()
+}

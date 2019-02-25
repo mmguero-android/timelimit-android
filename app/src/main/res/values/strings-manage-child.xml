@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_child_tab_categories">Categories</string>
+    <string name="manage_child_tab_other">Other</string>
+    <string name="manage_child_block_temporarily_title">block temporarily</string>
+    <string name="manage_child_block_temporarily_text">
+        Select categories which should be blocked temporarily.
+        Temporarily does not mean that the blocking is disabled automatically.
+        If you need a recurring blocking, use blocked time areas.
+    </string>
+
+    <string name="manage_child_category_no_time_limits">no time limit</string>
+
+    <string name="manage_child_categories_intro_title">Categories</string>
+    <string name="manage_child_categories_intro_text">
+        TimeLimit manages the limits using categories.
+        You can select multiple Apps and limits per category.
+        This allows for example to set one limit for all games.
+    </string>
+
+    <string name="manage_child_manipulation_title" translatable="false">@string/manage_device_manipulation_title</string>
+    <string name="manage_child_manipulation_text">
+        There was a manipulation at a device of this child.
+        Go back to the overview and open the corresponding device entry for details.
+    </string>
+
+    <string name="manage_child_category_for_unassigned_apps">used for Apps without category</string>
+    <string name="manage_child_category_is_child">Child category of %s</string>
+
+    <string name="manage_child_timezone_title">Timezone</string>
+    <string name="manage_child_timezone_change_button">Change timezone</string>
+    <string name="manage_child_timezone_search_hint">Search timezone</string>
+
+    <string name="manage_child_password_title">Child password</string>
+    <string name="manage_child_password_info">A child with a password
+        can set itself as the current user of a device
+        (using the authentication screen which is opened by the lock button at the bottom right)
+    </string>
+    <string name="manage_child_password_status_yes">This child has got a password</string>
+    <string name="manage_child_password_status_no">This child does not have a password</string>
+    <string name="manage_child_password_btn_set">Set password (for parents)</string>
+    <string name="manage_child_password_btn_change">Change password (for the child itself)</string>
+</resources>

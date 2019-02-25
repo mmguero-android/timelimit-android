@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="overview_header_devices">Devices</string>
+    <string name="overview_header_users">Users</string>
+    <string name="overview_add_device">Add device</string>
+    <string name="overview_add_error_local_mode">
+        You have set up TimeLimit in the local mode.
+        There is no linking, therefore you can not add devices.
+    </string>
+
+    <string name="overview_intro_title">Welcome to TimeLimit</string>
+    <string name="overview_intro_text">
+        This is the overview. Here you can see devices and users (maybe you have to scroll first).
+        \n\nUnder devices, you can see the status of a device and assign a user.
+        \n\nUnder users, you can configure the allowed Apps and time limits.
+    </string>
+    <string name="overview_intro_swipe_to_dismiss">You can remove this message by swiping it to the right</string>
+
+    <string name="overview_device_item_manipulation">There was a manipulation on this device</string>
+    <string name="overview_device_item_missing_permission">A required permission was not granted on this device</string>
+    <string name="overview_device_item_uninstall">TimeLimit was uninstalled at this device</string>
+    <string name="overview_device_item_password_disabled">Asking for password was disabled at this device</string>
+    <string name="overview_device_item_connected">Connected</string>
+    <string name="overview_device_item_older_version">uses an older TimeLimit version</string>
+
+    <string name="overview_user_item_temporarily_blocked">temporarily blocked</string>
+    <string name="overview_user_item_temporarily_disabled">Time limits temporarily disabled</string>
+    <string name="overview_user_item_role_child">is restricted</string>
+    <string name="overview_user_item_role_parent">can change settings</string>
+
+    <string name="overview_finish_setup_title">Finish setup</string>
+    <string name="overview_finish_setup_text">You could setup timelimit manually now. However, here you can do it more easily.</string>
+
+    <string name="overview_server_message">Message</string>
+</resources>

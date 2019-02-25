@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_parent_change_password_title">Passwort ändern</string>
+    <string name="manage_parent_change_password_text">Mit der Kentniss des aktuellen Passworts ein neues Passwort wählen</string>
+    <string name="manage_parent_change_password_old_password_hint">aktuelles Passwort</string>
+    <string name="manage_parent_change_password_toast_success">Das Passwort wurde geändert</string>
+    <string name="manage_parent_change_password_toast_wrong_password">Das alte Passwort ist falsch</string>
+
+    <string name="manage_parent_restore_password_text_require_mail">
+        Dies ermöglicht es, ein neues Passwort festzulegen, ohne das alte Passwort zu kennen.
+        Hierfür wird ein Zugang zu %1$s benötigt.
+    </string>
+    <string name="manage_parent_restore_password_text_not_possible">
+        Die Passwortwiederherstellung ist nicht möglich, da keine E-Mail-Adresse verknüpft wurde.
+    </string>
+    <string name="manage_parent_remove_user_title">Benutzer entfernen</string>
+    <string name="manage_parent_remove_user_text">
+        Um %1$s zu löschen, wird das Passwort von %1$s
+        und das Passwort eines anderen Elternteils benötigt.
+        Damit soll verhindert werden, dass Sie sich aussperren.
+        Falls Sie das Passwort von %1$s nicht haben und Sie die Passwortwiederherstellung nicht nutzen können,
+        wenden Sie sich an den Support.
+    </string>
+    <string name="manage_parent_remove_user_status_last_linked">
+        Sie sind im vernetzen Modus und dieser Benutzer ist der letzte, mit dem eine E-Mail-Adresse verknüpft wurde.
+        Sie müssen einen anderen Benutzer verknüpfen, bevor Sie diesen löschen können.
+    </string>
+    <string name="manage_parent_remove_user_status_not_authenticated">
+        Melden Sie sich mit einem anderen Benutzer an, um %1$s zu löschen.
+    </string>
+    <string name="manage_parent_remove_user_status_wrong_account">
+        Sie sind als %1$s angemeldet. Melden Sie sich als einen anderen Benutzer an.
+    </string>
+    <string name="manage_parent_remove_user_status_ready">
+        Geben Sie das Passwort von %1$s ein, um %1$s zu löschen.
+    </string>
+
+    <string name="manage_parent_notifications_title">Benachrichtigungs-E-Mails</string>
+    <string name="manage_parent_notifications_needs_linked_mail">Sie müssen eine E-Mail-Adresse hinterlegen, um diese Funktion zu benutzen</string>
+    <string name="manage_parent_notifications_checkbox_manipulation">Manipulationswarnungen</string>
+</resources>

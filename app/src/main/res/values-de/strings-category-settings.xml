@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="category_settings">Verwaltung</string>
+    <string name="category_settings_rename">Kategorie umbenennen</string>
+    <string name="category_settings_rename_empty">Der neue Name darf nicht leer sein</string>
+    <string name="category_settings_delete">Kategorie löschen</string>
+    <string name="category_settings_extra_time_title">Extrazeit</string>
+    <string name="category_settings_extra_time_info">
+        Die Extrazeit ermöglicht (sofern nicht durch entsprechende Regeln eingschränkt) die Nutzung über die normale Nutzungsdauer hinaus. Sie wird erst nach dem Verbrauch der regulären Zeit verbraucht und verfällt sonst nicht.
+    </string>
+    <string name="category_settings_extra_time_change">Extrazeit ändern</string>
+    <string name="category_settings_extra_time_change_toast">Die neue Extrazeit wurde gespeichert</string>
+
+    <string name="category_settings_delete_dialog">Möchten Sie die Kategorie %s löschen?</string>
+
+    <string name="category_settings_parent_category_title">Ober-Kategorie</string>
+    <string name="category_settings_parent_category_intro">Wenn die Oberkategorie einer Kategorie blockiert ist (z.B. weil die Zeit verbraucht wurde), dann wird auch die Unterkategorie blockiert.  Wenn die Unterkategorie verwendet wird, dann wird die Nutzungsdauer auch zur Ober-Kategorie hinzugefügt.</string>
+    <string name="category_settings_parent_category_already_used_as_parent">Sie können keine Oberkategorie wählen, weil diese Kategorie bereits die Oberkategorie für eine andere Kategorie ist.</string>
+    <string name="category_settings_parent_category_assigned_to">Diese Kategorie ist eine Unterkategorie von %s.</string>
+    <string name="category_settings_parent_category_button">Oberkategorie wählen</string>
+    <string name="category_settings_parent_category_none">keine Oberkategorie</string>
+</resources>

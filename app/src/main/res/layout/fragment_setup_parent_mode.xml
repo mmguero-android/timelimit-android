@@ -1,0 +1,135 @@
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="io.timelimit.android.ui.setup.parent.SetupParentModeFragment">
+
+    <data>
+        <variable
+            name="isNewFamily"
+            type="Boolean" />
+
+        <variable
+            name="mail"
+            type="String" />
+
+        <variable
+            name="enableOkButton"
+            type="Boolean" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <io.timelimit.android.ui.view.SafeViewFlipper
+        android:id="@+id/switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:id="@+id/scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <FrameLayout
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <androidx.cardview.widget.CardView
+                    app:cardUseCompatPadding="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:padding="8dp"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceLarge"
+                            tools:text="@string/setup_parent_mode_create_family"
+                            android:text="@{safeUnbox(isNewFamily) ? @string/setup_parent_mode_create_family : @string/setup_parent_mode_add_device}"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:text="@string/setup_parent_mode_explaination_user_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:inputType="textPersonName"
+                            android:id="@+id/prename"
+                            android:visibility="@{safeUnbox(isNewFamily) ? View.VISIBLE : View.GONE}"
+                            android:hint="@string/setup_parent_mode_field_name_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:visibility="@{safeUnbox(isNewFamily) ? View.VISIBLE : View.GONE}"
+                            tools:text="@string/setup_parent_mode_explaination_password"
+                            android:text="@{@string/setup_parent_mode_explaination_password(mail)}"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <io.timelimit.android.ui.view.SetPasswordView
+                            android:visibility="@{safeUnbox(isNewFamily) ? View.VISIBLE : View.GONE}"
+                            android:id="@+id/password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="@string/setup_parent_mode_explaination_device_title"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:inputType="text"
+                            android:id="@+id/device_name"
+                            android:hint="@string/setup_parent_mode_explaination_device_title_field_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceSmall"
+                            android:text="@string/purchase_demo_temporarily_notice"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <Button
+                            android:background="?selectableItemBackground"
+                            android:enabled="@{safeUnbox(enableOkButton)}"
+                            android:id="@+id/ok"
+                            android:layout_gravity="end"
+                            android:text="@string/generic_ok"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
+        </ScrollView>
+
+        <FrameLayout
+            android:id="@+id/mail_auth_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include layout="@layout/circular_progress_indicator" />
+
+    </io.timelimit.android.ui.view.SafeViewFlipper>
+</layout>

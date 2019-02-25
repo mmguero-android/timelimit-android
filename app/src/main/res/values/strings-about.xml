@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="about_version">Version %s</string>
+
+    <string name="about_contact_title">Support</string>
+    <string name="about_contact_mail">
+        https://timelimit.io/en/#support
+    </string>
+
+    <string name="about_full_version">Premium version</string>
+    <string name="about_full_version_not_in_local_mode">
+        The premium version is not available in the local mode.
+    </string>
+    <string name="about_full_version_expired">
+        You did not buy the premium version or the premium version expired.
+    </string>
+    <string name="about_full_version_until">
+        You have got the premium version until %s.
+    </string>
+    <string name="about_full_version_tap_hint">
+        Tap here to buy or extend the premium version.
+    </string>
+
+    <string name="about_contained_software_title">contained Software</string>
+    <string name="about_contained_software_text" translatable="false">
+        Kotlin Standard Library
+        (<a href="https://github.com/JetBrains/kotlin/blob/master/license/LICENSE.txt">Apache License, Version 2.0</a>)
+        \nKotlin Coroutines
+        (<a href="https://github.com/JetBrains/kotlin/blob/master/license/LICENSE.txt">Apache License, Version 2.0</a>)
+        \nAndroid X
+        (<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
+        \nAndroid Navigation Component
+        (<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
+        \nAndroid Room
+        (<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
+        \nAndroid X Paging Library
+        (<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
+        \nAndroid Work Manager
+        (<a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>)
+        \n<a href="https://github.com/jaredrummler/AndroidDeviceNames">Android Device Names</a>
+        (<a href="https://github.com/jaredrummler/AndroidDeviceNames/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
+        \n<a href="https://github.com/JakeWharton/ThreeTenABP">Three Ten Android Backport</a>
+        (<a href="https://github.com/JakeWharton/ThreeTenABP/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
+        \n<a href="https://github.com/jeremyh/jBCrypt">JBcrypt</a>
+        (<a href="https://github.com/jeremyh/jBCrypt/blob/master/LICENSE">ISC license</a>)
+        \n<a href="https://github.com/KeepSafe/TapTargetView">TapTargetView</a>
+        (<a href="https://github.com/KeepSafe/TapTargetView/blob/master/LICENSE">Apache License, Version 2.0</a>
+        \n<a href="https://github.com/google/flexbox-layout">Flexbox Layout</a>
+        (<a href="https://github.com/google/flexbox-layout/blob/master/LICENSE">Apache License, Version 2.0</a>)
+        \nGoogle Play Authentication Service (only in builds with google services)
+        \n<a href="https://github.com/serso/android-checkout">Checkout</a>
+        (<a href="https://github.com/serso/android-checkout/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
+        \n<a href="https://github.com/square/okhttp">OkHttp</a>
+        (<a href="https://github.com/square/okhttp/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
+        \n<a href="https://github.com/socketio/socket.io-client-java">Socket.io-Java-Client</a>
+        (<a href="https://github.com/socketio/socket.io-client-java/blob/master/LICENSE">MIT License</a>)
+    </string>
+
+    <string name="about_diagnose_title">Error diagnose</string>
+    <string name="about_diagnose_text">Tap here to access details which help diagnosing errors</string>
+</resources>

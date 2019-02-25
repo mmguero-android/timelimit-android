@@ -1,0 +1,160 @@
+/*
+ * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.timelimit.android.ui.manage.category.timelimit_rules
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import io.timelimit.android.R
+import io.timelimit.android.async.Threads
+import io.timelimit.android.data.Database
+import io.timelimit.android.data.extensions.getDateLive
+import io.timelimit.android.data.model.HintsToShow
+import io.timelimit.android.data.model.TimeLimitRule
+import io.timelimit.android.livedata.map
+import io.timelimit.android.livedata.switchMap
+import io.timelimit.android.logic.AppLogic
+import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.actions.CreateTimeLimitRuleAction
+import io.timelimit.android.sync.actions.UpdateTimeLimitRuleAction
+import io.timelimit.android.ui.main.ActivityViewModel
+import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
+import io.timelimit.android.ui.manage.category.timelimit_rules.edit.EditTimeLimitRuleDialogFragment
+import io.timelimit.android.ui.manage.category.timelimit_rules.edit.EditTimeLimitRuleDialogFragmentListener
+import kotlinx.android.synthetic.main.fragment_category_time_limit_rules.*
+
+class CategoryTimeLimitRulesFragment : Fragment(), EditTimeLimitRuleDialogFragmentListener {
+    companion object {
+        fun newInstance(params: ManageCategoryFragmentArgs): CategoryTimeLimitRulesFragment {
+            val result = CategoryTimeLimitRulesFragment()
+            result.arguments = params.toBundle()
+            return result
+        }
+    }
+
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(arguments!!) }
+    private val database: Database by lazy { logic.database }
+    private val rules: LiveData<List<TimeLimitRule>> by lazy { database.timeLimitRules().getTimeLimitRulesByCategory(params.categoryId) }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_category_time_limit_rules, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val adapter = Adapter()
+
+        recycler.layoutManager = LinearLayoutManager(context!!)
+        recycler.adapter = adapter
+
+        val userDate = database.user().getUserByIdLive(params.childId).getDateLive(logic.realTimeLogic)
+
+        val usedTimeItems = userDate.switchMap {
+            date ->
+
+            database.usedTimes().getUsedTimesOfWeek(
+                    categoryId = params.categoryId,
+                    firstDayOfWeekAsEpochDay = date.dayOfEpoch - date.dayOfWeek
+            )
+        }
+
+        val hasHiddenIntro = database.config().wereHintsShown(HintsToShow.TIME_LIMIT_RULE_INTRODUCTION)
+
+        rules.map { rules ->
+            rules.sortedBy { it.dayMask }.map { TimeLimitRuleRuleItem(it) }
+        }.switchMap {
+            val baseList = it + listOf(AddTimeLimitRuleItem)
+
+            hasHiddenIntro.map { hasHiddenIntro ->
+                if (hasHiddenIntro) {
+                    baseList
+                } else {
+                    listOf(TimeLimitRuleIntroductionItem) + baseList
+                }
+            }
+        }.observe(this, Observer {
+            adapter.data = it
+        })
+
+        usedTimeItems.observe(this, Observer {
+            usedTimes ->
+
+            adapter.usedTimes = (0..6).map { usedTimes[it]?.usedMillis ?: 0 } }
+        )
+
+        adapter.handlers = object: Handlers {
+            override fun onTimeLimitRuleClicked(rule: TimeLimitRule) {
+                if (auth.requestAuthenticationOrReturnTrue()) {
+                    EditTimeLimitRuleDialogFragment.newInstance(rule, this@CategoryTimeLimitRulesFragment).show(fragmentManager!!)
+                }
+            }
+
+            override fun onAddTimeLimitRuleClicked() {
+                if (auth.requestAuthenticationOrReturnTrue()) {
+                    EditTimeLimitRuleDialogFragment.newInstance(params.categoryId, this@CategoryTimeLimitRulesFragment).show(fragmentManager!!)
+                }
+            }
+
+            override fun onConfirmIntroduction() {
+                Threads.database.execute {
+                    database.config().setHintsShownSync(HintsToShow.TIME_LIMIT_RULE_INTRODUCTION)
+                }
+            }
+        }
+    }
+
+    override fun notifyRuleCreated() {
+        Snackbar.make(view!!, R.string.category_time_limit_rules_snackbar_created, Snackbar.LENGTH_SHORT)
+                .show()
+    }
+
+    override fun notifyRuleDeleted(oldRule: TimeLimitRule) {
+        Snackbar.make(view!!, R.string.category_time_limit_rules_snackbar_deleted, Snackbar.LENGTH_SHORT)
+                .setAction(R.string.generic_undo) {
+                    auth.tryDispatchParentAction(
+                            CreateTimeLimitRuleAction(
+                                    rule = oldRule
+                            )
+                    )
+                }
+                .show()
+    }
+
+    override fun notifyRuleUpdated(oldRule: TimeLimitRule, newRule: TimeLimitRule) {
+        Snackbar.make(view!!, R.string.category_time_limit_rules_snackbar_updated, Snackbar.LENGTH_SHORT)
+                .setAction(R.string.generic_undo) {
+                    auth.tryDispatchParentAction(
+                            UpdateTimeLimitRuleAction(
+                                    ruleId = oldRule.id,
+                                    applyToExtraTimeUsage = oldRule.applyToExtraTimeUsage,
+                                    maximumTimeInMillis = oldRule.maximumTimeInMillis,
+                                    dayMask = oldRule.dayMask
+                            )
+                    )
+                }
+                .show()
+    }
+}

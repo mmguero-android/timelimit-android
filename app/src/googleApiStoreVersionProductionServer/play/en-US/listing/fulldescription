@@ -1,0 +1,15 @@
+With TimeLimit, you can limit the usage duration flexibly. You can freely select times at which the usage is blocked, e.g. to prevent that games are played very late. You can chose different settings for different Apps.
+
+Depending on the version, you can add extra time, e.g. as reward. This can be set freely and is spent automatically when the regular limit was reached. Additionally, it's possible to limit the usage of extra time.
+
+Depending on the version, you can disable the time limits temporarily.
+
+There exists a connected mode. In this mode, you can change the settings from every device. Additionally, in the premium version you can temporarily block devices remotely.
+
+Moreover, you can assign one user to multiple devices in the premium version. The user can select one device for using it. The times are then added across all devices.
+
+Depending on the Android version, TimeLimit uses the permission for the usage stats access or the GET_TASKS permission. These are only used to detect the currently used App. Based on the currently used App, the App is blocked, allowed, or the remaining time is calculated.
+
+The device admin permission is used to detect an uninstallation of TimeLimit.
+
+TimeLimit uses the notification access to block notifications of blocked apps. Notifications and their contents are not saved.

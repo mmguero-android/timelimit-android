@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:icon="@drawable/ic_apps_white_24dp"
+        android:id="@+id/manage_category_tab_apps"
+        android:title="@string/category_apps_title"
+        app:showAsAction="always"
+        />
+    <item
+        android:icon="@drawable/ic_alarm_white_24dp"
+        android:id="@+id/manage_category_tab_time_limit_rules"
+        android:title="@string/category_time_limit_rules"
+        app:showAsAction="always"
+        />
+    <item
+        android:icon="@drawable/ic_time_white_24dp"
+        android:id="@+id/manage_category_tab_blocked_time_areas"
+        android:title="@string/blocked_time_areas"
+        app:showAsAction="always"
+        />
+    <item
+        android:icon="@drawable/ic_history_black_24dp"
+        android:id="@+id/manage_category_tab_usage_log"
+        android:title="@string/usage_history_title"
+        app:showAsAction="always"
+        />
+    <item
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:id="@+id/manage_category_tab_settings"
+        android:title="@string/category_settings"
+        app:showAsAction="always"
+        />
+</menu>

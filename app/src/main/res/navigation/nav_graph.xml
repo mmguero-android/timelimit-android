@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/overviewFragment">
+
+    <fragment
+        android:id="@+id/overviewFragment"
+        android:name="io.timelimit.android.ui.overview.main.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_overview" >
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_overviewFragment_to_manageChildFragment"
+            app:destination="@id/manageChildFragment" />
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_overviewFragment_to_addUserFragment"
+            app:destination="@id/addUserFragment" />
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_overviewFragment_to_setupTermsFragment"
+            app:destination="@id/setupTermsFragment" />
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_overviewFragment_to_manageDeviceFragment"
+            app:destination="@id/manageDeviceFragment" />
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_overviewFragment_to_purchaseFragment"
+            app:destination="@id/purchaseFragment" />
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_overviewFragment_to_manageParentFragment"
+            app:destination="@id/manageParentFragment" />
+        <action
+            android:id="@+id/action_overviewFragment_to_setupDeviceFragment"
+            app:destination="@id/setupDeviceFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_overviewFragment_to_diagnoseMainFragment"
+            app:destination="@id/diagnoseMainFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageChildFragment"
+        android:name="io.timelimit.android.ui.manage.child.ManageChildFragment"
+        android:label="fragment_manage_child"
+        tools:layout="@layout/fragment_manage_child" >
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_manageChildFragment_to_manageCategoryFragment"
+            app:destination="@id/manageCategoryFragment" />
+        <argument
+            android:name="childId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageCategoryFragment"
+        android:name="io.timelimit.android.ui.manage.category.ManageCategoryFragment"
+        android:label="fragment_manage_category"
+        tools:layout="@layout/fragment_manage_category" >
+        <argument
+            android:name="childId"
+            app:argType="string" />
+        <argument
+            android:name="categoryId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/addUserFragment"
+        android:name="io.timelimit.android.ui.user.create.AddUserFragment"
+        android:label="AddUserFragment" />
+    <fragment
+        android:id="@+id/setupDevicePermissionsFragment"
+        android:name="io.timelimit.android.ui.setup.SetupDevicePermissionsFragment"
+        android:label="fragment_setup_device_permissions"
+        tools:layout="@layout/fragment_setup_device_permissions" >
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_setupDevicePermissionsFragment_to_setupLocalModeFragment"
+            app:destination="@id/setupLocalModeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupSelectModeFragment"
+        android:name="io.timelimit.android.ui.setup.SetupSelectModeFragment"
+        android:label="fragment_setup_select_mode"
+        tools:layout="@layout/fragment_setup_select_mode" >
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_setupSelectModeFragment_to_setupDevicePermissionsFragment"
+            app:destination="@id/setupDevicePermissionsFragment" />
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_setupSelectModeFragment_to_setupParentModeFragment"
+            app:destination="@id/setupParentModeFragment" />
+        <action
+            android:id="@+id/action_setupSelectModeFragment_to_setupRemoteChildFragment"
+            app:destination="@id/setupRemoteChildFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupLocalModeFragment"
+        android:name="io.timelimit.android.ui.setup.SetupLocalModeFragment"
+        android:label="fragment_setup_local_mode"
+        tools:layout="@layout/fragment_setup_local_mode" ></fragment>
+    <fragment
+        android:id="@+id/setupTermsFragment"
+        android:name="io.timelimit.android.ui.setup.SetupTermsFragment"
+        android:label="fragment_setup_terms"
+        tools:layout="@layout/fragment_setup_terms" >
+        <action
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            android:id="@+id/action_setupTermsFragment_to_setupSelectModeFragment"
+            app:destination="@id/setupSelectModeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupParentModeFragment"
+        android:name="io.timelimit.android.ui.setup.parent.SetupParentModeFragment"
+        android:label="fragment_setup_parent_mode"
+        tools:layout="@layout/fragment_setup_parent_mode" ></fragment>
+    <fragment
+        android:id="@+id/setupRemoteChildFragment"
+        android:name="io.timelimit.android.ui.setup.child.SetupRemoteChildFragment"
+        android:label="setup_remote_child_fragment"
+        tools:layout="@layout/setup_remote_child_fragment" ></fragment>
+    <fragment
+        android:id="@+id/manageDeviceFragment"
+        android:name="io.timelimit.android.ui.manage.device.manage.ManageDeviceFragment"
+        android:label="fragment_manage_device"
+        tools:layout="@layout/fragment_manage_device" >
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/purchaseFragment"
+        android:name="io.timelimit.android.ui.payment.PurchaseFragment"
+        android:label="fragment_purchase"
+        tools:layout="@layout/fragment_purchase" />
+    <fragment
+        android:id="@+id/manageParentFragment"
+        android:name="io.timelimit.android.ui.manage.parent.ManageParentFragment"
+        android:label="fragment_manage_parent"
+        tools:layout="@layout/fragment_manage_parent" >
+        <argument
+            android:name="parentId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_manageParentFragment_to_changeParentPasswordFragment"
+            app:destination="@id/changeParentPasswordFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageParentFragment_to_restoreParentPasswordFragment"
+            app:destination="@id/restoreParentPasswordFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageParentFragment_to_linkParentMailFragment"
+            app:destination="@id/linkParentMailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/changeParentPasswordFragment"
+        android:name="io.timelimit.android.ui.manage.parent.password.change.ChangeParentPasswordFragment"
+        android:label="change_parent_password_fragment"
+        tools:layout="@layout/change_parent_password_fragment" >
+        <argument
+            android:name="parentUserId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/restoreParentPasswordFragment"
+        android:name="io.timelimit.android.ui.manage.parent.password.restore.RestoreParentPasswordFragment"
+        android:label="restore_parent_password_fragment"
+        tools:layout="@layout/restore_parent_password_fragment" >
+        <argument
+            android:name="parentId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/linkParentMailFragment"
+        android:name="io.timelimit.android.ui.manage.parent.link.LinkParentMailFragment"
+        android:label="link_parent_mail_fragment"
+        tools:layout="@layout/link_parent_mail_fragment" >
+        <argument
+            android:name="parentId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/setupDeviceFragment"
+        android:name="io.timelimit.android.ui.setup.device.SetupDeviceFragment"
+        android:label="fragment_setup_device"
+        tools:layout="@layout/fragment_setup_device" />
+    <fragment
+        android:id="@+id/diagnoseMainFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseMainFragment"
+        android:label="fragment_diagnose_main"
+        tools:layout="@layout/fragment_diagnose_main" >
+        <action
+            android:id="@+id/action_diagnoseMainFragment_to_diagnoseClockFragment"
+            app:destination="@id/diagnoseClockFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_diagnoseMainFragment_to_diagnoseConnectionFragment"
+            app:destination="@id/diagnoseConnectionFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_diagnoseMainFragment_to_diagnoseSyncFragment"
+            app:destination="@id/diagnoseSyncFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/diagnoseClockFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseClockFragment"
+        android:label="diagnose_clock_fragment"
+        tools:layout="@layout/diagnose_clock_fragment" />
+    <fragment
+        android:id="@+id/diagnoseConnectionFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseConnectionFragment"
+        android:label="fragment_diagnose_connection"
+        tools:layout="@layout/fragment_diagnose_connection" />
+    <fragment
+        android:id="@+id/diagnoseSyncFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseSyncFragment"
+        android:label="diagnose_sync_fragment"
+        tools:layout="@layout/diagnose_sync_fragment" />
+</navigation>

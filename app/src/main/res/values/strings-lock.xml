@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="lock_header_blocked">Blocked!</string>
+
+    <string name="lock_header_what">What was blocked?</string>
+    <string name="lock_header_why">Why was it blocked?</string>
+    <string name="lock_header_how_proceed">What can you do?</string>
+
+    <string name="lock_allow_temporarily_header">allow temporarily</string>
+    <string name="lock_allow_temporarily_text">
+        Allow using %1$s. %1$s will be blocked when the
+        option for it in the notification area was selected or the
+        screen was turned off.
+    </string>
+
+    <string name="lock_add_to_category_title">Add to a category</string>
+    <string name="lock_add_to_category_text">Use this option if you know this App and you want to allow it</string>
+
+    <string name="lock_goto_main_title">Open TimeLimit</string>
+    <string name="lock_goto_main_text">Open TimeLimit to view and/ or change the settings</string>
+
+    <string name="lock_extratime_title">Add extra time</string>
+    <string name="lock_extratime_text" translatable="false">@string/category_settings_extra_time_info</string>
+
+    <string name="lock_disable_time_verification_title">Disable manual time confirmation on this device</string>
+    <string name="lock_disable_time_verification_text">
+        If the network time is not available, use the clock from this device.
+        Use this option if this device does not have got an internet connection often.
+    </string>
+
+    <string name="lock_update_current_device_title">Adjust current device</string>
+    <string name="lock_update_current_device_text">Select this device as current device</string>
+
+    <string name="lock_disable_temporarily_lock_title">Disable temporary blocking</string>
+    <string name="lock_disable_temporarily_all_categories">all categories</string>
+    <string name="lock_disable_temporarily_all_categories_disabled">Only the category %s is blocked</string>
+
+    <string name="lock_confirm_time_title">Confirm time manually</string>
+    <string name="lock_confirm_time_btn">This time is correct</string>
+
+    <string name="lock_reason_no_category">
+        This App was not assigned to any category.
+        Due to that, there are no restriction settings.
+        And the simplest solution in this case is to block the App.
+    </string>
+    <string name="lock_reason_temporarily_blocked">
+        This App is part of a category which was temporarily blocked.
+    </string>
+    <string name="lock_reason_blocked_time">
+        This App is part of a category which is blocked at this time.
+    </string>
+    <string name="lock_reason_time_over">
+        This App is part of a category whose time limit was reached.
+    </string>
+    <string name="lock_reason_time_over_etra_time_can_be_used_later">
+        This App is part of a category whose time limit was reached.
+        There is still extra time, but the usage limit for the extra time was reached, too.
+    </string>
+    <string name="lock_reason_missing_network_time">
+        To decide if the App is allowed, the current time is required.
+        The network time verification is enabled and it failed.
+    </string>
+    <string name="lock_reason_requires_current_device">
+        To prevent that the time limits are used multiple times on different devices,
+        there must be one current device at which limited Apps can be used.
+        This device is not selected as current device now.
+    </string>
+
+    <string name="lock_reason_short_no_category">no category</string>
+    <string name="lock_reason_short_temporarily_blocked">temporarily blocked</string>
+    <string name="lock_reason_short_time_over">time over</string>
+    <string name="lock_reason_short_blocked_time_area">blocked time area</string>
+    <string name="lock_reason_short_missing_network_time">missing network time</string>
+    <string name="lock_reason_short_requires_current_device">device must be the current device</string>
+</resources>

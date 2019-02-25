@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="blocked_time_areas">
+        Blocked time areas
+    </string>
+
+    <string name="blocked_time_areas_help_about">
+        You can set blocked time areas here.
+        During a blocked time area, no Apps of the category can be used.
+        You can define the time area to the minute.
+    </string>
+
+    <string name="blocked_time_areas_help_colors">
+        There are 2 colors in this view: green means allowed, red means blocked.
+    </string>
+
+    <string name="blocked_time_areas_help_structure">
+        The days and hour are displayed as headlines, the minutes as tiles.
+        You can jump to a day using the day dropdown.
+    </string>
+
+    <string name="blocked_time_areas_help_modify">
+        To change one area, tap on the start time. It will become blue.
+        Then select the end time.
+        Now, the area colors will be inverted.
+    </string>
+
+    <string name="blocked_time_areas_snackbar_modified">
+        The blocked time areas were changed
+    </string>
+
+    <string name="blocked_time_areas_checkbox_detailed">show detailed settings</string>
+
+    <string name="blocked_time_areas_copy_to_other_days">Copy settings from one day to other days</string>
+    <string name="blocked_time_areas_copy_from">Copy from</string>
+    <string name="blocked_time_areas_copy_to">Copy from %s to</string>
+</resources>

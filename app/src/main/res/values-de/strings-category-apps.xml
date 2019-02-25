@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="category_apps_title">zugeordnete Apps</string>
+
+    <string name="category_apps_add_dialog_btn_positive">Apps hinzufügen</string>
+    <string name="category_apps_add_dialog_filter_hint">Nach Apps suchen</string>
+    <string name="category_apps_add_dialog_show_sys_apps">Systemapps anzeigen</string>
+    <string name="category_apps_add_dialog_select_all">Alle auswählen</string>
+    <string name="category_apps_add_dialog_show_assigned_to_other_category">Zu anderen Kategorien zugeordnete Apps anzeigen</string>
+    <string name="category_apps_add_dialog_show_from_other_devices">Apps von Geräten, die nicht diesem Kind zugeordnet wurden, anzeigen</string>
+    <plurals name="category_apps_add_dialog_hidden_entries">
+        <item quantity="one">%d ausgeblendeten Eintrag ausgewählt</item>
+        <item quantity="other">%s ausgeblendete Einträge ausgewählt</item>
+    </plurals>
+
+    <string name="category_apps_item_removed_toast">%s wurde entfernt</string>
+
+    <string name="category_apps_add_dialog_already_assigned_to">Bereits zugeordnet zu %s</string>
+</resources>

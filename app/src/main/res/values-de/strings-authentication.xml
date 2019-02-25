@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="authentication_required_overlay_title">Authentifizierung erforderlich</string>
+    <string name="authentication_required_overlay_text">Verwenden Sie zum Authentifizieren diesen Button</string>
+
+    <string name="authenticate_by_mail_text">
+        Zum Fortfahren wird eine E-Mail-Adresse sowie der Nachweis, dass Sie zu dieser Zugang haben, benötigt
+    </string>
+    <string name="authenticate_by_mail_btn_google">Mit einem Google-Konto anmelden</string>
+    <string name="authenticate_by_mail_google_info">
+        TimeLimit verwendet nur die mit dem Google-Konto verknüpfte E-Mail-Adresse.
+        Es können nur E-Mail-Adressen, die auf @gmail.com oder @googlemail.com enden, verwendet werden.
+    </string>
+
+    <string name="authenticate_by_mail_other_title">Mit einer E-Mail-Adresse anmelden</string>
+    <string name="authenticate_by_mail_other_text">TimeLimit wird Ihnen eine Nachricht mit einem Code senden, den Sie zum Authentifizieren hier eingeben.</string>
+    <string name="authenticate_by_mail_message_sent">Es wurde ein Code an %s gesendet.</string>
+    <string name="authenticate_by_mail_hint_mail">E-Mail-Adresse</string>
+    <string name="authenticate_by_mail_hint_code">empfangener Code</string>
+
+    <string name="authenticate_by_mail_snackbar_wrong_code">Der eingegebene Code ist falsch</string>
+</resources>

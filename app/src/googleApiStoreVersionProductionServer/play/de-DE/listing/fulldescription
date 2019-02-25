@@ -1,0 +1,17 @@
+Mit TimeLimit kann die Nutzungsdauer flexibel beschränkt werden. Es gibt frei wählbare Sperrzeiten, um z.B. zu verhindern, dass zu spät noch gespielt wird. Dabei können je nach App andere Regeln festgelegt werden.
+
+Je nach Version kann eine Extrazeit festgelegt werden, z.B. als Belohnung. Diese kann frei eingeteilt werden und wird automatisch verbraucht, sobald die reguläre Zeit vorbei ist. Es ist zusätzlich möglich, die Nutzung der Extrazeit einzuschränken.
+
+Je nach Version können die Zeitbegrenzungen vorübergehend deaktiviert werden.
+
+Es gibt zusätzlich einen vernetzten Modus. In diesem können Einstellungen von jedem Gerät aus geändert werden. In der Vollversion ist es außerdem möglich, ferngesteuert Geräte vorübergehend zu sperren.
+
+Außerdem können in der Vollversion für einen Benutzer mehrere Geräte hinterlegt werden und der Nutzer kann jeweils eins dieser Geräte zur Benutzung wählen. Die verbrauchten Zeiten werden dabei automatisch über alle Geräte addiert.
+
+Es gibt eine detailierte Dokumentation der Bedienung und Funktionen dieser App unter https://timelimit.io/de/dokumentation/
+
+Je nach Android-Version verwendet TimeLimit die Berechtigung zum Nutzungsdatenzugriff oder die "GET_TASKS"-Berechtigung. Diese werden ausschließlich zur Erkennung der momentan genutzten App verwendet. Auf der Basis der momentan genutzten App erfolgt eine Sperrung, eine Freigabe oder eine Berechnung der verbleibenden Nutzungsdauer.
+
+Die Geräte-Administrator-Berechtigung wird genutzt, um ein Deinstallieren von TimeLimit zu erkennen.
+
+TimeLimit verwendet den Benachrichtigungszugriff, um auch die Benachrichtigungen von gesperrten Apps zu sperren. Es erfolgt keine Speicherung von Benachrichtigungen oder deren Inhalten.
