@@ -1,16 +1,32 @@
-Mit TimeLimit kann die Nutzungsdauer flexibel beschränkt werden. Es gibt frei wählbare Sperrzeiten, um z.B. zu verhindern, dass zu spät noch gespielt wird. Dabei können je nach App andere Regeln festgelegt werden.
+Flexibel
 
-Je nach Version kann eine Extrazeit festgelegt werden, z.B. als Belohnung. Diese kann frei eingeteilt werden und wird automatisch verbraucht, sobald die reguläre Zeit vorbei ist. Es ist zusätzlich möglich, die Nutzung der Extrazeit einzuschränken.
+Apps werden in Kategorien zusammengefasst, wobei eine Kategorie auch nur eine App enthalten kann.
 
-Je nach Version können die Zeitbegrenzungen vorübergehend deaktiviert werden.
+Für jede Kategorie kann dann gewählt werden, an welchen Uhrzeiten diese Apps erlaubt sein sollen. Dadurch kann verhindert werden, dass zu spät noch gespielt wird.
 
-Es gibt zusätzlich einen vernetzten Modus. In diesem können Einstellungen von jedem Gerät aus geändert werden. In der Vollversion ist es außerdem möglich, ferngesteuert Geräte vorübergehend zu sperren.
+Zusätzlich können Zeitbegrenzungsregeln eingestellt werden. Damit kann die Gesamtnutzungsdauer an einem Tag oder über mehrere Tage hinweg (z.B. das Wochenende) begrenzt werden. Das lässt sich sogar kombinieren, sodass z.B. am Wochenende höchstens 3 Stunden gespielt werden darf, aber an jedem Wochenendtag jeweils höchstens 2 Stunden.
 
-Außerdem können in der Vollversion für einen Benutzer mehrere Geräte hinterlegt werden und der Nutzer kann jeweils eins dieser Geräte zur Benutzung wählen. Die verbrauchten Zeiten werden dabei automatisch über alle Geräte addiert.
+Außerdem gibt es die Möglichkeit, eine Extrazeit zu erteilen. Das ermöglicht eine einmalige längere Nutzung als sonst. Das kann z.B. als Belohnung verwendet werden. Es gibt auch die Möglichkeit, die Zeitbegrenzungen vorübergehend (z.B. für eine Stunde oder den Rest eines Tages) abzuschalten.
 
-Es gibt eine detailierte Dokumentation der Bedienung und Funktionen dieser App unter https://timelimit.io/de/dokumentation/
+Mehrbenutzerfähig
 
-Je nach Android-Version verwendet TimeLimit die Berechtigung zum Nutzungsdatenzugriff oder die "GET_TASKS"-Berechtigung. Diese werden ausschließlich zur Erkennung der momentan genutzten App verwendet. Auf der Basis der momentan genutzten App erfolgt eine Sperrung, eine Freigabe oder eine Berechnung der verbleibenden Nutzungsdauer.
+Es gibt den Fall, dass ein Gerät nur von einem Benutzer verwendet wird. Insbesondere bei Tablets ist das aber oft nicht der Fall. Daher könne in TimeLimit mehrere Benutzerprofile erstellt werden, für die es jeweils andere Einstellungen und Zeitkonten gibt. Dabei gibt es zwei Arten von Benutzern: Kinder und Elternteile. Wenn ein Elternteil als Benutzer eingestellt wurde, gibt es keine Einschränkungen. Eltern können jeden beliebigen Benutzer als aktuellen Benutzer einstellen. Kinder können sich nur selbst als Benutzer einstellen. 
+
+Mehrgerätfähig
+
+Es gibt den Fall, dass ein Benutzer mehrere Geräte hat. Anstatt Zeitbegrenzungen je Gerät einzustellen und die Zeitbegrenzungen auf die Geräte aufzuteilen, ist es möglich, einen Benutzer für mehrere Geräte festzulegen. Dann werden die Zeiten zusammengezählt und die Freigabe von Apps gilt automatisch auf allen Geräten. Je nach Einstellungen kann immer nur ein Gerät verwendet werden oder mehrere gleichzeitig, wobei im zweiten Fall z.B. bei Verbindungsunterbrechungen mehr Zeit als eigentlich erlaubt ist verwendet werden kann.
+
+Vernetzt
+
+Es ist möglich, die Einstellungen von jedem verknüpften Geräte aus einzusehen oder zu ändern. Diese Vernetzung kann - falls es erwünscht ist - auch über einen eigenen Server erfolgen.
+
+Hinweise
+
+Einige Funktionen sind kostenpflichtig, wenn kein eigener Server verwendet wird. Die Vollversion kostet in Deutschland 0,99 € je Monat oder 9,99 € je Jahr.
+
+Falls die App "nicht funktioniert" kann das an Energiesparfunktionen liegen. Wie Sie diese abschalten können, wird unter https://dontkillmyapp.com/ beschrieben. Wenden Sie sich an den Support, wenn das nicht hilft.
+
+Je nach Android-Version verwendet TimeLimit die Berechtigung zum Nutzungsdatenzugriff oder die "GET_TASKS"-Berechtigung. Diese werden ausschließlich zur Erkennung der momentan genutzten App verwendet. Auf der Basis der momentan genutzten App erfolgt eine Sperrung, eine Freigabe oder eine Berechnung und Anpassung der verbleibenden Nutzungsdauer.
 
 Die Geräte-Administrator-Berechtigung wird genutzt, um ein Deinstallieren von TimeLimit zu erkennen.
 
