@@ -79,11 +79,11 @@ class ManageChildFragment : Fragment(), FragmentWithCustomTitle {
         bottom_navigation_view.setOnNavigationItemSelectedListener {
             menuItem ->
 
-            pager.currentItem = when (menuItem.itemId) {
+            pager?.currentItem = when (menuItem.itemId) {
                 R.id.manage_child_tab_categories -> 0
                 R.id.manage_child_tab_apps -> 1
                 R.id.manage_child_tab_manage -> 2
-                else -> 0
+                else -> throw IllegalStateException()
             }
 
             true

@@ -75,13 +75,13 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
         bottom_navigation_view.setOnNavigationItemSelectedListener {
             menuItem ->
 
-            pager.currentItem = when(menuItem.itemId) {
+            pager?.currentItem = when(menuItem.itemId) {
                 R.id.manage_category_tab_apps -> 0
                 R.id.manage_category_tab_time_limit_rules -> 1
                 R.id.manage_category_tab_blocked_time_areas -> 2
                 R.id.manage_category_tab_usage_log -> 3
                 R.id.manage_category_tab_settings -> 4
-                else -> 0
+                else -> throw IllegalStateException()
             }
 
             true

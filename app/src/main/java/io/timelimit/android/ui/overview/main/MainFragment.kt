@@ -113,11 +113,11 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
         bottom_navigation_view.setOnNavigationItemSelectedListener {
             menuItem ->
 
-            pager.currentItem = when(menuItem.itemId) {
+            pager?.currentItem = when(menuItem.itemId) {
                 R.id.main_tab_overview -> 0
                 R.id.main_tab_uninstall -> 1
                 R.id.main_tab_about -> 2
-                else -> 0
+                else -> throw IllegalStateException()
             }
 
             true
