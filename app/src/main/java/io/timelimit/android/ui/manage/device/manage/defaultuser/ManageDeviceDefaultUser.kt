@@ -89,8 +89,9 @@ object ManageDeviceDefaultUser {
                 if (fullVersion) {
                     runAsync {
                         ApplyActionUtil.applyAppLogicAction(
-                                SignOutAtDeviceAction,
-                                auth.logic
+                                action = SignOutAtDeviceAction,
+                                appLogic = auth.logic,
+                                ignoreIfDeviceIsNotConfigured = true
                         )
                     }
                 } else {

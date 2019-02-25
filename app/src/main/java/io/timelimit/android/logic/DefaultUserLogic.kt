@@ -153,7 +153,8 @@ class DefaultUserLogic(private val appLogic: AppLogic) {
                                         if (appLogic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue()) {
                                             ApplyActionUtil.applyAppLogicAction(
                                                     appLogic = appLogic,
-                                                    action = SignOutAtDeviceAction
+                                                    action = SignOutAtDeviceAction,
+                                                    ignoreIfDeviceIsNotConfigured = true
                                             )
                                         } else {
                                             if (BuildConfig.DEBUG) {

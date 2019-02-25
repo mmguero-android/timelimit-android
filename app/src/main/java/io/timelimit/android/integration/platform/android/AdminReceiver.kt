@@ -41,14 +41,11 @@ class AdminReceiver: DeviceAdminReceiver() {
 
     override fun onDisableRequested(context: Context, intent: Intent?): CharSequence {
         runAsync {
-            val logic = DefaultAppLogic.with(context)
-
-            if (logic.database.config().getOwnDeviceId().waitForNullableValue() != null) {
-                ApplyActionUtil.applyAppLogicAction(
-                        TriedDisablingDeviceAdminAction,
-                        logic
-                )
-            }
+            ApplyActionUtil.applyAppLogicAction(
+                    action = TriedDisablingDeviceAdminAction,
+                    appLogic = DefaultAppLogic.with(context),
+                    ignoreIfDeviceIsNotConfigured = true
+            )
         }
 
         return context.getString(R.string.admin_disable_warning)

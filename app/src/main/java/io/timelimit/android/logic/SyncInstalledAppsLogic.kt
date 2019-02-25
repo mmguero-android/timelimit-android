@@ -82,14 +82,15 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
             // save the changes
             if (itemsToRemove.isNotEmpty()) {
                 ApplyActionUtil.applyAppLogicAction(
-                        RemoveInstalledAppsAction(packageNames = itemsToRemove.keys.toList()),
-                        appLogic
+                        action = RemoveInstalledAppsAction(packageNames = itemsToRemove.keys.toList()),
+                        appLogic = appLogic,
+                        ignoreIfDeviceIsNotConfigured = true
                 )
             }
 
             if (itemsToAdd.isNotEmpty()) {
                 ApplyActionUtil.applyAppLogicAction(
-                        AddInstalledAppsAction(
+                        action = AddInstalledAppsAction(
                                 apps = itemsToAdd.map {
                                     (_, app) ->
 
@@ -101,7 +102,8 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
                                     )
                                 }
                         ),
-                        appLogic
+                        appLogic = appLogic,
+                        ignoreIfDeviceIsNotConfigured = true
                 )
             }
         }

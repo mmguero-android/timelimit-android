@@ -40,14 +40,47 @@ import java.io.StringWriter
 object ApplyActionUtil {
     private const val LOG_TAG = "ApplyActionUtil"
 
-    suspend fun applyAppLogicAction(action: AppLogicAction, appLogic: AppLogic) {
-        applyAppLogicAction(action, appLogic.database, appLogic.syncUtil, appLogic.manipulationLogic)
+    suspend fun applyAppLogicAction(
+            action: AppLogicAction,
+            appLogic: AppLogic,
+            ignoreIfDeviceIsNotConfigured: Boolean
+    ) {
+        applyAppLogicAction(
+                action = action,
+                database = appLogic.database,
+                syncUtil = appLogic.syncUtil,
+                manipulationLogic = appLogic.manipulationLogic,
+                ignoreIfDeviceIsNotConfigured = ignoreIfDeviceIsNotConfigured
+        )
     }
 
-    private suspend fun applyAppLogicAction(action: AppLogicAction, database: Database, syncUtil: SyncUtil, manipulationLogic: ManipulationLogic) {
+    private suspend fun applyAppLogicAction(
+            action: AppLogicAction,
+            database: Database,
+            syncUtil: SyncUtil,
+            manipulationLogic: ManipulationLogic,
+            ignoreIfDeviceIsNotConfigured: Boolean
+    ) {
+        // uncomment this if you need to know what's dispatching an action
+        /*
+        if (BuildConfig.DEBUG) {
+            try {
+                throw Exception()
+            } catch (ex: Exception) {
+                Log.d(LOG_TAG, "handling action: $action", ex)
+            }
+        }
+        */
+
         Threads.database.executeAndWait {
             database.transaction().use {
-                LocalDatabaseAppLogicActionDispatcher.dispatchAppLogicActionSync(action, database.config().getOwnDeviceIdSync()!!, database, manipulationLogic)
+                val ownDeviceId = database.config().getOwnDeviceIdSync()
+
+                if (ownDeviceId == null && ignoreIfDeviceIsNotConfigured) {
+                    return@executeAndWait
+                }
+
+                LocalDatabaseAppLogicActionDispatcher.dispatchAppLogicActionSync(action, ownDeviceId!!, database, manipulationLogic)
 
                 if (isSyncEnabled(database)) {
                     if (action is AddUsedTimeAction) {

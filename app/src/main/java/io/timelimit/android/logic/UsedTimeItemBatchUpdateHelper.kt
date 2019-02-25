@@ -104,13 +104,14 @@ class UsedTimeItemBatchUpdateHelper(
             // do nothing
         } else {
             ApplyActionUtil.applyAppLogicAction(
-                    AddUsedTimeAction(
+                    action = AddUsedTimeAction(
                             categoryId = childCategoryId,
                             timeToAdd = timeToAdd,
                             dayOfEpoch = date.dayOfEpoch,
                             extraTimeToSubtract = extraTimeToSubtract
                     ),
-                    logic
+                    appLogic = logic,
+                    ignoreIfDeviceIsNotConfigured = true
             )
 
             timeToAdd = 0

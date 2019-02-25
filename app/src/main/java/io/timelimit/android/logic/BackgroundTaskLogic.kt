@@ -470,10 +470,11 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         if (deviceEntry != null) {
             if (deviceEntry.currentAppVersion != currentAppVersion) {
                 ApplyActionUtil.applyAppLogicAction(
-                        UpdateDeviceStatusAction.empty.copy(
+                        action = UpdateDeviceStatusAction.empty.copy(
                                 newAppVersion = currentAppVersion
                         ),
-                        appLogic
+                        appLogic = appLogic,
+                        ignoreIfDeviceIsNotConfigured = true
                 )
             }
         }
@@ -503,10 +504,11 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
             if (deviceEntry?.considerRebootManipulation == true) {
                 ApplyActionUtil.applyAppLogicAction(
-                        UpdateDeviceStatusAction.empty.copy(
+                        action = UpdateDeviceStatusAction.empty.copy(
                                 didReboot = true
                         ),
-                        appLogic
+                        appLogic = appLogic,
+                        ignoreIfDeviceIsNotConfigured = true
                 )
             }
         }
@@ -546,7 +548,11 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }
 
                 if (changes != UpdateDeviceStatusAction.empty) {
-                    ApplyActionUtil.applyAppLogicAction(changes, appLogic)
+                    ApplyActionUtil.applyAppLogicAction(
+                            action = changes,
+                            appLogic = appLogic,
+                            ignoreIfDeviceIsNotConfigured = true
+                    )
                 }
             }
         }

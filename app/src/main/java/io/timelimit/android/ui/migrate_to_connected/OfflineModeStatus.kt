@@ -73,7 +73,8 @@ data class OfflineModeStatus(
             try {
                 ApplyActionUtil.applyAppLogicAction(
                         action = action,
-                        appLogic = appLogic
+                        appLogic = appLogic,
+                        ignoreIfDeviceIsNotConfigured = false
                 )
             } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) {
