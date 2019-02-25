@@ -1,1 +1,1 @@
-fixed some rare crashes
+Fix crash which occurs when removing a device from TimeLimit at which a time limited App is used
