@@ -95,7 +95,7 @@ class AddUserModel(application: Application): AndroidViewModel(application) {
                                 )
                         ))
 
-                        defaultCategories.generateGamesTimeLimitRules(allowedAppsCategory).forEach { rule ->
+                        defaultCategories.generateGamesTimeLimitRules(allowedGamesCategory).forEach { rule ->
                             actions.add(CreateTimeLimitRuleAction(rule))
                         }
 
