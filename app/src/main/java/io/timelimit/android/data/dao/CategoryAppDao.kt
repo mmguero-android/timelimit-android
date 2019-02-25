@@ -46,4 +46,7 @@ abstract class CategoryAppDao {
 
     @Query("SELECT * FROM category_app LIMIT :pageSize OFFSET :offset")
     abstract fun getCategoryAppPageSync(offset: Int, pageSize: Int): List<CategoryApp>
+
+    @Query("SELECT * FROM category_app")
+    abstract fun getAllCategoryAppSync(): List<CategoryApp>
 }

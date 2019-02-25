@@ -22,7 +22,7 @@
             type="String" />
 
         <variable
-            name="usingDefaultServer"
+            name="showSignInWithGoogleButton"
             type="boolean" />
 
         <import type="android.text.TextUtils" />
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:visibility="@{(usingDefaultServer &amp;&amp; BuildConfig.useGoogleApis &amp;&amp; TextUtils.isEmpty(mailAddressToWhichCodeWasSent)) ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{(showSignInWithGoogleButton &amp;&amp; BuildConfig.useGoogleApis &amp;&amp; TextUtils.isEmpty(mailAddressToWhichCodeWasSent)) ? View.VISIBLE : View.GONE}"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">

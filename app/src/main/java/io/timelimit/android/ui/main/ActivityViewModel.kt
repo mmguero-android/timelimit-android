@@ -166,6 +166,8 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
         authenticatedUserMetadata.value = user
     }
 
+    fun getAuthenticatedUser() = authenticatedUserMetadata.value
+
     fun logOut() {
         authenticatedUserMetadata.value = null
     }

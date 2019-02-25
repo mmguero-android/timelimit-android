@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.extensions.showSafe
 
@@ -32,11 +33,30 @@ class CanNotAddDevicesInLocalModeDialogFragment: DialogFragment() {
         return AlertDialog.Builder(context!!, theme)
                 .setTitle(R.string.overview_add_device)
                 .setMessage(R.string.overview_add_error_local_mode)
-                .setPositiveButton(R.string.generic_ok, null)
+                .apply {
+                    if (BuildConfig.hasServer) {
+                        setNegativeButton(R.string.generic_cancel, null)
+                        setPositiveButton(R.string.overview_add_device_migrate_to_connected) { _, _ ->
+                            dismiss()
+
+                            targetFragment.let { target ->
+                                if (target is CanNotAddDevicesInLocalModeDialogFragmentListener) {
+                                    target.migrateToConnectedMode()
+                                }
+                            }
+                        }
+                    } else {
+                        setPositiveButton(R.string.generic_ok, null)
+                    }
+                }
                 .create()
     }
 
     fun show(manager: FragmentManager) {
         showSafe(manager, DIALOG_TAG)
     }
+}
+
+interface CanNotAddDevicesInLocalModeDialogFragmentListener {
+    fun migrateToConnectedMode()
 }

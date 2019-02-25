@@ -21,6 +21,7 @@
         You have set up TimeLimit in the local mode.
         There is no linking, therefore you can not add devices.
     </string>
+    <string name="overview_add_device_migrate_to_connected">Migrate to the connected mode</string>
 
     <string name="overview_intro_title">Welcome to TimeLimit</string>
     <string name="overview_intro_text">

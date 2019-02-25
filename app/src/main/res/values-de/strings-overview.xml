@@ -21,6 +21,7 @@
         Sie haben TimeLimit im lokalen Modus eingerichtet.
         In diesem gibt es keine Vernetzung, sodass Sie kein Gerät hinzufügen können.
     </string>
+    <string name="overview_add_device_migrate_to_connected">Zum vernetzten Modus migrieren</string>
 
     <string name="overview_intro_title">Willkommen bei TimeLimit</string>
     <string name="overview_intro_text">

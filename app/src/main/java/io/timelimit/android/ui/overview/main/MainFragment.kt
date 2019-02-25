@@ -40,10 +40,13 @@ import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.manage.device.add.AddDeviceFragment
 import io.timelimit.android.ui.overview.about.AboutFragmentParentHandlers
+import io.timelimit.android.ui.overview.overview.CanNotAddDevicesInLocalModeDialogFragmentListener
 import io.timelimit.android.ui.overview.overview.OverviewFragmentParentHandlers
 import kotlinx.android.synthetic.main.fragment_main.*
 
-class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers {
+class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers,
+        CanNotAddDevicesInLocalModeDialogFragmentListener {
+
     private val adapter: PagerAdapter by lazy { PagerAdapter(childFragmentManager) }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private lateinit var navigation: NavController
@@ -202,6 +205,13 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
     override fun onShowDiagnoseScreen() {
         navigation.safeNavigate(
                 MainFragmentDirections.actionOverviewFragmentToDiagnoseMainFragment(),
+                R.id.overviewFragment
+        )
+    }
+
+    override fun migrateToConnectedMode() {
+        navigation.safeNavigate(
+                MainFragmentDirections.actionOverviewFragmentToMigrateToConnectedModeFragment(),
                 R.id.overviewFragment
         )
     }

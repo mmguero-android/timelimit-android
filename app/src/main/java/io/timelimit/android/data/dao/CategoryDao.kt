@@ -94,6 +94,9 @@ abstract class CategoryDao {
 
     @Query("UPDATE category SET parent_category_id = :parentCategoryId WHERE id = :categoryId")
     abstract fun updateParentCategory(categoryId: String, parentCategoryId: String)
+
+    @Query("SELECT * FROM category")
+    abstract fun getAllCategoriesSync(): List<Category>
 }
 
 data class CategoryWithVersionNumbers(

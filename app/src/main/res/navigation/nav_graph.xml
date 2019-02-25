@@ -80,6 +80,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_overviewFragment_to_migrateToConnectedModeFragment"
+            app:destination="@id/migrateToConnectedModeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/manageChildFragment"
@@ -299,4 +306,9 @@
         android:name="io.timelimit.android.ui.diagnose.DiagnoseSyncFragment"
         android:label="diagnose_sync_fragment"
         tools:layout="@layout/diagnose_sync_fragment" />
+    <fragment
+        android:id="@+id/migrateToConnectedModeFragment"
+        android:name="io.timelimit.android.ui.migrate_to_connected.MigrateToConnectedModeFragment"
+        android:label="migrate_to_connected_mode_fragment"
+        tools:layout="@layout/migrate_to_connected_mode_fragment" />
 </navigation>

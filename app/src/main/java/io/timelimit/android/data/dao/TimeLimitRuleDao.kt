@@ -56,4 +56,7 @@ abstract class TimeLimitRuleDao {
 
     @Query("SELECT * FROM time_limit_rule LIMIT :pageSize OFFSET :offset")
     abstract fun getRulePageSync(offset: Int, pageSize: Int): List<TimeLimitRule>
+
+    @Query("SELECT * FROM time_limit_rule")
+    abstract fun getAllRulesSync(): List<TimeLimitRule>
 }

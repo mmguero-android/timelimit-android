@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="migrate_to_connected_mode_title">Migration zum vernetzten Modus</string>
+    <string name="migrate_to_connected_mode_info">Wenn Sie fortfahren, dann gehen die Passwörter von Kind-Benutzern und alle Elternbenutzer (außer dem, der sich jetzt anmeldet) verloren.</string>
+
+    <string name="migrate_to_connected_mode_other_account_linked">
+        Es gibt bereits ein Konto mit dieser E-Mail-Adresse.
+        Deshalb kann es nicht für eine Migration in den vernetzten Modus verwendet werden.
+    </string>
+
+    <string name="migrate_to_connected_mode_done">
+        Die Migration zum vernetzten Modus ist abgeschlossen. Sie können sich am anderen
+        Gerät mit der selben E-Mail-Adresse anmelden oder die Geräte-Hinzufüge-Funktion
+        an diesem Gerät verwenden.
+        Betätigen Sie die Zurück-Taste, um zur Übersicht zurückzukehren.
+    </string>
+</resources>

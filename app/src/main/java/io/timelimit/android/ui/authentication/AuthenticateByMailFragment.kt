@@ -34,17 +34,27 @@ import io.timelimit.android.ui.MainActivity
 class AuthenticateByMailFragment : Fragment() {
     companion object {
         private const val REQUEST_SIGN_IN_WITH_GOOGLE = 1
+        private const val EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON = "hsiwgb"
+
+        fun newInstance(hideSignInWithGoogleButton: Boolean) = AuthenticateByMailFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON, hideSignInWithGoogleButton)
+            }
+        }
     }
 
     private val listener: AuthenticateByMailFragmentListener by lazy { parentFragment as AuthenticateByMailFragmentListener }
     private val googleAuthUtil: GoogleSignInUtil by lazy { (activity as MainActivity).googleSignInUtil }
     private val model: AuthenticateByMailModel by lazy { ViewModelProviders.of(this).get(AuthenticateByMailModel::class.java) }
+    private val hideSignInWithGoogleButton: Boolean by lazy {
+        arguments?.getBoolean(EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON, false) ?: false
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAuthenticateByMailBinding.inflate(layoutInflater, container, false)
 
         model.usingDefaultServer.observe(this, Observer {
-            binding.usingDefaultServer = it
+            binding.showSignInWithGoogleButton = it && (!hideSignInWithGoogleButton)
         })
 
         binding.signInWithGoogleButton.setOnClickListener {

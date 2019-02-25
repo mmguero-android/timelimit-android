@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="migrate_to_connected_mode_title">Migrate to the connected mode</string>
+    <string name="migrate_to_connected_mode_info">When using this, password of child users and parent users other than the one who signs in for this process are lost.</string>
+
+    <string name="migrate_to_connected_mode_other_account_linked">
+        There is already an account with this mail address. Due to that,
+        migrating to the connected mode is not possible.
+    </string>
+
+    <string name="migrate_to_connected_mode_done">
+        The migration to the connected mode is done. You can sign in at your device
+        using the same mail address or use the add device procedure from this device.
+        Press back to go to the overview.
+    </string>
+</resources>
