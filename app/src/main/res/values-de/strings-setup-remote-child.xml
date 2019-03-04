@@ -17,7 +17,9 @@
     <string name="setup_remote_child_code_invalid">Dieser Code ist ungültig</string>
     <string name="setup_remote_child_title">Dieses Gerät verknüpfen</string>
     <string name="setup_remote_child_text">
-        Starten Sie das Hinzufügen eines Gerätes an einem anderen Gerät, auf dem TimeLimit bereits installiert ist.
+        Starten Sie das Hinzufügen eines Gerätes an einem anderen Gerät,
+        auf dem TimeLimit bereits installiert ist,
+        indem Sie bei dem anderen Gerät in der Übersicht von TimeLimit \"Gerät hinzufügen\" wählen.
         Geben Sie dann den dort angezeigten Code hier ein.
     </string>
     <string name="setup_remote_child_hint_code">Code zum Verknüpfen</string>
