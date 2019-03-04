@@ -152,8 +152,22 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             Log.d(LOG_TAG, "step 4.5")
         }
 
-        if (forNotification && category.blockAllNotifications) {
-            return liveDataFromValue(BlockingReason.NotificationsAreBlocked)
+        fun default() = getBlockingReasonStep4Point7(category, child, timeZone, isParentCategory, forNotification)
+
+        return if (forNotification && category.blockAllNotifications) {
+            appLogic.fullVersion.shouldProvideFullVersionFunctions.switchMap { fullVersion ->
+                if (fullVersion) {
+                    liveDataFromValue(BlockingReason.NotificationsAreBlocked)
+                } else {
+                    default()
+                }
+            }
+        } else default()
+    }
+
+    private fun getBlockingReasonStep4Point7(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, forNotification: Boolean): LiveData<BlockingReason> {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "step 4.7")
         }
 
         if (category.temporarilyBlocked) {
