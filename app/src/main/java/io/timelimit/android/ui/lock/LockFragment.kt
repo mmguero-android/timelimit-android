@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.lock
 
 import android.content.Intent
+import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
@@ -287,10 +288,17 @@ class LockFragment : Fragment() {
                             logic.platformIntegration.setSuspendedApps(listOf(packageName), false)
 
                             Threads.database.executeAndWait(Runnable {
-                                database.temporarilyAllowedApp().addTemporarilyAllowedAppSync(TemporarilyAllowedApp(
-                                        deviceId = deviceId,
-                                        packageName = packageName
-                                ))
+                                try {
+                                    database.temporarilyAllowedApp().addTemporarilyAllowedAppSync(TemporarilyAllowedApp(
+                                            deviceId = deviceId,
+                                            packageName = packageName
+                                    ))
+                                } catch (ex: SQLiteConstraintException) {
+                                    // ignore this
+                                    //
+                                    // this happens when touching that option more than once very fast
+                                    // or if the device is under load
+                                }
                             })
                         }
                     }
