@@ -86,4 +86,5 @@
     <string name="lock_reason_short_blocked_time_area">blocked time area</string>
     <string name="lock_reason_short_missing_network_time">missing network time</string>
     <string name="lock_reason_short_requires_current_device">device must be the current device</string>
+    <string name="lock_reason_short_notification_blocking">all notifications are blocked</string>
 </resources>

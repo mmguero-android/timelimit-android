@@ -93,6 +93,7 @@ class NotificationListener: NotificationListenerService() {
                                                     BlockingReason.BlockedAtThisTime -> getString(R.string.lock_reason_short_blocked_time_area)
                                                     BlockingReason.MissingNetworkTime -> getString(R.string.lock_reason_short_missing_network_time)
                                                     BlockingReason.RequiresCurrentDevice -> getString(R.string.lock_reason_short_requires_current_device)
+                                                    BlockingReason.NotificationsAreBlocked -> getString(R.string.lock_reason_short_notification_blocking)
                                                     BlockingReason.None -> throw IllegalStateException()
                                                 }
                                 )
@@ -115,7 +116,10 @@ class NotificationListener: NotificationListenerService() {
             return BlockingReason.None
         }
 
-        val blockingReason = blockingReasonUtil.getBlockingReason(sbn.packageName).waitForNonNullValue()
+        val blockingReason = blockingReasonUtil.getBlockingReason(
+                packageName = sbn.packageName,
+                forNotification = true
+        ).waitForNonNullValue()
 
         if (blockingReason == BlockingReason.None) {
             return BlockingReason.None

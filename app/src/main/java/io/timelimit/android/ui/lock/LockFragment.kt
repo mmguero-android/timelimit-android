@@ -72,7 +72,7 @@ class LockFragment : Fragment() {
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val title: String? by lazy { logic.platformIntegration.getLocalAppTitle(packageName) }
-    private val blockingReason: LiveData<BlockingReason> by lazy { BlockingReasonUtil(logic).getBlockingReason(packageName) }
+    private val blockingReason: LiveData<BlockingReason> by lazy { BlockingReasonUtil(logic).getBlockingReason(packageName, forNotification = false) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = LockFragmentBinding.inflate(layoutInflater, container, false)

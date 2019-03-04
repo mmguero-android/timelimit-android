@@ -82,4 +82,5 @@
     <string name="lock_reason_short_blocked_time_area">Sperrzeit</string>
     <string name="lock_reason_short_missing_network_time">Netzwerkzeit erforderlich</string>
     <string name="lock_reason_short_requires_current_device">nicht als aktuelles Gerät gewählt</string>
+    <string name="lock_reason_short_notification_blocking">alle Benachrichtigungen werden blockiert</string>
 </resources>
