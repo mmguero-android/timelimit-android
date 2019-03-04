@@ -19,6 +19,8 @@
         Wenn der Benachrichtigungszugriff in den Geräte-Einträgen aktiviert wurde,
         dann werden Benachrichtigungen bei Sperrzeiten und wenn die Zeit abgelaufen ist blockiert.
         Hiermit können die Benachrichtigungen von Apps einer Kategorie immer blockiert werden.
+        Diese Funktion setzt voraus, dass der Benachrichtigungszugriff aktiviert wurde. Ansonsten funktioniert
+        diese Funktion nicht.
     </string>
     <string name="category_notifications_filter_checkbox">Alle Benachrichtigungen blockieren</string>
 </resources>

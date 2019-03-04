@@ -19,6 +19,8 @@
         When enabling the notification access in the device entries,
         then notifications are blocked at blocked time areas and when the time is over.
         Here you can enable blocking all notifications from Apps of a category.
+        This feature requires that the notification access was enabled. Otherwise,
+        it does not work.
     </string>
     <string name="category_notifications_filter_checkbox">Block all notifications</string>
 </resources>
