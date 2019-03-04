@@ -1,1 +1,5 @@
-Möglichkeit hinzugefügt, Benachrichtungen von Apps einer Kategorie immer zu blockieren
+Fehlerbehebungen:
+- Absturz behoben, der auftrat, wenn ein Listenelement seitlich weggeschoben wurde (zum Entfernen) während Änderungen an der Liste angewendet wurden
+- Absturz behoben, der auftrat, wenn eine App mehrfach (durch mehrfaches Tippen auf einem langsamen Gerät) vorübergehend erlaubt wurde
+- Absturz behoben, der auftrat, wenn TimeLimit die Statusbenachrichtigung anzeigt hat und kurz danach wieder entfernen wollte
+- Absturz behoben, der beim Verarbeiten von In-App-Käufen auftreten konnte
