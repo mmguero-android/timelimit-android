@@ -104,6 +104,14 @@ android {
         if (dim.channel == 'storeVersion' && dim.api == 'noGoogleApi') {
             variant.setIgnore(true)
         }
+
+        if (dim.channel == 'directVersion' && dim.api == 'googleApi') {
+            variant.setIgnore(true)
+        }
+
+        if (dim.server == 'noServer' && dim.api == 'googleApi') {
+            variant.setIgnore(true)
+        }
     }
 
     lintOptions {
