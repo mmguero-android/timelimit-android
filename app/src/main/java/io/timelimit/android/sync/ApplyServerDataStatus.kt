@@ -274,6 +274,7 @@ object ApplyServerDataStatus {
                                     blockedMinutesInWeek = newCategory.blockedMinutesInWeek,
                                     extraTimeInMillis = newCategory.extraTimeInMillis,
                                     temporarilyBlocked = newCategory.temporarilyBlocked,
+                                    blockAllNotifications = newCategory.blockAllNotifications,
                                     baseVersion = newCategory.baseDataVersion,
                                     assignedAppsVersion = "",
                                     timeLimitRulesVersion = "",
@@ -287,6 +288,7 @@ object ApplyServerDataStatus {
                                     blockedMinutesInWeek = newCategory.blockedMinutesInWeek,
                                     extraTimeInMillis = newCategory.extraTimeInMillis,
                                     temporarilyBlocked = newCategory.temporarilyBlocked,
+                                    blockAllNotifications = newCategory.blockAllNotifications,
                                     baseVersion = newCategory.baseDataVersion,
                                     parentCategoryId = newCategory.parentCategoryId
                             )

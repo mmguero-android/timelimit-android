@@ -300,7 +300,8 @@ data class ServerUpdatedCategoryBaseData(
         val extraTimeInMillis: Long,
         val temporarilyBlocked: Boolean,
         val baseDataVersion: String,
-        val parentCategoryId: String
+        val parentCategoryId: String,
+        val blockAllNotifications: Boolean
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -311,6 +312,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val TEMPORARILY_BLOCKED = "tempBlocked"
         private const val BASE_DATA_VERSION = "version"
         private const val PARENT_CATEGORY_ID = "parentCategoryId"
+        private const val BLOCK_ALL_NOTIFICATIONS = "blockAllNotifications"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -321,6 +323,8 @@ data class ServerUpdatedCategoryBaseData(
             var temporarilyBlocked: Boolean? = null
             var baseDataVersion: String? = null
             var parentCategoryId: String? = null
+            // added later -> default values
+            var blockAllNotifications = false
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -333,6 +337,7 @@ data class ServerUpdatedCategoryBaseData(
                     TEMPORARILY_BLOCKED -> temporarilyBlocked = reader.nextBoolean()
                     BASE_DATA_VERSION -> baseDataVersion = reader.nextString()
                     PARENT_CATEGORY_ID -> parentCategoryId = reader.nextString()
+                    BLOCK_ALL_NOTIFICATIONS -> blockAllNotifications = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -346,7 +351,8 @@ data class ServerUpdatedCategoryBaseData(
                     extraTimeInMillis = extraTimeInMillis!!,
                     temporarilyBlocked = temporarilyBlocked!!,
                     baseDataVersion = baseDataVersion!!,
-                    parentCategoryId = parentCategoryId!!
+                    parentCategoryId = parentCategoryId!!,
+                    blockAllNotifications = blockAllNotifications
             )
         }
 

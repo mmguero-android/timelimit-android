@@ -164,7 +164,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             assignedAppsVersion = "",
                             timeLimitRulesVersion = "",
                             usedTimesVersion = "",
-                            parentCategoryId = ""
+                            parentCategoryId = "",
+                            blockAllNotifications = false
                     ))
 
                     appLogic.database.category().addCategory(Category(
@@ -178,7 +179,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             assignedAppsVersion = "",
                             timeLimitRulesVersion = "",
                             usedTimesVersion = "",
-                            parentCategoryId = ""
+                            parentCategoryId = "",
+                            blockAllNotifications = false
                     ))
 
                     // add default allowed apps

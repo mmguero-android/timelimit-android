@@ -78,7 +78,8 @@ object LocalDatabaseParentActionDispatcher {
                             assignedAppsVersion = "",
                             timeLimitRulesVersion = "",
                             usedTimesVersion = "",
-                            parentCategoryId = ""
+                            parentCategoryId = "",
+                            blockAllNotifications = false
                     ))
                 }
                 is DeleteCategoryAction -> {
