@@ -84,7 +84,7 @@ android {
         }
         noServer {
             dimension 'server'
-            buildConfigField 'String', 'serverUrl', '"https://128.0.0.1"'
+            buildConfigField 'String', 'serverUrl', '"https://127.0.0.1"'
             buildConfigField 'boolean', 'hasServer', 'false'
             applicationIdSuffix '.offline'
         }
