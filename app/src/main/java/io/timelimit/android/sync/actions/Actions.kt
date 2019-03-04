@@ -877,6 +877,28 @@ data class UpdateCategoryBlockedTimesAction(val categoryId: String, val blockedT
     }
 }
 
+data class UpdateCategoryBlockAllNotificationsAction(val categoryId: String, val blocked: Boolean): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_CATEGORY_BLOCK_ALL_NOTIFICATIONS"
+        private const val CATEGORY_ID = "categoryId"
+        private const val BLOCK = "blocked"
+    }
+
+    init {
+        IdGenerator.assertIdValid(categoryId)
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(BLOCK).value(blocked)
+
+        writer.endObject()
+    }
+}
+
 data class CreateTimeLimitRuleAction(val rule: TimeLimitRule): ParentAction() {
     companion object {
         const val TYPE_VALUE = "CREATE_TIMELIMIT_RULE"

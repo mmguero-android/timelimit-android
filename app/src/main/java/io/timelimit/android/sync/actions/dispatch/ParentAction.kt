@@ -454,6 +454,16 @@ object LocalDatabaseParentActionDispatcher {
                             )
                     )
                 }
+                is UpdateCategoryBlockAllNotificationsAction -> {
+                    val categoryEntry = database.category().getCategoryByIdSync(action.categoryId)
+                            ?: throw IllegalArgumentException("can not update notification blocking for non exsistent category")
+
+                    database.category().updateCategorySync(
+                            categoryEntry.copy(
+                                    blockAllNotifications = action.blocked
+                            )
+                    )
+                }
             }.let { }
 
             database.setTransactionSuccessful()

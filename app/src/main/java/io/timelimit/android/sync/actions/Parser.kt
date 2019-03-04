@@ -60,6 +60,7 @@ object ActionParser {
         // SetConsiderRebootManipulationAction
         // RenameChildAction
         // UpdateParentNotificationFlagsAction
+        // UpdateCategoryBlockAllNotificationsAction
         else -> throw IllegalStateException()
     }
 }
