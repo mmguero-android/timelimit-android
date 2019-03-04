@@ -165,8 +165,14 @@ class ActivityPurchaseModel(application: Application): AndroidViewModel(applicat
 
         runAsync {
             lock.withLock {
-                Checkout.forApplication(billing).startAsync().use {
-                    it.requests.consumeAsync(purchase.token)
+                try {
+                    Checkout.forApplication(billing).startAsync().use {
+                        it.requests.consumeAsync(purchase.token)
+                    }
+                } catch (ex: Exception) {
+                    if (BuildConfig.DEBUG) {
+                        Log.w(LOG_TAG, "consumePurchaseAsync() failed", ex)
+                    }
                 }
             }
         }
