@@ -97,7 +97,10 @@ class OverviewFragment : CoroutineFragment(), CanNotAddDevicesInLocalModeDialogF
         ItemTouchHelper(
                 object: ItemTouchHelper.Callback() {
                     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-                        if (adapter.data!![viewHolder.adapterPosition] == OverviewFragmentHeaderIntro) {
+                        val index = viewHolder.adapterPosition
+                        val item = if (index == RecyclerView.NO_POSITION) null else adapter.data!![index]
+
+                        if (item == OverviewFragmentHeaderIntro) {
                             return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END) or
                                     makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END)
                         } else {

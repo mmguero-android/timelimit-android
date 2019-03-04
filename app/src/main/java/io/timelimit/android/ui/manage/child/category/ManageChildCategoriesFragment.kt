@@ -91,7 +91,10 @@ class ManageChildCategoriesFragment : Fragment() {
 
         ItemTouchHelper(object: ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-                if (adapter.categories!![viewHolder.adapterPosition] == CategoriesIntroductionHeader) {
+                val index = viewHolder.adapterPosition
+                val item = if (index == RecyclerView.NO_POSITION) null else adapter.categories!![index]
+
+                if (item == CategoriesIntroductionHeader) {
                     return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END) or
                             makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END)
                 } else {
