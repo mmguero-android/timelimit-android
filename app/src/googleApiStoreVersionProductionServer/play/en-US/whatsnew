@@ -1,1 +1,1 @@
-Fix crash which occurs when removing a device from TimeLimit at which a time limited App is used
+Add option to block all notifications of Apps from a category
