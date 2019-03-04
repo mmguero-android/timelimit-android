@@ -76,6 +76,9 @@
             <include android:id="@+id/parent_category"
                 layout="@layout/manage_parent_category" />
 
+            <include android:id="@+id/notification_filter"
+                layout="@layout/category_notification_filter" />
+
             <androidx.cardview.widget.CardView
                 app:cardUseCompatPadding="true"
                 android:layout_width="match_parent"

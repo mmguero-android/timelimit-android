@@ -69,6 +69,14 @@ class CategorySettingsFragment : Fragment() {
                 auth = auth
         )
 
+        CategoryNotificationFilter.bind(
+                view = binding.notificationFilter,
+                lifecycleOwner = this,
+                fragmentManager = fragmentManager!!,
+                auth = auth,
+                categoryLive = categoryEntry
+        )
+
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }
         binding.editCategoryTitleGo.setOnClickListener { renameCategory() }
 
