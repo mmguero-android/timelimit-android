@@ -37,10 +37,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
+import io.timelimit.android.coroutines.runAsyncExpectForever
 import io.timelimit.android.data.model.App
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.integration.platform.android.foregroundapp.ForegroundAppHelper
 import io.timelimit.android.ui.lock.LockActivity
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.delay
 
 
 class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectionLevel) {
@@ -159,12 +163,22 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     }
 
     private var lastAppStatusMessage: AppStatusMessage? = null
+    private var appStatusMessageChannel = Channel<AppStatusMessage?>(capacity = Channel.CONFLATED)
 
     override fun setAppStatusMessage(message: AppStatusMessage?) {
         if (lastAppStatusMessage != message) {
             lastAppStatusMessage = message
+            appStatusMessageChannel.offer(message)
+        }
+    }
 
-            BackgroundService.setStatusMessage(message, context)
+    init {
+        runAsyncExpectForever {
+            appStatusMessageChannel.consumeEach { message ->
+                BackgroundService.setStatusMessage(message, context)
+
+                delay(200)
+            }
         }
     }
 
