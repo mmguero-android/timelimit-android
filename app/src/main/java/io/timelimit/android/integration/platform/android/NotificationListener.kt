@@ -35,12 +35,14 @@ import io.timelimit.android.logic.*
 class NotificationListener: NotificationListenerService() {
     companion object {
         private const val LOG_TAG = "NotificationListenerLog"
+        private val SUPPORTS_HIDING_ONGOING_NOTIFICATIONS = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     }
 
     private val appLogic: AppLogic by lazy { DefaultAppLogic.with(this) }
     private val blockingReasonUtil: BlockingReasonUtil by lazy { BlockingReasonUtil(appLogic) }
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private val queryAppTitleCache: QueryAppTitleCache by lazy { QueryAppTitleCache(appLogic.platformIntegration) }
+    private val lastOngoingNotificationHidden = mutableSetOf<String>()
 
     override fun onCreate() {
         super.onCreate()
@@ -58,9 +60,23 @@ class NotificationListener: NotificationListenerService() {
         runAsync {
             val reason = shouldRemoveNotification(sbn)
 
-            if (reason != BlockingReason.None) {
+            if (reason == BlockingReason.None) {
+                if (sbn.isOngoing) {
+                    lastOngoingNotificationHidden.remove(sbn.packageName)
+                }
+            } else {
                 val success = try {
-                    cancelNotification(sbn.key)
+                    if (sbn.isOngoing && SUPPORTS_HIDING_ONGOING_NOTIFICATIONS) {
+                        // only snooze for 5 seconds to show it again soon
+                        snoozeNotification(sbn.key, 5000)
+
+                        if (!lastOngoingNotificationHidden.add(sbn.packageName)) {
+                            // skip showing again a notification that it was blocked
+                            return@runAsync
+                        }
+                    } else {
+                        cancelNotification(sbn.key)
+                    }
 
                     true
                 } catch (ex: SecurityException) {
@@ -112,7 +128,11 @@ class NotificationListener: NotificationListenerService() {
     }
 
     private suspend fun shouldRemoveNotification(sbn: StatusBarNotification): BlockingReason {
-        if (sbn.packageName == packageName || sbn.isOngoing) {
+        if (sbn.packageName == packageName) {
+            return BlockingReason.None
+        }
+
+        if (sbn.isOngoing && (!SUPPORTS_HIDING_ONGOING_NOTIFICATIONS)) {
             return BlockingReason.None
         }
 
