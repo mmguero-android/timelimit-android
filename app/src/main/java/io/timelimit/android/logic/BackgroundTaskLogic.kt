@@ -128,6 +128,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
     private var usedTimeUpdateHelper: UsedTimeItemBatchUpdateHelper? = null
     private var previousMainLogicExecutionTime = 0
     private var previousMainLoopEndTime = 0L
+    private val dayChangeTracker = DayChangeTracker(
+            timeApi = appLogic.timeApi,
+            longDuration = 1000 * 60 * 10 /* 10 minutes */
+    )
 
     private val appTitleCache = QueryAppTitleCache(appLogic.platformIntegration)
 
@@ -183,6 +187,32 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
             try {
                 // get the current time
                 appLogic.realTimeLogic.getRealTime(realTime)
+
+                val nowTimestamp = realTime.timeInMillis
+                val nowTimezone = TimeZone.getTimeZone(deviceUserEntry.timeZone)
+
+                val nowDate = DateInTimezone.newInstance(nowTimestamp, nowTimezone)
+                val minuteOfWeek = getMinuteOfWeek(nowTimestamp, nowTimezone)
+
+                // eventually remove old used time data
+                if (realTime.shouldTrustTimePermanently) {
+                    val dayChange = dayChangeTracker.reportDayChange(nowDate.dayOfEpoch)
+
+                    fun deleteOldUsedTimes() = UsedTimeDeleter.deleteOldUsedTimeItems(
+                            database = appLogic.database,
+                            date = nowDate
+                    )
+
+                    if (realTime.isNetworkTime) {
+                        if (dayChange == DayChangeTracker.DayChange.Now) {
+                            deleteOldUsedTimes()
+                        }
+                    } else {
+                        if (dayChange == DayChangeTracker.DayChange.NowSinceLongerTime) {
+                            deleteOldUsedTimes()
+                        }
+                    }
+                }
 
                 // get the categories
                 val categories = childCategories.get(deviceUserEntry.id).waitForNonNullValue()
@@ -242,12 +272,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         ))
                         appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
                     } else {
-                        val nowTimestamp = realTime.timeInMillis
-                        val nowTimezone = TimeZone.getTimeZone(deviceUserEntry.timeZone)
-
-                        val nowDate = DateInTimezone.newInstance(nowTimestamp, nowTimezone)
-                        val minuteOfWeek = getMinuteOfWeek(nowTimestamp, nowTimezone)
-
                         // disable time limits temporarily feature
                         if (realTime.shouldTrustTimeTemporarily && nowTimestamp < deviceUserEntry.disableLimitsUntil) {
                             appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(

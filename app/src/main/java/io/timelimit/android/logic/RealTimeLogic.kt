@@ -142,34 +142,41 @@ class RealTimeLogic(private val appLogic: AppLogic) {
             time.timeInMillis = systemTime
             time.shouldTrustTimeTemporarily = true
             time.shouldTrustTimePermanently = false
+            time.isNetworkTime = false
         } else if (deviceConfig.networkTime == NetworkTime.Disabled) {
             time.timeInMillis = systemTime
             time.shouldTrustTimeTemporarily = true
             time.shouldTrustTimePermanently = true
+            time.isNetworkTime = false
         } else if (deviceConfig.networkTime == NetworkTime.IfPossible) {
             if (uptimeRealTimeOffset != null) {
                 time.timeInMillis = systemUptime + uptimeRealTimeOffset
                 time.shouldTrustTimeTemporarily = true
                 time.shouldTrustTimePermanently = true
+                time.isNetworkTime = true
             } else {
                 time.timeInMillis = systemTime
                 time.shouldTrustTimeTemporarily = true
                 time.shouldTrustTimePermanently = true
+                time.isNetworkTime = false
             }
         } else if (deviceConfig.networkTime == NetworkTime.Enabled) {
             if (uptimeRealTimeOffset != null) {
                 time.timeInMillis = systemUptime + uptimeRealTimeOffset
                 time.shouldTrustTimeTemporarily = true
                 time.shouldTrustTimePermanently = true
+                time.isNetworkTime = true
             } else if (confirmedUptimeSystemTimeOffset != null) {
                 time.timeInMillis = systemUptime + confirmedUptimeSystemTimeOffset
                 time.shouldTrustTimeTemporarily = true
                 time.shouldTrustTimePermanently = false
+                time.isNetworkTime = false
             } else {
                 time.timeInMillis = systemTime
                 // 5 seconds grace period
                 time.shouldTrustTimeTemporarily = requireRemoteTimeUptime + 5000 > systemUptime
                 time.shouldTrustTimePermanently = false
+                time.isNetworkTime = false
             }
         } else {
             throw IllegalStateException()
@@ -199,9 +206,10 @@ class RealTimeLogic(private val appLogic: AppLogic) {
 data class RealTime(
         var timeInMillis: Long,
         var shouldTrustTimeTemporarily: Boolean,
-        var shouldTrustTimePermanently: Boolean
+        var shouldTrustTimePermanently: Boolean,
+        var isNetworkTime: Boolean
 ) {
     companion object {
-        fun newInstance() = RealTime(0, false, false)
+        fun newInstance() = RealTime(0, false, false, false)
     }
 }

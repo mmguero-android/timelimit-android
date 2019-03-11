@@ -60,6 +60,9 @@ abstract class UsedTimeDao {
     @Query("DELETE FROM used_time WHERE category_id = :categoryId")
     abstract fun deleteUsedTimeItems(categoryId: String)
 
+    @Query("DELETE FROM used_time WHERE day_of_epoch < :lastDayToKeep")
+    abstract fun deleteOldUsedTimeItems(lastDayToKeep: Int)
+
     @Query("SELECT * FROM used_time LIMIT :pageSize OFFSET :offset")
     abstract fun getUsedTimePageSync(offset: Int, pageSize: Int): List<UsedTimeItem>
 
