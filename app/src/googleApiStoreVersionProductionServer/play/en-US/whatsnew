@@ -1,5 +1,1 @@
-Bugfixes:
-- fix crash which occurred when dismissing a list element while the list was updated
-- fix crash which occurred when tapping multiple times "allow app temporarily" at a slow device
-- fix crash which occurred when TimeLimit showed the status notification for a short moment and tried to hide it then
-- fix crash which occurred sometimes when processing in app purchases
+Extend notification filter for ongoing notifications

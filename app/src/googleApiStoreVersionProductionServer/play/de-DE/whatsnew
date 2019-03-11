@@ -1,5 +1,1 @@
-Abstürze behoben:
-- wenn ein Listenelement seitlich weggeschoben wurde (zum Entfernen) während Änderungen an der Liste angewendet wurden
-- wenn eine App mehrfach (durch mehrfaches Tippen auf einem langsamen Gerät) vorübergehend erlaubt wurde
-- wenn TimeLimit die Statusbenachrichtigung anzeigt hat und kurz danach wieder entfernen wollte
-- beim Verarbeiten von In-App-Käufen
+Benachrichtigungsfilter erweitert für nicht-entfernbare Benachrichtigungen
