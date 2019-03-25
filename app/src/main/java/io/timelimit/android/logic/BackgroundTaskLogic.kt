@@ -160,13 +160,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     appLogic.defaultUserLogic.reportScreenOn(appLogic.platformIntegration.isScreenOn())
 
                     appLogic.platformIntegration.setAppStatusMessage(
-                            if (IsAppInForeground.isRunning())
-                                null
-                            else
-                                AppStatusMessage(
-                                        title = appLogic.context.getString(R.string.background_logic_timeout_title),
-                                        text = appLogic.context.getString(R.string.background_logic_timeout_text)
-                                )
+                            AppStatusMessage(
+                                    title = appLogic.context.getString(R.string.background_logic_timeout_title),
+                                    text = appLogic.context.getString(R.string.background_logic_timeout_text)
+                            )
                     )
 
                     liveDataCaches.reportLoopDone()
@@ -232,11 +229,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 val foregroundAppPackageName = appLogic.platformIntegration.getForegroundAppPackageName()
                 // the following is not executed if the permission is missing
 
-                if (foregroundAppPackageName == BuildConfig.APPLICATION_ID) {
-                    // this app itself runs now -> no need for an status message
-                    usedTimeUpdateHelper?.commit(appLogic)
-                    appLogic.platformIntegration.setAppStatusMessage(null)
-                } else if (foregroundAppPackageName != null && AndroidIntegrationApps.ignoredApps.contains(foregroundAppPackageName)) {
+                if (
+                        (foregroundAppPackageName == BuildConfig.APPLICATION_ID) ||
+                        (foregroundAppPackageName != null && AndroidIntegrationApps.ignoredApps.contains(foregroundAppPackageName))
+                ) {
                     usedTimeUpdateHelper?.commit(appLogic)
                     appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
                             appTitleCache.query(foregroundAppPackageName),
