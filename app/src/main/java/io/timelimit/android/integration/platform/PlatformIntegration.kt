@@ -32,6 +32,7 @@ abstract class PlatformIntegration(
     abstract fun getDrawOverOtherAppsPermissionStatus(): RuntimePermissionStatus
     abstract fun getNotificationAccessPermissionStatus(): NewPermissionStatus
     abstract fun getOverlayPermissionStatus(): RuntimePermissionStatus
+    abstract fun isAccessibilityServiceEnabled(): Boolean
     abstract fun disableDeviceAdmin()
     abstract fun trySetLockScreenPassword(password: String): Boolean
     // this must have a fallback if the permission is not granted

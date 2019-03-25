@@ -294,6 +294,10 @@ object LocalDatabaseParentActionDispatcher {
                         deviceEntry = deviceEntry.copy(highestOverlayPermission = deviceEntry.currentOverlayPermission)
                     }
 
+                    if (action.ignoreAccessibilityServiceManipulation) {
+                        deviceEntry = deviceEntry.copy(wasAccessibilityServiceEnabled = deviceEntry.accessibilityServiceEnabled)
+                    }
+
                     if (action.ignoreReboot) {
                         deviceEntry = deviceEntry.copy(manipulationDidReboot = false)
                     }

@@ -140,6 +140,28 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
 
     override fun getOverlayPermissionStatus(): RuntimePermissionStatus = overlay.getOverlayPermissionStatus()
 
+    override fun isAccessibilityServiceEnabled(): Boolean {
+        val service = context.packageName + "/" + AccessibilityService::class.java.canonicalName
+
+        val accessibilityEnabled = try {
+            Settings.Secure.getInt(context.contentResolver, Settings.Secure.ACCESSIBILITY_ENABLED)
+        } catch (ex: Settings.SettingNotFoundException) {
+            0
+        }
+
+        if (accessibilityEnabled == 1) {
+            val enabledServicesString = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+
+            if (!enabledServicesString.isNullOrEmpty()) {
+                if (enabledServicesString.split(":").contains(service)) {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
     override fun trySetLockScreenPassword(password: String): Boolean {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "set password")

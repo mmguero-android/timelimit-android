@@ -38,6 +38,10 @@
             type="Boolean" />
 
         <variable
+            name="hasManipulatedAccessibilityService"
+            type="Boolean" />
+
+        <variable
             name="hasManipulatedAppVersion"
             type="Boolean" />
 
@@ -115,6 +119,13 @@
                 android:visibility="@{safeUnbox(hasManipulatedOverlayPermission) ? View.VISIBLE : View.GONE}"
                 android:id="@+id/overlay_permission_checkbox"
                 android:text="@string/manage_device_manipulation_overlay_permission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:visibility="@{safeUnbox(hasManipulatedAccessibilityService) ? View.VISIBLE : View.GONE}"
+                android:id="@+id/accessibility_service_checkbox"
+                android:text="@string/manage_device_manipulation_accessibility_service"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

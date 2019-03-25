@@ -65,6 +65,10 @@ class DummyIntegration(
         return RuntimePermissionStatus.NotRequired
     }
 
+    override fun isAccessibilityServiceEnabled(): Boolean {
+        return false
+    }
+
     override fun trySetLockScreenPassword(password: String): Boolean {
         return false    // it failed
     }

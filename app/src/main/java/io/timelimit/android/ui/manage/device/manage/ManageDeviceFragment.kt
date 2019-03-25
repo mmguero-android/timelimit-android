@@ -195,6 +195,13 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 }
             }
 
+            override fun openAccessibilitySettings() {
+                startActivity(
+                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
+
             override fun manageDeviceAdmin() {
                 if (binding.isThisDevice == true) {
                     val protectionLevel = logic.platformIntegration.getCurrentProtectionLevel()
@@ -279,6 +286,7 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 binding.notificationAccessPermission = device.currentNotificationAccessPermission
                 binding.protectionLevel = device.currentProtectionLevel
                 binding.overlayPermission = device.currentOverlayPermission
+                binding.accessibilityServiceEnabled = device.accessibilityServiceEnabled
                 binding.didAppDowngrade = device.currentAppVersion < device.highestAppVersion
             }
         })
@@ -365,6 +373,7 @@ interface ManageDeviceFragmentHandlers {
     fun openUsageStatsSettings()
     fun openNotificationAccessSettings()
     fun openDrawOverOtherAppsScreen()
+    fun openAccessibilitySettings()
     fun manageDeviceAdmin()
     fun editDeviceTitle()
     fun showAuthenticationScreen()

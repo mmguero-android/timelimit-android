@@ -52,6 +52,12 @@
         Das Anzeigen über anderen Apps kann das Sperren in einigen Fällen verbessern.
     </string>
 
+    <string name="manage_device_permission_accessibility_title">Bedienhilfe</string>
+    <string name="manage_device_permission_accessibility_text">
+        Damit \"drückt\" TimeLimit den Home-Button, bevor der Sperrbildschirm aufgerufen wird.
+        Das kann das Sperren in einigen Fällen verbessern.
+    </string>
+
     <string name="manage_device_permission_device_admin_title">Geräte-Administrator</string>
     <string name="manage_device_permission_device_admin_text_disabled">
         Die Geräte-Administrator-Berechtigung wurde nicht gewährt. TimeLimit kann jederzeit über die Systemeinstellungen beendet werden.

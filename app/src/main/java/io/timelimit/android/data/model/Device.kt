@@ -82,7 +82,11 @@ data class Device(
         @ColumnInfo(name = "current_overlay_permission")
         val currentOverlayPermission: RuntimePermissionStatus,
         @ColumnInfo(name = "highest_overlay_permission")
-        val highestOverlayPermission: RuntimePermissionStatus
+        val highestOverlayPermission: RuntimePermissionStatus,
+        @ColumnInfo(name = "current_accessibility_service_permission")
+        val accessibilityServiceEnabled: Boolean,
+        @ColumnInfo(name = "was_accessibility_service_permission")
+        val wasAccessibilityServiceEnabled: Boolean
 ): JsonSerializable {
     companion object {
         private const val ID = "id"
@@ -111,6 +115,8 @@ data class Device(
         private const val CONSIDER_REBOOT_A_MANIPULATION = "cram"
         private const val CURRENT_OVERLAY_PERMISSION = "cop"
         private const val HIGHEST_OVERLAY_PERMISSION = "hop"
+        private const val ACCESSIBILITY_SERVICE_ENABLED = "ase"
+        private const val WAS_ACCESSIBILITY_SERVICE_ENABLED = "wase"
 
         fun parse(reader: JsonReader): Device {
             var id: String? = null
@@ -139,6 +145,8 @@ data class Device(
             var considerRebootManipulation = false
             var currentOverlayPermission = RuntimePermissionStatus.NotGranted
             var highestOverlayPermission = RuntimePermissionStatus.NotGranted
+            var accessibilityServiceEnabled = false
+            var wasAccessibilityServiceEnabled = false
 
             reader.beginObject()
 
@@ -170,6 +178,8 @@ data class Device(
                     CONSIDER_REBOOT_A_MANIPULATION -> considerRebootManipulation = reader.nextBoolean()
                     CURRENT_OVERLAY_PERMISSION -> currentOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
                     HIGHEST_OVERLAY_PERMISSION -> highestOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
+                    ACCESSIBILITY_SERVICE_ENABLED -> accessibilityServiceEnabled = reader.nextBoolean()
+                    WAS_ACCESSIBILITY_SERVICE_ENABLED -> wasAccessibilityServiceEnabled = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -202,7 +212,9 @@ data class Device(
                     defaultUserTimeout = defaultUserTimeout,
                     considerRebootManipulation = considerRebootManipulation,
                     currentOverlayPermission = currentOverlayPermission,
-                    highestOverlayPermission = highestOverlayPermission
+                    highestOverlayPermission = highestOverlayPermission,
+                    accessibilityServiceEnabled = accessibilityServiceEnabled,
+                    wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled
             )
         }
     }
@@ -268,6 +280,8 @@ data class Device(
         writer.name(CONSIDER_REBOOT_A_MANIPULATION).value(considerRebootManipulation)
         writer.name(CURRENT_OVERLAY_PERMISSION).value(RuntimePermissionStatusUtil.serialize(currentOverlayPermission))
         writer.name(HIGHEST_OVERLAY_PERMISSION).value(RuntimePermissionStatusUtil.serialize(highestOverlayPermission))
+        writer.name(ACCESSIBILITY_SERVICE_ENABLED).value(accessibilityServiceEnabled)
+        writer.name(WAS_ACCESSIBILITY_SERVICE_ENABLED).value(wasAccessibilityServiceEnabled)
 
         writer.endObject()
     }
@@ -282,6 +296,8 @@ data class Device(
     val manipulationOfAppVersion = currentAppVersion != highestAppVersion
     @Transient
     val manipulationOfOverlayPermission = currentOverlayPermission != highestOverlayPermission
+    @Transient
+    val manipulationOfAccessibilityService = accessibilityServiceEnabled != wasAccessibilityServiceEnabled
 
     @Transient
     val hasActiveManipulationWarning = manipulationOfProtectionLevel ||
@@ -290,7 +306,8 @@ data class Device(
             manipulationOfAppVersion ||
             manipulationTriedDisablingDeviceAdmin ||
             manipulationDidReboot ||
-            manipulationOfOverlayPermission
+            manipulationOfOverlayPermission ||
+            manipulationOfAccessibilityService
 
     @Transient
     val hasAnyManipulation = hasActiveManipulationWarning || hadManipulation

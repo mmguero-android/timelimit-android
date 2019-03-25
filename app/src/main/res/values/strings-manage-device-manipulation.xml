@@ -23,6 +23,7 @@
     <string name="manage_device_manipulation_usage_stats_access">usage stats access</string>
     <string name="manage_device_manipulation_notification_access">notification access</string>
     <string name="manage_device_manipulation_overlay_permission">draw over other Apps permission</string>
+    <string name="manage_device_manipulation_accessibility_service">Accessibility service permission</string>
     <string name="manage_device_manipulation_app_version">older App version installed</string>
     <string name="manage_device_manipulation_reboot">device was rebooted</string>
     <string name="manage_device_manipulation_existed">there was a manipulation which was stopped again</string>

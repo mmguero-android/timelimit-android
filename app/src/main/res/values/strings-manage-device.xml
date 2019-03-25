@@ -52,6 +52,12 @@
         Enabling drawing on top of other Apps can improve blocking in some cases.
     </string>
 
+    <string name="manage_device_permission_accessibility_title">Accessibility service</string>
+    <string name="manage_device_permission_accessibility_text">
+        This is used to \"press\" the home button before showing the lock screen.
+        This fixes blocking in some cases.
+    </string>
+
     <string name="manage_device_permission_device_admin_title">Device admin</string>
     <string name="manage_device_permission_device_admin_text_disabled">
         The device admin permission was not granted.

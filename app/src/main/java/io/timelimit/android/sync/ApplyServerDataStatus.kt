@@ -156,7 +156,9 @@ object ApplyServerDataStatus {
                                         defaultUserTimeout = newDevice.defaultUserTimeout,
                                         considerRebootManipulation = newDevice.considerRebootManipulation,
                                         currentOverlayPermission = newDevice.currentOverlayPermission,
-                                        highestOverlayPermission = newDevice.highestOverlayPermission
+                                        highestOverlayPermission = newDevice.highestOverlayPermission,
+                                        accessibilityServiceEnabled = newDevice.accessibilityServiceEnabled,
+                                        wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled
                                 ))
                             } else {
                                 // eventually update old entry
@@ -185,7 +187,9 @@ object ApplyServerDataStatus {
                                         defaultUserTimeout = newDevice.defaultUserTimeout,
                                         considerRebootManipulation = newDevice.considerRebootManipulation,
                                         currentOverlayPermission = newDevice.currentOverlayPermission,
-                                        highestOverlayPermission = newDevice.highestOverlayPermission
+                                        highestOverlayPermission = newDevice.highestOverlayPermission,
+                                        accessibilityServiceEnabled = newDevice.accessibilityServiceEnabled,
+                                        wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled
                                 )
 
                                 if (updatedDeviceEntry != oldDeviceEntry) {

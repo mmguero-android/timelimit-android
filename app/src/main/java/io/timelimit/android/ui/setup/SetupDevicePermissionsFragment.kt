@@ -99,8 +99,16 @@ class SetupDevicePermissionsFragment : Fragment() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     startActivity(
                             Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
                 }
+            }
+
+            override fun openAccessibilitySettings() {
+                startActivity(
+                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
             }
 
             override fun gotoNextStep() {
@@ -124,6 +132,7 @@ class SetupDevicePermissionsFragment : Fragment() {
         binding.protectionLevel = platform.getCurrentProtectionLevel()
         binding.usageStatsAccess = platform.getForegroundAppPermissionStatus()
         binding.overlayPermission = platform.getOverlayPermissionStatus()
+        binding.accessibilityServiceEnabled = platform.isAccessibilityServiceEnabled()
     }
 
     override fun onResume() {
@@ -138,5 +147,6 @@ interface SetupDevicePermissionsHandlers {
     fun openUsageStatsSettings()
     fun openNotificationAccessSettings()
     fun openDrawOverOtherAppsScreen()
+    fun openAccessibilitySettings()
     fun gotoNextStep()
 }

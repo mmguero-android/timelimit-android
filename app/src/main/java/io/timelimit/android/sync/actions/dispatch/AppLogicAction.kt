@@ -168,6 +168,24 @@ object LocalDatabaseAppLogicActionDispatcher {
                         }
                     }
 
+                    if (action.newAccessibilityServiceEnabled != null) {
+                        if (device.accessibilityServiceEnabled != action.newAccessibilityServiceEnabled) {
+                            device = device.copy(
+                                    accessibilityServiceEnabled = action.newAccessibilityServiceEnabled
+                            )
+
+                            if (action.newAccessibilityServiceEnabled) {
+                                device = device.copy(
+                                        wasAccessibilityServiceEnabled = true
+                                )
+                            }
+
+                            if (device.accessibilityServiceEnabled != device.wasAccessibilityServiceEnabled) {
+                                device = device.copy(hadManipulation = true)
+                            }
+                        }
+                    }
+
                     if (action.newAppVersion != null) {
                         if (device.currentAppVersion != action.newAppVersion) {
                             device = device.copy(

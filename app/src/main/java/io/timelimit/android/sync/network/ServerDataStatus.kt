@@ -180,7 +180,9 @@ data class ServerDeviceData(
         val defaultUserTimeout: Int,
         val considerRebootManipulation: Boolean,
         val currentOverlayPermission: RuntimePermissionStatus,
-        val highestOverlayPermission: RuntimePermissionStatus
+        val highestOverlayPermission: RuntimePermissionStatus,
+        val accessibilityServiceEnabled: Boolean,
+        val wasAccessibilityServiceEnabled: Boolean
 ) {
     companion object {
         private const val DEVICE_ID = "deviceId"
@@ -208,6 +210,8 @@ data class ServerDeviceData(
         private const val CONSIDER_REBOOT_MANIPULATION = "rebootIsManipulation"
         private const val CURRENT_OVERLAY_PERMISSION = "cOverlay"
         private const val HIGHEST_OVERLAY_PERMISSION = "hOverlay"
+        private const val ACCESSIBILITY_SERVICE_ENABLED = "asEnabled"
+        private const val WAS_ACCESSIBILITY_SERVICE_ENABLED = "wasAsEnabled"
 
         fun parse(reader: JsonReader): ServerDeviceData {
             var deviceId: String? = null
@@ -235,6 +239,8 @@ data class ServerDeviceData(
             var considerRebootManipulation: Boolean? = null
             var currentOverlayPermission: RuntimePermissionStatus? = null
             var highestOverlayPermission: RuntimePermissionStatus? = null
+            var accessibilityServiceEnabled: Boolean? = null
+            var wasAccessibilityServiceEnabled: Boolean? = null
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -264,6 +270,8 @@ data class ServerDeviceData(
                     CONSIDER_REBOOT_MANIPULATION -> considerRebootManipulation = reader.nextBoolean()
                     CURRENT_OVERLAY_PERMISSION -> currentOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
                     HIGHEST_OVERLAY_PERMISSION -> highestOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
+                    ACCESSIBILITY_SERVICE_ENABLED -> accessibilityServiceEnabled = reader.nextBoolean()
+                    WAS_ACCESSIBILITY_SERVICE_ENABLED -> wasAccessibilityServiceEnabled = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -294,7 +302,9 @@ data class ServerDeviceData(
                     defaultUserTimeout = defaultUserTimeout!!,
                     considerRebootManipulation = considerRebootManipulation!!,
                     currentOverlayPermission = currentOverlayPermission!!,
-                    highestOverlayPermission = highestOverlayPermission!!
+                    highestOverlayPermission = highestOverlayPermission!!,
+                    accessibilityServiceEnabled = accessibilityServiceEnabled!!,
+                    wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled!!
             )
         }
 
