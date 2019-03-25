@@ -1,3 +1,1 @@
-- Statusbenachrichtigung wird auch angezeigt, wenn TimeLimit selbst geöffnet ist
-- automatische Löschung von alten Nutzungsdauer-Werten im lokalen Modus
-- Beta aus dem Namen und der Version entfernt
+- Bedienhilfe-Berechtigung, um das Sperren in einigen Fällen zu verbessern
