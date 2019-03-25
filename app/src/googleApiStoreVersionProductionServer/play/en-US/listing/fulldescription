@@ -32,3 +32,5 @@ Depending on the Android version, TimeLimit uses the permission for the usage st
 The device admin permission is used to detect an uninstallation of TimeLimit.
 
 TimeLimit uses the notification access to block notifications of blocked apps. Notifications and their contents are not saved.
+
+TimeLimit uses an accessibility service to press the home button before showing the lock screen. This fixes blocking in some cases.
