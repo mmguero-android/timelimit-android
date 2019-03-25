@@ -31,12 +31,14 @@ abstract class PlatformIntegration(
     abstract fun getForegroundAppPermissionStatus(): RuntimePermissionStatus
     abstract fun getDrawOverOtherAppsPermissionStatus(): RuntimePermissionStatus
     abstract fun getNotificationAccessPermissionStatus(): NewPermissionStatus
+    abstract fun getOverlayPermissionStatus(): RuntimePermissionStatus
     abstract fun disableDeviceAdmin()
     abstract fun trySetLockScreenPassword(password: String): Boolean
     // this must have a fallback if the permission is not granted
     abstract fun showOverlayMessage(text: String)
 
     abstract fun showAppLockScreen(currentPackageName: String)
+    abstract fun setShowBlockingOverlay(show: Boolean)
     // this should throw an SecurityException if the permission is missing
     abstract suspend fun getForegroundAppPackageName(): String?
     abstract fun setAppStatusMessage(message: AppStatusMessage?)

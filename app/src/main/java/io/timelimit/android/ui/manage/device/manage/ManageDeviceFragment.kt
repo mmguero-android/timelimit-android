@@ -18,6 +18,7 @@ package io.timelimit.android.ui.manage.device.manage
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -186,6 +187,14 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 }
             }
 
+            override fun openDrawOverOtherAppsScreen() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    startActivity(
+                            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
+                    )
+                }
+            }
+
             override fun manageDeviceAdmin() {
                 if (binding.isThisDevice == true) {
                     val protectionLevel = logic.platformIntegration.getCurrentProtectionLevel()
@@ -269,6 +278,7 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 binding.usageStatsAccess = device.currentUsageStatsPermission
                 binding.notificationAccessPermission = device.currentNotificationAccessPermission
                 binding.protectionLevel = device.currentProtectionLevel
+                binding.overlayPermission = device.currentOverlayPermission
                 binding.didAppDowngrade = device.currentAppVersion < device.highestAppVersion
             }
         })
@@ -354,6 +364,7 @@ interface ManageDeviceFragmentHandlers {
     fun changeNetworkTimeVerification(newValue: NetworkTime)
     fun openUsageStatsSettings()
     fun openNotificationAccessSettings()
+    fun openDrawOverOtherAppsScreen()
     fun manageDeviceAdmin()
     fun editDeviceTitle()
     fun showAuthenticationScreen()

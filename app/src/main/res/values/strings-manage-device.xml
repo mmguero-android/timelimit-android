@@ -47,6 +47,11 @@
         Notifications and their contents are not saved.
     </string>
 
+    <string name="manage_device_permissions_overlay_title">Draw over other Apps</string>
+    <string name="manage_device_permissions_overlay_text">
+        Enabling drawing on top of other Apps can improve blocking in some cases.
+    </string>
+
     <string name="manage_device_permission_device_admin_title">Device admin</string>
     <string name="manage_device_permission_device_admin_text_disabled">
         The device admin permission was not granted.

@@ -17,6 +17,7 @@ package io.timelimit.android.integration.platform.android
 
 import android.annotation.TargetApi
 import android.app.ActivityManager
+import android.app.Application
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
@@ -73,6 +74,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     private val activityManager = this.context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     private val notificationManager = this.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val deviceAdmin = ComponentName(context.applicationContext, AdminReceiver::class.java)
+    private val overlay = OverlayUtil(context as Application)
 
     init {
         AppsChangeListener.registerBroadcastReceiver(this.context, object : BroadcastReceiver() {
@@ -136,6 +138,8 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         }
     }
 
+    override fun getOverlayPermissionStatus(): RuntimePermissionStatus = overlay.getOverlayPermissionStatus()
+
     override fun trySetLockScreenPassword(password: String): Boolean {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "set password")
@@ -184,6 +188,14 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
 
     override fun showAppLockScreen(currentPackageName: String) {
         LockActivity.start(context, currentPackageName)
+    }
+
+    override fun setShowBlockingOverlay(show: Boolean) {
+        if (show) {
+            overlay.show()
+        } else {
+            overlay.hide()
+        }
     }
 
     override fun isScreenOn(): Boolean {

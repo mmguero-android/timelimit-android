@@ -78,7 +78,11 @@ data class Device(
         @ColumnInfo(name = "default_user_timeout")
         val defaultUserTimeout: Int,
         @ColumnInfo(name = "consider_reboot_manipulation")
-        val considerRebootManipulation: Boolean
+        val considerRebootManipulation: Boolean,
+        @ColumnInfo(name = "current_overlay_permission")
+        val currentOverlayPermission: RuntimePermissionStatus,
+        @ColumnInfo(name = "highest_overlay_permission")
+        val highestOverlayPermission: RuntimePermissionStatus
 ): JsonSerializable {
     companion object {
         private const val ID = "id"
@@ -105,6 +109,8 @@ data class Device(
         private const val DEFAULT_USER = "du"
         private const val DEFAULT_USER_TIMEOUT = "dut"
         private const val CONSIDER_REBOOT_A_MANIPULATION = "cram"
+        private const val CURRENT_OVERLAY_PERMISSION = "cop"
+        private const val HIGHEST_OVERLAY_PERMISSION = "hop"
 
         fun parse(reader: JsonReader): Device {
             var id: String? = null
@@ -131,6 +137,8 @@ data class Device(
             var defaultUser = ""
             var defaultUserTimeout = 0
             var considerRebootManipulation = false
+            var currentOverlayPermission = RuntimePermissionStatus.NotGranted
+            var highestOverlayPermission = RuntimePermissionStatus.NotGranted
 
             reader.beginObject()
 
@@ -160,6 +168,8 @@ data class Device(
                     DEFAULT_USER -> defaultUser = reader.nextString()
                     DEFAULT_USER_TIMEOUT -> defaultUserTimeout = reader.nextInt()
                     CONSIDER_REBOOT_A_MANIPULATION -> considerRebootManipulation = reader.nextBoolean()
+                    CURRENT_OVERLAY_PERMISSION -> currentOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
+                    HIGHEST_OVERLAY_PERMISSION -> highestOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
                     else -> reader.skipValue()
                 }
             }
@@ -190,7 +200,9 @@ data class Device(
                     showDeviceConnected = showDeviceConnected,
                     defaultUser = defaultUser,
                     defaultUserTimeout = defaultUserTimeout,
-                    considerRebootManipulation = considerRebootManipulation
+                    considerRebootManipulation = considerRebootManipulation,
+                    currentOverlayPermission = currentOverlayPermission,
+                    highestOverlayPermission = highestOverlayPermission
             )
         }
     }
@@ -254,6 +266,8 @@ data class Device(
         writer.name(DEFAULT_USER).value(defaultUser)
         writer.name(DEFAULT_USER_TIMEOUT).value(defaultUserTimeout)
         writer.name(CONSIDER_REBOOT_A_MANIPULATION).value(considerRebootManipulation)
+        writer.name(CURRENT_OVERLAY_PERMISSION).value(RuntimePermissionStatusUtil.serialize(currentOverlayPermission))
+        writer.name(HIGHEST_OVERLAY_PERMISSION).value(RuntimePermissionStatusUtil.serialize(highestOverlayPermission))
 
         writer.endObject()
     }
@@ -266,6 +280,8 @@ data class Device(
     val manipulationOfNotificationAccess = currentNotificationAccessPermission != highestNotificationAccessPermission
     @Transient
     val manipulationOfAppVersion = currentAppVersion != highestAppVersion
+    @Transient
+    val manipulationOfOverlayPermission = currentOverlayPermission != highestOverlayPermission
 
     @Transient
     val hasActiveManipulationWarning = manipulationOfProtectionLevel ||
@@ -273,7 +289,8 @@ data class Device(
             manipulationOfNotificationAccess ||
             manipulationOfAppVersion ||
             manipulationTriedDisablingDeviceAdmin ||
-            manipulationDidReboot
+            manipulationDidReboot ||
+            manipulationOfOverlayPermission
 
     @Transient
     val hasAnyManipulation = hasActiveManipulationWarning || hadManipulation

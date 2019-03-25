@@ -563,6 +563,7 @@ data class UpdateDeviceStatusAction(
         val newProtectionLevel: ProtectionLevel?,
         val newUsageStatsPermissionStatus: RuntimePermissionStatus?,
         val newNotificationAccessPermission: NewPermissionStatus?,
+        val newOverlayPermission: RuntimePermissionStatus?,
         val newAppVersion: Int?,
         val didReboot: Boolean
 ): AppLogicAction() {
@@ -571,6 +572,7 @@ data class UpdateDeviceStatusAction(
         private const val NEW_PROTECTION_LEVEL = "protectionLevel"
         private const val NEW_USAGE_STATS_PERMISSION_STATUS = "usageStats"
         private const val NEW_NOTIFICATION_ACCESS_PERMISSION = "notificationAccess"
+        private const val NEW_OVERLAY_PERMISSION = "overlayPermission"
         private const val NEW_APP_VERSION = "appVersion"
         private const val DID_REBOOT = "didReboot"
 
@@ -578,6 +580,7 @@ data class UpdateDeviceStatusAction(
                 newProtectionLevel = null,
                 newUsageStatsPermissionStatus = null,
                 newNotificationAccessPermission = null,
+                newOverlayPermission = null,
                 newAppVersion = null,
                 didReboot = false
         )
@@ -611,6 +614,12 @@ data class UpdateDeviceStatusAction(
                     .value(NewPermissionStatusUtil.serialize(newNotificationAccessPermission))
         }
 
+        if (newOverlayPermission != null) {
+            writer
+                    .name(NEW_OVERLAY_PERMISSION)
+                    .value(RuntimePermissionStatusUtil.serialize(newOverlayPermission))
+        }
+
         if (newAppVersion != null) {
             writer.name(NEW_APP_VERSION)
             writer.value(newAppVersion)
@@ -631,6 +640,7 @@ data class IgnoreManipulationAction(
         val ignoreAppDowngrade: Boolean,
         val ignoreNotificationAccessManipulation: Boolean,
         val ignoreUsageStatsAccessManipulation: Boolean,
+        val ignoreOverlayPermissionManipulation: Boolean,
         val ignoreReboot: Boolean,
         val ignoreHadManipulation: Boolean
 ): ParentAction() {
@@ -642,6 +652,7 @@ data class IgnoreManipulationAction(
         private const val IGNORE_APP_DOWNGRADE = "downgrade"
         private const val IGNORE_NOTIFICATION_ACCESS = "notification"
         private const val IGNORE_USAGE_STATS_ACCESS = "usageStats"
+        private const val IGNORE_OVERLAY_PERMISSION_MANIPULATION = "overlay"
         private const val IGNORE_HAD_MANIPULATION = "hadManipulation"
         private const val IGNORE_REBOOT = "reboot"
     }
@@ -655,6 +666,7 @@ data class IgnoreManipulationAction(
             (!ignoreAppDowngrade) &&
             (!ignoreNotificationAccessManipulation) &&
             (!ignoreUsageStatsAccessManipulation) &&
+            (!ignoreOverlayPermissionManipulation) &&
             (!ignoreReboot) &&
             (!ignoreHadManipulation)
 
@@ -668,6 +680,7 @@ data class IgnoreManipulationAction(
         writer.name(IGNORE_APP_DOWNGRADE).value(ignoreAppDowngrade)
         writer.name(IGNORE_NOTIFICATION_ACCESS).value(ignoreNotificationAccessManipulation)
         writer.name(IGNORE_USAGE_STATS_ACCESS).value(ignoreUsageStatsAccessManipulation)
+        writer.name(IGNORE_OVERLAY_PERMISSION_MANIPULATION).value(ignoreOverlayPermissionManipulation)
         writer.name(IGNORE_HAD_MANIPULATION).value(ignoreHadManipulation)
         writer.name(IGNORE_REBOOT).value(ignoreReboot)
 

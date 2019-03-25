@@ -35,6 +35,8 @@ import io.timelimit.android.integration.platform.android.AdminReceiver
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.manage.device.manage.InformAboutDeviceOwnerDialogFragment
+import android.net.Uri
+
 
 class SetupDevicePermissionsFragment : Fragment() {
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
@@ -93,6 +95,14 @@ class SetupDevicePermissionsFragment : Fragment() {
                 }
             }
 
+            override fun openDrawOverOtherAppsScreen() {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    startActivity(
+                            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
+                    )
+                }
+            }
+
             override fun gotoNextStep() {
                 navigation.safeNavigate(
                         SetupDevicePermissionsFragmentDirections
@@ -113,6 +123,7 @@ class SetupDevicePermissionsFragment : Fragment() {
         binding.notificationAccessPermission = platform.getNotificationAccessPermissionStatus()
         binding.protectionLevel = platform.getCurrentProtectionLevel()
         binding.usageStatsAccess = platform.getForegroundAppPermissionStatus()
+        binding.overlayPermission = platform.getOverlayPermissionStatus()
     }
 
     override fun onResume() {
@@ -126,5 +137,6 @@ interface SetupDevicePermissionsHandlers {
     fun manageDeviceAdmin()
     fun openUsageStatsSettings()
     fun openNotificationAccessSettings()
+    fun openDrawOverOtherAppsScreen()
     fun gotoNextStep()
 }

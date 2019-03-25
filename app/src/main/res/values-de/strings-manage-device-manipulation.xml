@@ -22,6 +22,7 @@
     <string name="manage_device_manipulation_device_admin_disable_attempt">Geräteadministrator-Deaktivierung wurde versucht</string>
     <string name="manage_device_manipulation_usage_stats_access">Nutzungsdatenzugriff</string>
     <string name="manage_device_manipulation_notification_access">Benachrichtigungszugriff</string>
+    <string name="manage_device_manipulation_overlay_permission">Berechtigung zum Anzeigen über anderen Apps</string>
     <string name="manage_device_manipulation_app_version">ältere App-Version installiert</string>
     <string name="manage_device_manipulation_reboot">Gerät wurde neu gestartet</string>
     <string name="manage_device_manipulation_existed">Es gab eine Manipulation, die wieder beendet wurde</string>

@@ -31,6 +31,10 @@
             type="io.timelimit.android.integration.platform.ProtectionLevel" />
 
         <variable
+            name="overlayPermission"
+            type="RuntimePermissionStatus" />
+
+        <variable
             name="handlers"
             type="io.timelimit.android.ui.setup.SetupDevicePermissionsHandlers" />
 
@@ -229,6 +233,65 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <androidx.cardview.widget.CardView
+                android:visibility="gone"
+                android:onClick="@{() -> handlers.openDrawOverOtherAppsScreen()}"
+                android:foreground="?selectableItemBackground"
+                android:clickable="@{usageStatsAccess != RuntimePermissionStatus.NotRequired}"
+                app:cardUseCompatPadding="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:text="@string/manage_device_permissions_overlay_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/manage_device_permissions_overlay_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:visibility="@{overlayPermission == RuntimePermissionStatus.Granted ? View.VISIBLE : View.GONE}"
+                        android:textColor="@color/green"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/manage_device_permission_status_granted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:visibility="@{overlayPermission == RuntimePermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
+                        android:textColor="@color/red"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/manage_device_permission_status_not_granted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:visibility="@{overlayPermission == RuntimePermissionStatus.NotRequired ? View.VISIBLE : View.GONE}"
+                        android:textColor="@color/green"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/manage_device_permission_status_not_required"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:visibility="@{overlayPermission != RuntimePermissionStatus.NotRequired ? View.VISIBLE : View.GONE}"
+                        android:text="@string/manage_device_permission_tap_top_open_settings"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:orientation="horizontal"

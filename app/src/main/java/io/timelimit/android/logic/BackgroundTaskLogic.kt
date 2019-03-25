@@ -35,7 +35,6 @@ import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
 import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.actions.UpdateDeviceStatusAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
-import io.timelimit.android.ui.IsAppInForeground
 import io.timelimit.android.util.TimeTextUtil
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -144,6 +143,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 usedTimeUpdateHelper?.commit(appLogic)
                 liveDataCaches.removeAllItems()
                 appLogic.platformIntegration.setAppStatusMessage(null)
+                appLogic.platformIntegration.setShowBlockingOverlay(false)
                 appLogic.enable.waitUntilValueMatches { it == true }
 
                 continue
@@ -165,12 +165,14 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                     text = appLogic.context.getString(R.string.background_logic_timeout_text)
                             )
                     )
+                    appLogic.platformIntegration.setShowBlockingOverlay(false)
 
                     liveDataCaches.reportLoopDone()
                     appLogic.timeApi.sleep(BACKGROUND_SERVICE_INTERVAL)
                 } else {
                     liveDataCaches.removeAllItems()
                     appLogic.platformIntegration.setAppStatusMessage(null)
+                    appLogic.platformIntegration.setShowBlockingOverlay(false)
 
                     val isChildSignedIn = deviceUserEntryLive.read().map { it != null && it.type == UserType.Child }
 
@@ -238,12 +240,14 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                             appTitleCache.query(foregroundAppPackageName),
                             appLogic.context.getString(R.string.background_logic_whitelisted)
                     ))
+                    appLogic.platformIntegration.setShowBlockingOverlay(false)
                 } else if (foregroundAppPackageName != null && temporarilyAllowedApps.contains(foregroundAppPackageName)) {
                     usedTimeUpdateHelper?.commit(appLogic)
                     appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
                             appTitleCache.query(foregroundAppPackageName),
                             appLogic.context.getString(R.string.background_logic_temporarily_allowed)
                     ))
+                    appLogic.platformIntegration.setShowBlockingOverlay(false)
                 } else if (foregroundAppPackageName != null) {
                     val appCategory = appCategories.get(Pair(foregroundAppPackageName, categories.map { it.id })).waitForNullableValue()
                     val category = categories.find { it.id == appCategory?.categoryId }
@@ -259,6 +263,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         ))
                         appLogic.platformIntegration.setSuspendedApps(listOf(foregroundAppPackageName), true)
                         appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
+                        appLogic.platformIntegration.setShowBlockingOverlay(true)
                     } else if (category.temporarilyBlocked or (parentCategory?.temporarilyBlocked == true)) {
                         usedTimeUpdateHelper?.commit(appLogic)
 
@@ -267,6 +272,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                 text = appLogic.context.getString(R.string.background_logic_opening_lockscreen)
                         ))
                         appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
+                        appLogic.platformIntegration.setShowBlockingOverlay(true)
                     } else {
                         // disable time limits temporarily feature
                         if (realTime.shouldTrustTimeTemporarily && nowTimestamp < deviceUserEntry.disableLimitsUntil) {
@@ -274,6 +280,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                     title = appTitleCache.query(foregroundAppPackageName),
                                     text = appLogic.context.getString(R.string.background_logic_limits_disabled)
                             ))
+                            appLogic.platformIntegration.setShowBlockingOverlay(false)
                         } else if (
                         // check blocked time areas
                         // directly blocked
@@ -295,6 +302,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                     text = appLogic.context.getString(R.string.background_logic_opening_lockscreen)
                             ))
                             appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
+                            appLogic.platformIntegration.setShowBlockingOverlay(true)
                         } else {
                             // check time limits
                             val rules = timeLimitRules.get(category.id).waitForNonNullValue()
@@ -310,6 +318,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                         category.title + " - " + appTitleCache.query(foregroundAppPackageName),
                                         appLogic.context.getString(R.string.background_logic_no_timelimit)
                                 ))
+                                appLogic.platformIntegration.setShowBlockingOverlay(false)
                             } else {
                                 val isCurrentDevice = isThisDeviceTheCurrentDeviceLive.read().waitForNonNullValue()
 
@@ -321,6 +330,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                             text = appLogic.context.getString(R.string.background_logic_opening_lockscreen)
                                     ))
                                     appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
+                                    appLogic.platformIntegration.setShowBlockingOverlay(true)
                                 } else if (realTime.shouldTrustTimeTemporarily) {
                                     val usedTimes = usedTimesOfCategoryAndWeekByFirstDayOfWeek.get(Pair(category.id, nowDate.dayOfEpoch - nowDate.dayOfWeek)).waitForNonNullValue()
                                     val parentUsedTimes = parentCategory?.let {
@@ -387,6 +397,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                                 category.title + " - " + appTitleCache.query(foregroundAppPackageName),
                                                 appLogic.context.getString(R.string.background_logic_no_timelimit)
                                         ))
+                                        appLogic.platformIntegration.setShowBlockingOverlay(false)
                                     } else {
                                         // time limited
                                         if (remaining.includingExtraTime > 0) {
@@ -397,6 +408,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                                         category.title + " - " + appTitleCache.query(foregroundAppPackageName),
                                                         appLogic.context.getString(R.string.background_logic_using_extra_time, TimeTextUtil.remaining(remaining.includingExtraTime.toInt(), appLogic.context))
                                                 ))
+                                                appLogic.platformIntegration.setShowBlockingOverlay(false)
 
                                                 if (isScreenOn) {
                                                     newUsedTimeItemBatchUpdateHelper.addUsedTime(
@@ -412,6 +424,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                                         category.title + " - " + appTitleCache.query(foregroundAppPackageName),
                                                         TimeTextUtil.remaining(remaining.default.toInt(), appLogic.context)
                                                 ))
+                                                appLogic.platformIntegration.setShowBlockingOverlay(false)
 
                                                 if (isScreenOn) {
                                                     newUsedTimeItemBatchUpdateHelper.addUsedTime(
@@ -431,6 +444,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                                     text = appLogic.context.getString(R.string.background_logic_opening_lockscreen)
                                             ))
                                             appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
+                                            appLogic.platformIntegration.setShowBlockingOverlay(true)
                                         }
                                     }
                                 } else {
@@ -443,6 +457,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                             text = appLogic.context.getString(R.string.background_logic_opening_lockscreen)
                                     ))
                                     appLogic.platformIntegration.showAppLockScreen(foregroundAppPackageName)
+                                    appLogic.platformIntegration.setShowBlockingOverlay(true)
                                 }
                             }
                         }
@@ -452,6 +467,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                             appLogic.context.getString(R.string.background_logic_idle_title),
                             appLogic.context.getString(R.string.background_logic_idle_text)
                     ))
+                    appLogic.platformIntegration.setShowBlockingOverlay(false)
                 }
             } catch (ex: SecurityException) {
                 // this is handled by an other main loop (with a delay)
@@ -460,6 +476,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         appLogic.context.getString(R.string.background_logic_error),
                         appLogic.context.getString(R.string.background_logic_error_permission)
                 ))
+                appLogic.platformIntegration.setShowBlockingOverlay(false)
             } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) {
                     Log.w(LOG_TAG, "exception during running main loop", ex)
@@ -469,6 +486,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         appLogic.context.getString(R.string.background_logic_error),
                         appLogic.context.getString(R.string.background_logic_error_internal)
                 ))
+                appLogic.platformIntegration.setShowBlockingOverlay(false)
             }
 
             liveDataCaches.reportLoopDone()
@@ -542,6 +560,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 val protectionLevel = appLogic.platformIntegration.getCurrentProtectionLevel()
                 val usageStatsPermission = appLogic.platformIntegration.getForegroundAppPermissionStatus()
                 val notificationAccess = appLogic.platformIntegration.getNotificationAccessPermissionStatus()
+                val overlayPermission = appLogic.platformIntegration.getOverlayPermissionStatus()
 
                 var changes = UpdateDeviceStatusAction.empty
 
@@ -564,6 +583,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 if (notificationAccess != deviceEntry.currentNotificationAccessPermission) {
                     changes = changes.copy(
                             newNotificationAccessPermission = notificationAccess
+                    )
+                }
+
+                if (overlayPermission != deviceEntry.currentOverlayPermission) {
+                    changes = changes.copy(
+                            newOverlayPermission = overlayPermission
                     )
                 }
 

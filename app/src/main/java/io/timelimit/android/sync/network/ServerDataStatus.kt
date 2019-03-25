@@ -178,7 +178,9 @@ data class ServerDeviceData(
         val showDeviceConnected: Boolean,
         val defaultUser: String,
         val defaultUserTimeout: Int,
-        val considerRebootManipulation: Boolean
+        val considerRebootManipulation: Boolean,
+        val currentOverlayPermission: RuntimePermissionStatus,
+        val highestOverlayPermission: RuntimePermissionStatus
 ) {
     companion object {
         private const val DEVICE_ID = "deviceId"
@@ -204,6 +206,8 @@ data class ServerDeviceData(
         private const val DEFAULT_USER = "defUser"
         private const val DEFAULT_USER_TIMEOUT = "defUserTimeout"
         private const val CONSIDER_REBOOT_MANIPULATION = "rebootIsManipulation"
+        private const val CURRENT_OVERLAY_PERMISSION = "cOverlay"
+        private const val HIGHEST_OVERLAY_PERMISSION = "hOverlay"
 
         fun parse(reader: JsonReader): ServerDeviceData {
             var deviceId: String? = null
@@ -229,6 +233,8 @@ data class ServerDeviceData(
             var defaultUser: String? = null
             var defaultUserTimeout: Int? = null
             var considerRebootManipulation: Boolean? = null
+            var currentOverlayPermission: RuntimePermissionStatus? = null
+            var highestOverlayPermission: RuntimePermissionStatus? = null
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -256,6 +262,8 @@ data class ServerDeviceData(
                     DEFAULT_USER -> defaultUser = reader.nextString()
                     DEFAULT_USER_TIMEOUT -> defaultUserTimeout = reader.nextInt()
                     CONSIDER_REBOOT_MANIPULATION -> considerRebootManipulation = reader.nextBoolean()
+                    CURRENT_OVERLAY_PERMISSION -> currentOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
+                    HIGHEST_OVERLAY_PERMISSION -> highestOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
                     else -> reader.skipValue()
                 }
             }
@@ -284,7 +292,9 @@ data class ServerDeviceData(
                     showDeviceConnected = showDeviceConnected!!,
                     defaultUser = defaultUser!!,
                     defaultUserTimeout = defaultUserTimeout!!,
-                    considerRebootManipulation = considerRebootManipulation!!
+                    considerRebootManipulation = considerRebootManipulation!!,
+                    currentOverlayPermission = currentOverlayPermission!!,
+                    highestOverlayPermission = highestOverlayPermission!!
             )
         }
 

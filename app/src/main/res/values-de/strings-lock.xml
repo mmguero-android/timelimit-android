@@ -83,4 +83,9 @@
     <string name="lock_reason_short_missing_network_time">Netzwerkzeit erforderlich</string>
     <string name="lock_reason_short_requires_current_device">nicht als aktuelles Gerät gewählt</string>
     <string name="lock_reason_short_notification_blocking">alle Benachrichtigungen werden blockiert</string>
+
+    <string name="lock_overlay_warning">
+        Öffnen des Sperrbildschirms fehlgeschlagen.
+        Versuche es, den Home- oder Anwendungslisten-Button zu verwenden, um diesen Bildschirm zu verlassen.
+    </string>
 </resources>

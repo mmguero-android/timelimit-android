@@ -20,7 +20,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <!--
-    not used yet
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     -->
     <uses-permission android:name="android.permission.INTERNET" />

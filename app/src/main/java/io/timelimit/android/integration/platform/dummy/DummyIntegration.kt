@@ -61,6 +61,10 @@ class DummyIntegration(
         return notificationAccess
     }
 
+    override fun getOverlayPermissionStatus(): RuntimePermissionStatus {
+        return RuntimePermissionStatus.NotRequired
+    }
+
     override fun trySetLockScreenPassword(password: String): Boolean {
         return false    // it failed
     }
@@ -70,6 +74,10 @@ class DummyIntegration(
 
     override fun showAppLockScreen(currentPackageName: String) {
         launchLockScreenForPackage = currentPackageName
+    }
+
+    override fun setShowBlockingOverlay(show: Boolean) {
+        // ignore
     }
 
     fun getAndResetShowAppLockScreen(): String? {

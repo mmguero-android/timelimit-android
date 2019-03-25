@@ -150,6 +150,24 @@ object LocalDatabaseAppLogicActionDispatcher {
                         }
                     }
 
+                    if (action.newOverlayPermission != null) {
+                        if (device.currentOverlayPermission != action.newOverlayPermission) {
+                            device = device.copy(
+                                    currentOverlayPermission = action.newOverlayPermission
+                            )
+
+                            if (RuntimePermissionStatusUtil.toInt(action.newOverlayPermission) > RuntimePermissionStatusUtil.toInt(device.highestOverlayPermission)) {
+                                device = device.copy(
+                                        highestOverlayPermission = action.newOverlayPermission
+                                )
+                            }
+
+                            if (device.currentOverlayPermission != device.highestOverlayPermission) {
+                                device = device.copy(hadManipulation = true)
+                            }
+                        }
+                    }
+
                     if (action.newAppVersion != null) {
                         if (device.currentAppVersion != action.newAppVersion) {
                             device = device.copy(
