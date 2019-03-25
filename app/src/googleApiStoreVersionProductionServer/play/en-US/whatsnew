@@ -1,1 +1,3 @@
-Extend notification filter for ongoing notifications
+- show status notification even if TimeLimit is in the foreground
+- automatically delete old usage duration data in the local mode
+- removed "Beta" from the title and the version
