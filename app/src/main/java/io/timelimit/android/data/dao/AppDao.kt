@@ -38,6 +38,9 @@ interface AppDao {
     @Query("DELETE FROM app WHERE device_id = :deviceId AND package_name IN (:packageNames)")
     fun removeAppsByDeviceIdAndPackageNamesSync(deviceId: String, packageNames: List<String>)
 
+    @Query("DELETE FROM app WHERE device_id IN (:deviceIds)")
+    fun removeAppsByDeviceIds(deviceIds: List<String>)
+
     @Query("SELECT * FROM app WHERE device_id IN (:deviceIds)")
     fun getAppsByDeviceIds(deviceIds: List<String>): LiveData<List<App>>
 

@@ -116,6 +116,8 @@ object ApplyServerDataStatus {
 
                         if (removedDeviceEntryIds.isNotEmpty()) {
                             database.device().removeDevicesById(removedDeviceEntryIds)
+                            database.app().removeAppsByDeviceIds(removedDeviceEntryIds)
+                            database.appActivity().deleteAppActivitiesByDeviceIds(removedDeviceEntryIds)
                         }
                     }
 
@@ -235,7 +237,7 @@ object ApplyServerDataStatus {
 
                     run {
                         // apply activities
-                        database.appActivity().deleteAppActivitiesByDeviceId(item.deviceId)
+                        database.appActivity().deleteAppActivitiesByDeviceIds(listOf(item.deviceId))
                         database.appActivity().addAppActivitiesSync(item.activities.map {
                             AppActivity(
                                     deviceId = item.deviceId,
