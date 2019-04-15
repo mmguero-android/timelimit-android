@@ -149,6 +149,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
             if (blockedAppPackageName != appLogic.platformIntegration.getLauncherAppPackageName()) {
                 AccessibilityService.instance?.showHomescreen()
                 delay(100)
+                AccessibilityService.instance?.showHomescreen()
+                delay(100)
             }
         }
 
