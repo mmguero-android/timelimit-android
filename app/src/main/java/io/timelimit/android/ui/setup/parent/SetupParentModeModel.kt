@@ -16,10 +16,12 @@
 package io.timelimit.android.ui.setup.parent
 
 import android.app.Application
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.jaredrummler.android.device.DeviceName
+import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
@@ -38,6 +40,10 @@ import io.timelimit.android.sync.network.api.ConflictHttpError
 import io.timelimit.android.sync.network.api.UnauthorizedHttpError
 
 class SetupParentModeModel(application: Application): AndroidViewModel(application) {
+    companion object {
+        private const val LOG_TAG = "SetupParentModeModel"
+    }
+
     private val logic = DefaultAppLogic.with(application)
 
     private val mailAuthTokenInternal = MutableLiveData<String?>().apply { value = null }
@@ -125,6 +131,10 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
 
                 Toast.makeText(getApplication(), R.string.error_server_rejected, Toast.LENGTH_SHORT).show()
             } catch (ex: Exception) {
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "error during setup", ex)
+                }
+
                 isDoingSetupInternal.value = false
 
                 Toast.makeText(getApplication(), R.string.error_network, Toast.LENGTH_SHORT).show()
@@ -182,6 +192,10 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
 
                 Toast.makeText(getApplication(), R.string.error_server_rejected, Toast.LENGTH_SHORT).show()
             } catch (ex: Exception) {
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "error during setup", ex)
+                }
+
                 isDoingSetupInternal.value = false
 
                 Toast.makeText(getApplication(), R.string.error_network, Toast.LENGTH_SHORT).show()
