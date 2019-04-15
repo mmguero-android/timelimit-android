@@ -341,6 +341,8 @@ data class UpdateAppActivitiesAction(
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 
+        writer.name(TYPE).value(TYPE_VALUE)
+
         writer.name(REMOVED).beginArray()
         removedActivities.forEach { (pkg, cls) -> writer.beginArray().value(pkg).value(cls).endArray() }
         writer.endArray()
