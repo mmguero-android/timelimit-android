@@ -29,6 +29,7 @@ abstract class PlatformIntegration(
     abstract fun getLocalAppActivities(deviceId: String): Collection<AppActivity>
     abstract fun getLocalAppTitle(packageName: String): String?
     abstract fun getAppIcon(packageName: String): Drawable?
+    abstract fun getLauncherAppPackageName(): String?
     abstract fun getCurrentProtectionLevel(): ProtectionLevel
     abstract fun getForegroundAppPermissionStatus(): RuntimePermissionStatus
     abstract fun getDrawOverOtherAppsPermissionStatus(): RuntimePermissionStatus

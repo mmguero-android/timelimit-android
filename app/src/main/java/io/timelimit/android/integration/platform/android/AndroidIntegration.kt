@@ -101,6 +101,12 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         return AndroidIntegrationApps.getAppIcon(packageName, context)
     }
 
+    override fun getLauncherAppPackageName(): String? {
+        return Intent(Intent.ACTION_MAIN)
+                .addCategory(Intent.CATEGORY_HOME)
+                .resolveActivity(context.packageManager)?.packageName
+    }
+
     override fun getCurrentProtectionLevel(): ProtectionLevel {
         return AdminStatus.getAdminStatus(context, policyManager)
     }

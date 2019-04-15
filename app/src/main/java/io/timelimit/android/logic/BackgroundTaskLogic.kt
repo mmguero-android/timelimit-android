@@ -146,8 +146,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         appLogic.platformIntegration.setShowBlockingOverlay(true)
 
         if (appLogic.platformIntegration.isAccessibilityServiceEnabled()) {
-            AccessibilityService.instance?.showHomescreen()
-            delay(100)
+            if (blockedAppPackageName != appLogic.platformIntegration.getLauncherAppPackageName()) {
+                AccessibilityService.instance?.showHomescreen()
+                delay(100)
+            }
         }
 
         appLogic.platformIntegration.showAppLockScreen(blockedAppPackageName, blockedAppActivityName)

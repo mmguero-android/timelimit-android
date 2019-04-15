@@ -50,6 +50,8 @@ class DummyIntegration(
         return null
     }
 
+    override fun getLauncherAppPackageName(): String? = null
+
     override fun getCurrentProtectionLevel(): ProtectionLevel {
         return protectionLevel
     }
