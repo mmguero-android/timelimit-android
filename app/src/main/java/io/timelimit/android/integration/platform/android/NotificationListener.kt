@@ -138,22 +138,31 @@ class NotificationListener: NotificationListenerService() {
 
         val blockingReason = blockingReasonUtil.getBlockingReason(
                 packageName = sbn.packageName,
-                forNotification = true
+                activityName = null
         ).waitForNonNullValue()
 
-        if (blockingReason == BlockingReason.None) {
-            return BlockingReason.None
+        if (blockingReason.areNotificationsBlocked) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "blocking notification of ${sbn.packageName} because notifications are blocked")
+            }
+
+            return BlockingReason.NotificationsAreBlocked
         }
 
-        if (isSystemApp(sbn.packageName) && blockingReason == BlockingReason.NotPartOfAnCategory) {
-            return BlockingReason.None
-        }
+        return when (blockingReason) {
+            is NoBlockingReason -> BlockingReason.None
+            is BlockedReasonDetails -> {
+                if (isSystemApp(sbn.packageName) && blockingReason.reason == BlockingReason.NotPartOfAnCategory) {
+                    return BlockingReason.None
+                }
 
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "blocking notification of ${sbn.packageName} because $blockingReason")
-        }
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "blocking notification of ${sbn.packageName} because ${blockingReason.reason}")
+                }
 
-        return blockingReason
+                return blockingReason.reason
+            }
+        }
     }
 
     private fun isSystemApp(packageName: String): Boolean {

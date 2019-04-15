@@ -585,6 +585,9 @@
                     android:id="@+id/send_device_connected"
                     layout="@layout/manage_send_device_connected" />
 
+                <include android:id="@+id/activity_level_blocking"
+                    layout="@layout/manage_device_activity_level_blocking" />
+
                 <!-- this is always hidden in the offline version -->
                 <include android:id="@+id/dont_ask_password_at_device"
                     layout="@layout/dont_ask_password_on_device_view" />

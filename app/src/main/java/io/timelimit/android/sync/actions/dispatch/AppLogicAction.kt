@@ -17,6 +17,7 @@ package io.timelimit.android.sync.actions.dispatch
 
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.App
+import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.data.model.UsedTimeItem
 import io.timelimit.android.integration.platform.NewPermissionStatusUtil
 import io.timelimit.android.integration.platform.ProtectionLevelUtil
@@ -240,6 +241,35 @@ object LocalDatabaseAppLogicActionDispatcher {
                             ),
                             database
                     )
+
+                    null
+                }
+                is UpdateAppActivitiesAction -> {
+                    if (action.updatedOrAddedActivities.isNotEmpty()) {
+                        database.appActivity().addAppActivitiesSync(
+                                action.updatedOrAddedActivities.map { item ->
+                                    AppActivity(
+                                            deviceId = deviceId,
+                                            appPackageName = item.packageName,
+                                            activityClassName = item.className,
+                                            title = item.title
+                                    )
+                                }
+                        )
+                    }
+
+                    if (action.removedActivities.isNotEmpty()) {
+                        action.removedActivities.groupBy { it.first }.entries.forEach { item ->
+                            val packageName = item.component1()
+                            val activities = item.component2().map { it.second }
+
+                            database.appActivity().deleteAppActivitiesSync(
+                                    deviceId = deviceId,
+                                    packageName = packageName,
+                                    activities = activities
+                            )
+                        }
+                    }
 
                     null
                 }

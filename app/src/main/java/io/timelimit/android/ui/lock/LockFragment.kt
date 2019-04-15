@@ -35,10 +35,7 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.*
 import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.livedata.*
-import io.timelimit.android.logic.AppLogic
-import io.timelimit.android.logic.BlockingReason
-import io.timelimit.android.logic.BlockingReasonUtil
-import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.logic.*
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.sync.actions.IncrementCategoryExtraTimeAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
@@ -57,12 +54,17 @@ import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 class LockFragment : Fragment() {
     companion object {
         private const val EXTRA_PACKAGE_NAME = "pkg"
+        private const val EXTRA_ACTIVITY = "activitiy"
 
-        fun newInstance(packageName: String): LockFragment {
+        fun newInstance(packageName: String, activity: String?): LockFragment {
             val result = LockFragment()
             val arguments = Bundle()
 
             arguments.putString(EXTRA_PACKAGE_NAME, packageName)
+
+            if (activity != null) {
+                arguments.putString(EXTRA_ACTIVITY, activity)
+            }
 
             result.arguments = arguments
             return result
@@ -70,10 +72,16 @@ class LockFragment : Fragment() {
     }
 
     private val packageName: String by lazy { arguments!!.getString(EXTRA_PACKAGE_NAME) }
+    private val activityName: String? by lazy {
+        if (arguments!!.containsKey(EXTRA_ACTIVITY))
+            arguments!!.getString(EXTRA_ACTIVITY)
+        else
+            null
+    }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val title: String? by lazy { logic.platformIntegration.getLocalAppTitle(packageName) }
-    private val blockingReason: LiveData<BlockingReason> by lazy { BlockingReasonUtil(logic).getBlockingReason(packageName, forNotification = false) }
+    private val blockingReason: LiveData<BlockingReasonDetail> by lazy { BlockingReasonUtil(logic).getBlockingReason(packageName, activityName) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = LockFragmentBinding.inflate(layoutInflater, container, false)
@@ -97,7 +105,13 @@ class LockFragment : Fragment() {
             )
         })
 
+        val enableActivityLevelBlocking = logic.deviceEntry.map { it?.enableActivityLevelBlocking ?: false }
+
         binding.packageName = packageName
+
+        enableActivityLevelBlocking.observe(this, Observer {
+            binding.activityName = if (it) activityName?.removePrefix(packageName) else null
+        })
 
         if (title != null) {
             binding.appTitle = title
@@ -108,11 +122,16 @@ class LockFragment : Fragment() {
         binding.appIcon.setImageDrawable(logic.platformIntegration.getAppIcon(packageName))
 
         blockingReason.observe(this, Observer {
-            if (it == BlockingReason.None) {
-                activity!!.finish()
-            } else {
-                binding.reason = it
-            }
+            when (it) {
+                is NoBlockingReason -> activity!!.finish()
+                is BlockedReasonDetails -> {
+                    binding.reason = it.reason
+                    binding.blockedKindLabel = when (it.level) {
+                        BlockingLevel.Activity -> "Activity"
+                        BlockingLevel.App -> "App"
+                    }
+                }
+            }.let { /* require handling all cases */ }
         })
 
         val categories = logic.deviceUserEntry.switchMap {
@@ -138,13 +157,14 @@ class LockFragment : Fragment() {
             } else {
                 val (_, categoryItems) = status
 
-                Transformations.map(logic.database.categoryApp().getCategoryApp(
-                        categoryItems.map { it.id },
-                        packageName
-                )) {
-                    appEntry ->
-
-                    categoryItems.find { it.id == appEntry?.categoryId }
+                blockingReason.map { reason ->
+                    if (reason is BlockedReasonDetails) {
+                        reason.categoryId
+                    } else {
+                        null
+                    }
+                }.map { categoryId ->
+                    categoryItems.find { it.id == categoryId }
                 }
             }
         }
@@ -375,7 +395,9 @@ class LockFragment : Fragment() {
 
         if (savedInstanceState == null) {
             runAsync {
-                if (blockingReason.waitForNonNullValue() == BlockingReason.RequiresCurrentDevice) {
+                val reason = blockingReason.waitForNonNullValue()
+
+                if (reason is BlockedReasonDetails && reason.reason == BlockingReason.RequiresCurrentDevice) {
                     if (isResumed) {
                         binding.handlers!!.setThisDeviceAsCurrentDevice()
                     }

@@ -56,6 +56,17 @@ data class CategoryApp(
         }
     }
 
+    @delegate:Transient
+    val packageNameWithoutActivityName: String by lazy {
+        if (specifiesActivity)
+            packageName.substring(0, packageName.indexOf(":"))
+        else
+            packageName
+    }
+
+    @Transient
+    val specifiesActivity = packageName.contains(":")
+
     init {
         IdGenerator.assertIdValid(categoryId)
 

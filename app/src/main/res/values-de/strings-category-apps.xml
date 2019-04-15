@@ -26,6 +26,18 @@
         <item quantity="one">%d ausgeblendeten Eintrag ausgewählt</item>
         <item quantity="other">%s ausgeblendete Einträge ausgewählt</item>
     </plurals>
+    <string name="category_apps_add_dialog_cannot_add_activities_already_sth_selected">
+        Sie können nur Activities hinzufügen, wenn Sie noch keine Apps zum Hinufügen ausgewählt haben
+    </string>
+    <string name="category_apps_add_activity_dialog_search_hint">Activities suchen</string>
+    <string name="category_apps_add_activity_btn_positive">Activities hinzufügen</string>
+    <string name="category_apps_add_activity_empty_filtered">
+        Zu diesem Suchbegriff wurden keine Activities gefunden
+    </string>
+    <string name="category_apps_add_activity_empty_unfiltered">
+        Es wurden keine Activities gefunden.
+        Stellen Sie sicher, dass es ein Gerät mit dieser App gibt, auf dem das Sperren auf Activity-Ebene aktiviert wurde.
+    </string>
 
     <string name="category_apps_item_removed_toast">%s wurde entfernt</string>
 

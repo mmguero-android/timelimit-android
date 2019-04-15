@@ -262,6 +262,96 @@ data class RemoveInstalledAppsAction(val packageNames: List<String>): AppLogicAc
         writer.endObject()
     }
 }
+data class AppActivityItem (
+        val packageName: String,
+        val className: String,
+        val title: String
+) {
+    companion object {
+        private const val PACKAGE_NAME = "p"
+        private const val CLASS_NAME = "c"
+        private const val TITLE = "t"
+
+        fun parse(item: JSONObject) = AppActivityItem(
+                packageName = item.getString(PACKAGE_NAME),
+                className = item.getString(CLASS_NAME),
+                title = item.getString(TITLE)
+        )
+
+        fun parse(reader: JsonReader): AppActivityItem {
+            var packageName: String? = null
+            var className: String? = null
+            var title: String? = null
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    PACKAGE_NAME -> packageName = reader.nextString()
+                    CLASS_NAME -> className = reader.nextString()
+                    TITLE -> title = reader.nextString()
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+
+            return AppActivityItem(
+                    packageName = packageName!!,
+                    className = className!!,
+                    title = title!!
+            )
+        }
+    }
+
+    fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(PACKAGE_NAME).value(packageName)
+        writer.name(CLASS_NAME).value(className)
+        writer.name(TITLE).value(title)
+
+        writer.endObject()
+    }
+}
+data class UpdateAppActivitiesAction(
+        // package name to activity class names
+        val removedActivities: List<Pair<String, String>>,
+        val updatedOrAddedActivities: List<AppActivityItem>
+): AppLogicAction() {
+    companion object {
+        const val TYPE_VALUE = "UPDATE_APP_ACTIVITIES"
+        private const val REMOVED = "removed"
+        private const val UPDATED_OR_ADDED = "UPDATED_OR_ADDED"
+
+        fun parse(data: JSONObject) = UpdateAppActivitiesAction(
+                removedActivities = data.getJSONArray(REMOVED).toJsonArrayArray().map { item ->
+                    ParseUtils.readStringPair(item)
+                },
+                updatedOrAddedActivities = data.getJSONArray(UPDATED_OR_ADDED).toJsonObjectArray().map { item ->
+                    AppActivityItem.parse(item)
+                }
+        )
+    }
+
+    init {
+        if (removedActivities.isEmpty() && updatedOrAddedActivities.isEmpty()) {
+            throw IllegalArgumentException("empty action")
+        }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(REMOVED).beginArray()
+        removedActivities.forEach { (pkg, cls) -> writer.beginArray().value(pkg).value(cls).endArray() }
+        writer.endArray()
+
+        writer.name(UPDATED_OR_ADDED).beginArray()
+        updatedOrAddedActivities.forEach { it.serialize(writer) }
+        writer.endArray()
+
+        writer.endObject()
+    }
+}
 object SignOutAtDeviceAction: AppLogicAction() {
     const val TYPE_VALUE = "SIGN_OUT_AT_DEVICE"
 
@@ -876,6 +966,28 @@ data class SetConsiderRebootManipulationAction(val deviceId: String, val conside
         writer.name(TYPE).value(TYPE_VALUE)
         writer.name(DEVICE_ID).value(deviceId)
         writer.name(ENABLE).value(considerRebootManipulation)
+
+        writer.endObject()
+    }
+}
+
+data class UpdateEnableActivityLevelBlocking(val deviceId: String, val enable: Boolean): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_ENABLE_ACTIVITY_LEVEL_BLOCKING"
+        private const val DEVICE_ID = "deviceId"
+        private const val ENABLE = "enable"
+    }
+
+    init {
+        IdGenerator.assertIdValid(deviceId)
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(DEVICE_ID).value(deviceId)
+        writer.name(ENABLE).value(enable)
 
         writer.endObject()
     }

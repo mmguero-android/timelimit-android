@@ -19,12 +19,14 @@ import android.graphics.drawable.Drawable
 import android.os.Parcelable
 import androidx.room.TypeConverter
 import io.timelimit.android.data.model.App
+import io.timelimit.android.data.model.AppActivity
 import kotlinx.android.parcel.Parcelize
 
 abstract class PlatformIntegration(
         val maximumProtectionLevel: ProtectionLevel
 ) {
     abstract fun getLocalApps(deviceId: String): Collection<App>
+    abstract fun getLocalAppActivities(deviceId: String): Collection<AppActivity>
     abstract fun getLocalAppTitle(packageName: String): String?
     abstract fun getAppIcon(packageName: String): Drawable?
     abstract fun getCurrentProtectionLevel(): ProtectionLevel
@@ -38,10 +40,10 @@ abstract class PlatformIntegration(
     // this must have a fallback if the permission is not granted
     abstract fun showOverlayMessage(text: String)
 
-    abstract fun showAppLockScreen(currentPackageName: String)
+    abstract fun showAppLockScreen(currentPackageName: String, currentActivityName: String?)
     abstract fun setShowBlockingOverlay(show: Boolean)
     // this should throw an SecurityException if the permission is missing
-    abstract suspend fun getForegroundAppPackageName(): String?
+    abstract suspend fun getForegroundApp(result: ForegroundAppSpec)
     abstract fun setAppStatusMessage(message: AppStatusMessage?)
     abstract fun isScreenOn(): Boolean
     abstract fun setShowNotificationToRevokeTemporarilyAllowedApps(show: Boolean)
@@ -56,6 +58,12 @@ abstract class PlatformIntegration(
     abstract fun setLockTaskPackages(packageNames: List<String>): Boolean
 
     var installedAppsChangeListener: Runnable? = null
+}
+
+data class ForegroundAppSpec(var packageName: String?, var activityName: String?) {
+    companion object {
+        fun newInstance() = ForegroundAppSpec(packageName = null, activityName = null)
+    }
 }
 
 enum class ProtectionLevel {
@@ -174,4 +182,4 @@ class NewPermissionStatusConverter {
 }
 
 @Parcelize
-data class AppStatusMessage(val title: String, val text: String): Parcelable
+data class AppStatusMessage(val title: String, val text: String, val subtext: String? = null): Parcelable

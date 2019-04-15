@@ -17,16 +17,21 @@ package io.timelimit.android.integration.platform.android.foregroundapp
 
 import android.app.ActivityManager
 import android.content.Context
+import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 
 class CompatForegroundAppHelper(context: Context) : ForegroundAppHelper() {
     private val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
-    override suspend fun getForegroundAppPackage(): String? {
-        return try {
-            activityManager.getRunningTasks(1)[0].topActivity.packageName
+    override suspend fun getForegroundApp(result: ForegroundAppSpec) {
+        try {
+            val activity = activityManager.getRunningTasks(1)[0].topActivity
+
+            result.packageName = activity.packageName
+            result.activityName = activity.className
         } catch (ex: NullPointerException) {
-            null
+            result.activityName = null
+            result.packageName = null
         }
     }
 

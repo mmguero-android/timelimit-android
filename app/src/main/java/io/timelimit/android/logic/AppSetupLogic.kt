@@ -99,7 +99,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             currentOverlayPermission = RuntimePermissionStatus.NotGranted,
                             highestOverlayPermission = RuntimePermissionStatus.NotGranted,
                             accessibilityServiceEnabled = false,
-                            wasAccessibilityServiceEnabled = false
+                            wasAccessibilityServiceEnabled = false,
+                            enableActivityLevelBlocking = false
                     )
 
                     appLogic.database.device().addDeviceSync(device)

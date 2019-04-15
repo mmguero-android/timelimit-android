@@ -356,6 +356,13 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 auth = auth
         )
 
+        ManageDeviceActivityLevelBlocking.bind(
+                view = binding.activityLevelBlocking,
+                auth = auth,
+                deviceEntry = deviceEntry,
+                lifecycleOwner = this
+        )
+
         return binding.root
     }
 

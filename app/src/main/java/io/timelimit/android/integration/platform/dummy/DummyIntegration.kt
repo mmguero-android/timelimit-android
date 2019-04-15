@@ -17,6 +17,7 @@ package io.timelimit.android.integration.platform.dummy
 
 import android.graphics.drawable.Drawable
 import io.timelimit.android.data.model.App
+import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
 
 class DummyIntegration(
@@ -39,6 +40,10 @@ class DummyIntegration(
 
     override fun getLocalAppTitle(packageName: String): String? {
         return localApps.find { it.packageName == packageName }?.title
+    }
+
+    override fun getLocalAppActivities(deviceId: String): Collection<AppActivity> {
+        return emptySet()
     }
 
     override fun getAppIcon(packageName: String): Drawable? {
@@ -76,7 +81,7 @@ class DummyIntegration(
         // do nothing
     }
 
-    override fun showAppLockScreen(currentPackageName: String) {
+    override fun showAppLockScreen(currentPackageName: String, currentActivityName: String?) {
         launchLockScreenForPackage = currentPackageName
     }
 
@@ -92,12 +97,13 @@ class DummyIntegration(
         }
     }
 
-    override suspend fun getForegroundAppPackageName(): String? {
+    override suspend fun getForegroundApp(result: ForegroundAppSpec) {
         if (foregroundAppPermission == RuntimePermissionStatus.NotGranted) {
             throw SecurityException()
         }
 
-        return foregroundApp
+        result.packageName = foregroundApp
+        result.activityName = null
     }
 
     override fun setAppStatusMessage(message: AppStatusMessage?) {

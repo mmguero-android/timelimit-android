@@ -19,7 +19,7 @@
     <data>
         <variable
             name="item"
-            type="io.timelimit.android.data.model.App" />
+            type="io.timelimit.android.data.model.AppActivity" />
 
         <variable
             name="currentCategoryTitle"
@@ -27,7 +27,7 @@
 
         <variable
             name="handlers"
-            type="io.timelimit.android.ui.manage.category.apps.add.ItemHandlers" />
+            type="io.timelimit.android.ui.manage.category.apps.addactivity.ItemHandlers" />
 
         <variable
             name="checked"
@@ -38,8 +38,7 @@
     </data>
 
     <androidx.cardview.widget.CardView
-        android:onClick="@{() -> handlers.onAppClicked(item)}"
-        android:onLongClick="@{() -> handlers.onAppLongClicked(item)}"
+        android:onClick="@{() -> handlers.onActivityClicked(item)}"
         android:foreground="?selectableItemBackground"
         app:cardUseCompatPadding="true"
         android:layout_width="match_parent"
@@ -48,14 +47,6 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/icon"
-                tools:src="@mipmap/ic_launcher"
-                android:layout_margin="8dp"
-                android:layout_gravity="center_vertical"
-                android:layout_width="@android:dimen/app_icon_size"
-                android:layout_height="@android:dimen/app_icon_size" />
 
             <LinearLayout
                 android:layout_weight="1"
@@ -82,7 +73,7 @@
                 <TextView
                     android:textAppearance="?android:textAppearanceSmall"
                     tools:text="com.android.settings"
-                    android:text="@{item.packageName}"
+                    android:text="@{item.activityClassName}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </LinearLayout>

@@ -158,7 +158,8 @@ object ApplyServerDataStatus {
                                         currentOverlayPermission = newDevice.currentOverlayPermission,
                                         highestOverlayPermission = newDevice.highestOverlayPermission,
                                         accessibilityServiceEnabled = newDevice.accessibilityServiceEnabled,
-                                        wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled
+                                        wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled,
+                                        enableActivityLevelBlocking = newDevice.enableActivityLevelBlocking
                                 ))
                             } else {
                                 // eventually update old entry
@@ -189,7 +190,8 @@ object ApplyServerDataStatus {
                                         currentOverlayPermission = newDevice.currentOverlayPermission,
                                         highestOverlayPermission = newDevice.highestOverlayPermission,
                                         accessibilityServiceEnabled = newDevice.accessibilityServiceEnabled,
-                                        wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled
+                                        wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled,
+                                        enableActivityLevelBlocking = newDevice.enableActivityLevelBlocking
                                 )
 
                                 if (updatedDeviceEntry != oldDeviceEntry) {

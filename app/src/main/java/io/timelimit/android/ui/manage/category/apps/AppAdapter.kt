@@ -103,7 +103,7 @@ class AppAdapter: RecyclerView.Adapter<ViewHolder>() {
             // TODO: bind icon more modular
             binding.icon.setImageDrawable(
                     DefaultAppLogic.with(binding.root.context)
-                            .platformIntegration.getAppIcon(item.packageName)
+                            .platformIntegration.getAppIcon(item.packageNameWithoutActivityName)
             )
         }
     }
@@ -112,7 +112,7 @@ class AppAdapter: RecyclerView.Adapter<ViewHolder>() {
 open class ViewHolder(view: View): RecyclerView.ViewHolder(view)
 class AppViewHolder(val binding: FragmentCategoryAppsItemBinding): ViewHolder(binding.root)
 
-data class AppEntry(val title: String, val packageName: String)
+data class AppEntry(val title: String, val packageName: String, val packageNameWithoutActivityName: String)
 
 interface Handlers {
     fun onAppClicked(app: AppEntry)

@@ -16,8 +16,20 @@
 package io.timelimit.android.sync.actions
 
 import org.json.JSONArray
+import java.io.IOException
 
 object ParseUtils {
     fun readStringArray(array: JSONArray) = (0..(array.length() - 1)).map { array.getString(it) }
     fun readObjectArray(array: JSONArray) = (0..(array.length() - 1)).map { array.getJSONObject(it) }
+    fun readArrayArray(array: JSONArray) = (0..(array.length() - 1)).map { array.getJSONArray(it) }
+    fun readStringPair(array: JSONArray): Pair<String, String> {
+        if (array.length() != 2) {
+            throw IOException("invalid pair")
+        }
+
+        return array.getString(0) to array.getString(1)
+    }
 }
+
+fun JSONArray.toJsonObjectArray() = ParseUtils.readObjectArray(this)
+fun JSONArray.toJsonArrayArray() = ParseUtils.readArrayArray(this)

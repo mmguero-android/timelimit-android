@@ -35,12 +35,18 @@ import io.timelimit.android.ui.util.SyncStatusModel
 class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
     companion object {
         private const val EXTRA_PACKAGE_NAME = "pkg"
+        private const val EXTRA_ACTIVITY_NAME = "an"
         private const val LOGIN_DIALOG_TAG = "ldt"
 
-        fun start(context: Context, packageName: String) {
+        fun start(context: Context, packageName: String, activityName: String?) {
             context.startActivity(
                     Intent(context, LockActivity::class.java)
                             .putExtra(EXTRA_PACKAGE_NAME, packageName)
+                            .apply {
+                                if (activityName != null) {
+                                    putExtra(EXTRA_ACTIVITY_NAME, activityName)
+                                }
+                            }
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -48,8 +54,15 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         }
     }
 
-    val blockedPackageName: String by lazy {
+    private val blockedPackageName: String by lazy {
         intent.getStringExtra(EXTRA_PACKAGE_NAME)
+    }
+
+    private val blockedActivityName: String? by lazy {
+        if (intent.hasExtra(EXTRA_ACTIVITY_NAME))
+            intent.getStringExtra(EXTRA_ACTIVITY_NAME)
+        else
+            null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +71,7 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, LockFragment.newInstance(blockedPackageName))
+                    .replace(R.id.container, LockFragment.newInstance(blockedPackageName, blockedActivityName))
                     .commitNow()
         }
 

@@ -39,6 +39,9 @@ android {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas".toString())
             }
+            javacOptions {
+                option("-Xmaxerrs", 500)
+            }
         }
         buildConfigField 'String', 'googlePlayKey', '"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqxGPPhjSGrSI4jfIJmw83dDGTO4Sg74nXhOoHl5Omyvxa1Hv+Tzp/wC97emXSmKq9Li2bV4q3yJLjtLJtoDmh9V1vpdyjH13qOidhIUYOtlkGexbwKz56jZwRFXGBIy0RFDDr3j5DLfUWMk0dqplLgIHDqsdUNY50419oMGKAOCX3DEw+ky+0zMY/hlUkZHnd0HLi0CYNkdZyMMYnk8OiOZ3YoDU/vz9PTf93MCAONYcXBlo3Y5hdVY2tyH4qNZh1eyqe0Trz4fRf+y1ljoa0s4ZqYskbsgpy+zUbGb82cxmATAsrdJMnNKMEa30HBvfMzKiOPR6sq3A8PPPoWT5KQIDAQAB"'
     }

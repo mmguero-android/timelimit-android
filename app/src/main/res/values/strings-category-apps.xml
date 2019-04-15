@@ -26,6 +26,18 @@
         <item quantity="one">%d hidden entry selected</item>
         <item quantity="other">%s hidden entries selected</item>
     </plurals>
+    <string name="category_apps_add_dialog_cannot_add_activities_already_sth_selected">
+        You can only add Activities if you did not select any Apps for assigning.
+    </string>
+    <string name="category_apps_add_activity_dialog_search_hint">Search Activities</string>
+    <string name="category_apps_add_activity_btn_positive">Add Activities</string>
+    <string name="category_apps_add_activity_empty_filtered">
+        There are no Activities which match this search term
+    </string>
+    <string name="category_apps_add_activity_empty_unfiltered">
+        There are no known activities.
+        Please check if there is a device with this App where blocking at activity level was enabled.
+    </string>
 
     <string name="category_apps_item_removed_toast">%s was removed</string>
 

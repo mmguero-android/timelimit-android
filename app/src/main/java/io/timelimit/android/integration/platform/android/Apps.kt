@@ -26,6 +26,7 @@ import android.provider.Settings
 import android.provider.Telephony
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.data.model.App
+import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.data.model.AppRecommendation
 
 object AndroidIntegrationApps {
@@ -94,6 +95,21 @@ object AndroidIntegrationApps {
         }
 
         return result.values
+    }
+
+    fun getLocalAppActivities(deviceId: String, context: Context): Collection<AppActivity> {
+        return context.packageManager.getInstalledApplications(0).asSequence().map { applicationInfo ->
+            (context.packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_ACTIVITIES)?.activities ?: emptyArray())
+                    .filter { it.exported }
+                    .map {
+                        AppActivity(
+                                deviceId = deviceId,
+                                appPackageName = applicationInfo.packageName,
+                                activityClassName = it.name,
+                                title = it.loadLabel(context.packageManager).toString()
+                        )
+                    }
+        }.flatten().toSet()
     }
 
     private fun add(map: MutableMap<String, App>, resolveInfoList: List<ResolveInfo>, deviceId: String, recommendation: AppRecommendation, context: Context) {

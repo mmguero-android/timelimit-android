@@ -16,6 +16,7 @@
 package io.timelimit.android.logic
 
 import io.timelimit.android.data.model.UserType
+import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.livedata.waitForNullableValue
 
@@ -36,21 +37,36 @@ object AppAffectedByPrimaryDeviceUtil {
             }
         }
 
-        val currentApp = try {
-            logic.platformIntegration.getForegroundAppPackageName()
+        val currentApp = ForegroundAppSpec.newInstance()
+
+        try {
+            logic.platformIntegration.getForegroundApp(currentApp)
         } catch (ex: SecurityException) {
-            null
+            // ignore
         }
 
-        if (currentApp == null) {
+        if (currentApp.packageName == null) {
             return false
         }
 
         val categories = logic.database.category().getCategoriesByChildId(user.id).waitForNonNullValue()
-        val categoryId = logic.database.categoryApp().getCategoryApp(
-                categoryIds = categories.map { it.id },
-                packageName = currentApp
-        ).waitForNullableValue()?.categoryId ?: user.categoryForNotAssignedApps
+        val categoryId = run {
+            val categoryIdAtAppLevel = logic.database.categoryApp().getCategoryApp(
+                    categoryIds = categories.map { it.id },
+                    packageName = currentApp.packageName!!
+            ).waitForNullableValue()?.categoryId
+
+            if (logic.deviceEntry.waitForNullableValue()?.enableActivityLevelBlocking == true) {
+                val categoryIdAtActivityLevel = logic.database.categoryApp().getCategoryApp(
+                        categoryIds = categories.map { it.id },
+                        packageName = "${currentApp.packageName}:${currentApp.activityName}"
+                ).waitForNullableValue()?.categoryId
+
+                categoryIdAtActivityLevel ?: categoryIdAtAppLevel
+            } else {
+                categoryIdAtAppLevel
+            }
+        } ?: user.categoryForNotAssignedApps
 
         val category = categories.find { it.id == categoryId }
         val parentCategory = categories.find { it.id == category?.parentCategoryId }

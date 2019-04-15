@@ -15,6 +15,8 @@
  */
 package io.timelimit.android.extensions
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -40,4 +42,20 @@ fun EditText.setOnEnterListenr(listener: () -> Unit) {
             false
         }
     }
+}
+
+fun EditText.addOnTextChangedListener(listener: () -> Unit) {
+    this.addTextChangedListener(object: TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            // ignore
+        }
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            // ignore
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            listener()
+        }
+    })
 }

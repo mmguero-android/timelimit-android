@@ -38,6 +38,7 @@ object DatabaseBackupLowlevel {
     private const val TIME_LIMIT_RULE = "timelimitRule"
     private const val USED_TIME_ITEM = "usedTime"
     private const val USER = "user"
+    private const val APP_ACTIVITY = "appActivity"
 
     fun outputAsBackupJson(database: Database, outputStream: OutputStream) {
         val writer = JsonWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
@@ -79,6 +80,7 @@ object DatabaseBackupLowlevel {
         handleCollection(TIME_LIMIT_RULE) { offset, pageSize -> database.timeLimitRules().getRulePageSync(offset, pageSize) }
         handleCollection(USED_TIME_ITEM) { offset, pageSize -> database.usedTimes().getUsedTimePageSync(offset, pageSize) }
         handleCollection(USER) { offset, pageSize -> database.user().getUserPageSync(offset, pageSize) }
+        handleCollection(APP_ACTIVITY) { offset, pageSize -> database.appActivity().getAppActivityPageSync(offset, pageSize) }
 
         writer.endObject().flush()
     }
@@ -175,6 +177,15 @@ object DatabaseBackupLowlevel {
 
                         while (reader.hasNext()) {
                             database.user().addUserSync(User.parse(reader))
+                        }
+
+                        reader.endArray()
+                    }
+                    APP_ACTIVITY -> {
+                        reader.beginArray()
+
+                        while (reader.hasNext()) {
+                            database.appActivity().addAppActivitySync(AppActivity.parse(reader))
                         }
 
                         reader.endArray()

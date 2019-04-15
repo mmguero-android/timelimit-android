@@ -40,6 +40,7 @@ import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsyncExpectForever
 import io.timelimit.android.data.model.App
+import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.integration.platform.android.foregroundapp.ForegroundAppHelper
 import io.timelimit.android.ui.lock.LockActivity
@@ -88,6 +89,10 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         return AndroidIntegrationApps.getLocalApps(deviceId, context)
     }
 
+    override fun getLocalAppActivities(deviceId: String): Collection<AppActivity> {
+        return AndroidIntegrationApps.getLocalAppActivities(deviceId, context)
+    }
+
     override fun getLocalAppTitle(packageName: String): String? {
         return AndroidIntegrationApps.getAppTitle(packageName, context)
     }
@@ -100,8 +105,8 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         return AdminStatus.getAdminStatus(context, policyManager)
     }
 
-    override suspend fun getForegroundAppPackageName(): String? {
-        return foregroundAppHelper.getForegroundAppPackage()
+    override suspend fun getForegroundApp(result: ForegroundAppSpec) {
+        foregroundAppHelper.getForegroundApp(result)
     }
 
     override fun getForegroundAppPermissionStatus(): RuntimePermissionStatus {
@@ -208,8 +213,8 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         }
     }
 
-    override fun showAppLockScreen(currentPackageName: String) {
-        LockActivity.start(context, currentPackageName)
+    override fun showAppLockScreen(currentPackageName: String, currentActivityName: String?) {
+        LockActivity.start(context, currentPackageName, currentActivityName)
     }
 
     override fun setShowBlockingOverlay(show: Boolean) {

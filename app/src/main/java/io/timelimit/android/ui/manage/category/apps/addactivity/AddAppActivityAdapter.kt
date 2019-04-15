@@ -13,57 +13,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.manage.category.apps.add
+package io.timelimit.android.ui.manage.category.apps.addactivity
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.timelimit.android.data.model.App
+import io.timelimit.android.data.model.AppActivity
+import io.timelimit.android.databinding.FragmentAddCategoryActivitiesItemBinding
 import io.timelimit.android.databinding.FragmentAddCategoryAppsItemBinding
 import io.timelimit.android.extensions.toggle
 import io.timelimit.android.logic.DefaultAppLogic
 import kotlin.properties.Delegates
 
-class AddAppAdapter: RecyclerView.Adapter<ViewHolder>() {
-    var data: List<App>? by Delegates.observable(null as List<App>?) { _, _, _ -> notifyDataSetChanged() }
-    var listener: AddAppAdapterListener? = null
-    var categoryTitleByPackageName: Map<String, String> by Delegates.observable(emptyMap()) { _, _, _ -> notifyDataSetChanged() }
-    val selectedApps = mutableSetOf<String>()
+class AddAppActivityAdapter: RecyclerView.Adapter<ViewHolder>() {
+    var data: List<AppActivity>? by Delegates.observable(null as List<AppActivity>?) { _, _, _ -> notifyDataSetChanged() }
+    val selectedActiviities = mutableSetOf<String>()
 
     private val itemHandlers = object: ItemHandlers {
-        override fun onAppClicked(app: App) {
-            selectedApps.toggle(app.packageName)
+        override fun onActivityClicked(activity: AppActivity) {
+            selectedActiviities.toggle(activity.activityClassName)
 
             notifyDataSetChanged()
         }
-
-        override fun onAppLongClicked(app: App) = listener?.onAppLongClicked(app) ?: false
     }
 
     init {
         setHasStableIds(true)
     }
 
-    private fun getItem(position: Int): App {
+    private fun getItem(position: Int): AppActivity {
         return data!![position]
     }
 
     override fun getItemId(position: Int): Long {
-        return getItem(position).hashCode().toLong()
+        return getItem(position).activityClassName.hashCode().toLong()
     }
 
-    override fun getItemCount(): Int {
-        val data = this.data
-
-        if (data == null) {
-            return 0
-        } else {
-            return data.size
-        }
-    }
+    override fun getItemCount(): Int = this.data?.size ?: 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
-            FragmentAddCategoryAppsItemBinding.inflate(
+            FragmentAddCategoryActivitiesItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -75,24 +65,14 @@ class AddAppAdapter: RecyclerView.Adapter<ViewHolder>() {
 
         holder.apply {
             binding.item = item
-            binding.checked = selectedApps.contains(item.packageName)
-            binding.currentCategoryTitle = categoryTitleByPackageName[item.packageName]
+            binding.checked = selectedActiviities.contains(item.activityClassName)
             binding.executePendingBindings()
-
-            binding.icon.setImageDrawable(
-                    DefaultAppLogic.with(holder.itemView.context)
-                            .platformIntegration.getAppIcon(item.packageName)
-            )
         }
     }
 }
 
-class ViewHolder(val binding: FragmentAddCategoryAppsItemBinding): RecyclerView.ViewHolder(binding.root)
+class ViewHolder(val binding: FragmentAddCategoryActivitiesItemBinding): RecyclerView.ViewHolder(binding.root)
 
-interface ItemHandlers: AddAppAdapterListener {
-    fun onAppClicked(app: App)
-}
-
-interface AddAppAdapterListener {
-    fun onAppLongClicked(app: App): Boolean
+interface ItemHandlers {
+    fun onActivityClicked(activity: AppActivity)
 }

@@ -22,6 +22,7 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.os.Build
 import io.timelimit.android.coroutines.executeAndWait
+import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -37,22 +38,24 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
 
     private var lastQueryTime: Long = 0
     private var lastPackage: String? = null
+    private var lastPackageActivity: String? = null
     private var lastPackageTime: Long = 0
     private val event = UsageEvents.Event()
 
     @Throws(SecurityException::class)
-    override suspend fun getForegroundAppPackage(): String? {
+    override suspend fun getForegroundApp(result: ForegroundAppSpec) {
         if (getPermissionStatus() == RuntimePermissionStatus.NotGranted) {
             throw SecurityException()
         }
 
-        return foregroundAppThread.executeAndWait {
+        foregroundAppThread.executeAndWait {
             val now = System.currentTimeMillis()
 
             if (lastQueryTime > now) {
                 // if the time went backwards, forget everything
                 lastQueryTime = 0
                 lastPackage = null
+                lastPackageActivity = null
                 lastPackageTime = 0
             }
 
@@ -77,6 +80,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
                         if (event.timeStamp > lastPackageTime) {
                             lastPackageTime = event.timeStamp
                             lastPackage = event.packageName
+                            lastPackageActivity = event.className
                         }
                     }
                 }
@@ -84,7 +88,8 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
 
             lastQueryTime = now
 
-            lastPackage
+            result.packageName = lastPackage
+            result.activityName = lastPackageActivity
         }
     }
 

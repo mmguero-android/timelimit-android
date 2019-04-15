@@ -86,7 +86,9 @@ data class Device(
         @ColumnInfo(name = "current_accessibility_service_permission")
         val accessibilityServiceEnabled: Boolean,
         @ColumnInfo(name = "was_accessibility_service_permission")
-        val wasAccessibilityServiceEnabled: Boolean
+        val wasAccessibilityServiceEnabled: Boolean,
+        @ColumnInfo(name = "enable_activity_level_blocking")
+        val enableActivityLevelBlocking: Boolean
 ): JsonSerializable {
     companion object {
         private const val ID = "id"
@@ -117,6 +119,7 @@ data class Device(
         private const val HIGHEST_OVERLAY_PERMISSION = "hop"
         private const val ACCESSIBILITY_SERVICE_ENABLED = "ase"
         private const val WAS_ACCESSIBILITY_SERVICE_ENABLED = "wase"
+        private const val ENABLE_ACTIVITY_LEVEL_BLOCKING = "ealb"
 
         fun parse(reader: JsonReader): Device {
             var id: String? = null
@@ -147,6 +150,7 @@ data class Device(
             var highestOverlayPermission = RuntimePermissionStatus.NotGranted
             var accessibilityServiceEnabled = false
             var wasAccessibilityServiceEnabled = false
+            var enableActivityLevelBlocking = false
 
             reader.beginObject()
 
@@ -180,6 +184,7 @@ data class Device(
                     HIGHEST_OVERLAY_PERMISSION -> highestOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
                     ACCESSIBILITY_SERVICE_ENABLED -> accessibilityServiceEnabled = reader.nextBoolean()
                     WAS_ACCESSIBILITY_SERVICE_ENABLED -> wasAccessibilityServiceEnabled = reader.nextBoolean()
+                    ENABLE_ACTIVITY_LEVEL_BLOCKING -> enableActivityLevelBlocking = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -214,7 +219,8 @@ data class Device(
                     currentOverlayPermission = currentOverlayPermission,
                     highestOverlayPermission = highestOverlayPermission,
                     accessibilityServiceEnabled = accessibilityServiceEnabled,
-                    wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled
+                    wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled,
+                    enableActivityLevelBlocking = enableActivityLevelBlocking
             )
         }
     }
@@ -282,6 +288,7 @@ data class Device(
         writer.name(HIGHEST_OVERLAY_PERMISSION).value(RuntimePermissionStatusUtil.serialize(highestOverlayPermission))
         writer.name(ACCESSIBILITY_SERVICE_ENABLED).value(accessibilityServiceEnabled)
         writer.name(WAS_ACCESSIBILITY_SERVICE_ENABLED).value(wasAccessibilityServiceEnabled)
+        writer.name(ENABLE_ACTIVITY_LEVEL_BLOCKING).value(enableActivityLevelBlocking)
 
         writer.endObject()
     }

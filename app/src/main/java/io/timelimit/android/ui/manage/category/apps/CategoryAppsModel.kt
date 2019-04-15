@@ -42,7 +42,7 @@ class CategoryAppsModel(application: Application): AndroidViewModel(application)
     private val appsOfCategoryWithNames = installedApps.switchMap { allApps ->
         appsOfThisCategory.map { apps ->
             apps.map { categoryApp ->
-                categoryApp to allApps.find { app -> app.packageName == categoryApp.packageName }
+                categoryApp to allApps.find { app -> app.packageName == categoryApp.packageNameWithoutActivityName }
             }
         }
     }
@@ -50,9 +50,9 @@ class CategoryAppsModel(application: Application): AndroidViewModel(application)
     val appEntries = appsOfCategoryWithNames.map { apps ->
         apps.map { (app, appEntry) ->
             if (appEntry != null) {
-                AppEntry(appEntry.title, app.packageName)
+                AppEntry(appEntry.title, app.packageName, app.packageNameWithoutActivityName)
             } else {
-                AppEntry("app not found", app.packageName)
+                AppEntry("app not found", app.packageName, app.packageNameWithoutActivityName)
             }
         }.sortedBy { it.title.toLowerCase(Locale.US) }
     }

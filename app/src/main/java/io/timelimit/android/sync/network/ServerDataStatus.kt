@@ -182,7 +182,8 @@ data class ServerDeviceData(
         val currentOverlayPermission: RuntimePermissionStatus,
         val highestOverlayPermission: RuntimePermissionStatus,
         val accessibilityServiceEnabled: Boolean,
-        val wasAccessibilityServiceEnabled: Boolean
+        val wasAccessibilityServiceEnabled: Boolean,
+        val enableActivityLevelBlocking: Boolean
 ) {
     companion object {
         private const val DEVICE_ID = "deviceId"
@@ -212,6 +213,7 @@ data class ServerDeviceData(
         private const val HIGHEST_OVERLAY_PERMISSION = "hOverlay"
         private const val ACCESSIBILITY_SERVICE_ENABLED = "asEnabled"
         private const val WAS_ACCESSIBILITY_SERVICE_ENABLED = "wasAsEnabled"
+        private const val ENABLE_ACTIVITY_LEVEL_BLOCKING = "activityLevelBlocking"
 
         fun parse(reader: JsonReader): ServerDeviceData {
             var deviceId: String? = null
@@ -241,6 +243,7 @@ data class ServerDeviceData(
             var highestOverlayPermission: RuntimePermissionStatus? = null
             var accessibilityServiceEnabled: Boolean? = null
             var wasAccessibilityServiceEnabled: Boolean? = null
+            var enableActivityLevelBlocking = false
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -272,6 +275,7 @@ data class ServerDeviceData(
                     HIGHEST_OVERLAY_PERMISSION -> highestOverlayPermission = RuntimePermissionStatusUtil.parse(reader.nextString())
                     ACCESSIBILITY_SERVICE_ENABLED -> accessibilityServiceEnabled = reader.nextBoolean()
                     WAS_ACCESSIBILITY_SERVICE_ENABLED -> wasAccessibilityServiceEnabled = reader.nextBoolean()
+                    ENABLE_ACTIVITY_LEVEL_BLOCKING -> enableActivityLevelBlocking = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -304,7 +308,8 @@ data class ServerDeviceData(
                     currentOverlayPermission = currentOverlayPermission!!,
                     highestOverlayPermission = highestOverlayPermission!!,
                     accessibilityServiceEnabled = accessibilityServiceEnabled!!,
-                    wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled!!
+                    wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled!!,
+                    enableActivityLevelBlocking = enableActivityLevelBlocking
             )
         }
 

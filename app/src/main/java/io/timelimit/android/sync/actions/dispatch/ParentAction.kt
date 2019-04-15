@@ -472,6 +472,16 @@ object LocalDatabaseParentActionDispatcher {
                             )
                     )
                 }
+                is UpdateEnableActivityLevelBlocking -> {
+                    val deviceEntry = database.device().getDeviceByIdSync(action.deviceId)
+                            ?: throw IllegalArgumentException("device not found")
+
+                    database.device().updateDeviceEntry(
+                            deviceEntry.copy(
+                                    enableActivityLevelBlocking = action.enable
+                            )
+                    )
+                }
             }.let { }
 
             database.setTransactionSuccessful()

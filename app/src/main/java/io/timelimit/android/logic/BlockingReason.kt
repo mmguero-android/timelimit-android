@@ -20,10 +20,7 @@ import android.util.SparseLongArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import io.timelimit.android.BuildConfig
-import io.timelimit.android.data.model.Category
-import io.timelimit.android.data.model.TimeLimitRule
-import io.timelimit.android.data.model.User
-import io.timelimit.android.data.model.UserType
+import io.timelimit.android.data.model.*
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
@@ -43,49 +40,79 @@ enum class BlockingReason {
     NotificationsAreBlocked
 }
 
+enum class BlockingLevel {
+    App,
+    Activity
+}
+
+sealed class BlockingReasonDetail {
+    abstract val areNotificationsBlocked: Boolean
+}
+data class NoBlockingReason(
+        override val areNotificationsBlocked: Boolean
+): BlockingReasonDetail() {
+    companion object {
+        private val instanceWithoutNotificationsBlocked = NoBlockingReason(areNotificationsBlocked = false)
+        private val instanceWithNotificationsBlocked = NoBlockingReason(areNotificationsBlocked = true)
+
+        fun getInstance(areNotificationsBlocked: Boolean) = if (areNotificationsBlocked)
+            instanceWithNotificationsBlocked
+        else
+            instanceWithoutNotificationsBlocked
+    }
+}
+data class BlockedReasonDetails(
+        val reason: BlockingReason,
+        val level: BlockingLevel,
+        val categoryId: String?,
+        override val areNotificationsBlocked: Boolean
+): BlockingReasonDetail()
+
 class BlockingReasonUtil(private val appLogic: AppLogic) {
     companion object {
         private const val LOG_TAG = "BlockingReason"
     }
 
-    fun getBlockingReason(packageName: String, forNotification: Boolean): LiveData<BlockingReason> {
+    private val enableActivityLevelFiltering = appLogic.deviceEntry.map { it?.enableActivityLevelBlocking ?: false }
+
+    fun getBlockingReason(packageName: String, activityName: String?): LiveData<BlockingReasonDetail> {
         // check precondition that the app is running
 
         return appLogic.enable.switchMap {
             enabled ->
 
             if (enabled == null || enabled == false) {
-                liveDataFromValue(BlockingReason.None)
+                liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false) as BlockingReasonDetail)
             } else {
                 appLogic.deviceUserEntry.switchMap {
                     user ->
 
                     if (user == null || user.type != UserType.Child) {
-                        liveDataFromValue(BlockingReason.None)
+                        liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false) as BlockingReasonDetail)
                     } else {
-                        getBlockingReasonStep2(packageName, user, TimeZone.getTimeZone(user.timeZone), forNotification)
+                        getBlockingReasonStep2(packageName, activityName, user, TimeZone.getTimeZone(user.timeZone))
                     }
                 }
             }
         }
     }
 
-    private fun getBlockingReasonStep2(packageName: String, child: User, timeZone: TimeZone, forNotification: Boolean): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep2(packageName: String, activityName: String?, child: User, timeZone: TimeZone): LiveData<BlockingReasonDetail> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 2")
         }
 
         // check internal whitelist
         if (packageName == BuildConfig.APPLICATION_ID) {
-            return liveDataFromValue(BlockingReason.None)
+            return liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false))
         } else if (AndroidIntegrationApps.ignoredApps.contains(packageName)) {
-            return liveDataFromValue(BlockingReason.None)
+            return liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false))
         } else {
-            return getBlockingReasonStep3(packageName, child, timeZone, forNotification)
+            return getBlockingReasonStep3(packageName, activityName, child, timeZone)
         }
     }
 
-    private fun getBlockingReasonStep3(packageName: String, child: User, timeZone: TimeZone, forNotification: Boolean): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep3(packageName: String, activityName: String?, child: User, timeZone: TimeZone): LiveData<BlockingReasonDetail> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 3")
         }
@@ -101,14 +128,14 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             temporarilyAllowedApps ->
 
             if (temporarilyAllowedApps.contains(packageName)) {
-                liveDataFromValue(BlockingReason.None)
+                liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false) as BlockingReasonDetail)
             } else {
-                getBlockingReasonStep4(packageName, child, timeZone, forNotification)
+                getBlockingReasonStep4(packageName, activityName, child, timeZone)
             }
         }
     }
 
-    private fun getBlockingReasonStep4(packageName: String, child: User, timeZone: TimeZone, forNotification: Boolean): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep4(packageName: String, activityName: String?, child: User, timeZone: TimeZone): LiveData<BlockingReasonDetail> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 4")
         }
@@ -116,13 +143,27 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         return appLogic.database.category().getCategoriesByChildId(child.id).switchMap {
             childCategories ->
 
-            Transformations.map(appLogic.database.categoryApp().getCategoryApp(childCategories.map { it.id }, packageName)) {
+            val categoryAppLevel = appLogic.database.categoryApp().getCategoryApp(childCategories.map { it.id }, packageName)
+            val categoryAppActivityLevel = enableActivityLevelFiltering.switchMap {
+                if (it)
+                    appLogic.database.categoryApp().getCategoryApp(childCategories.map { it.id }, "$packageName:$activityName")
+                else
+                    liveDataFromValue(null as CategoryApp?)
+            }
+
+            val categoryApp = categoryAppLevel.switchMap { appLevel ->
+                categoryAppActivityLevel.map { activityLevel ->
+                    activityLevel?.let { it to BlockingLevel.Activity } ?: appLevel?.let { it to BlockingLevel.App }
+                }
+            }
+
+            Transformations.map(categoryApp) {
                 categoryApp ->
 
                 if (categoryApp == null) {
                     null
                 } else {
-                    childCategories.find { it.id == categoryApp.categoryId }
+                    childCategories.find { it.id == categoryApp.first.categoryId }?.let { it to categoryApp.second }
                 }
             }
         }.switchMap {
@@ -136,36 +177,53 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
 
                 defaultCategory.switchMap { categoryEntry2 ->
                     if (categoryEntry2 == null) {
-                        liveDataFromValue(BlockingReason.NotPartOfAnCategory)
+                        liveDataFromValue(
+                                BlockedReasonDetails(
+                                        areNotificationsBlocked = false,
+                                        level = BlockingLevel.App,
+                                        reason = BlockingReason.NotPartOfAnCategory,
+                                        categoryId = null
+                                ) as BlockingReasonDetail
+                        )
                     } else {
-                        getBlockingReasonStep4Point5(categoryEntry2, child, timeZone, false, forNotification)
+                        getBlockingReasonStep4Point5(categoryEntry2, child, timeZone, false, BlockingLevel.App)
                     }
                 }
             } else {
-                getBlockingReasonStep4Point5(categoryEntry, child, timeZone, false, forNotification)
+                getBlockingReasonStep4Point5(categoryEntry.first, child, timeZone, false, categoryEntry.second)
             }
         }
     }
 
-    private fun getBlockingReasonStep4Point5(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, forNotification: Boolean): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep4Point5(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, blockingLevel: BlockingLevel): LiveData<BlockingReasonDetail> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 4.5")
         }
 
-        fun default() = getBlockingReasonStep4Point7(category, child, timeZone, isParentCategory, forNotification)
+        val shouldBlockNotifications = if (category.blockAllNotifications)
+            appLogic.fullVersion.shouldProvideFullVersionFunctions
+        else
+            liveDataFromValue(false)
 
-        return if (forNotification && category.blockAllNotifications) {
-            appLogic.fullVersion.shouldProvideFullVersionFunctions.switchMap { fullVersion ->
-                if (fullVersion) {
-                    liveDataFromValue(BlockingReason.NotificationsAreBlocked)
+        val nextLevel = getBlockingReasonStep4Point7(category, child, timeZone, isParentCategory, blockingLevel)
+
+        return shouldBlockNotifications.switchMap { blockNotifications ->
+            nextLevel.map { blockingReason ->
+                if (blockingReason == BlockingReason.None) {
+                    NoBlockingReason.getInstance(areNotificationsBlocked = blockNotifications)
                 } else {
-                    default()
+                    BlockedReasonDetails(
+                            areNotificationsBlocked = blockNotifications,
+                            level = blockingLevel,
+                            reason = blockingReason,
+                            categoryId = category.id
+                    )
                 }
             }
-        } else default()
+        }
     }
 
-    private fun getBlockingReasonStep4Point7(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, forNotification: Boolean): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep4Point7(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, blockingLevel: BlockingLevel): LiveData<BlockingReason> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 4.7")
         }
@@ -200,7 +258,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
                     if (parentCategory == null) {
                         liveDataFromValue(BlockingReason.None)
                     } else {
-                        getBlockingReasonStep4Point5(parentCategory, child, timeZone, true, forNotification)
+                        getBlockingReasonStep4Point7(parentCategory, child, timeZone, true, blockingLevel)
                     }
                 }
             } else {

@@ -17,11 +17,10 @@ package io.timelimit.android.logic
 
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.coroutines.runAsyncExpectForever
+import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.livedata.*
-import io.timelimit.android.sync.actions.AddInstalledAppsAction
-import io.timelimit.android.sync.actions.InstalledApp
-import io.timelimit.android.sync.actions.RemoveInstalledAppsAction
+import io.timelimit.android.sync.actions.*
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -36,7 +35,9 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
 
     init {
         appLogic.platformIntegration.installedAppsChangeListener = Runnable { requestSync() }
-        appLogic.deviceEntryIfEnabled.map { it?.id + it?.currentUserId }.ignoreUnchanged().observeForever { requestSync() }
+        appLogic.deviceEntryIfEnabled.map {
+            it?.id + it?.currentUserId + it?.enableActivityLevelBlocking
+        }.ignoreUnchanged().observeForever { requestSync() }
 
         runAsyncExpectForever { syncLoop() }
     }
@@ -69,42 +70,82 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
 
             val deviceId = deviceEntry.id
 
-            val currentlyInstalled = appLogic.platformIntegration.getLocalApps(deviceId = deviceId).associateBy { app -> app.packageName }
-            val currentlySaved = appLogic.database.app().getAppsByDeviceIdAsync(deviceId = deviceId).waitForNonNullValue().associateBy { app -> app.packageName }
+            run {
+                val currentlyInstalled = appLogic.platformIntegration.getLocalApps(deviceId = deviceId).associateBy { app -> app.packageName }
+                val currentlySaved = appLogic.database.app().getAppsByDeviceIdAsync(deviceId = deviceId).waitForNonNullValue().associateBy { app -> app.packageName }
 
-            // skip all items for removal which are still saved locally
-            val itemsToRemove = HashMap(currentlySaved)
-            currentlyInstalled.forEach { (packageName, _) -> itemsToRemove.remove(packageName) }
+                // skip all items for removal which are still saved locally
+                val itemsToRemove = HashMap(currentlySaved)
+                currentlyInstalled.forEach { (packageName, _) -> itemsToRemove.remove(packageName) }
 
-            // only add items which are not the same locally
-            val itemsToAdd = currentlyInstalled.filter { (packageName, app) -> currentlySaved[packageName] != app }
+                // only add items which are not the same locally
+                val itemsToAdd = currentlyInstalled.filter { (packageName, app) -> currentlySaved[packageName] != app }
 
-            // save the changes
-            if (itemsToRemove.isNotEmpty()) {
-                ApplyActionUtil.applyAppLogicAction(
-                        action = RemoveInstalledAppsAction(packageNames = itemsToRemove.keys.toList()),
-                        appLogic = appLogic,
-                        ignoreIfDeviceIsNotConfigured = true
-                )
+                // save the changes
+                if (itemsToRemove.isNotEmpty()) {
+                    ApplyActionUtil.applyAppLogicAction(
+                            action = RemoveInstalledAppsAction(packageNames = itemsToRemove.keys.toList()),
+                            appLogic = appLogic,
+                            ignoreIfDeviceIsNotConfigured = true
+                    )
+                }
+
+                if (itemsToAdd.isNotEmpty()) {
+                    ApplyActionUtil.applyAppLogicAction(
+                            action = AddInstalledAppsAction(
+                                    apps = itemsToAdd.map {
+                                        (_, app) ->
+
+                                        InstalledApp(
+                                                packageName = app.packageName,
+                                                title = app.title,
+                                                recommendation = app.recommendation,
+                                                isLaunchable = app.isLaunchable
+                                        )
+                                    }
+                            ),
+                            appLogic = appLogic,
+                            ignoreIfDeviceIsNotConfigured = true
+                    )
+                }
             }
 
-            if (itemsToAdd.isNotEmpty()) {
-                ApplyActionUtil.applyAppLogicAction(
-                        action = AddInstalledAppsAction(
-                                apps = itemsToAdd.map {
-                                    (_, app) ->
+            run {
+                fun buildKey(activity: AppActivity) = "${activity.appPackageName}:${activity.activityClassName}"
 
-                                    InstalledApp(
-                                            packageName = app.packageName,
-                                            title = app.title,
-                                            recommendation = app.recommendation,
-                                            isLaunchable = app.isLaunchable
-                                    )
-                                }
-                        ),
-                        appLogic = appLogic,
-                        ignoreIfDeviceIsNotConfigured = true
-                )
+                val currentlyInstalled = (
+                        if (deviceEntry.enableActivityLevelBlocking)
+                            appLogic.platformIntegration.getLocalAppActivities(deviceId = deviceId)
+                        else
+                            emptyList()
+                        ).associateBy { buildKey(it) }
+
+                val currentlySaved = appLogic.database.appActivity().getAppActivitiesByDeviceIds(deviceIds = listOf(deviceId)).waitForNonNullValue().associateBy { buildKey(it) }
+
+                // skip all items for removal which are still saved locally
+                val itemsToRemove = HashMap(currentlySaved)
+                currentlyInstalled.forEach { (packageName, _) -> itemsToRemove.remove(packageName) }
+
+                // only add items which are not the same locally
+                val itemsToAdd = currentlyInstalled.filter { (packageName, app) -> currentlySaved[packageName] != app }
+
+                // save the changes
+                if (itemsToRemove.isNotEmpty() or itemsToAdd.isNotEmpty()) {
+                    ApplyActionUtil.applyAppLogicAction(
+                            action = UpdateAppActivitiesAction(
+                                    removedActivities = itemsToRemove.map { it.value.appPackageName to it.value.activityClassName },
+                                    updatedOrAddedActivities = itemsToAdd.map { item ->
+                                        AppActivityItem(
+                                                packageName = item.value.appPackageName,
+                                                className = item.value.activityClassName,
+                                                title = item.value.title
+                                        )
+                                    }
+                            ),
+                            appLogic = appLogic,
+                            ignoreIfDeviceIsNotConfigured = true
+                    )
+                }
             }
         }
     }

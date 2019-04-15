@@ -24,6 +24,7 @@ object ActionParser {
         RemoveInstalledAppsAction.TYPE_VALUE -> RemoveInstalledAppsAction.parse(action)
         TriedDisablingDeviceAdminAction.TYPE_VALUE -> TriedDisablingDeviceAdminAction
         SignOutAtDeviceAction.TYPE_VALUE -> SignOutAtDeviceAction
+        UpdateAppActivitiesAction.TYPE_VALUE -> UpdateAppActivitiesAction.parse(action)
         else -> throw IllegalStateException()
     }
 
@@ -61,6 +62,7 @@ object ActionParser {
         // RenameChildAction
         // UpdateParentNotificationFlagsAction
         // UpdateCategoryBlockAllNotificationsAction
+        // UpdateEnableActivityLevelBlocking
         else -> throw IllegalStateException()
     }
 }

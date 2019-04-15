@@ -89,6 +89,7 @@ class BackgroundService: Service() {
                         .setSmallIcon(R.drawable.ic_stat_timelapse)
                         .setContentTitle(appStatusMessage.title)
                         .setContentText(appStatusMessage.text)
+                        .setSubText(appStatusMessage.subtext)
                         .setContentIntent(openAppIntent)
                         .setWhen(0)
                         .setShowWhen(false)

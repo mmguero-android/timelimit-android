@@ -54,20 +54,20 @@
         Die App wurde zu keiner Kategorie zugeordnet. Das bedeutet, dass es keine Einschränkungs-Einstellungen gibt. Und da ist es die einfachste Lösung, die App zu sperren.
     </string>
     <string name="lock_reason_temporarily_blocked">
-        Diese App ist in einer Kategorie, die vorübergehend gesperrt wurde.
+        Diese %s ist in einer Kategorie, die vorübergehend gesperrt wurde.
     </string>
     <string name="lock_reason_blocked_time">
-        Diese App ist in einer Kategorie, für die festgelegt wurde, dass Sie zu dieser Uhrzeit gesperrt ist.
+        Diese %s ist in einer Kategorie, für die festgelegt wurde, dass Sie zu dieser Uhrzeit gesperrt ist.
     </string>
     <string name="lock_reason_time_over">
-        Diese App ist in einer Kategorie, deren maximale Nutzungszeit erreicht wurde.
+        Diese %s ist in einer Kategorie, deren maximale Nutzungszeit erreicht wurde.
     </string>
     <string name="lock_reason_time_over_etra_time_can_be_used_later">
-        Diese App ist in einer Kategorie, deren maximale Nutzungszeit erreicht wurde.
+        Diese %s ist in einer Kategorie, deren maximale Nutzungszeit erreicht wurde.
         Es gab noch Extra-Zeit, aber die maximale Nutzung der Extra-Zeit wurde erreicht.
     </string>
     <string name="lock_reason_missing_network_time">
-        Um festzustellen, ob diese App erlaubt sein sollte, wird die Uhrzeit benötigt.
+        Um festzustellen, ob diese %s erlaubt sein sollte, wird die Uhrzeit benötigt.
         Die Netzwerkzeitverifizierung ist aktiviert, aber sie ist fehlgeschlagen.
     </string>
     <string name="lock_reason_requires_current_device">

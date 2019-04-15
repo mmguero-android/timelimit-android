@@ -29,6 +29,7 @@ interface Database {
     fun user(): UserDao
     fun temporarilyAllowedApp(): TemporarilyAllowedAppDao
     fun pendingSyncAction(): PendingSyncActionDao
+    fun appActivity(): AppActivityDao
 
     fun beginTransaction()
     fun setTransactionSuccessful()

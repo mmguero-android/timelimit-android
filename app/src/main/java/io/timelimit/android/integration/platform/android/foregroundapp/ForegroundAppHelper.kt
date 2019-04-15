@@ -17,10 +17,11 @@ package io.timelimit.android.integration.platform.android.foregroundapp
 
 import android.content.Context
 import android.os.Build
+import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 
 abstract class ForegroundAppHelper {
-    abstract suspend fun getForegroundAppPackage(): String?
+    abstract suspend fun getForegroundApp(result: ForegroundAppSpec)
     abstract fun getPermissionStatus(): RuntimePermissionStatus
 
     companion object {
