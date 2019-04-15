@@ -43,7 +43,7 @@ abstract class PlatformIntegration(
     abstract fun showAppLockScreen(currentPackageName: String, currentActivityName: String?)
     abstract fun setShowBlockingOverlay(show: Boolean)
     // this should throw an SecurityException if the permission is missing
-    abstract suspend fun getForegroundApp(result: ForegroundAppSpec)
+    abstract suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long)
     abstract fun setAppStatusMessage(message: AppStatusMessage?)
     abstract fun isScreenOn(): Boolean
     abstract fun setShowNotificationToRevokeTemporarilyAllowedApps(show: Boolean)

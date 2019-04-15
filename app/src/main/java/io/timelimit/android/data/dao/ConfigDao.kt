@@ -24,6 +24,7 @@ import io.timelimit.android.data.model.ConfigurationItemTypeConverter
 import io.timelimit.android.data.model.ConfigurationItemTypeUtil
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.map
+import java.lang.IllegalArgumentException
 
 @Dao
 @TypeConverters(ConfigurationItemTypeConverter::class)
@@ -208,4 +209,13 @@ abstract class ConfigDao {
     fun getCustomServerUrlSync() = getValueOfKeySync(ConfigurationItemType.CustomServerUrl) ?: ""
     fun getCustomServerUrlAsync() = getValueOfKeyAsync(ConfigurationItemType.CustomServerUrl).map { it ?: "" }
     fun setCustomServerUrlSync(url: String) = updateValueSync(ConfigurationItemType.CustomServerUrl, url)
+
+    fun getForegroundAppQueryIntervalAsync(): LiveData<Long> = getValueOfKeyAsync(ConfigurationItemType.ForegroundAppQueryRange).map { (it ?: "0").toLong() }
+    fun setForegroundAppQueryIntervalSync(interval: Long) {
+        if (interval < 0) {
+            throw IllegalArgumentException()
+        }
+
+        updateValueSync(ConfigurationItemType.ForegroundAppQueryRange, interval.toString())
+    }
 }

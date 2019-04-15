@@ -290,6 +290,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_diagnoseMainFragment_to_diagnoseForegroundAppFragment"
+            app:destination="@id/diagnoseForegroundAppFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/diagnoseClockFragment"
@@ -311,4 +318,9 @@
         android:name="io.timelimit.android.ui.migrate_to_connected.MigrateToConnectedModeFragment"
         android:label="migrate_to_connected_mode_fragment"
         tools:layout="@layout/migrate_to_connected_mode_fragment" />
+    <fragment
+        android:id="@+id/diagnoseForegroundAppFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseForegroundAppFragment"
+        android:label="diagnose_foreground_app_fragment"
+        tools:layout="@layout/diagnose_foreground_app_fragment" />
 </navigation>

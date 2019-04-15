@@ -23,7 +23,7 @@ import io.timelimit.android.integration.platform.RuntimePermissionStatus
 class CompatForegroundAppHelper(context: Context) : ForegroundAppHelper() {
     private val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
-    override suspend fun getForegroundApp(result: ForegroundAppSpec) {
+    override suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long) {
         try {
             val activity = activityManager.getRunningTasks(1)[0].topActivity
 

@@ -51,6 +51,13 @@ class DiagnoseMainFragment : Fragment() {
             )
         }
 
+        binding.diagnoseFgaButton.setOnClickListener {
+            navigation.safeNavigate(
+                    DiagnoseMainFragmentDirections.actionDiagnoseMainFragmentToDiagnoseForegroundAppFragment(),
+                    R.id.diagnoseMainFragment
+            )
+        }
+
         return binding.root
     }
 }

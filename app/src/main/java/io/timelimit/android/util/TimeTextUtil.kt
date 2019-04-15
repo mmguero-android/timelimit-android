@@ -29,6 +29,10 @@ object TimeTextUtil {
         return context.resources.getQuantityString(R.plurals.util_time_minutes, minutes, minutes)
     }
 
+    fun seconds(seconds: Int, context: Context): String {
+        return context.resources.getQuantityString(R.plurals.util_time_seconds, seconds, seconds)
+    }
+
     fun days(days: Int, context: Context): String {
         return context.resources.getQuantityString(R.plurals.util_time_days, days, days)
     }

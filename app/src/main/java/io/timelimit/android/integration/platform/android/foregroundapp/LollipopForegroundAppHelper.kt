@@ -43,7 +43,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
     private val event = UsageEvents.Event()
 
     @Throws(SecurityException::class)
-    override suspend fun getForegroundApp(result: ForegroundAppSpec) {
+    override suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long) {
         if (getPermissionStatus() == RuntimePermissionStatus.NotGranted) {
             throw SecurityException()
         }
@@ -51,7 +51,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
         foregroundAppThread.executeAndWait {
             val now = System.currentTimeMillis()
 
-            if (lastQueryTime > now) {
+            if (lastQueryTime > now || queryInterval >= 1000 * 60 * 60 * 24 /* 1 day */) {
                 // if the time went backwards, forget everything
                 lastQueryTime = 0
                 lastPackage = null
@@ -69,7 +69,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
                 //       which seems to provide all data
                 // update: with 1 second, some App switching events were missed
                 //         it seems to always work with 1.5 seconds
-                lastQueryTime - 1500
+                lastQueryTime - Math.max(queryInterval, 1500)
             }
 
             usageStatsManager.queryEvents(queryStartTime, now)?.let { usageEvents ->

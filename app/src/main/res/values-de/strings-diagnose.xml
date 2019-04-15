@@ -43,4 +43,8 @@
     <string name="diagnose_sync_btn_clear_cache_toast">Cache geleert</string>
     <string name="diagnose_sync_btn_request_sync">Synchronisation anfordern</string>
     <string name="diagnose_sync_btn_request_sync_toast">Synchronisation wurde angefordert</string>
+
+    <string name="diagnose_fga_title">Erkennung der aktiven App</string>
+    <string name="diagnose_fga_query_range">Abfragezeitraum</string>
+    <string name="diagnose_fga_query_range_min">Minimal (Standard)</string>
 </resources>

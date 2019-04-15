@@ -249,7 +249,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
                 }
 
-                appLogic.platformIntegration.getForegroundApp(foregroundAppSpec)
+                appLogic.platformIntegration.getForegroundApp(foregroundAppSpec, appLogic.getForegroundAppQueryInterval())
                 val foregroundAppPackageName = foregroundAppSpec.packageName
                 val foregroundAppActivityName = foregroundAppSpec.activityName
                 val activityLevelBlocking = appLogic.deviceEntry.value?.enableActivityLevelBlocking ?: false

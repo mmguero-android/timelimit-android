@@ -40,7 +40,7 @@ object AppAffectedByPrimaryDeviceUtil {
         val currentApp = ForegroundAppSpec.newInstance()
 
         try {
-            logic.platformIntegration.getForegroundApp(currentApp)
+            logic.platformIntegration.getForegroundApp(currentApp, logic.getForegroundAppQueryInterval())
         } catch (ex: SecurityException) {
             // ignore
         }
