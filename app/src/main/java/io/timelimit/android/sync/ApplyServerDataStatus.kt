@@ -234,6 +234,19 @@ object ApplyServerDataStatus {
                     }
 
                     run {
+                        // apply activities
+                        database.appActivity().deleteAppActivitiesByDeviceId(item.deviceId)
+                        database.appActivity().addAppActivitiesSync(item.activities.map {
+                            AppActivity(
+                                    deviceId = item.deviceId,
+                                    appPackageName = it.packageName,
+                                    activityClassName = it.className,
+                                    title = it.title
+                            )
+                        })
+                    }
+
+                    run {
                         // apply changed version number
                         database.device().updateAppsVersion(
                                 deviceId = item.deviceId,

@@ -25,4 +25,7 @@ interface AppActivityDao {
 
     @Query("DELETE FROM app_activity WHERE device_id = :deviceId AND app_package_name = :packageName AND activity_class_name IN (:activities)")
     fun deleteAppActivitiesSync(deviceId: String, packageName: String, activities: List<String>)
+
+    @Query("DELETE FROM app_activity WHERE device_id = :deviceId")
+    fun deleteAppActivitiesByDeviceId(deviceId: String)
 }

@@ -320,7 +320,7 @@ data class UpdateAppActivitiesAction(
     companion object {
         const val TYPE_VALUE = "UPDATE_APP_ACTIVITIES"
         private const val REMOVED = "removed"
-        private const val UPDATED_OR_ADDED = "UPDATED_OR_ADDED"
+        private const val UPDATED_OR_ADDED = "updatedOrAdded"
 
         fun parse(data: JSONObject) = UpdateAppActivitiesAction(
                 removedActivities = data.getJSONArray(REMOVED).toJsonArrayArray().map { item ->
