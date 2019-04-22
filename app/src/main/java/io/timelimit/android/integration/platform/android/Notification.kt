@@ -68,4 +68,5 @@ object NotificationChannels {
 object PendingIntentIds {
     const val OPEN_MAIN_APP = 1
     const val REVOKE_TEMPORARILY_ALLOWED = 2
+    const val SWITCH_TO_DEFAULT_USER = 3
 }

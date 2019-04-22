@@ -21,12 +21,16 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.integration.platform.AppStatusMessage
+import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.actions.SignOutAtDeviceAction
+import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.ui.MainActivity
 
 class BackgroundService: Service() {
@@ -34,6 +38,7 @@ class BackgroundService: Service() {
         private const val ACTION = "a"
         private const val ACTION_SET_NOTIFICATION = "a"
         private const val ACTION_REVOKE_TEMPORARILY_ALLOWED_APPS = "b"
+        private const val ACTION_SWITCH_TO_DEFAULT_USER = "c"
         private const val EXTRA_NOTIFICATION = "b"
 
         fun setStatusMessage(status: AppStatusMessage?, context: Context) {
@@ -53,6 +58,9 @@ class BackgroundService: Service() {
 
         fun prepareRevokeTemporarilyAllowed(context: Context) = Intent(context, BackgroundService::class.java)
                 .putExtra(ACTION, ACTION_REVOKE_TEMPORARILY_ALLOWED_APPS)
+
+        fun prepareSwitchToDefaultUser(context: Context) = Intent(context, BackgroundService::class.java)
+                .putExtra(ACTION, ACTION_SWITCH_TO_DEFAULT_USER)
     }
 
     private val notificationManager: NotificationManager by lazy {
@@ -99,6 +107,24 @@ class BackgroundService: Service() {
                         .setAutoCancel(false)
                         .setOngoing(true)
                         .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .let { builder ->
+                            if (appStatusMessage.showSwitchToDefaultUserOption) {
+                                builder.addAction(
+                                        NotificationCompat.Action.Builder(
+                                                R.drawable.ic_account_circle_black_24dp,
+                                                getString(R.string.manage_device_default_user_switch_btn),
+                                                PendingIntent.getService(
+                                                        this@BackgroundService,
+                                                        PendingIntentIds.SWITCH_TO_DEFAULT_USER,
+                                                        prepareSwitchToDefaultUser(this@BackgroundService),
+                                                        PendingIntent.FLAG_UPDATE_CURRENT
+                                                )
+                                        ).build()
+                                )
+                            }
+
+                            builder
+                        }
                         .build()
 
                 if (didPostNotification) {
@@ -110,6 +136,20 @@ class BackgroundService: Service() {
             } else if (action == ACTION_REVOKE_TEMPORARILY_ALLOWED_APPS) {
                 runAsync {
                     DefaultAppLogic.with(this@BackgroundService).backgroundTaskLogic.resetTemporarilyAllowedApps()
+                }
+            } else if (action == ACTION_SWITCH_TO_DEFAULT_USER) {
+                runAsync {
+                    val logic = DefaultAppLogic.with(this@BackgroundService)
+
+                    if (logic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue()) {
+                        ApplyActionUtil.applyAppLogicAction(
+                                appLogic = logic,
+                                action = SignOutAtDeviceAction,
+                                ignoreIfDeviceIsNotConfigured = true
+                        )
+                    } else {
+                        Toast.makeText(this@BackgroundService, R.string.purchase_required_dialog_title, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         }

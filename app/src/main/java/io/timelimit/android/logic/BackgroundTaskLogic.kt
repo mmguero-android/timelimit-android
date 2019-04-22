@@ -187,7 +187,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     appLogic.platformIntegration.setAppStatusMessage(
                             AppStatusMessage(
                                     title = appLogic.context.getString(R.string.background_logic_timeout_title),
-                                    text = appLogic.context.getString(R.string.background_logic_timeout_text)
+                                    text = appLogic.context.getString(R.string.background_logic_timeout_text),
+                                    showSwitchToDefaultUserOption = true
                             )
                     )
                     appLogic.platformIntegration.setShowBlockingOverlay(false)

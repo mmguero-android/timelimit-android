@@ -183,4 +183,9 @@ class NewPermissionStatusConverter {
 }
 
 @Parcelize
-data class AppStatusMessage(val title: String, val text: String, val subtext: String? = null): Parcelable
+data class AppStatusMessage(
+        val title: String,
+        val text: String,
+        val subtext: String? = null,
+        val showSwitchToDefaultUserOption: Boolean = false
+): Parcelable
