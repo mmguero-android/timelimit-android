@@ -14,12 +14,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+plugins {
+    id 'com.github.triplet.play' version '2.2.0'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 androidExtensions {
@@ -204,7 +207,7 @@ dependencies {
 }
 
 play {
-    jsonFile = file("play-key.json")
+    serviceAccountCredentials = file("play-key.json")
     track = "production"
 }
 
