@@ -1,1 +1,5 @@
-Bugfix: Blocking at activity level did not show some activities
+- allow switching to the default user from the notification area if a parent is the current user
+- allow chosing a shorter time for automatically switching to the default user
+- improved syncing the installed Apps
+- fix crash which could occur when using blocking at activity level
+

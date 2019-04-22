@@ -1,1 +1,5 @@
-Fehlerbehebung: Das Sperren auf Activity-Ebene hat einige Activities nicht angeboten
+- Wechsel zum Standardbenutzer vom Benachrichtigungsbereich aus ermöglicht, wenn ein Elternteil angemeldet ist
+- Es kann eine kürzere Zeit, nach der automatisch zum Standardbenutzer gewechselt wird, gewählt werden
+- Synchronisation der installierten Apps verbessert
+- Abstürze behoben, die beim Nutzen vom Sperren auf Activity-Ebene auftreten konnten
+
