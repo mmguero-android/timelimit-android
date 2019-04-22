@@ -3,6 +3,7 @@ package io.timelimit.android.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import io.timelimit.android.data.model.AppActivity
 
@@ -17,10 +18,10 @@ interface AppActivityDao {
     @Query("SELECT * FROM app_activity WHERE app_package_name = :packageName")
     fun getAppActivitiesByPackageName(packageName: String): LiveData<List<AppActivity>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAppActivitySync(item: AppActivity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAppActivitiesSync(items: List<AppActivity>)
 
     @Query("DELETE FROM app_activity WHERE device_id = :deviceId AND app_package_name = :packageName AND activity_class_name IN (:activities)")
