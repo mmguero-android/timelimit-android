@@ -36,7 +36,7 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
     init {
         appLogic.platformIntegration.installedAppsChangeListener = Runnable { requestSync() }
         appLogic.deviceEntryIfEnabled.map {
-            it?.id + it?.currentUserId + it?.enableActivityLevelBlocking
+            it?.id + it?.currentUserId + it?.defaultUser + it?.enableActivityLevelBlocking
         }.ignoreUnchanged().observeForever { requestSync() }
 
         runAsyncExpectForever { syncLoop() }
@@ -62,10 +62,17 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
                 return
             }
 
-            val userEntry = appLogic.deviceUserEntry.waitForNullableValue()
+            if (appLogic.database.config().getDeviceAuthTokenAsync().waitForNullableValue().isNullOrEmpty()) {
+                // local mode -> sync always
+            } else {
+                // connected mode -> don't sync always
 
-            if (userEntry == null || userEntry.type != UserType.Child) {
-                return@withLock
+                val userEntry = appLogic.deviceUserEntry.waitForNullableValue()
+                val defaultUserEntry = appLogic.database.user().getUserByIdLive(deviceEntry.defaultUser).waitForNullableValue()
+
+                if (userEntry?.type != UserType.Child && defaultUserEntry?.type != UserType.Child) {
+                    return@withLock
+                }
             }
 
             val deviceId = deviceEntry.id
