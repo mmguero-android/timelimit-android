@@ -1,0 +1,36 @@
+Flexible
+
+Apps are grouped to categories (a category can contain only 1 App).
+
+You can chose per category at which times it should be allowed. This allows preventing playing games too late.
+
+Additionally, you can configure time limit rules. These rules limit the total usage duration at one day or over multiple days (e.g. a weekend). It is possible to combine both, e.g. 2 hours per week end day, but in total only 3 hours.
+
+Moreover, there is the possibility to set an extra time. This allows using something longer than regulary once. This can be used as bonus. There is additionally the option to disable all time limits temporarily (e.g. for the whole day or an hour).
+
+Multi user support
+
+There is the scenario that one device is used by exactly one user. However, with tablets, there are often multiple possible users. Due to that, it is possible to create multiple user profiles in TimeLimit. Each user has got different settings and time counters. There are two kinds of users: parents and children. If a parent was chosen as user, then there are no restrictions. Parents can chose any other user as current user. Children can only chose themselves as current user. 
+
+Multi device support
+
+There are scenarios in which one user has got multiple devices. Instead of time limits per device and splitting the limits across the devices, it is possible to assign one user to multiple devices.
+Then the usage durations are counted together and allowing an App automatically affects all devices. Depending on the settings, only one device per time can be used or multiple devices at the same time. However, un the second case, it is possible to use more time than available e.g. at connection interruptions.
+
+Connected
+
+It is possible to view and change settings from any linked device. This connection is possible - if wanted - using your server.
+
+Notes
+
+Some features cost money if you don't use your own server. These features cost 0,99 € per month/ 9,99 € per year (in Germany).
+
+If it "does not work": This can be caused by power saving features. You can find at https://dontkillmyapp.com/ how you can disable these features. Get in touch with the support if that does not help.
+
+Depending on the Android version, TimeLimit uses the permission for the usage stats access or the GET_TASKS permission. These are only used to detect the currently used App. Based on the currently used App, the App is blocked, allowed, or the remaining time is calculated.
+
+The device admin permission is used to detect an uninstallation of TimeLimit.
+
+TimeLimit uses the notification access to block notifications of blocked apps. Notifications and their contents are not saved.
+
+TimeLimit uses an accessibility service to press the home button before showing the lock screen. This fixes blocking in some cases.
