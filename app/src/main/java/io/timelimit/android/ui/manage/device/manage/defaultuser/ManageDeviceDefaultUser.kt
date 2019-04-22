@@ -81,7 +81,13 @@ object ManageDeviceDefaultUser {
             view.defaultUserSwitchText = if (defaultUserTimeout == 0)
                 context.getString(R.string.manage_device_default_user_timeout_off)
             else
-                context.getString(R.string.manage_device_default_user_timeout_on, TimeTextUtil.time(defaultUserTimeout, context))
+                context.getString(
+                        R.string.manage_device_default_user_timeout_on,
+                        if (defaultUserTimeout < 1000 * 60)
+                            TimeTextUtil.seconds(defaultUserTimeout / 1000, context)
+                        else
+                            TimeTextUtil.time(defaultUserTimeout, context)
+                )
         })
 
         auth.logic.fullVersion.shouldProvideFullVersionFunctions.observe(lifecycleOwner, Observer { fullVersion ->

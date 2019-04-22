@@ -41,6 +41,7 @@ class SetDeviceDefaultUserTimeoutDialogFragment: BottomSheetDialogFragment() {
         private const val DIALOG_TAG = "sddutdf"
         private val OPTIONS = listOf(
                 0,
+                1000 * 5,
                 1000 * 60,
                 1000 * 60 * 5,
                 1000 * 60 * 15,
@@ -97,6 +98,8 @@ class SetDeviceDefaultUserTimeoutDialogFragment: BottomSheetDialogFragment() {
                 buildRow().let { row ->
                     row.text = if (option == 0)
                         getString(R.string.manage_device_default_user_timeout_dialog_disable)
+                    else if (option < 1000 * 60)
+                        TimeTextUtil.seconds(option / 1000, context!!)
                     else
                         TimeTextUtil.time(option, context!!)
 
