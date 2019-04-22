@@ -105,7 +105,13 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         // check internal whitelist
         if (packageName == BuildConfig.APPLICATION_ID) {
             return liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false))
-        } else if (AndroidIntegrationApps.ignoredApps.contains(packageName)) {
+        } else if (AndroidIntegrationApps.ignoredApps[packageName].let {
+                    when (it) {
+                        null -> false
+                        AndroidIntegrationApps.IgnoredAppHandling.Ignore -> true
+                        AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable -> BuildConfig.storeCompilant
+                    }
+                }) {
             return liveDataFromValue(NoBlockingReason.getInstance(areNotificationsBlocked = false))
         } else {
             return getBlockingReasonStep3(packageName, activityName, child, timeZone)

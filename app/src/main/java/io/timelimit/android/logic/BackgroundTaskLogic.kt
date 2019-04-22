@@ -270,7 +270,13 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 if (
                         (foregroundAppPackageName == BuildConfig.APPLICATION_ID) ||
-                        (foregroundAppPackageName != null && AndroidIntegrationApps.ignoredApps.contains(foregroundAppPackageName))
+                        (foregroundAppPackageName != null && AndroidIntegrationApps.ignoredApps[foregroundAppPackageName].let {
+                            when (it) {
+                                null -> false
+                                AndroidIntegrationApps.IgnoredAppHandling.Ignore -> true
+                                AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable -> BuildConfig.storeCompilant
+                            }
+                        })
                 ) {
                     usedTimeUpdateHelper?.commit(appLogic)
                     showStatusMessageWithCurrentAppTitle(
@@ -303,7 +309,11 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     if (category == null) {
                         usedTimeUpdateHelper?.commit(appLogic)
 
-                        appLogic.platformIntegration.setSuspendedApps(listOf(foregroundAppPackageName), true)
+                        if (AndroidIntegrationApps.ignoredApps[foregroundAppPackageName] == null) {
+                            // don't suspend system apps which are whitelisted in any version
+                            appLogic.platformIntegration.setSuspendedApps(listOf(foregroundAppPackageName), true)
+                        }
+
                         openLockscreen(foregroundAppPackageName, foregroundAppActivityName)
                     } else if (category.temporarilyBlocked or (parentCategory?.temporarilyBlocked == true)) {
                         usedTimeUpdateHelper?.commit(appLogic)

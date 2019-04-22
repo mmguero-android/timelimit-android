@@ -37,14 +37,19 @@ object AndroidIntegrationApps {
             .addCategory(Intent.CATEGORY_DEFAULT)
             .addCategory(Intent.CATEGORY_HOME)
 
-    val ignoredApps = HashSet<String>()
+    enum class IgnoredAppHandling {
+        Ignore,
+        IgnoreOnStoreOtherwiseWhitelistAndDontDisable
+    }
+
+    val ignoredApps = mutableMapOf<String, IgnoredAppHandling>()
     init {
-        ignoredApps.add("com.android.systemui")
-        ignoredApps.add("android")
-        ignoredApps.add("com.android.packageinstaller")
-        ignoredApps.add("com.google.android.packageinstaller")
-        ignoredApps.add("com.android.bluetooth")
-        ignoredApps.add("com.android.nfc")
+        ignoredApps["com.android.systemui"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
+        ignoredApps["android"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
+        ignoredApps["com.android.bluetooth"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
+        ignoredApps["com.android.nfc"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
+        ignoredApps["com.android.packageinstaller"] = AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable
+        ignoredApps["com.google.android.packageinstaller"] = AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable
     }
 
     fun getLocalApps(deviceId: String, context: Context): Collection<App> {
@@ -82,16 +87,30 @@ object AndroidIntegrationApps {
 
         for (applicationInfo in installedPackages) {
             val packageName = applicationInfo.packageName
+            val ignoreConfig = ignoredApps[packageName]
 
-            if (!result.containsKey(packageName) && !ignoredApps.contains(packageName)) {
-                result[packageName] = App(
-                        deviceId = deviceId,
-                        packageName = packageName,
-                        title = applicationInfo.loadLabel(packageManager).toString(),
-                        isLaunchable = false,
-                        recommendation = AppRecommendation.None
-                )
+            if (result.containsKey(packageName)) {
+                continue
             }
+
+            if (when (ignoreConfig) {
+                null -> false
+                AndroidIntegrationApps.IgnoredAppHandling.Ignore -> true
+                AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable -> BuildConfig.storeCompilant
+            }) {
+                continue
+            }
+
+            result[packageName] = App(
+                    deviceId = deviceId,
+                    packageName = packageName,
+                    title = applicationInfo.loadLabel(packageManager).toString(),
+                    isLaunchable = false,
+                    recommendation = if (ignoreConfig == AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable)
+                        AppRecommendation.Whitelist
+                    else
+                        AppRecommendation.None
+            )
         }
 
         return result.values
@@ -117,7 +136,9 @@ object AndroidIntegrationApps {
 
         for (info in resolveInfoList) {
             val packageName = info.activityInfo.applicationInfo.packageName
-            if (ignoredApps.contains(packageName)) {
+            val ignoreConfig = ignoredApps[packageName]
+
+            if (ignoreConfig != null && BuildConfig.storeCompilant) {
                 continue
             }
 
@@ -127,7 +148,10 @@ object AndroidIntegrationApps {
                         packageName = packageName,
                         title = info.activityInfo.applicationInfo.loadLabel(packageManager).toString(),
                         isLaunchable = true,
-                        recommendation = recommendation
+                        recommendation = if (ignoreConfig == AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable)
+                            AppRecommendation.Whitelist
+                        else
+                            recommendation
                 )
             }
         }
@@ -140,7 +164,9 @@ object AndroidIntegrationApps {
             return
         }
 
-        if (ignoredApps.contains(packageName)) {
+        val ignoreConfig = ignoredApps[packageName]
+
+        if (ignoreConfig != null && BuildConfig.storeCompilant) {
             return
         }
 
@@ -156,7 +182,10 @@ object AndroidIntegrationApps {
                     packageName = packageName,
                     title = packageInfo.loadLabel(packageManager).toString(),
                     isLaunchable = true,
-                    recommendation = recommendation
+                    recommendation = if (ignoreConfig == AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable)
+                        AppRecommendation.Whitelist
+                    else
+                        recommendation
             )
         } catch (ex: PackageManager.NameNotFoundException) {
             // ignore
