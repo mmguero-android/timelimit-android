@@ -1,0 +1,1 @@
+Bugfix: Blocking at activity level did not show some activities

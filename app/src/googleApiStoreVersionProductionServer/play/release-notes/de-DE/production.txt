@@ -1,0 +1,1 @@
+Fehlerbehebung: Das Sperren auf Activity-Ebene hat einige Activities nicht angeboten
