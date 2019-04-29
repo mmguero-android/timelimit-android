@@ -85,6 +85,10 @@ class SyncUtil (private val logic: AppLogic) {
             shouldSyncImportant.or(shouldSyncUnimportant).or(shouldSyncVeryUnimportant)
     )
 
+    private val lastSyncExceptionInternal = MutableLiveData<Exception?>().apply { postValue(null) }
+    val lastSyncException = lastSyncExceptionInternal.castDown()
+    val isSyncing = liveDataFromFunction (pollInterval = 100) { isSyncingLock.isLocked }
+
     init {
         runAsync {
             wipeCacheIfUpdated()
@@ -113,11 +117,14 @@ class SyncUtil (private val logic: AppLogic) {
                     lastSync.value = logic.timeApi.getCurrentUptimeInMillis()
 
                     SyncInBackgroundWorker.deschedule()
+                    lastSyncExceptionInternal.postValue(null)
 
                     // wait 2 to 3 seconds before any next sync (debounce)
                     logic.timeApi.sleep((2 * 1000 + random.nextInt(1000)).toLong())
                 } catch (ex: Exception) {
                     // wait 10 to 15 seconds before retrying
+
+                    lastSyncExceptionInternal.postValue(ex)
 
                     if (BuildConfig.DEBUG) {
                         Log.w(LOG_TAG, "sync failed", ex)

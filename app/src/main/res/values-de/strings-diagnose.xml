@@ -43,6 +43,10 @@
     <string name="diagnose_sync_btn_clear_cache_toast">Cache geleert</string>
     <string name="diagnose_sync_btn_request_sync">Synchronisation anfordern</string>
     <string name="diagnose_sync_btn_request_sync_toast">Synchronisation wurde angefordert</string>
+    <string name="diagnose_sync_btn_show_exception">Fehlerdetails anzeigen</string>
+    <string name="diagnose_sync_status_idle">Es läuft gerade keine Synchronisation</string>
+    <string name="diagnose_sync_status_syncing">Es wird jetzt synchronisiert</string>
+    <string name="diagnose_sync_status_had_error">Es trat ein Fehler beim Synchronisieren auf</string>
 
     <string name="diagnose_fga_title">Erkennung der aktiven App</string>
     <string name="diagnose_fga_query_range">Abfragezeitraum</string>

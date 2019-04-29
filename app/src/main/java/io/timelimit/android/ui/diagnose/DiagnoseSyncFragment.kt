@@ -28,6 +28,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.DiagnoseSyncFragmentBinding
+import io.timelimit.android.livedata.map
+import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.apply.UploadActionsUtil
 
@@ -36,6 +38,7 @@ class DiagnoseSyncFragment : Fragment() {
         val binding = DiagnoseSyncFragmentBinding.inflate(inflater, container, false)
         val logic = DefaultAppLogic.with(context!!)
         val adapter = PendingSyncActionAdapter()
+        val sync = logic.syncUtil
 
         binding.recycler.layoutManager = LinearLayoutManager(context!!)
         binding.recycler.adapter = adapter
@@ -56,9 +59,29 @@ class DiagnoseSyncFragment : Fragment() {
         }
 
         binding.requestSyncBtn.setOnClickListener {
-            logic.syncUtil.requestImportantSync(true)
+            sync.requestImportantSync(true)
 
             Toast.makeText(context!!, R.string.diagnose_sync_btn_request_sync_toast, Toast.LENGTH_SHORT).show()
+        }
+
+        sync.isSyncing.switchMap { a ->
+            sync.lastSyncException.map { b -> a to b }
+        }.observe(this, Observer { (isSyncing, lastSyncException) ->
+            binding.hadSyncException = lastSyncException != null
+
+            if (isSyncing) {
+                binding.syncStatusText = getString(R.string.diagnose_sync_status_syncing)
+            } else if (lastSyncException != null) {
+                binding.syncStatusText = getString(R.string.diagnose_sync_status_had_error)
+            } else {
+                binding.syncStatusText = getString(R.string.diagnose_sync_status_idle)
+            }
+        })
+
+        binding.showExceptionBtn.setOnClickListener {
+            sync.lastSyncException.value?.let { ex ->
+                DiagnoseExceptionDialogFragment.newInstance(ex).show(fragmentManager!!)
+            }
         }
 
         return binding.root

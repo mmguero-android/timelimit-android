@@ -43,6 +43,10 @@
     <string name="diagnose_sync_btn_clear_cache_toast">Cache cleared</string>
     <string name="diagnose_sync_btn_request_sync">Request sync</string>
     <string name="diagnose_sync_btn_request_sync_toast">sync was requested</string>
+    <string name="diagnose_sync_btn_show_exception">Show exception details</string>
+    <string name="diagnose_sync_status_idle">Idle</string>
+    <string name="diagnose_sync_status_syncing">Syncing now</string>
+    <string name="diagnose_sync_status_had_error">Idle, exception occurred</string>
 
     <string name="diagnose_fga_title">Foreground-App-Detection</string>
     <string name="diagnose_fga_query_range">Requested time range</string>

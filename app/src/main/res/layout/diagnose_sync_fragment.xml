@@ -21,6 +21,14 @@
             name="isListEmpty"
             type="Boolean" />
 
+        <variable
+            name="syncStatusText"
+            type="String" />
+
+        <variable
+            name="hadSyncException"
+            type="boolean" />
+
         <import type="android.view.View" />
     </data>
 
@@ -49,6 +57,22 @@
                 android:layout_height="match_parent" />
 
         </FrameLayout>
+
+        <TextView
+            android:gravity="center_horizontal"
+            tools:text="@string/diagnose_sync_status_idle"
+            android:padding="8dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@{syncStatusText}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:visibility="@{hadSyncException ? View.VISIBLE : View.GONE}"
+            android:id="@+id/show_exception_btn"
+            android:text="@string/diagnose_sync_btn_show_exception"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/clear_cache_btn"
