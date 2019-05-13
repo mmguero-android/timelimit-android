@@ -1,4 +1,4 @@
-package io.timelimit.android.ui.manage.device.manage
+package io.timelimit.android.ui.manage.device.manage.feature
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData

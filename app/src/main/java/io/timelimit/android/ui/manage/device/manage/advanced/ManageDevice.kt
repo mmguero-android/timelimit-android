@@ -13,26 +13,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.manage.device.manage
+package io.timelimit.android.ui.manage.device.manage.advanced
 
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import io.timelimit.android.data.Database
-import io.timelimit.android.databinding.RemoveDeviceViewBinding
+import io.timelimit.android.databinding.ManageDeviceViewBinding
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.manage.device.remove.ConfirmRemoveDeviceDialogFragment
-import io.timelimit.android.ui.manage.device.remove.RemoveDeviceProgressDialog
 
-object RemoveDevice {
+object ManageDevice {
     fun bind(
-            view: RemoveDeviceViewBinding,
+            view: ManageDeviceViewBinding,
             activityViewModel: ActivityViewModel,
             fragmentManager: FragmentManager,
             deviceId: String,
             database: Database,
             lifecycleOwner: LifecycleOwner
     ) {
+        view.renameBtn.setOnClickListener {
+            if (activityViewModel.requestAuthenticationOrReturnTrue()) {
+                UpdateDeviceTitleDialogFragment.newInstance(deviceId).show(fragmentManager)
+            }
+        }
+
         view.removeBtn.setOnClickListener {
             if (activityViewModel.requestAuthenticationOrReturnTrue()) {
                 ConfirmRemoveDeviceDialogFragment.newInstance(deviceId).show(fragmentManager)

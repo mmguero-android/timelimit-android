@@ -15,6 +15,7 @@
 -->
 <resources>
     <string name="manage_send_device_connected_title">Send if device is connected</string>
+    <string name="manage_send_device_connected_title_short">Send device connected</string>
     <string name="manage_send_device_connected_info">This allows you to see at other devices if the device is connected/ if TimeLimit is currently running.</string>
     <string name="manage_send_device_connected_error_offline">You can use this only in the connected mode</string>
     <string name="manage_send_device_connected_error_wrong_device">You can only change this setting at the device itself</string>

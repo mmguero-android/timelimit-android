@@ -15,6 +15,7 @@
 -->
 <resources>
     <string name="manage_send_device_connected_title">Verbindungsstatus anzeigen</string>
+    <string name="manage_send_device_connected_title_short">@string/manage_send_device_connected_title</string>
     <string name="manage_send_device_connected_info">Dies ermöglicht es Ihnen, an anderen Geräten zu sehen, ob dieses Gerät verbunden ist/ ob TimeLimit noch aktiv ist.</string>
     <string name="manage_send_device_connected_error_offline">Sie können diese Funktion nur im vernetzten Modus verwenden</string>
     <string name="manage_send_device_connected_error_wrong_device">Sie können diese Einstellung nur am entsprechenden Gerät ändern</string>

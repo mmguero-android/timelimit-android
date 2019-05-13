@@ -15,41 +15,29 @@
  */
 package io.timelimit.android.ui.manage.device.manage
 
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
-import io.timelimit.android.data.model.NetworkTime
 import io.timelimit.android.databinding.FragmentManageDeviceBinding
-import io.timelimit.android.integration.platform.ProtectionLevel
-import io.timelimit.android.integration.platform.android.AdminReceiver
+import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.RealTime
-import io.timelimit.android.sync.actions.SetDeviceUserAction
-import io.timelimit.android.sync.actions.UpdateNetworkTimeVerificationAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
-import io.timelimit.android.ui.manage.device.manage.defaultuser.ManageDeviceDefaultUser
+import io.timelimit.android.ui.manage.device.manage.feature.ManageDeviceFeaturesFragment
+import io.timelimit.android.ui.manage.device.manage.permission.ManageDevicePermissionsFragment
 
 class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
@@ -71,39 +59,12 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 lifecycleOwner = this
         )
 
-        RemoveDevice.bind(
-                view = binding.removeDevice,
-                activityViewModel = auth,
-                fragmentManager = fragmentManager!!,
-                deviceId = args.deviceId,
-                database = logic.database,
-                lifecycleOwner = this
-        )
-
         ManageDeviceManipulation.bindView(
                 binding = binding.manageManipulation,
                 deviceEntry = deviceEntry,
                 lifecycleOwner = this,
                 activityViewModel = auth
         )
-
-        DontAskPasswordOnDeviceView.bind(
-                view = binding.dontAskPasswordAtDevice,
-                lifecycleOwner = this,
-                deviceEntry = deviceEntry,
-                activityViewModel = auth
-        )
-
-        ManageSendDeviceConnected.bind(
-                binding = binding.sendDeviceConnected,
-                deviceEntry = deviceEntry,
-                auth = auth,
-                lifecycleOwner = this
-        )
-
-        val userSpinnerAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_item).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
 
         // auth
         AuthenticationFab.manageAuthenticationFab(
@@ -114,153 +75,45 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 doesSupportAuth = liveDataFromValue(true)
         )
 
-        // label, id
-        val userListItems = ArrayList<Pair<String, String>>()
-
-        fun bindUserListItems() {
-            userSpinnerAdapter.clear()
-            userSpinnerAdapter.addAll(userListItems.map { it.first })
-            userSpinnerAdapter.notifyDataSetChanged()
-        }
-
-        fun bindUserListSelection() {
-            val selectedUserId = deviceEntry.value?.currentUserId
-
-            val selectedIndex = userListItems.indexOfFirst { it.second == selectedUserId }
-
-            if (selectedIndex != -1) {
-                binding.userSpinner.setSelection(selectedIndex)
-            } else {
-                val fallbackSelectedIndex = userListItems.indexOfFirst { it.second == "" }
-
-                if (fallbackSelectedIndex != -1) {
-                    binding.userSpinner.setSelection(fallbackSelectedIndex)
-                }
-            }
-        }
-
         binding.handlers = object: ManageDeviceFragmentHandlers {
-            override fun changeNetworkTimeVerification(newValue: NetworkTime) {
-                val device = deviceEntry.value
-
-                if (device != null) {
-                    if (device.networkTime != newValue) {
-                        if (!auth.tryDispatchParentAction(
-                                        UpdateNetworkTimeVerificationAction(
-                                                deviceId = device.id,
-                                                mode = newValue
-                                        )
-                                )) {
-                            // revert it
-
-                            binding.networkTimeVerification = device.networkTime
-                        }
-                    }
-                }
-            }
-
-            override fun openUsageStatsSettings() {
-                if (binding.isThisDevice == true) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        startActivity(
-                                Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    }
-                }
-            }
-
-            override fun openNotificationAccessSettings() {
-                if (binding.isThisDevice == true) {
-                    try {
-                        startActivity(
-                                Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    } catch (ex: Exception) {
-                        Toast.makeText(
-                                context,
-                                R.string.error_general,
-                                Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-
-            override fun openDrawOverOtherAppsScreen() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    startActivity(
-                            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
-                    )
-                }
-            }
-
-            override fun openAccessibilitySettings() {
-                startActivity(
-                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            override fun showUserScreen() {
+                navigation.safeNavigate(
+                        ManageDeviceFragmentDirections.actionManageDeviceFragmentToManageDeviceUserFragment(
+                                deviceId = args.deviceId
+                        ),
+                        R.id.manageDeviceFragment
                 )
             }
 
-            override fun manageDeviceAdmin() {
-                if (binding.isThisDevice == true) {
-                    val protectionLevel = logic.platformIntegration.getCurrentProtectionLevel()
-
-                    if (protectionLevel == ProtectionLevel.None) {
-                        if (InformAboutDeviceOwnerDialogFragment.shouldShow) {
-                            InformAboutDeviceOwnerDialogFragment().show(fragmentManager!!)
-                        } else {
-                            startActivity(
-                                    Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                                            .putExtra(
-                                                    DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                                                    ComponentName(context!!, AdminReceiver::class.java)
-                                            )
-                            )
-                        }
-                    } else {
-                        startActivity(
-                                Intent(Settings.ACTION_SECURITY_SETTINGS)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    }
-                }
+            override fun showPermissionsScreen() {
+                navigation.safeNavigate(
+                        ManageDeviceFragmentDirections.actionManageDeviceFragmentToManageDevicePermissionsFragment(
+                                deviceId = args.deviceId
+                        ),
+                        R.id.manageDeviceFragment
+                )
             }
 
-            override fun editDeviceTitle() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    UpdateDeviceTitleDialogFragment.newInstance(args.deviceId).show(fragmentManager!!)
-                }
+            override fun showFeaturesScreen() {
+                navigation.safeNavigate(
+                        ManageDeviceFragmentDirections.actionManageDeviceFragmentToManageDeviceFeaturesFragment(
+                                deviceId = args.deviceId
+                        ),
+                        R.id.manageDeviceFragment
+                )
+            }
+
+            override fun showManageScreen() {
+                navigation.safeNavigate(
+                        ManageDeviceFragmentDirections.actionManageDeviceFragmentToManageDeviceAdvancedFragment(
+                                deviceId = args.deviceId
+                        ),
+                        R.id.manageDeviceFragment
+                )
             }
 
             override fun showAuthenticationScreen() {
                 activity.showAuthenticationScreen()
-            }
-        }
-
-        binding.userSpinner.adapter = userSpinnerAdapter
-        binding.userSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val item = userListItems[position]
-                val userId = item.second
-                val device = deviceEntry.value
-
-                if (device != null) {
-                    if (device.currentUserId != userId) {
-                        if (!auth.tryDispatchParentAction(
-                                        SetDeviceUserAction(
-                                                deviceId = args.deviceId,
-                                                userId = userId
-                                        )
-                                )) {
-                            bindUserListSelection()
-                        }
-                    }
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                // nothing to do
             }
         }
 
@@ -273,7 +126,6 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 val now = RealTime.newInstance()
                 logic.realTimeLogic.getRealTime(now)
 
-                binding.deviceTitle = device.name
                 binding.modelString = device.model
                 binding.addedAtString = getString(R.string.manage_device_added_at, DateUtils.getRelativeTimeSpanString(
                         device.addedAt,
@@ -281,28 +133,9 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                         DateUtils.HOUR_IN_MILLIS
 
                 ))
-                binding.networkTimeVerification = device.networkTime
-                binding.usageStatsAccess = device.currentUsageStatsPermission
-                binding.notificationAccessPermission = device.currentNotificationAccessPermission
-                binding.protectionLevel = device.currentProtectionLevel
-                binding.overlayPermission = device.currentOverlayPermission
-                binding.accessibilityServiceEnabled = device.accessibilityServiceEnabled
                 binding.didAppDowngrade = device.currentAppVersion < device.highestAppVersion
-            }
-        })
-
-        mergeLiveData(deviceEntry, userEntries).observe(this, Observer {
-            val (device, users) = it!!
-
-            if (device != null && users != null) {
-                userListItems.clear()
-                userListItems.addAll(
-                        users.map { user -> Pair(user.name, user.id) }
-                )
-                userListItems.add(Pair(getString(R.string.manage_device_current_user_none), ""))
-
-                bindUserListItems()
-                bindUserListSelection()
+                binding.permissionCardText = ManageDevicePermissionsFragment.getPreviewText(device, context!!)
+                binding.featureCardText = ManageDeviceFeaturesFragment.getPreviewText(device, context!!)
             }
         })
 
@@ -333,55 +166,20 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 user = userEntry
         )
 
-        ManageDeviceTroubleshooting.bind(
-                view = binding.troubleshootingView,
-                userEntry = userEntry,
-                lifecycleOwner = this
-        )
-
-        ManageDeviceDefaultUser.bind(
-                view = binding.defaultUser,
-                device = deviceEntry,
-                users = userEntries,
-                lifecycleOwner = this,
-                isThisDevice = isThisDevice,
-                auth = auth,
-                fragmentManager = fragmentManager!!
-        )
-
-        ManageDeviceRebootManipulationView.bind(
-                view = binding.deviceRebootManipulation,
-                lifecycleOwner = this,
-                deviceEntry = deviceEntry,
-                auth = auth
-        )
-
-        ManageDeviceActivityLevelBlocking.bind(
-                view = binding.activityLevelBlocking,
-                auth = auth,
-                deviceEntry = deviceEntry,
-                lifecycleOwner = this
-        )
+        userEntry.observe(this, Observer {
+            binding.userCardText = it?.name ?: getString(R.string.manage_device_current_user_none)
+        })
 
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        logic.backgroundTaskLogic.syncDeviceStatusAsync()
     }
 
     override fun getCustomTitle() = deviceEntry.map { it?.name }
 }
 
 interface ManageDeviceFragmentHandlers {
-    fun changeNetworkTimeVerification(newValue: NetworkTime)
-    fun openUsageStatsSettings()
-    fun openNotificationAccessSettings()
-    fun openDrawOverOtherAppsScreen()
-    fun openAccessibilitySettings()
-    fun manageDeviceAdmin()
-    fun editDeviceTitle()
+    fun showUserScreen()
+    fun showPermissionsScreen()
+    fun showFeaturesScreen()
+    fun showManageScreen()
     fun showAuthenticationScreen()
 }

@@ -21,6 +21,7 @@
             name="isLocalMode"
             type="Boolean" />
 
+        <import type="io.timelimit.android.BuildConfig" />
         <import type="android.view.View" />
     </data>
 
@@ -41,14 +42,20 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:visibility="@{isLocalMode == Boolean.FALSE ? View.VISIBLE : View.GONE}"
+                android:text="@string/manage_device_rename"
+                android:id="@+id/rename_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:visibility="@{isLocalMode == Boolean.FALSE &amp;&amp; BuildConfig.hasServer ? View.VISIBLE : View.GONE}"
                 android:id="@+id/remove_btn"
                 android:text="@string/remove_device_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:visibility="@{isLocalMode == Boolean.TRUE ? View.VISIBLE : View.GONE}"
+                android:visibility="@{(isLocalMode == Boolean.TRUE &amp;&amp; BuildConfig.hasServer) ? View.VISIBLE : View.GONE}"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:text="@string/remove_device_local_mode"
                 android:layout_width="match_parent"

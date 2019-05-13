@@ -15,5 +15,5 @@
 -->
 <resources>
     <string name="usage_stats_permission_required_and_missing_title">Usage stats access is required</string>
-    <string name="usage_stats_permission_required_and_missing_text">TimeLimit needs this permission to work correctly. Scroll down to find the option to enable it.</string>
+    <string name="usage_stats_permission_required_and_missing_text">TimeLimit needs this permission to work correctly. Select \"permissions\" below to enable it.</string>
 </resources>

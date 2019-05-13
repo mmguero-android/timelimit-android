@@ -14,11 +14,19 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
+    <string name="manage_device_card_user_title">User</string>
+    <string name="manage_device_card_permission_title">Permissions</string>
+    <string name="manage_device_card_feature_title">Features</string>
+    <string name="manage_device_card_manage_title">Manage</string>
+    <string name="manage_device_card_manage_text">other settings for this device</string>
+
     <string name="manage_device_added_at">Added: %s</string>
     <string name="manage_device_is_this_device">This is the device which is in front of you</string>
 
     <string name="manage_device_current_user_title">User of the device</string>
     <string name="manage_device_current_user_none">No selection - no limits</string>
+
+    <string name="manage_device_feature_summary_none">No features enabled</string>
 
     <string name="manage_device_network_time_verification_title">Network time verification</string>
     <string name="manage_device_network_time_verification_description">
@@ -35,7 +43,10 @@
         Use always, otherwise block when limited categories are used
     </string>
 
+    <string name="manage_device_permissions_summary_none">No permissions granted</string>
+
     <string name="manage_device_permissions_usagestats_title">Usage stats access</string>
+    <string name="manage_device_permissions_usagestats_title_short">Usage stats</string>
     <string name="manage_device_permissions_usagestats_text">
         TimeLimit uses the permission for the usage stats access.
         This is only used to detect the currently used App.

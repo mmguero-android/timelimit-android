@@ -17,6 +17,6 @@
     <string name="usage_stats_permission_required_and_missing_title">Nutzungsdatenzugriff wird benötigt</string>
     <string name="usage_stats_permission_required_and_missing_text">
         TimeLimit benötigt den Nutzungsdatenzugriff, um korrekt zu funktionieren.
-        Sie finden die Möglichkeit, um den Nutzungsdatenzugriff zu aktivieren, weiter unten.
+        Wählen Sie die Option \"Berechtigungen\", um den Nutzungsdatenzugriff zu aktivieren.
     </string>
 </resources>

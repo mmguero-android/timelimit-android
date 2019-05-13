@@ -34,7 +34,7 @@ import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AdminReceiver
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.ui.manage.device.manage.InformAboutDeviceOwnerDialogFragment
+import io.timelimit.android.ui.manage.device.manage.permission.InformAboutDeviceOwnerDialogFragment
 import android.net.Uri
 
 

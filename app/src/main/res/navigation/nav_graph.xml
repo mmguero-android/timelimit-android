@@ -196,6 +196,34 @@
         <argument
             android:name="deviceId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_manageDeviceFragment_to_manageDevicePermissionsFragment"
+            app:destination="@id/manageDevicePermissionsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageDeviceFragment_to_manageDeviceFeaturesFragment"
+            app:destination="@id/manageDeviceFeaturesFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageDeviceFragment_to_manageDeviceUserFragment"
+            app:destination="@id/manageDeviceUserFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageDeviceFragment_to_manageDeviceAdvancedFragment"
+            app:destination="@id/manageDeviceAdvancedFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/purchaseFragment"
@@ -323,4 +351,40 @@
         android:name="io.timelimit.android.ui.diagnose.DiagnoseForegroundAppFragment"
         android:label="diagnose_foreground_app_fragment"
         tools:layout="@layout/diagnose_foreground_app_fragment" />
+    <fragment
+        android:id="@+id/manageDevicePermissionsFragment"
+        android:name="io.timelimit.android.ui.manage.device.manage.permission.ManageDevicePermissionsFragment"
+        android:label="manage_device_permissions_fragment"
+        tools:layout="@layout/manage_device_permissions_fragment" >
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageDeviceFeaturesFragment"
+        android:name="io.timelimit.android.ui.manage.device.manage.feature.ManageDeviceFeaturesFragment"
+        android:label="manage_device_features_fragment"
+        tools:layout="@layout/manage_device_features_fragment" >
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageDeviceUserFragment"
+        android:name="io.timelimit.android.ui.manage.device.manage.user.ManageDeviceUserFragment"
+        android:label="manage_device_user_fragment"
+        tools:layout="@layout/manage_device_user_fragment" >
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageDeviceAdvancedFragment"
+        android:name="io.timelimit.android.ui.manage.device.manage.advanced.ManageDeviceAdvancedFragment"
+        android:label="manage_device_advanced_fragment"
+        tools:layout="@layout/manage_device_advanced_fragment" >
+        <argument
+            android:name="deviceId"
+            app:argType="string" />
+    </fragment>
 </navigation>

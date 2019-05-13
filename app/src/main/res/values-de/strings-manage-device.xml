@@ -14,11 +14,19 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
+    <string name="manage_device_card_user_title">Benutzer</string>
+    <string name="manage_device_card_permission_title">Berechtigungen</string>
+    <string name="manage_device_card_feature_title">Funktionen</string>
+    <string name="manage_device_card_manage_title">Verwaltung</string>
+    <string name="manage_device_card_manage_text">sonstige Einstellungen für dieses Gerät</string>
+
     <string name="manage_device_added_at">Hinzugefügt: %s</string>
     <string name="manage_device_is_this_device">Das ist das Gerät, das Sie gerade vor sich haben</string>
 
     <string name="manage_device_current_user_title">Benutzer des Geräts</string>
     <string name="manage_device_current_user_none">Keine Angabe - keine Begrenzungen</string>
+
+    <string name="manage_device_feature_summary_none">Keine Funktionen aktiviert</string>
 
     <string name="manage_device_network_time_verification_title">Netzwerkzeitverifizierung</string>
     <string name="manage_device_network_time_verification_description">
@@ -35,7 +43,10 @@
         Immer verwenden, ansonsten zeitbegrenzte Kategorien sperren
     </string>
 
+    <string name="manage_device_permissions_summary_none">Keine Berechtigungen gewährt</string>
+
     <string name="manage_device_permissions_usagestats_title">Berechtigung zum Nutzungsdatenzugriff</string>
+    <string name="manage_device_permissions_usagestats_title_short">Nutzungsdatenzugriff</string>
     <string name="manage_device_permissions_usagestats_text">
         Der Nutzungsdatenzugriff ermöglicht es, die Nutzung des Gerätes zu erfassen.
         Dies wird genutzt, um zu ermitteln, welche App genutzt wird, damit die Zeit gezählt werden kann oder die App gesperrt werden kann.
