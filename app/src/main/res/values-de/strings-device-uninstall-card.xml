@@ -15,5 +15,5 @@
 -->
 <resources>
     <string name="device_uninstall_card_title">TimeLimit wurde auf diesem Gerät deinstalliert</string>
-    <string name="device_uninstall_card_text">Sie können das Gerät in dieser Ansicht entfernen, damit es nicht mehr in Ihrer Geräteliste angezeigt wird</string>
+    <string name="device_uninstall_card_text">Sie können das Gerät entfernen, damit es nicht mehr in Ihrer Geräteliste angezeigt wird</string>
 </resources>

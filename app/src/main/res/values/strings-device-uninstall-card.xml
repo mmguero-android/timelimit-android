@@ -15,5 +15,5 @@
 -->
 <resources>
     <string name="device_uninstall_card_title">TimeLimit was uninstalled from this device</string>
-    <string name="device_uninstall_card_text">You can remove this device in this screen to remove it from your device list</string>
+    <string name="device_uninstall_card_text">You can remove this device to remove it from your device list</string>
 </resources>
