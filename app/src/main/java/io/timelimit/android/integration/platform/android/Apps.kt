@@ -118,15 +118,21 @@ object AndroidIntegrationApps {
 
     fun getLocalAppActivities(deviceId: String, context: Context): Collection<AppActivity> {
         return context.packageManager.getInstalledApplications(0).asSequence().map { applicationInfo ->
-            (context.packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_ACTIVITIES)?.activities ?: emptyArray())
-                    .map {
-                        AppActivity(
-                                deviceId = deviceId,
-                                appPackageName = applicationInfo.packageName,
-                                activityClassName = it.name,
-                                title = it.loadLabel(context.packageManager).toString()
-                        )
+            (
+                    try {
+                        context.packageManager.getPackageInfo(applicationInfo.packageName, PackageManager.GET_ACTIVITIES)?.activities
+                    } catch (ex: PackageManager.NameNotFoundException) {
+                        null
                     }
+                            ?: emptyArray()
+                    ).map {
+                AppActivity(
+                        deviceId = deviceId,
+                        appPackageName = applicationInfo.packageName,
+                        activityClassName = it.name,
+                        title = it.loadLabel(context.packageManager).toString()
+                )
+            }
         }.flatten().toSet()
     }
 
