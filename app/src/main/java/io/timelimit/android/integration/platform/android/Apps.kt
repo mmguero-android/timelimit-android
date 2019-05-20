@@ -44,7 +44,7 @@ object AndroidIntegrationApps {
 
     val ignoredApps = mutableMapOf<String, IgnoredAppHandling>()
     init {
-        ignoredApps["com.android.systemui"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
+        ignoredApps["com.android.systemui"] = AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable
         ignoredApps["android"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
         ignoredApps["com.android.bluetooth"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
         ignoredApps["com.android.nfc"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
