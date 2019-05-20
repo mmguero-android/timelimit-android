@@ -1,1 +1,4 @@
-- extend error diagnose for the syncing
+- refactor device screen
+- fix crash during syncing app activities
+- updated icon
+- Symbol verändert

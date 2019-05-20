@@ -1,1 +1,3 @@
-- Erweiterung der Fehlerdiagnosefunktionen für die Synchronisation
+- Geräte-Bildschirm überarbeitet
+- Absturz beim Synchronisieren von App-Activities behoben
+- Symbol verändert
