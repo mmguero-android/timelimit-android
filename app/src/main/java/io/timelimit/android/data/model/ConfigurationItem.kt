@@ -89,7 +89,8 @@ enum class ConfigurationItemType {
     LastScreenOnTime,
     ServerMessage,
     CustomServerUrl,
-    ForegroundAppQueryRange
+    ForegroundAppQueryRange,
+    EnableBackgroundSync
 }
 
 object ConfigurationItemTypeUtil {
@@ -106,6 +107,7 @@ object ConfigurationItemTypeUtil {
     private const val SERVER_MESSAGE = 12
     private const val CUSTOM_SERVER_URL = 13
     private const val FOREGROUND_APP_QUERY_RANGE = 14
+    private const val ENABLE_BACKGROUND_SYNC = 15
 
     val TYPES = listOf(
             ConfigurationItemType.OwnDeviceId,
@@ -120,7 +122,8 @@ object ConfigurationItemTypeUtil {
             ConfigurationItemType.LastScreenOnTime,
             ConfigurationItemType.ServerMessage,
             ConfigurationItemType.CustomServerUrl,
-            ConfigurationItemType.ForegroundAppQueryRange
+            ConfigurationItemType.ForegroundAppQueryRange,
+            ConfigurationItemType.EnableBackgroundSync
     )
 
     fun serialize(value: ConfigurationItemType) = when(value) {
@@ -137,6 +140,7 @@ object ConfigurationItemTypeUtil {
         ConfigurationItemType.ServerMessage -> SERVER_MESSAGE
         ConfigurationItemType.CustomServerUrl -> CUSTOM_SERVER_URL
         ConfigurationItemType.ForegroundAppQueryRange -> FOREGROUND_APP_QUERY_RANGE
+        ConfigurationItemType.EnableBackgroundSync -> ENABLE_BACKGROUND_SYNC
     }
 
     fun parse(value: Int) = when(value) {
@@ -153,6 +157,7 @@ object ConfigurationItemTypeUtil {
         SERVER_MESSAGE -> ConfigurationItemType.ServerMessage
         CUSTOM_SERVER_URL -> ConfigurationItemType.CustomServerUrl
         FOREGROUND_APP_QUERY_RANGE -> ConfigurationItemType.ForegroundAppQueryRange
+        ENABLE_BACKGROUND_SYNC -> ConfigurationItemType.EnableBackgroundSync
         else -> throw IllegalArgumentException()
     }
 }

@@ -47,7 +47,7 @@ class NotificationListener: NotificationListenerService() {
     override fun onCreate() {
         super.onCreate()
 
-        NotificationChannels.createBlockedNotificationChannel(notificationManager, this)
+        NotificationChannels.createNotificationChannels(notificationManager, this)
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

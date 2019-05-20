@@ -30,6 +30,7 @@ interface Database {
     fun temporarilyAllowedApp(): TemporarilyAllowedAppDao
     fun pendingSyncAction(): PendingSyncActionDao
     fun appActivity(): AppActivityDao
+    fun notification(): NotificationDao
 
     fun beginTransaction()
     fun setTransactionSuccessful()

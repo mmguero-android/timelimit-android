@@ -38,6 +38,7 @@ import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.actions.UpdateDeviceStatusAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.util.TimeTextUtil
+import io.timelimit.android.work.PeriodicSyncInBackgroundWorker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -84,6 +85,14 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
         temporarilyAllowedApps.map { it.isNotEmpty() }.ignoreUnchanged().observeForever {
             appLogic.platformIntegration.setShowNotificationToRevokeTemporarilyAllowedApps(it!!)
+        }
+
+        appLogic.database.config().getEnableBackgroundSyncAsync().ignoreUnchanged().observeForever {
+            if (it) {
+                PeriodicSyncInBackgroundWorker.enable()
+            } else {
+                PeriodicSyncInBackgroundWorker.disable()
+            }
         }
     }
 

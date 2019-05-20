@@ -115,12 +115,14 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
                     model.createFamily(
                             parentPassword = binding.password.password.value!!,
                             parentName = binding.prename.text.toString(),
-                            deviceName = binding.deviceName.text.toString()
+                            deviceName = binding.deviceName.text.toString(),
+                            enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked
                     )
                 }
                 StatusOfMailAddress.MailAddressWithFamily -> {
                     model.addDeviceToFamily(
-                            deviceName = binding.deviceName.text.toString()
+                            deviceName = binding.deviceName.text.toString(),
+                            enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked
                     )
                 }
             }

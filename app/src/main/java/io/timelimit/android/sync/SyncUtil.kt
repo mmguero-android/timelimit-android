@@ -186,6 +186,8 @@ class SyncUtil (private val logic: AppLogic) {
             try {
                 pushActions(server = server)
                 pullStatus(server = server)
+
+                logic.syncNotificationLogic.sync(forceUiSync = false)
             } catch (ex: UnauthorizedHttpError) {
                 if (BuildConfig.DEBUG) {
                     Log.d(LOG_TAG, "authentication error, check if reset should happen")

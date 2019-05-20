@@ -26,13 +26,16 @@ object NotificationIds {
     const val NOTIFICATION_BLOCKED = 2
     const val REVOKE_TEMPORARILY_ALLOWED_APPS = 3
     const val APP_RESET = 4
+    const val USER_NOTIFICATION = 5
 }
 
 object NotificationChannels {
     const val APP_STATUS = "app status"
     const val BLOCKED_NOTIFICATIONS_NOTIFICATION = "notification blocked notification"
+    const val MANIPULATION_WARNING = "manipulation warning"
+    const val UPDATE_NOTIFICATION = "update notification"
 
-    fun createAppStatusChannel(notificationManager: NotificationManager, context: Context) {
+    private fun createAppStatusChannel(notificationManager: NotificationManager, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.createNotificationChannel(
                     NotificationChannel(
@@ -50,7 +53,7 @@ object NotificationChannels {
         }
     }
 
-    fun createBlockedNotificationChannel(notificationManager: NotificationManager, context: Context) {
+    private fun createBlockedNotificationChannel(notificationManager: NotificationManager, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.createNotificationChannel(
                     NotificationChannel(
@@ -63,10 +66,50 @@ object NotificationChannels {
             )
         }
     }
+
+    private fun createManipulationNotificationChannel(notificationManager: NotificationManager, context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                    NotificationChannel(
+                            NotificationChannels.MANIPULATION_WARNING,
+                            context.getString(R.string.notification_channel_manipulation_title),
+                            NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = context.getString(R.string.notification_channel_manipulation_text)
+                    }
+            )
+        }
+    }
+
+    private fun createUpdateNotificationChannel(notificationManager: NotificationManager, context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                    NotificationChannel(
+                            NotificationChannels.UPDATE_NOTIFICATION,
+                            context.getString(R.string.notification_channel_update_title),
+                            NotificationManager.IMPORTANCE_DEFAULT
+                    ).apply {
+                        description = context.getString(R.string.notification_channel_update_text)
+                        enableLights(false)
+                        setSound(null, null)
+                        enableVibration(false)
+                    }
+            )
+        }
+    }
+
+    fun createNotificationChannels(notificationManager: NotificationManager, context: Context) {
+        createAppStatusChannel(notificationManager, context)
+        createBlockedNotificationChannel(notificationManager, context)
+        createManipulationNotificationChannel(notificationManager, context)
+        createUpdateNotificationChannel(notificationManager, context)
+    }
 }
 
 object PendingIntentIds {
     const val OPEN_MAIN_APP = 1
     const val REVOKE_TEMPORARILY_ALLOWED = 2
     const val SWITCH_TO_DEFAULT_USER = 3
+    const val SYNC_NOTIFICATIONS = 4
+    val DYNAMIC_NOTIFICATION_RANGE = 100..10000
 }

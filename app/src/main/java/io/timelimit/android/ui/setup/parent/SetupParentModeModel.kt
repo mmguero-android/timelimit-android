@@ -38,6 +38,7 @@ import io.timelimit.android.sync.network.ParentPassword
 import io.timelimit.android.sync.network.StatusOfMailAddressResponse
 import io.timelimit.android.sync.network.api.ConflictHttpError
 import io.timelimit.android.sync.network.api.UnauthorizedHttpError
+import io.timelimit.android.work.PeriodicSyncInBackgroundWorker
 
 class SetupParentModeModel(application: Application): AndroidViewModel(application) {
     companion object {
@@ -75,7 +76,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
         }
     }
 
-    fun createFamily(parentPassword: String, parentName: String, deviceName: String) {
+    fun createFamily(parentPassword: String, parentName: String, deviceName: String, enableBackgroundSync: Boolean) {
         val database = logic.database
 
         if (isDoingSetup.value!!) {
@@ -110,6 +111,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                         database.config().setCustomServerUrlSync(customServerUrl)
                         database.config().setOwnDeviceIdSync(registerResponse.ownDeviceId)
                         database.config().setDeviceAuthTokenSync(registerResponse.deviceAuthToken)
+                        database.config().setEnableBackgroundSync(enableBackgroundSync)
 
                         ApplyServerDataStatus.applyServerDataStatusSync(clientStatusResponse, logic.database, logic.platformIntegration)
 
@@ -118,6 +120,10 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                 }
 
                 DatabaseBackup.with(getApplication()).tryCreateDatabaseBackupAsync()
+
+                if (enableBackgroundSync) {
+                    PeriodicSyncInBackgroundWorker.enable()
+                }
 
                 // the fragment detects the success and leaves this screen
             } catch (ex: ConflictHttpError) {
@@ -142,7 +148,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
         }
     }
 
-    fun addDeviceToFamily(deviceName: String) {
+    fun addDeviceToFamily(deviceName: String, enableBackgroundSync: Boolean) {
         val database = logic.database
 
         if (isDoingSetup.value!!) {
@@ -171,6 +177,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                         database.deleteAllData()
                         database.config().setOwnDeviceIdSync(registerResponse.ownDeviceId)
                         database.config().setDeviceAuthTokenSync(registerResponse.deviceAuthToken)
+                        database.config().setEnableBackgroundSync(enableBackgroundSync)
 
                         ApplyServerDataStatus.applyServerDataStatusSync(clientStatusResponse, logic.database, logic.platformIntegration)
 
@@ -179,6 +186,10 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                 }
 
                 DatabaseBackup.with(getApplication()).tryCreateDatabaseBackupAsync()
+
+                if (enableBackgroundSync) {
+                    PeriodicSyncInBackgroundWorker.enable()
+                }
 
                 // the fragment detects the success and leaves this screen
             } catch (ex: ConflictHttpError) {

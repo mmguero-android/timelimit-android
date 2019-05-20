@@ -203,6 +203,9 @@
                 <include android:id="@+id/network_time_verification"
                     layout="@layout/setup_network_time_verification" />
 
+                <include android:id="@+id/background_sync"
+                    layout="@layout/manage_device_background_sync_view" />
+
                 <Button
                     android:id="@+id/confirm_btn"
                     android:background="?selectableItemBackground"

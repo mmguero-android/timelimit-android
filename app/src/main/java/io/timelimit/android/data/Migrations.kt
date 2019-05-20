@@ -112,4 +112,18 @@ object DatabaseMigrations {
             database.execSQL("ALTER TABLE `device` ADD COLUMN `enable_activity_level_blocking` INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    val MIGRATE_TO_V16 = object: Migration(15, 16) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // this is empty
+            //
+            // a new possible enum value was added, the version upgrade enables the downgrade mechanism
+        }
+    }
+
+    val MIGRATE_TO_V17 = object: Migration(16, 17) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `notification` (`type` INTEGER NOT NULL, `id` TEXT NOT NULL, `first_notify_time` INTEGER NOT NULL, `dismissed` INTEGER NOT NULL, PRIMARY KEY(`type`, `id`))")
+        }
+    }
 }

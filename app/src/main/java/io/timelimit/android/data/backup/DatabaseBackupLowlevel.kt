@@ -39,6 +39,7 @@ object DatabaseBackupLowlevel {
     private const val USED_TIME_ITEM = "usedTime"
     private const val USER = "user"
     private const val APP_ACTIVITY = "appActivity"
+    private const val NOTIFICATION = "notification"
 
     fun outputAsBackupJson(database: Database, outputStream: OutputStream) {
         val writer = JsonWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
@@ -81,6 +82,7 @@ object DatabaseBackupLowlevel {
         handleCollection(USED_TIME_ITEM) { offset, pageSize -> database.usedTimes().getUsedTimePageSync(offset, pageSize) }
         handleCollection(USER) { offset, pageSize -> database.user().getUserPageSync(offset, pageSize) }
         handleCollection(APP_ACTIVITY) { offset, pageSize -> database.appActivity().getAppActivityPageSync(offset, pageSize) }
+        handleCollection(NOTIFICATION) { offset, pageSize -> database.notification().getNotificationPageSync(offset, pageSize) }
 
         writer.endObject().flush()
     }
@@ -186,6 +188,15 @@ object DatabaseBackupLowlevel {
 
                         while (reader.hasNext()) {
                             database.appActivity().addAppActivitySync(AppActivity.parse(reader))
+                        }
+
+                        reader.endArray()
+                    }
+                    NOTIFICATION -> {
+                        reader.beginArray()
+
+                        while (reader.hasNext()) {
+                            database.notification().addNotificationSync(Notification.parse(reader))
                         }
 
                         reader.endArray()

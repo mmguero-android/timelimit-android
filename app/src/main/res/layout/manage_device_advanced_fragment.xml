@@ -43,6 +43,9 @@
                 <include android:id="@+id/troubleshooting_view"
                     layout="@layout/manage_device_troubleshooting_view" />
 
+                <include android:id="@+id/manage_background_sync"
+                    layout="@layout/manage_device_background_sync_view" />
+
                 <include
                     android:id="@+id/manage_device"
                     layout="@layout/manage_device_view" />

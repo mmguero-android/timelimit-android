@@ -241,7 +241,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
 
     override fun setShowNotificationToRevokeTemporarilyAllowedApps(show: Boolean) {
         if (show) {
-            NotificationChannels.createAppStatusChannel(notificationManager, context)
+            NotificationChannels.createNotificationChannels(notificationManager, context)
 
             val actionIntent = PendingIntent.getService(
                     context,
@@ -272,7 +272,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     }
 
     override fun showRemoteResetNotification() {
-        NotificationChannels.createAppStatusChannel(notificationManager, context)
+        NotificationChannels.createNotificationChannels(notificationManager, context)
 
         notificationManager.notify(
                 NotificationIds.APP_RESET,

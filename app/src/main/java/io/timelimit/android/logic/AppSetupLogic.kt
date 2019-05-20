@@ -29,6 +29,7 @@ import io.timelimit.android.integration.platform.NewPermissionStatus
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 import io.timelimit.android.ui.user.create.DefaultCategories
+import io.timelimit.android.work.PeriodicSyncInBackgroundWorker
 import java.util.*
 
 class AppSetupLogic(private val appLogic: AppLogic) {
@@ -223,6 +224,7 @@ class AppSetupLogic(private val appLogic: AppLogic) {
 
         // delete the old config
         DatabaseBackup.with(appLogic.context).tryCreateDatabaseBackupAsync()
+        PeriodicSyncInBackgroundWorker.disable()
     }
 
     suspend fun dangerousRemoteReset() {

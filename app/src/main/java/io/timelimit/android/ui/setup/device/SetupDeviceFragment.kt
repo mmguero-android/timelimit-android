@@ -38,6 +38,7 @@ import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.manage.device.manage.advanced.ManageDeviceBackgroundSync
 import io.timelimit.android.ui.overview.main.MainFragmentDirections
 import io.timelimit.android.ui.setup.SetupNetworkTimeVerification
 
@@ -277,6 +278,13 @@ class SetupDeviceFragment : Fragment() {
         val validationOfAll = validationOfName.and(validationOfPassword)
 
         validationOfAll.observe(this, Observer { binding.confirmBtn.isEnabled = it })
+
+        ManageDeviceBackgroundSync.bind(
+                view = binding.backgroundSync,
+                isThisDevice = liveDataFromValue(true),
+                lifecycleOwner = this,
+                activityViewModel = activity.getActivityViewModel()
+        )
 
         binding.confirmBtn.setOnClickListener {
             model.doSetup(

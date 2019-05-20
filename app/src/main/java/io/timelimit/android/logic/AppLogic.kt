@@ -19,6 +19,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.User
@@ -32,6 +33,7 @@ import io.timelimit.android.sync.SyncUtil
 import io.timelimit.android.sync.network.api.ServerApi
 import io.timelimit.android.sync.websocket.NetworkStatus
 import io.timelimit.android.sync.websocket.WebsocketClientCreator
+import io.timelimit.android.ui.notification.NotificationAreaSync
 
 class AppLogic(
         val platformIntegration: PlatformIntegration,
@@ -83,6 +85,7 @@ class AppLogic(
     val currentDeviceLogic = CurrentDeviceLogic(this)
     val backgroundTaskLogic = BackgroundTaskLogic(this)
     val appSetupLogic = AppSetupLogic(this)
+    val syncNotificationLogic = SyncNotificationLogic(this)
 
     private val isConnectedInternal = MutableLiveData<Boolean>().apply { value = false }
     val isConnected = isConnectedInternal.castDown()

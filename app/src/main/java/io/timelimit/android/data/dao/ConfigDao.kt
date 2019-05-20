@@ -218,4 +218,7 @@ abstract class ConfigDao {
 
         updateValueSync(ConfigurationItemType.ForegroundAppQueryRange, interval.toString())
     }
+
+    fun getEnableBackgroundSyncAsync(): LiveData<Boolean> = getValueOfKeyAsync(ConfigurationItemType.EnableBackgroundSync).map { (it ?: "0") != "0" }
+    fun setEnableBackgroundSync(enable: Boolean) = updateValueSync(ConfigurationItemType.EnableBackgroundSync, if (enable) "1" else "0")
 }

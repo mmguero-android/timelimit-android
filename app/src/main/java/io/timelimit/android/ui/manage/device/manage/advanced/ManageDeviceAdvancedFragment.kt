@@ -28,6 +28,7 @@ import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.ManageDeviceAdvancedFragmentBinding
+import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
@@ -50,6 +51,7 @@ class ManageDeviceAdvancedFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = ManageDeviceAdvancedFragmentBinding.inflate(inflater, container, false)
         val navigation = Navigation.findNavController(container!!)
+        val isThisDevice = logic.deviceId.map { ownDeviceId -> ownDeviceId == args.deviceId }.ignoreUnchanged()
 
         val userEntry = deviceEntry.switchMap { device ->
             device?.currentUserId?.let { userId ->
@@ -85,6 +87,13 @@ class ManageDeviceAdvancedFragment : Fragment(), FragmentWithCustomTitle {
                 view = binding.troubleshootingView,
                 userEntry = userEntry,
                 lifecycleOwner = this
+        )
+
+        ManageDeviceBackgroundSync.bind(
+                view = binding.manageBackgroundSync,
+                isThisDevice = isThisDevice,
+                lifecycleOwner = this,
+                activityViewModel = auth
         )
 
         binding.handlers = object: ManageDeviceAdvancedFragmentHandlers {

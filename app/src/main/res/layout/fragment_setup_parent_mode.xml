@@ -64,6 +64,7 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:visibility="@{safeUnbox(isNewFamily) ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/setup_parent_mode_explaination_user_name"
                             android:layout_width="match_parent"
@@ -101,6 +102,18 @@
                             android:inputType="text"
                             android:id="@+id/device_name"
                             android:hint="@string/setup_parent_mode_explaination_device_title_field_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:text="@string/device_background_sync_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <CheckBox
+                            android:text="@string/device_background_sync_checkbox"
+                            android:id="@+id/background_sync_checkbox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 

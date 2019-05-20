@@ -19,4 +19,10 @@
 
     <string name="notification_channel_blocked_notification_title">blockierte Benachrichtigungen</string>
     <string name="notification_channel_blocked_notification_text">Zeigt an, wann eine Benachrichtigung einer anderen App von TimeLimit blockiert wurde</string>
+
+    <string name="notification_channel_manipulation_title">Manipulationswarnungen</string>
+    <string name="notification_channel_manipulation_text">Benachrichtigung für Eltern, wenn ein Kind Manipulationen durchgeführt hat</string>
+
+    <string name="notification_channel_update_title">Update-Benachrichtigungen</string>
+    <string name="notification_channel_update_text">Informiert über Updates für TimeLimit</string>
 </resources>

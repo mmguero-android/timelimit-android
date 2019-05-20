@@ -15,6 +15,7 @@
  */
 package io.timelimit.android.integration.platform.android
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -32,6 +33,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.SignOutAtDeviceAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.ui.MainActivity
+import io.timelimit.android.ui.notification.NotificationAreaSync
 
 class BackgroundService: Service() {
     companion object {
@@ -39,7 +41,11 @@ class BackgroundService: Service() {
         private const val ACTION_SET_NOTIFICATION = "a"
         private const val ACTION_REVOKE_TEMPORARILY_ALLOWED_APPS = "b"
         private const val ACTION_SWITCH_TO_DEFAULT_USER = "c"
+        private const val ACTION_DISMISS_NOTIFICATION = "d"
+        private const val ACTION_UPDATE_NOTIFICATION = "e"
         private const val EXTRA_NOTIFICATION = "b"
+        private const val EXTRA_NOTIFICATION_TYPE = "c"
+        private const val EXTRA_NOTIFICATION_ID = "d"
 
         fun setStatusMessage(status: AppStatusMessage?, context: Context) {
             val intent = Intent(context, BackgroundService::class.java)
@@ -61,6 +67,26 @@ class BackgroundService: Service() {
 
         fun prepareSwitchToDefaultUser(context: Context) = Intent(context, BackgroundService::class.java)
                 .putExtra(ACTION, ACTION_SWITCH_TO_DEFAULT_USER)
+
+        fun prepareDismissNotification(context: Context, type: Int, id: String) = Intent(context, BackgroundService::class.java)
+                .putExtra(ACTION, ACTION_DISMISS_NOTIFICATION)
+                .putExtra(EXTRA_NOTIFICATION_TYPE, type)
+                .putExtra(EXTRA_NOTIFICATION_ID, id)
+
+        fun getOpenAppIntent(context: Context) = PendingIntent.getActivity(
+                context,
+                PendingIntentIds.OPEN_MAIN_APP,
+                Intent(context, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        fun getSyncNotificationsPendingIntent(context: Context) = PendingIntent.getService(
+                context,
+                PendingIntentIds.SYNC_NOTIFICATIONS,
+                Intent(context, BackgroundService::class.java)
+                        .putExtra(ACTION, ACTION_UPDATE_NOTIFICATION),
+                PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 
     private val notificationManager: NotificationManager by lazy {
@@ -76,7 +102,7 @@ class BackgroundService: Service() {
         DefaultAppLogic.with(this)
 
         // create the channel
-        NotificationChannels.createAppStatusChannel(notificationManager, this)
+        NotificationChannels.createNotificationChannels(notificationManager, this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -86,19 +112,12 @@ class BackgroundService: Service() {
             if (action == ACTION_SET_NOTIFICATION) {
                 val appStatusMessage = intent.getParcelableExtra<AppStatusMessage>(EXTRA_NOTIFICATION)
 
-                val openAppIntent = PendingIntent.getActivity(
-                        this,
-                        PendingIntentIds.OPEN_MAIN_APP,
-                        Intent(this, MainActivity::class.java),
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                )
-
                 val notification = NotificationCompat.Builder(this, NotificationChannels.APP_STATUS)
                         .setSmallIcon(R.drawable.ic_stat_timelapse)
                         .setContentTitle(appStatusMessage.title)
                         .setContentText(appStatusMessage.text)
                         .setSubText(appStatusMessage.subtext)
-                        .setContentIntent(openAppIntent)
+                        .setContentIntent(getOpenAppIntent(this@BackgroundService))
                         .setWhen(0)
                         .setShowWhen(false)
                         .setSound(null)
@@ -150,6 +169,21 @@ class BackgroundService: Service() {
                     } else {
                         Toast.makeText(this@BackgroundService, R.string.purchase_required_dialog_title, Toast.LENGTH_LONG).show()
                     }
+                }
+            } else if (action == ACTION_DISMISS_NOTIFICATION) {
+                runAsync {
+                    NotificationAreaSync.saveNotificationDismissed(
+                            DefaultAppLogic.with(this@BackgroundService).database,
+                            intent.getIntExtra(EXTRA_NOTIFICATION_TYPE, 0),
+                            intent.getStringExtra(EXTRA_NOTIFICATION_ID)
+                    )
+                }
+            } else if (action == ACTION_UPDATE_NOTIFICATION) {
+                runAsync {
+                    NotificationAreaSync.sync(
+                            this@BackgroundService,
+                            DefaultAppLogic.with(this@BackgroundService).database
+                    )
                 }
             }
         }

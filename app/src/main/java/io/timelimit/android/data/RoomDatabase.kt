@@ -32,8 +32,9 @@ import io.timelimit.android.data.model.*
     ConfigurationItem::class,
     TemporarilyAllowedApp::class,
     PendingSyncAction::class,
-    AppActivity::class
-], version = 15)
+    AppActivity::class,
+    Notification::class
+], version = 17)
 abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database {
     companion object {
         private val lock = Object()
@@ -82,7 +83,9 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
                             DatabaseMigrations.MIGRATE_TO_V12,
                             DatabaseMigrations.MIGRATE_TO_V13,
                             DatabaseMigrations.MIGRATE_TO_V14,
-                            DatabaseMigrations.MIGRATE_TO_V15
+                            DatabaseMigrations.MIGRATE_TO_V15,
+                            DatabaseMigrations.MIGRATE_TO_V16,
+                            DatabaseMigrations.MIGRATE_TO_V17
                     )
                     .build()
         }
