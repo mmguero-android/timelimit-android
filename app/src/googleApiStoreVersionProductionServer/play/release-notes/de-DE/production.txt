@@ -1,3 +1,1 @@
-- Geräte-Bildschirm überarbeitet
-- Absturz beim Synchronisieren von App-Activities behoben
-- Symbol verändert
+- Hintergrundsynchronisation

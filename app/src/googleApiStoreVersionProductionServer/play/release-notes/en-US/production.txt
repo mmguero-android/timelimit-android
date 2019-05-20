@@ -1,4 +1,1 @@
-- refactor device screen
-- fix crash during syncing app activities
-- updated icon
-- Symbol verändert
+- background sync
