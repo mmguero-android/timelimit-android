@@ -64,8 +64,8 @@
                         android:padding="8dp"
                         android:layout_gravity="center_vertical"
                         android:src="@mipmap/ic_launcher"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_width="56dp"
+                        android:layout_height="56dp" />
 
                     <LinearLayout
                         android:padding="8dp"
