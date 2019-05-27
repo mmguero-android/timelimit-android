@@ -56,6 +56,8 @@
     <string name="manage_device_permission_notification_access_text">
         Der Benachrichtigungszugriff wird von TimeLimit genutzt, um nicht nur Apps, sondern auch
         deren Benachrichtigungen zu sperren.
+        Zusätzlich wird dadurch die Wiedergaben von Medienplayern beendet, wenn die entsprechenden
+        Medienplayer gesperrt werden.
     </string>
 
     <string name="manage_device_permissions_overlay_title">Über anderen Apps anzeigen</string>

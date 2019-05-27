@@ -55,7 +55,8 @@
     <string name="manage_device_permission_notification_access_title">Notification access</string>
     <string name="manage_device_permission_notification_access_text">
         TimeLimit uses the notification access to block notifications of blocked apps.
-        Notifications and their contents are not saved.
+        Notifications and their contents are not saved. Additionally, this blocks
+        the playback of media players if the media player is blocked.
     </string>
 
     <string name="manage_device_permissions_overlay_title">Draw over other Apps</string>
