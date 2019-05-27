@@ -30,6 +30,6 @@ Je nach Android-Version verwendet TimeLimit die Berechtigung zum Nutzungsdatenzu
 
 Die Geräte-Administrator-Berechtigung wird genutzt, um ein Deinstallieren von TimeLimit zu erkennen.
 
-TimeLimit verwendet den Benachrichtigungszugriff, um auch die Benachrichtigungen von gesperrten Apps zu sperren. Es erfolgt keine Speicherung von Benachrichtigungen oder deren Inhalten.
+TimeLimit verwendet den Benachrichtigungszugriff, um auch die Benachrichtigungen von gesperrten Apps zu sperren und um Medienplayer vollständig zu beenden. Es erfolgt keine Speicherung von Benachrichtigungen oder deren Inhalten.
 
 TimeLimit verwendet die Bedienhilfe-Berechtigung, um den Home-Button vor dem Aufruf des Sperrbildschirms zu drücken, um das Sperren in einigen Fällen zu verbessern.

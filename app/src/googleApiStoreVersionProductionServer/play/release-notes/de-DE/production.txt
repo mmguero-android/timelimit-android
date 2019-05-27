@@ -1,1 +1,1 @@
-- Hintergrundsynchronisation
+- Beenden einer aktiven Musikwiedergabe, wenn der Medienplayer gesperrt wird

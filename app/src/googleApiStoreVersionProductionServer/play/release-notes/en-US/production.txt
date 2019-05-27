@@ -1,1 +1,1 @@
-- background sync
+- terminate media playback if the media player is blocked
