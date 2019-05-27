@@ -28,11 +28,13 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.media.session.MediaSessionManager
 import android.os.Build
 import android.os.PowerManager
 import android.os.UserManager
 import android.provider.Settings
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -221,6 +223,26 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
 
     override fun showAppLockScreen(currentPackageName: String, currentActivityName: String?) {
         LockActivity.start(context, currentPackageName, currentActivityName)
+    }
+
+    override fun muteAudioIfPossible(packageName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (getNotificationAccessPermissionStatus() == NewPermissionStatus.Granted) {
+                val manager = context.getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
+                val sessions = manager.getActiveSessions(ComponentName(context, NotificationListener::class.java))
+                val sessionsOfTheApp = sessions.filter { it.packageName == packageName }
+                sessionsOfTheApp.forEach { session ->
+                    session.dispatchMediaButtonEvent(KeyEvent(
+                            KeyEvent.ACTION_DOWN,
+                            KeyEvent.KEYCODE_MEDIA_STOP
+                    ))
+                    session.dispatchMediaButtonEvent(KeyEvent(
+                            KeyEvent.ACTION_UP,
+                            KeyEvent.KEYCODE_MEDIA_STOP
+                    ))
+                }
+            }
+        }
     }
 
     override fun setShowBlockingOverlay(show: Boolean) {

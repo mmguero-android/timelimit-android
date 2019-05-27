@@ -65,6 +65,8 @@ class NotificationListener: NotificationListenerService() {
                     lastOngoingNotificationHidden.remove(sbn.packageName)
                 }
             } else {
+                appLogic.platformIntegration.muteAudioIfPossible(sbn.packageName)
+
                 val success = try {
                     if (sbn.isOngoing && SUPPORTS_HIDING_ONGOING_NOTIFICATIONS) {
                         // only snooze for 5 seconds to show it again soon

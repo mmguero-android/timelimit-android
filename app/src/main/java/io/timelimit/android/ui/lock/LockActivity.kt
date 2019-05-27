@@ -75,6 +75,10 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
                     .commitNow()
         }
 
+        if (savedInstanceState == null) {
+            stopMediaPlayback()
+        }
+
         val syncModel = ViewModelProviders.of(this).get(SyncStatusModel::class.java)
 
         syncModel.statusText.observe(this, Observer {
@@ -118,7 +122,7 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         IsAppInForeground.reportStop()
     }
 
-    fun lockTaskModeWorkaround() {
+    private fun lockTaskModeWorkaround() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val platformIntegration = DefaultAppLogic.with(this).platformIntegration
             val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -133,6 +137,11 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
                 platformIntegration.setSuspendedApps(listOf(blockedPackageName), false)
             }
         }
+    }
+
+    private fun stopMediaPlayback() {
+        val platformIntegration = DefaultAppLogic.with(this).platformIntegration
+        platformIntegration.muteAudioIfPossible(blockedPackageName)
     }
 
     override fun onBackPressed() {

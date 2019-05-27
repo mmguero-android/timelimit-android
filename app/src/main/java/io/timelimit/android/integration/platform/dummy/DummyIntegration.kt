@@ -87,6 +87,10 @@ class DummyIntegration(
         launchLockScreenForPackage = currentPackageName
     }
 
+    override fun muteAudioIfPossible(packageName: String) {
+        // ignore
+    }
+
     override fun setShowBlockingOverlay(show: Boolean) {
         // ignore
     }
