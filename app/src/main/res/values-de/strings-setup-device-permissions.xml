@@ -17,6 +17,8 @@
     <string name="setup_device_permissions_text">
         TimeLimit benötigt einige Berechtigungen, um funktionieren zu können.
         Wirklich erforderlich ist nur die 1. Berechtigung.
+        Ab Android Q wird zum Öffnen des Sperrbildschirms die Berechtigung
+        "Über anderen Apps anzeigen" oder "Bedienhilfe" benötigt.
         Die weiteren Berechtigungen ermöglichen Zusatzfunktionen.
     </string>
 </resources>

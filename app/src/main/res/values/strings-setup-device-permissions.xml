@@ -17,6 +17,8 @@
     <string name="setup_device_permissions_text">
         TimeLimit needs some permissions to work.
         Only the first permission is absolutely necessary.
+        Starting Android Q, the permission "Draw over other Apps" or "Accessibility service"
+        is required to open the lockscreen.
         The other permissions are required for some extra features.
     </string>
 </resources>

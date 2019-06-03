@@ -39,7 +39,6 @@ import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.device.manage.feature.ManageDeviceFeaturesFragment
 import io.timelimit.android.ui.manage.device.manage.permission.ManageDevicePermissionsFragment
 
-// TODO: inform during local mode setup about required permission at Q+
 class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
