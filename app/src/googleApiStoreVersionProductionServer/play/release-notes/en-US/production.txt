@@ -1,1 +1,1 @@
-- terminate media playback if the media player is blocked
+- warning if there is not much remaining time
