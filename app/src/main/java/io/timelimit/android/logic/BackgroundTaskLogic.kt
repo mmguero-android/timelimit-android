@@ -37,6 +37,7 @@ import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
 import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.actions.UpdateDeviceStatusAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
+import io.timelimit.android.util.AndroidVersion
 import io.timelimit.android.util.TimeTextUtil
 import io.timelimit.android.work.PeriodicSyncInBackgroundWorker
 import kotlinx.coroutines.delay
@@ -595,6 +596,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 val notificationAccess = appLogic.platformIntegration.getNotificationAccessPermissionStatus()
                 val overlayPermission = appLogic.platformIntegration.getOverlayPermissionStatus()
                 val accessibilityService = appLogic.platformIntegration.isAccessibilityServiceEnabled()
+                val qOrLater = AndroidVersion.qOrLater
 
                 var changes = UpdateDeviceStatusAction.empty
 
@@ -630,6 +632,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     changes = changes.copy(
                             newAccessibilityServiceEnabled = accessibilityService
                     )
+                }
+
+                if (qOrLater && !deviceEntry.qOrLater) {
+                    changes = changes.copy(isQOrLaterNow = true)
                 }
 
                 if (changes != UpdateDeviceStatusAction.empty) {

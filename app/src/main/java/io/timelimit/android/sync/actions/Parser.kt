@@ -25,6 +25,7 @@ object ActionParser {
         TriedDisablingDeviceAdminAction.TYPE_VALUE -> TriedDisablingDeviceAdminAction
         SignOutAtDeviceAction.TYPE_VALUE -> SignOutAtDeviceAction
         UpdateAppActivitiesAction.TYPE_VALUE -> UpdateAppActivitiesAction.parse(action)
+        UpdateDeviceStatusAction.TYPE_VALUE -> UpdateDeviceStatusAction.parse(action)
         else -> throw IllegalStateException()
     }
 

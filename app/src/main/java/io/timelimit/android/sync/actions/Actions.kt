@@ -658,7 +658,8 @@ data class UpdateDeviceStatusAction(
         val newOverlayPermission: RuntimePermissionStatus?,
         val newAccessibilityServiceEnabled: Boolean?,
         val newAppVersion: Int?,
-        val didReboot: Boolean
+        val didReboot: Boolean,
+        val isQOrLaterNow: Boolean
 ): AppLogicAction() {
     companion object {
         const val TYPE_VALUE = "UPDATE_DEVICE_STATUS"
@@ -669,6 +670,7 @@ data class UpdateDeviceStatusAction(
         private const val NEW_ACCESSIBILITY_SERVICE_ENABLED = "accessibilityServiceEnabled"
         private const val NEW_APP_VERSION = "appVersion"
         private const val DID_REBOOT = "didReboot"
+        private const val IS_Q_OR_LATER_NOW = "isQOrLaterNow"
 
         val empty = UpdateDeviceStatusAction(
                 newProtectionLevel = null,
@@ -677,7 +679,34 @@ data class UpdateDeviceStatusAction(
                 newOverlayPermission = null,
                 newAccessibilityServiceEnabled = null,
                 newAppVersion = null,
-                didReboot = false
+                didReboot = false,
+                isQOrLaterNow = false
+        )
+
+        fun parse(value: JSONObject) = UpdateDeviceStatusAction(
+                newProtectionLevel = if (value.has(NEW_PROTECTION_LEVEL))
+                    ProtectionLevelUtil.parse(value.getString(NEW_PROTECTION_LEVEL))
+                else
+                    null,
+                newUsageStatsPermissionStatus = if (value.has(NEW_USAGE_STATS_PERMISSION_STATUS))
+                    RuntimePermissionStatusUtil.parse(value.getString(NEW_USAGE_STATS_PERMISSION_STATUS))
+                else
+                    null,
+                newNotificationAccessPermission = if (value.has(NEW_NOTIFICATION_ACCESS_PERMISSION))
+                    NewPermissionStatusUtil.parse(value.getString(NEW_NOTIFICATION_ACCESS_PERMISSION))
+                else
+                    null,
+                newOverlayPermission = if (value.has(NEW_OVERLAY_PERMISSION))
+                    RuntimePermissionStatusUtil.parse(value.getString(NEW_OVERLAY_PERMISSION))
+                else
+                    null,
+                newAccessibilityServiceEnabled = if (value.has(NEW_ACCESSIBILITY_SERVICE_ENABLED))
+                    value.getBoolean(NEW_ACCESSIBILITY_SERVICE_ENABLED)
+                else
+                    null,
+                newAppVersion = if (value.has(NEW_APP_VERSION)) value.getInt(NEW_APP_VERSION) else null,
+                didReboot = if (value.has(DID_REBOOT)) value.getBoolean(DID_REBOOT) else false,
+                isQOrLaterNow = if (value.has(IS_Q_OR_LATER_NOW)) value.getBoolean(IS_Q_OR_LATER_NOW) else false
         )
     }
 
@@ -728,6 +757,10 @@ data class UpdateDeviceStatusAction(
 
         if (didReboot) {
             writer.name(DID_REBOOT).value(true)
+        }
+
+        if (isQOrLaterNow) {
+            writer.name(IS_Q_OR_LATER_NOW).value(true)
         }
 
         writer.endObject()

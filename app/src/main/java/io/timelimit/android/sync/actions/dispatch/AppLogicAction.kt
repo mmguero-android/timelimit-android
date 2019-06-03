@@ -206,6 +206,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                         )
                     }
 
+                    if (action.isQOrLaterNow && !device.qOrLater) {
+                        device = device.copy(qOrLater = true)
+                    }
+
                     database.device().updateDeviceEntry(device)
 
                     if (device.hasActiveManipulationWarning) {
