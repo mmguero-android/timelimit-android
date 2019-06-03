@@ -71,11 +71,11 @@ class OverlayUtil(private var application: Application) {
 
     fun isOverlayShown() = currentView?.root?.isShown ?: false
 
-    fun getOverlayPermissionStatus() = /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+    fun getOverlayPermissionStatus() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         if (Settings.canDrawOverlays(application))
             RuntimePermissionStatus.Granted
         else
-            */RuntimePermissionStatus.NotGranted/*
+            RuntimePermissionStatus.NotGranted
     else
-        RuntimePermissionStatus.NotRequired*/
+        RuntimePermissionStatus.NotRequired
 }
