@@ -32,4 +32,6 @@ Die Geräte-Administrator-Berechtigung wird genutzt, um ein Deinstallieren von T
 
 TimeLimit verwendet den Benachrichtigungszugriff, um auch die Benachrichtigungen von gesperrten Apps zu sperren und um Medienplayer vollständig zu beenden. Es erfolgt keine Speicherung von Benachrichtigungen oder deren Inhalten.
 
-TimeLimit verwendet die Bedienhilfe-Berechtigung, um den Home-Button vor dem Aufruf des Sperrbildschirms zu drücken, um das Sperren in einigen Fällen zu verbessern.
+TimeLimit verwendet die Bedienhilfe-Berechtigung, um den Home-Button vor dem Aufruf des Sperrbildschirms zu drücken, um das Sperren in einigen Fällen zu verbessern. Außerdem ist das eine Möglichkeit, um es TimeLimit unter neueren Android-Versionen zu ermöglichen, den Sperrbildschirm zu öffnen.
+
+TimeLimit verwendet die Berechtigung "Über anderen Apps anzeigen", um bei neueren Android-Versionen den Sperrbildschirm aufrufen zu können und um gesperrte Apps zu überlagern, bis der Sperrbildschirm gestartet wurde.

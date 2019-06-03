@@ -40,7 +40,6 @@ import io.timelimit.android.ui.manage.device.manage.feature.ManageDeviceFeatures
 import io.timelimit.android.ui.manage.device.manage.permission.ManageDevicePermissionsFragment
 
 // TODO: inform during local mode setup about required permission at Q+
-// TODO: add draw over other apps to the store description
 class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
