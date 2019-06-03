@@ -63,12 +63,16 @@
     <string name="manage_device_permissions_overlay_title">Über anderen Apps anzeigen</string>
     <string name="manage_device_permissions_overlay_text">
         Das Anzeigen über anderen Apps kann das Sperren in einigen Fällen verbessern.
+        Außerdem ist diese Berechtigung eine Möglichkeit, um TimeLimit bei neueren Android-Versionen zu erlauben,
+        den Sperrbildschirm zu öffnen.
     </string>
 
     <string name="manage_device_permission_accessibility_title">Bedienhilfe</string>
     <string name="manage_device_permission_accessibility_text">
         Damit \"drückt\" TimeLimit den Home-Button, bevor der Sperrbildschirm aufgerufen wird.
         Das kann das Sperren in einigen Fällen verbessern.
+        Außerdem ist diese Berechtigung eine Möglichkeit, um TimeLimit bei neueren Android-Versionen zu erlauben,
+        den Sperrbildschirm zu öffnen.
     </string>
 
     <string name="manage_device_permission_device_admin_title">Geräte-Administrator</string>

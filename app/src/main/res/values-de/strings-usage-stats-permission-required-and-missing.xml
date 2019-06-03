@@ -19,4 +19,6 @@
         TimeLimit benötigt den Nutzungsdatenzugriff, um korrekt zu funktionieren.
         Wählen Sie die Option \"Berechtigungen\", um den Nutzungsdatenzugriff zu aktivieren.
     </string>
+
+    <string name="activity_launch_permission_required_and_missing_title">Über anderen Apps anzeigen oder Bedienhilfe wird benötigt</string>
 </resources>

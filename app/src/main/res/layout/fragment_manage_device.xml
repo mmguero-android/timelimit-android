@@ -74,7 +74,10 @@
                     layout="@layout/manage_device_uninstall_card" />
 
                 <include android:id="@+id/usage_stats_access_missing"
-                    layout="@layout/usage_stats_permission_required_and_missing" />
+                    layout="@layout/missing_permission_view" />
+
+                <include android:id="@+id/activity_launch_permission_missing"
+                    layout="@layout/missing_permission_view" />
 
                 <include
                     android:id="@+id/manage_manipulation"

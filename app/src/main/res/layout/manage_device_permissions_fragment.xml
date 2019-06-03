@@ -264,7 +264,6 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:visibility="gone"
                     android:onClick="@{() -> handlers.openDrawOverOtherAppsScreen()}"
                     android:foreground="?selectableItemBackground"
                     android:clickable="@{safeUnbox(isThisDevice) &amp;&amp; (overlayPermission != RuntimePermissionStatus.NotRequired)}"

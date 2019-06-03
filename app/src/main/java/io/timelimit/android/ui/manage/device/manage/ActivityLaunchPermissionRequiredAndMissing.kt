@@ -26,17 +26,17 @@ import io.timelimit.android.databinding.MissingPermissionViewBinding
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 import io.timelimit.android.livedata.mergeLiveData
 
-object UsageStatsAccessRequiredAndMissing {
+object ActivityLaunchPermissionRequiredAndMissing {
     fun bind(
             view: MissingPermissionViewBinding,
             user: LiveData<User?>,
             device: LiveData<Device?>,
             lifecycleOwner: LifecycleOwner
     ) {
-        view.title = view.root.context.getString(R.string.usage_stats_permission_required_and_missing_title)
+        view.title = view.root.context.getString(R.string.activity_launch_permission_required_and_missing_title)
 
         mergeLiveData(user, device).observe(lifecycleOwner, Observer { (user, device) ->
-            view.showMessage = user?.type == UserType.Child && device?.currentUsageStatsPermission == RuntimePermissionStatus.NotGranted
+            view.showMessage = user?.type == UserType.Child && device?.missingPermissionAtQOrLater ?: false
         })
     }
 }

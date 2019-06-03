@@ -14,11 +14,16 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="showMessage"
             type="Boolean" />
+
+        <variable
+            name="title"
+            type="String" />
 
         <import type="android.view.View" />
     </data>
@@ -40,7 +45,8 @@
                 android:drawablePadding="8dp"
                 android:drawableStart="@drawable/ic_warning_white_24dp"
                 android:textAppearance="?android:textAppearanceLarge"
-                android:text="@string/usage_stats_permission_required_and_missing_title"
+                tools:text="@string/usage_stats_permission_required_and_missing_title"
+                android:text="@{title}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
