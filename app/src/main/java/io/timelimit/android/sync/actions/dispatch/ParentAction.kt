@@ -483,6 +483,25 @@ object LocalDatabaseParentActionDispatcher {
                             )
                     )
                 }
+                is UpdateCategoryTimeWarningsAction -> {
+                    val categoryEntry = database.category().getCategoryByIdSync(action.categoryId)
+                            ?: throw IllegalArgumentException("category not found")
+
+                    val modified = if (action.enable)
+                        categoryEntry.copy(
+                                timeWarnings = categoryEntry.timeWarnings or action.flags
+                        )
+                    else
+                        categoryEntry.copy(
+                                timeWarnings = categoryEntry.timeWarnings and (action.flags.inv())
+                        )
+
+                    if (modified != categoryEntry) {
+                        database.category().updateCategorySync(modified)
+                    }
+
+                    null
+                }
             }.let { }
 
             database.setTransactionSuccessful()

@@ -594,6 +594,35 @@ data class UpdateCategoryTemporarilyBlockedAction(val categoryId: String, val bl
         writer.endObject()
     }
 }
+data class UpdateCategoryTimeWarningsAction(val categoryId: String, val enable: Boolean, val flags: Int): ParentAction() {
+    companion object {
+        const val TYPE_VALUE = "UPDATE_CATEGORY_TIME_WARNINGS"
+        private const val CATEGORY_ID = "categoryId"
+        private const val ENABLE = "enable"
+        private const val FLAGS = "flags"
+
+        fun parse(action: JSONObject) = UpdateCategoryTimeWarningsAction(
+                categoryId = action.getString(CATEGORY_ID),
+                enable = action.getBoolean(ENABLE),
+                flags = action.getInt(FLAGS)
+        )
+    }
+
+    init {
+        IdGenerator.assertIdValid(categoryId)
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(ENABLE).value(enable)
+        writer.name(FLAGS).value(flags)
+
+        writer.endObject()
+    }
+}
 data class SetCategoryForUnassignedApps(val childId: String, val categoryId: String): ParentAction() {
     // category id can be empty
 
