@@ -161,7 +161,8 @@ object ApplyServerDataStatus {
                                         highestOverlayPermission = newDevice.highestOverlayPermission,
                                         accessibilityServiceEnabled = newDevice.accessibilityServiceEnabled,
                                         wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled,
-                                        enableActivityLevelBlocking = newDevice.enableActivityLevelBlocking
+                                        enableActivityLevelBlocking = newDevice.enableActivityLevelBlocking,
+                                        qOrLater = newDevice.qOrLater
                                 ))
                             } else {
                                 // eventually update old entry
@@ -193,7 +194,8 @@ object ApplyServerDataStatus {
                                         highestOverlayPermission = newDevice.highestOverlayPermission,
                                         accessibilityServiceEnabled = newDevice.accessibilityServiceEnabled,
                                         wasAccessibilityServiceEnabled = newDevice.wasAccessibilityServiceEnabled,
-                                        enableActivityLevelBlocking = newDevice.enableActivityLevelBlocking
+                                        enableActivityLevelBlocking = newDevice.enableActivityLevelBlocking,
+                                        qOrLater = newDevice.qOrLater
                                 )
 
                                 if (updatedDeviceEntry != oldDeviceEntry) {
@@ -304,7 +306,8 @@ object ApplyServerDataStatus {
                                     assignedAppsVersion = "",
                                     timeLimitRulesVersion = "",
                                     usedTimesVersion = "",
-                                    parentCategoryId = newCategory.parentCategoryId
+                                    parentCategoryId = newCategory.parentCategoryId,
+                                    timeWarnings = newCategory.timeWarnings
                             ))
                         } else {
                             val updatedCategory = oldCategory.copy(
@@ -315,7 +318,8 @@ object ApplyServerDataStatus {
                                     temporarilyBlocked = newCategory.temporarilyBlocked,
                                     blockAllNotifications = newCategory.blockAllNotifications,
                                     baseVersion = newCategory.baseDataVersion,
-                                    parentCategoryId = newCategory.parentCategoryId
+                                    parentCategoryId = newCategory.parentCategoryId,
+                                    timeWarnings = newCategory.timeWarnings
                             )
 
                             if (updatedCategory != oldCategory) {

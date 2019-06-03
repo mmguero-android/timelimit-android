@@ -185,7 +185,8 @@ data class ServerDeviceData(
         val highestOverlayPermission: RuntimePermissionStatus,
         val accessibilityServiceEnabled: Boolean,
         val wasAccessibilityServiceEnabled: Boolean,
-        val enableActivityLevelBlocking: Boolean
+        val enableActivityLevelBlocking: Boolean,
+        val qOrLater: Boolean
 ) {
     companion object {
         private const val DEVICE_ID = "deviceId"
@@ -216,6 +217,7 @@ data class ServerDeviceData(
         private const val ACCESSIBILITY_SERVICE_ENABLED = "asEnabled"
         private const val WAS_ACCESSIBILITY_SERVICE_ENABLED = "wasAsEnabled"
         private const val ENABLE_ACTIVITY_LEVEL_BLOCKING = "activityLevelBlocking"
+        private const val Q_OR_LATER = "qOrLater"
 
         fun parse(reader: JsonReader): ServerDeviceData {
             var deviceId: String? = null
@@ -246,6 +248,7 @@ data class ServerDeviceData(
             var accessibilityServiceEnabled: Boolean? = null
             var wasAccessibilityServiceEnabled: Boolean? = null
             var enableActivityLevelBlocking = false
+            var qOrLater = false
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -278,6 +281,7 @@ data class ServerDeviceData(
                     ACCESSIBILITY_SERVICE_ENABLED -> accessibilityServiceEnabled = reader.nextBoolean()
                     WAS_ACCESSIBILITY_SERVICE_ENABLED -> wasAccessibilityServiceEnabled = reader.nextBoolean()
                     ENABLE_ACTIVITY_LEVEL_BLOCKING -> enableActivityLevelBlocking = reader.nextBoolean()
+                    Q_OR_LATER -> qOrLater = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -311,7 +315,8 @@ data class ServerDeviceData(
                     highestOverlayPermission = highestOverlayPermission!!,
                     accessibilityServiceEnabled = accessibilityServiceEnabled!!,
                     wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled!!,
-                    enableActivityLevelBlocking = enableActivityLevelBlocking
+                    enableActivityLevelBlocking = enableActivityLevelBlocking,
+                    qOrLater = qOrLater
             )
         }
 
@@ -328,7 +333,8 @@ data class ServerUpdatedCategoryBaseData(
         val temporarilyBlocked: Boolean,
         val baseDataVersion: String,
         val parentCategoryId: String,
-        val blockAllNotifications: Boolean
+        val blockAllNotifications: Boolean,
+        val timeWarnings: Int
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -340,6 +346,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val BASE_DATA_VERSION = "version"
         private const val PARENT_CATEGORY_ID = "parentCategoryId"
         private const val BLOCK_ALL_NOTIFICATIONS = "blockAllNotifications"
+        private const val TIME_WARNINGS = "timeWarnings"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -352,6 +359,7 @@ data class ServerUpdatedCategoryBaseData(
             var parentCategoryId: String? = null
             // added later -> default values
             var blockAllNotifications = false
+            var timeWarnings = 0
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -365,6 +373,7 @@ data class ServerUpdatedCategoryBaseData(
                     BASE_DATA_VERSION -> baseDataVersion = reader.nextString()
                     PARENT_CATEGORY_ID -> parentCategoryId = reader.nextString()
                     BLOCK_ALL_NOTIFICATIONS -> blockAllNotifications = reader.nextBoolean()
+                    TIME_WARNINGS -> timeWarnings = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -379,7 +388,8 @@ data class ServerUpdatedCategoryBaseData(
                     temporarilyBlocked = temporarilyBlocked!!,
                     baseDataVersion = baseDataVersion!!,
                     parentCategoryId = parentCategoryId!!,
-                    blockAllNotifications = blockAllNotifications
+                    blockAllNotifications = blockAllNotifications,
+                    timeWarnings = timeWarnings
             )
         }
 

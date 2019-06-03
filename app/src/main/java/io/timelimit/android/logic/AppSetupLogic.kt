@@ -16,6 +16,7 @@
 package io.timelimit.android.logic
 
 import android.content.Context
+import android.os.Build
 import com.jaredrummler.android.device.DeviceName
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
@@ -29,6 +30,7 @@ import io.timelimit.android.integration.platform.NewPermissionStatus
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 import io.timelimit.android.ui.user.create.DefaultCategories
+import io.timelimit.android.util.AndroidVersion
 import io.timelimit.android.work.PeriodicSyncInBackgroundWorker
 import java.util.*
 
@@ -101,7 +103,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             highestOverlayPermission = RuntimePermissionStatus.NotGranted,
                             accessibilityServiceEnabled = false,
                             wasAccessibilityServiceEnabled = false,
-                            enableActivityLevelBlocking = false
+                            enableActivityLevelBlocking = false,
+                            qOrLater = AndroidVersion.qOrLater
                     )
 
                     appLogic.database.device().addDeviceSync(device)
@@ -171,7 +174,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             timeLimitRulesVersion = "",
                             usedTimesVersion = "",
                             parentCategoryId = "",
-                            blockAllNotifications = false
+                            blockAllNotifications = false,
+                            timeWarnings = 0
                     ))
 
                     appLogic.database.category().addCategory(Category(
@@ -186,7 +190,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             timeLimitRulesVersion = "",
                             usedTimesVersion = "",
                             parentCategoryId = "",
-                            blockAllNotifications = false
+                            blockAllNotifications = false,
+                            timeWarnings = 0
                     ))
 
                     // add default allowed apps

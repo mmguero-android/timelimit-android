@@ -88,7 +88,9 @@ data class Device(
         @ColumnInfo(name = "was_accessibility_service_permission")
         val wasAccessibilityServiceEnabled: Boolean,
         @ColumnInfo(name = "enable_activity_level_blocking")
-        val enableActivityLevelBlocking: Boolean
+        val enableActivityLevelBlocking: Boolean,
+        @ColumnInfo(name = "q_or_later")
+        val qOrLater: Boolean
 ): JsonSerializable {
     companion object {
         private const val ID = "id"
@@ -120,6 +122,7 @@ data class Device(
         private const val ACCESSIBILITY_SERVICE_ENABLED = "ase"
         private const val WAS_ACCESSIBILITY_SERVICE_ENABLED = "wase"
         private const val ENABLE_ACTIVITY_LEVEL_BLOCKING = "ealb"
+        private const val Q_OR_LATER = "qol"
 
         fun parse(reader: JsonReader): Device {
             var id: String? = null
@@ -151,6 +154,7 @@ data class Device(
             var accessibilityServiceEnabled = false
             var wasAccessibilityServiceEnabled = false
             var enableActivityLevelBlocking = false
+            var qOrLater = false
 
             reader.beginObject()
 
@@ -185,6 +189,7 @@ data class Device(
                     ACCESSIBILITY_SERVICE_ENABLED -> accessibilityServiceEnabled = reader.nextBoolean()
                     WAS_ACCESSIBILITY_SERVICE_ENABLED -> wasAccessibilityServiceEnabled = reader.nextBoolean()
                     ENABLE_ACTIVITY_LEVEL_BLOCKING -> enableActivityLevelBlocking = reader.nextBoolean()
+                    Q_OR_LATER -> qOrLater = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -220,7 +225,8 @@ data class Device(
                     highestOverlayPermission = highestOverlayPermission,
                     accessibilityServiceEnabled = accessibilityServiceEnabled,
                     wasAccessibilityServiceEnabled = wasAccessibilityServiceEnabled,
-                    enableActivityLevelBlocking = enableActivityLevelBlocking
+                    enableActivityLevelBlocking = enableActivityLevelBlocking,
+                    qOrLater = qOrLater
             )
         }
     }
@@ -289,6 +295,7 @@ data class Device(
         writer.name(ACCESSIBILITY_SERVICE_ENABLED).value(accessibilityServiceEnabled)
         writer.name(WAS_ACCESSIBILITY_SERVICE_ENABLED).value(wasAccessibilityServiceEnabled)
         writer.name(ENABLE_ACTIVITY_LEVEL_BLOCKING).value(enableActivityLevelBlocking)
+        writer.name(Q_OR_LATER).value(qOrLater)
 
         writer.endObject()
     }

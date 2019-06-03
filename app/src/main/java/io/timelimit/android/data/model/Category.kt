@@ -54,8 +54,10 @@ data class Category(
         @ColumnInfo(name = "parent_category_id")
         val parentCategoryId: String,
         @ColumnInfo(name = "block_all_notifications")
-        val blockAllNotifications: Boolean
-        ): JsonSerializable {
+        val blockAllNotifications: Boolean,
+        @ColumnInfo(name = "time_warnings")
+        val timeWarnings: Int
+): JsonSerializable {
     companion object {
         const val MINUTES_PER_DAY = 60 * 24
         const val BLOCKED_MINUTES_IN_WEEK_LENGTH = MINUTES_PER_DAY * 7
@@ -72,6 +74,7 @@ data class Category(
         private const val USED_TIMES_VERSION = "vu"
         private const val PARENT_CATEGORY_ID = "pc"
         private const val BlOCK_ALL_NOTIFICATIONS = "ban"
+        private const val TIME_WARNINGS = "tw"
 
         fun parse(reader: JsonReader): Category {
             var id: String? = null
@@ -87,6 +90,7 @@ data class Category(
             // this field was added later so it has got a default value
             var parentCategoryId = ""
             var blockAllNotifications = false
+            var timeWarnings = 0
 
             reader.beginObject()
 
@@ -104,6 +108,7 @@ data class Category(
                     USED_TIMES_VERSION -> usedTimesVersion = reader.nextString()
                     PARENT_CATEGORY_ID -> parentCategoryId = reader.nextString()
                     BlOCK_ALL_NOTIFICATIONS -> blockAllNotifications = reader.nextBoolean()
+                    TIME_WARNINGS -> timeWarnings = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -122,7 +127,8 @@ data class Category(
                     timeLimitRulesVersion = timeLimitRulesVersion!!,
                     usedTimesVersion = usedTimesVersion!!,
                     parentCategoryId = parentCategoryId,
-                    blockAllNotifications = blockAllNotifications
+                    blockAllNotifications = blockAllNotifications,
+                    timeWarnings = timeWarnings
             )
         }
     }
@@ -155,6 +161,7 @@ data class Category(
         writer.name(USED_TIMES_VERSION).value(usedTimesVersion)
         writer.name(PARENT_CATEGORY_ID).value(parentCategoryId)
         writer.name(BlOCK_ALL_NOTIFICATIONS).value(blockAllNotifications)
+        writer.name(TIME_WARNINGS).value(timeWarnings)
 
         writer.endObject()
     }
