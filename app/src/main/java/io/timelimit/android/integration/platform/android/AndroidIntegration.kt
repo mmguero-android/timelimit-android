@@ -314,6 +314,25 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         )
     }
 
+    override fun showTimeWarningNotification(title: String, text: String) {
+        NotificationChannels.createNotificationChannels(notificationManager, context)
+
+        notificationManager.notify(
+                NotificationIds.TIME_WARNING,
+                NotificationCompat.Builder(context, NotificationChannels.TIME_WARNING)
+                        .setSmallIcon(R.drawable.ic_stat_timelapse)
+                        .setContentTitle(title)
+                        .setContentText(text)
+                        .setWhen(System.currentTimeMillis())
+                        .setShowWhen(true)
+                        .setLocalOnly(true)
+                        .setAutoCancel(false)
+                        .setOngoing(false)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .build()
+        )
+    }
+
     override fun disableDeviceAdmin() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (policyManager.isDeviceOwnerApp(context.packageName)) {

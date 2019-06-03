@@ -136,6 +136,10 @@ class DummyIntegration(
         // nothing to do
     }
 
+    override fun showTimeWarningNotification(title: String, text: String) {
+        // nothing to do
+    }
+
     override fun disableDeviceAdmin() {
         // nothing to do
     }

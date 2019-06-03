@@ -484,8 +484,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                                     val flagIndex = CategoryTimeWarnings.durationToBitIndex[roundedNewTime]
 
                                                     if (flagIndex != null && category.timeWarnings and (1 shl flagIndex) != 0) {
-                                                        // TODO: real notification
-                                                       Toast.makeText(appLogic.context, "TIME WARNING", Toast.LENGTH_SHORT).show()
+                                                        appLogic.platformIntegration.showTimeWarningNotification(
+                                                                title = appLogic.context.getString(R.string.time_warning_not_title, category.title),
+                                                                text = TimeTextUtil.remaining(roundedNewTime.toInt(), appLogic.context)
+                                                        )
                                                     }
                                                 }
                                             }

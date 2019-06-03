@@ -50,6 +50,7 @@ abstract class PlatformIntegration(
     abstract fun isScreenOn(): Boolean
     abstract fun setShowNotificationToRevokeTemporarilyAllowedApps(show: Boolean)
     abstract fun showRemoteResetNotification()
+    abstract fun showTimeWarningNotification(title: String, text: String)
     // returns package names for which it was set
     abstract fun setSuspendedApps(packageNames: List<String>, suspend: Boolean): List<String>
     abstract fun stopSuspendingForAllApps()

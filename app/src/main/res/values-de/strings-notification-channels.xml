@@ -25,4 +25,7 @@
 
     <string name="notification_channel_update_title">Update-Benachrichtigungen</string>
     <string name="notification_channel_update_text">Informiert über Updates für TimeLimit</string>
+
+    <string name="notification_channel_time_warning_title">Zeitwarnungen</string>
+    <string name="notification_channel_time_warning_text">Benachrichtigungen für Kinder, wenn nur noch wenig Zeit übrig ist</string>
 </resources>

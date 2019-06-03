@@ -14,6 +14,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="time_warnings_title">Time warnings</string>
+    <string name="time_warning_title">Time warnings</string>
     <string name="time_warning_desc">If there is less time remaining than checked below, then a notification will be shown</string>
+
+    <string name="time_warning_not_title">Time warning for %s</string>
 </resources>

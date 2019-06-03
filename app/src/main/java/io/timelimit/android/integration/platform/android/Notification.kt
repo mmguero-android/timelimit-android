@@ -27,6 +27,7 @@ object NotificationIds {
     const val REVOKE_TEMPORARILY_ALLOWED_APPS = 3
     const val APP_RESET = 4
     const val USER_NOTIFICATION = 5
+    const val TIME_WARNING = 6
 }
 
 object NotificationChannels {
@@ -34,6 +35,7 @@ object NotificationChannels {
     const val BLOCKED_NOTIFICATIONS_NOTIFICATION = "notification blocked notification"
     const val MANIPULATION_WARNING = "manipulation warning"
     const val UPDATE_NOTIFICATION = "update notification"
+    const val TIME_WARNING = "time warning"
 
     private fun createAppStatusChannel(notificationManager: NotificationManager, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -98,11 +100,26 @@ object NotificationChannels {
         }
     }
 
+    private fun createTimeWarningsNotificationChannel(notificationManager: NotificationManager, context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                    NotificationChannel(
+                            NotificationChannels.TIME_WARNING,
+                            context.getString(R.string.notification_channel_time_warning_title),
+                            NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = context.getString(R.string.notification_channel_time_warning_text)
+                    }
+            )
+        }
+    }
+
     fun createNotificationChannels(notificationManager: NotificationManager, context: Context) {
         createAppStatusChannel(notificationManager, context)
         createBlockedNotificationChannel(notificationManager, context)
         createManipulationNotificationChannel(notificationManager, context)
         createUpdateNotificationChannel(notificationManager, context)
+        createTimeWarningsNotificationChannel(notificationManager, context)
     }
 }
 

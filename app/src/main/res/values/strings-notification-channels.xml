@@ -25,4 +25,7 @@
 
     <string name="notification_channel_update_title">Update notifications</string>
     <string name="notification_channel_update_text">Informs about available app updates for TimeLimit</string>
+
+    <string name="notification_channel_time_warning_title">Time warning</string>
+    <string name="notification_channel_time_warning_text">Notification for childs if there is not much time remaining</string>
 </resources>
