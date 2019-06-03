@@ -18,6 +18,7 @@ package io.timelimit.android.logic
 import android.util.Log
 import android.util.SparseArray
 import android.util.SparseLongArray
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
@@ -445,37 +446,47 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                     } else {
                                         // time limited
                                         if (remaining.includingExtraTime > 0) {
+                                            var subtractExtraTime: Boolean
+
                                             if (remaining.default == 0L) {
                                                 // using extra time
-
                                                 showStatusMessageWithCurrentAppTitle(
                                                         text = appLogic.context.getString(R.string.background_logic_using_extra_time, TimeTextUtil.remaining(remaining.includingExtraTime.toInt(), appLogic.context)),
                                                         titlePrefix = category.title + " - "
                                                 )
-                                                appLogic.platformIntegration.setShowBlockingOverlay(false)
-
-                                                if (isScreenOn) {
-                                                    newUsedTimeItemBatchUpdateHelper.addUsedTime(
-                                                            Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND),    // never save more than a second of used time
-                                                            true,
-                                                            appLogic
-                                                    )
-                                                }
+                                                subtractExtraTime = true
                                             } else {
                                                 // using normal contingent
-
                                                 showStatusMessageWithCurrentAppTitle(
                                                         text = TimeTextUtil.remaining(remaining.default.toInt(), appLogic.context),
                                                         titlePrefix = category.title + " - "
                                                 )
-                                                appLogic.platformIntegration.setShowBlockingOverlay(false)
+                                                subtractExtraTime = false
+                                            }
 
-                                                if (isScreenOn) {
-                                                    newUsedTimeItemBatchUpdateHelper.addUsedTime(
-                                                            Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND),    // never save more than a second of used time
-                                                            false,
-                                                            appLogic
-                                                    )
+                                            appLogic.platformIntegration.setShowBlockingOverlay(false)
+                                            if (isScreenOn) {
+                                                // never save more than a second of used time
+                                                val timeToSubtract = Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND)
+
+                                                newUsedTimeItemBatchUpdateHelper.addUsedTime(
+                                                        timeToSubtract,
+                                                        subtractExtraTime,
+                                                        appLogic
+                                                )
+
+                                                val oldRemainingTime = remaining.includingExtraTime
+                                                val newRemainingTime = oldRemainingTime - timeToSubtract
+
+                                                if (oldRemainingTime / (1000 * 60) != newRemainingTime / (1000 * 60)) {
+                                                    // eventually show remaining time warning
+                                                    val roundedNewTime = (newRemainingTime / (1000 * 60)) * (1000 * 60)
+                                                    val flagIndex = CategoryTimeWarnings.durationToBitIndex[roundedNewTime]
+
+                                                    if (flagIndex != null && category.timeWarnings and (1 shl flagIndex) != 0) {
+                                                        // TODO: real notification
+                                                       Toast.makeText(appLogic.context, "TIME WARNING", Toast.LENGTH_SHORT).show()
+                                                    }
                                                 }
                                             }
                                         } else {
