@@ -238,7 +238,6 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:visibility="gone"
                 android:onClick="@{() -> handlers.openDrawOverOtherAppsScreen()}"
                 android:foreground="?selectableItemBackground"
                 android:clickable="@{usageStatsAccess != RuntimePermissionStatus.NotRequired}"
