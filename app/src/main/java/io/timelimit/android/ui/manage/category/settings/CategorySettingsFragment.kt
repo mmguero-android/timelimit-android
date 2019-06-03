@@ -77,6 +77,13 @@ class CategorySettingsFragment : Fragment() {
                 categoryLive = categoryEntry
         )
 
+        CategoryTimeWarningView.bind(
+                view = binding.timeWarnings,
+                auth = auth,
+                categoryLive = categoryEntry,
+                lifecycleOwner = this
+        )
+
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }
         binding.editCategoryTitleGo.setOnClickListener { renameCategory() }
 

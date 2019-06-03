@@ -166,3 +166,15 @@ data class Category(
         writer.endObject()
     }
 }
+
+object CategoryTimeWarnings {
+    val durationToBitIndex = mapOf(
+            1000L * 60 to 0, // 1 minute
+            1000L * 60 * 3 to 1, // 3 minutes
+            1000L * 60 * 5 to 2, // 5 minutes
+            1000L * 60 * 10 to 3, // 10 minutes
+            1000L * 60 * 15 to 4 // 15 minutes
+    )
+
+    val durations = durationToBitIndex.keys
+}
