@@ -480,7 +480,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                                                 if (oldRemainingTime / (1000 * 60) != newRemainingTime / (1000 * 60)) {
                                                     // eventually show remaining time warning
-                                                    val roundedNewTime = (newRemainingTime / (1000 * 60)) * (1000 * 60)
+                                                    val roundedNewTime = ((newRemainingTime / (1000 * 60)) + 1) * (1000 * 60)
                                                     val flagIndex = CategoryTimeWarnings.durationToBitIndex[roundedNewTime]
 
                                                     if (flagIndex != null && category.timeWarnings and (1 shl flagIndex) != 0) {
