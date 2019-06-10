@@ -30,7 +30,7 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "io.timelimit.android"
         minSdkVersion 19
