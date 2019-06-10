@@ -20,10 +20,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
-import androidx.viewpager.widget.ViewPager
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.User
@@ -35,6 +35,11 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
+import io.timelimit.android.ui.manage.category.apps.CategoryAppsFragment
+import io.timelimit.android.ui.manage.category.blocked_times.BlockedTimeAreasFragment
+import io.timelimit.android.ui.manage.category.settings.CategorySettingsFragment
+import io.timelimit.android.ui.manage.category.timelimit_rules.CategoryTimeLimitRulesFragment
+import io.timelimit.android.ui.manage.category.usagehistory.UsageHistoryFragment
 import kotlinx.android.synthetic.main.fragment_manage_category.*
 
 class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
@@ -47,7 +52,6 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
     private val user: LiveData<User?> by lazy {
         logic.database.user().getUserByIdLive(params.childId)
     }
-    private val adapter: PagerAdapter by lazy { PagerAdapter(childFragmentManager, params) }
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
     private var wereViewsCreated = false
 
@@ -70,43 +74,28 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
 
         val navigation = Navigation.findNavController(view)
 
-        pager.adapter = adapter
-
-        bottom_navigation_view.setOnNavigationItemSelectedListener {
-            menuItem ->
-
-            pager?.currentItem = when(menuItem.itemId) {
-                R.id.manage_category_tab_apps -> 0
-                R.id.manage_category_tab_time_limit_rules -> 1
-                R.id.manage_category_tab_blocked_time_areas -> 2
-                R.id.manage_category_tab_usage_log -> 3
-                R.id.manage_category_tab_settings -> 4
-                else -> throw IllegalStateException()
-            }
+        bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
+        bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
+            childFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .replace(R.id.container, when(menuItem.itemId) {
+                        R.id.manage_category_tab_apps -> CategoryAppsFragment.newInstance(params)
+                        R.id.manage_category_tab_time_limit_rules -> CategoryTimeLimitRulesFragment.newInstance(params)
+                        R.id.manage_category_tab_blocked_time_areas -> BlockedTimeAreasFragment.newInstance(params)
+                        R.id.manage_category_tab_usage_log -> UsageHistoryFragment.newInstance(params)
+                        R.id.manage_category_tab_settings -> CategorySettingsFragment.newInstance(params)
+                        else -> throw IllegalStateException()
+                    })
+                    .commit()
 
             true
         }
 
-        pager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {
-                // ignore
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                // ignore
-            }
-
-            override fun onPageSelected(position: Int) {
-                bottom_navigation_view.selectedItemId = when(position) {
-                    0 -> R.id.manage_category_tab_apps
-                    1 -> R.id.manage_category_tab_time_limit_rules
-                    2 -> R.id.manage_category_tab_blocked_time_areas
-                    3 -> R.id.manage_category_tab_usage_log
-                    4 -> R.id.manage_category_tab_settings
-                    else -> throw IllegalStateException()
-                }
-            }
-        })
+        if (childFragmentManager.findFragmentById(R.id.container) == null) {
+            childFragmentManager.beginTransaction()
+                    .replace(R.id.container, CategoryAppsFragment.newInstance(params))
+                    .commit()
+        }
 
         if (!wereViewsCreated) {
             wereViewsCreated = true

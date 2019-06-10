@@ -20,10 +20,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
-import androidx.viewpager.widget.ViewPager
 import io.timelimit.android.R
 import io.timelimit.android.data.model.User
 import io.timelimit.android.data.model.UserType
@@ -34,11 +34,13 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
+import io.timelimit.android.ui.manage.child.advanced.ManageChildAdvancedFragment
+import io.timelimit.android.ui.manage.child.apps.ChildAppsFragment
+import io.timelimit.android.ui.manage.child.category.ManageChildCategoriesFragment
 import kotlinx.android.synthetic.main.fragment_manage_child.*
 
 class ManageChildFragment : Fragment(), FragmentWithCustomTitle {
     private val params: ManageChildFragmentArgs by lazy { ManageChildFragmentArgs.fromBundle(arguments!!) }
-    private val adapter: PagerAdapter by lazy { PagerAdapter(childFragmentManager, params) }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val child: LiveData<User?> by lazy { logic.database.user().getUserByIdLive(params.childId) }
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
@@ -74,39 +76,26 @@ class ManageChildFragment : Fragment(), FragmentWithCustomTitle {
             })
         }
 
-        pager.adapter = adapter
-
-        bottom_navigation_view.setOnNavigationItemSelectedListener {
-            menuItem ->
-
-            pager?.currentItem = when (menuItem.itemId) {
-                R.id.manage_child_tab_categories -> 0
-                R.id.manage_child_tab_apps -> 1
-                R.id.manage_child_tab_manage -> 2
-                else -> throw IllegalStateException()
-            }
+        bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
+        bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
+            childFragmentManager.beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .replace(R.id.container, when (menuItem.itemId) {
+                        R.id.manage_child_tab_categories -> ManageChildCategoriesFragment.newInstance(params)
+                        R.id.manage_child_tab_apps -> ChildAppsFragment.newInstance(params)
+                        R.id.manage_child_tab_manage -> ManageChildAdvancedFragment.newInstance(params)
+                        else -> throw IllegalStateException()
+                    })
+                    .commit()
 
             true
         }
 
-        pager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {
-                // ignore
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                // ignore
-            }
-
-            override fun onPageSelected(position: Int) {
-                bottom_navigation_view.selectedItemId = when(position) {
-                    0 -> R.id.manage_child_tab_categories
-                    1 -> R.id.manage_child_tab_apps
-                    2 -> R.id.manage_child_tab_manage
-                    else -> throw IllegalStateException()
-                }
-            }
-        })
+        if (childFragmentManager.findFragmentById(R.id.container) == null) {
+            childFragmentManager.beginTransaction()
+                    .replace(R.id.container, ManageChildCategoriesFragment.newInstance(params))
+                    .commit()
+        }
     }
 
     override fun getCustomTitle() = child.map { it?.name }
