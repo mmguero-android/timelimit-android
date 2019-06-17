@@ -31,6 +31,9 @@
     <string name="authenticate_by_mail_message_sent">A code was sent to %s.</string>
     <string name="authenticate_by_mail_hint_mail">Mail address</string>
     <string name="authenticate_by_mail_hint_code">Received code</string>
+    <string name="authenticate_by_mail_hint_enter">Use the enter button of the keyboard to continue</string>
 
     <string name="authenticate_by_mail_snackbar_wrong_code">The entered code is invalid</string>
+    <string name="authenticate_by_mail_snackbar_invalid_address">Invalid mail address</string>
+    <string name="authenticate_by_mail_snackbar_invalid_address_suggest">Invalid mail address, correction suggested</string>
 </resources>

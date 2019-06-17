@@ -44,36 +44,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:visibility="@{(showSignInWithGoogleButton &amp;&amp; BuildConfig.useGoogleApis &amp;&amp; TextUtils.isEmpty(mailAddressToWhichCodeWasSent)) ? View.VISIBLE : View.GONE}"
-                    android:orientation="vertical"
+                <TextView
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:text="@string/authenticate_by_mail_text"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:textAppearance="?android:textAppearanceMedium"
-                        android:text="@string/authenticate_by_mail_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <com.google.android.gms.common.SignInButton
-                        android:id="@+id/sign_in_with_google_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:textAppearance="?android:textAppearanceSmall"
-                        android:text="@string/authenticate_by_mail_google_info"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <View
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:background="@color/divider"
-                        android:layout_width="match_parent"
-                        android:layout_height="1px" />
-                </LinearLayout>
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:textAppearance="?android:textAppearanceLarge"
@@ -114,6 +89,40 @@
                     android:maxLines="1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+                <TextView
+                    android:text="@string/authenticate_by_mail_hint_enter"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:visibility="@{(showSignInWithGoogleButton &amp;&amp; BuildConfig.useGoogleApis &amp;&amp; TextUtils.isEmpty(mailAddressToWhichCodeWasSent)) ? View.VISIBLE : View.GONE}"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <View
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1px" />
+
+                    <Button
+                        android:background="?selectableItemBackground"
+                        android:text="@string/authenticate_by_mail_btn_google"
+                        android:id="@+id/sign_in_with_google_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:text="@string/authenticate_by_mail_google_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </ScrollView>

@@ -31,6 +31,9 @@
     <string name="authenticate_by_mail_message_sent">Es wurde ein Code an %s gesendet.</string>
     <string name="authenticate_by_mail_hint_mail">E-Mail-Adresse</string>
     <string name="authenticate_by_mail_hint_code">empfangener Code</string>
+    <string name="authenticate_by_mail_hint_enter">Verwenden Sie die Enter-Taste der Tastatur, um fortzufahren</string>
 
     <string name="authenticate_by_mail_snackbar_wrong_code">Der eingegebene Code ist falsch</string>
+    <string name="authenticate_by_mail_snackbar_invalid_address">Die E-Mail-Adresse ist ungültig</string>
+    <string name="authenticate_by_mail_snackbar_invalid_address_suggest">Die E-Mail-Adresse ist ungültig; Eim Korrekturvorschlag wurde eingefügt</string>
 </resources>

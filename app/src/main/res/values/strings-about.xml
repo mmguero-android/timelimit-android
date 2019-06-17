@@ -68,6 +68,8 @@
         (<a href="https://github.com/square/okhttp/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
         \n<a href="https://github.com/socketio/socket.io-client-java">Socket.io-Java-Client</a>
         (<a href="https://github.com/socketio/socket.io-client-java/blob/master/LICENSE">MIT License</a>)
+        \n<a href="https://github.com/apache/commons-text">Apache Commons Text</a>
+        (<a href="https://github.com/apache/commons-text/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
     </string>
 
     <string name="about_diagnose_title">Error diagnose</string>

@@ -30,6 +30,7 @@ import io.timelimit.android.extensions.setOnEnterListenr
 import io.timelimit.android.flavors.GoogleSignInUtil
 import io.timelimit.android.livedata.map
 import io.timelimit.android.ui.MainActivity
+import io.timelimit.android.util.MailValidation
 
 class AuthenticateByMailFragment : Fragment() {
     companion object {
@@ -45,7 +46,7 @@ class AuthenticateByMailFragment : Fragment() {
 
     private val listener: AuthenticateByMailFragmentListener by lazy { parentFragment as AuthenticateByMailFragmentListener }
     private val googleAuthUtil: GoogleSignInUtil by lazy { (activity as MainActivity).googleSignInUtil }
-    private val model: AuthenticateByMailModel by lazy { ViewModelProviders.of(this).get(AuthenticateByMailModel::class.java) }
+    val model: AuthenticateByMailModel by lazy { ViewModelProviders.of(this).get(AuthenticateByMailModel::class.java) }
     private val hideSignInWithGoogleButton: Boolean by lazy {
         arguments?.getBoolean(EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON, false) ?: false
     }
@@ -64,8 +65,38 @@ class AuthenticateByMailFragment : Fragment() {
         binding.mailEdit.setOnEnterListenr {
             val mail = binding.mailEdit.text.toString()
 
-            if (mail.isNotBlank()) {
-                model.sendAuthMessage(mail)
+            if (!MailValidation.seemsMailAddressValid(mail)) {
+                Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address, Snackbar.LENGTH_SHORT).show()
+                return@setOnEnterListenr
+            }
+
+            val domain = MailValidation.getDomain(mail)
+            val suggestedDomain = MailValidation.suggestAlternativeDomain(domain)
+
+            if (!MailValidation.seemsDomainValid(domain)) {
+                if (suggestedDomain == null) {
+                    Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address, Snackbar.LENGTH_SHORT).show()
+                } else {
+                    val mailWithoutDomain = mail.substring(0, mail.length - domain.length)
+                    val mailWithSuggestedDomain = mailWithoutDomain + suggestedDomain
+
+                    binding.mailEdit.setText(mailWithSuggestedDomain)
+                    Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address_suggest, Snackbar.LENGTH_SHORT).show()
+                }
+
+                return@setOnEnterListenr
+            } else {
+                if (suggestedDomain != null) {
+                    val mailWithoutDomain = mail.substring(0, mail.length - domain.length)
+                    val mailWithSuggestedDomain = mailWithoutDomain + suggestedDomain
+
+                    SelectMailDialogFragment.newInstance(
+                            options = listOf(mailWithSuggestedDomain, mail),
+                            target = this
+                    ).show(fragmentManager!!)
+                } else {
+                    model.sendAuthMessage(mail)
+                }
             }
         }
 
