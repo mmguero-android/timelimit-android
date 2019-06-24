@@ -1,1 +1,1 @@
-- warning if there is not much remaining time
+- refactored sign in by mail
