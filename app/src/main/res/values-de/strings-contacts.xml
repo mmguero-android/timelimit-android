@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="contacts_title">Kontakte</string>
+    <string name="contacts_snackbar_added">Kontakt wurde hinzugefügt</string>
+    <string name="contacts_title_long">Erlaubte Kontakte</string>
+    <string name="contacts_description">Das ist eine Liste von Telefonnummern.
+        Eltern können Einträge von der Systemkontaktliste hinzufügen.
+        Jeder Nutzer diese Gerätes kann über diese Ansicht einen Anruf zu diesen Nummern starten,
+        auch wenn die Telefon-App gesperrt ist.
+        Die Telefonnummern werden nur auf diesem Gerät gespeichert.
+    </string>
+    <string name="contacts_intro_swipe">Se können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
+    <string name="contacts_add">Kontakt hinzufügen</string>
+    <string name="contacts_snackbar_remove_auth">Sie müssen sich anmelden um Kontakte zu entfernen</string>
+    <string name="contacts_snackbar_removed">%s wurde entfernt</string>
+    <string name="contacts_snackbar_call_failed">Anruf fehlgeschlagen</string>
+    <string name="contacts_snackbar_call_started">Anruf gestartet; Kann per Benachrichtigungsbereich beendet werden</string>
+</resources>

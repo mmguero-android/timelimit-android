@@ -18,7 +18,6 @@ package io.timelimit.android.logic
 import android.util.Log
 import android.util.SparseArray
 import android.util.SparseLongArray
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
@@ -47,6 +46,8 @@ import kotlinx.coroutines.sync.withLock
 import java.util.*
 
 class BackgroundTaskLogic(val appLogic: AppLogic) {
+    var pauseBackgroundLoop = false
+
     companion object {
         private const val CHECK_PERMISSION_INTERVAL = 10 * 1000L    // all 10 seconds
         private const val BACKGROUND_SERVICE_INTERVAL = 100L    // all 100 ms
@@ -280,7 +281,14 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 // the following is not executed if the permission is missing
 
-                if (
+                if (pauseBackgroundLoop) {
+                    usedTimeUpdateHelper?.commit(appLogic)
+                    appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
+                            title = appLogic.context.getString(R.string.background_logic_paused_title),
+                            text = appLogic.context.getString(R.string.background_logic_paused_text)
+                    ))
+                    appLogic.platformIntegration.setShowBlockingOverlay(false)
+                } else if (
                         (foregroundAppPackageName == BuildConfig.APPLICATION_ID) ||
                         (foregroundAppPackageName != null && AndroidIntegrationApps.ignoredApps[foregroundAppPackageName].let {
                             when (it) {

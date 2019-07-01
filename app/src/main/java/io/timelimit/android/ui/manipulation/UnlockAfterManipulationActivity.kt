@@ -36,6 +36,8 @@ class UnlockAfterManipulationActivity : AppCompatActivity(), ActivityViewModelHo
         ViewModelProviders.of(this).get(ActivityViewModel::class.java)
     }
 
+    override var ignoreStop: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unlock_after_manipulation)

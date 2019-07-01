@@ -31,4 +31,7 @@
 
     <string name="background_logic_timeout_title">automatische Abmeldung aktiviert</string>
     <string name="background_logic_timeout_text">TimeLimit läuft noch, um das zu ermöglichen</string>
+
+    <string name="background_logic_paused_title">Vorübergehend deaktiviert</string>
+    <string name="background_logic_paused_text">Keine Einschränkungen</string>
 </resources>

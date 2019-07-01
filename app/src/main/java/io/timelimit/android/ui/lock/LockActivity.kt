@@ -54,6 +54,8 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         }
     }
 
+    override var ignoreStop: Boolean = false
+
     private val blockedPackageName: String by lazy {
         intent.getStringExtra(EXTRA_PACKAGE_NAME)
     }
@@ -115,7 +117,7 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
     override fun onStop() {
         super.onStop()
 
-        if (!isChangingConfigurations) {
+        if ((!isChangingConfigurations) && (!ignoreStop)) {
             getActivityViewModel().logOut()
         }
 

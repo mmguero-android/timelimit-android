@@ -31,6 +31,7 @@ interface Database {
     fun pendingSyncAction(): PendingSyncActionDao
     fun appActivity(): AppActivityDao
     fun notification(): NotificationDao
+    fun allowedContact(): AllowedContactDao
 
     fun beginTransaction()
     fun setTransactionSuccessful()

@@ -36,6 +36,7 @@ import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.livedata.waitForNullableValue
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.contacts.ContactsFragment
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.manage.device.add.AddDeviceFragment
@@ -113,6 +114,7 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
         fun updateShowFab(selectedItemId: Int) {
             showAuthButtonLive.value = when (selectedItemId) {
                 R.id.main_tab_overview -> true
+                R.id.main_tab_contacts -> true
                 R.id.main_tab_uninstall -> !BuildConfig.storeCompilant
                 R.id.main_tab_about -> false
                 else -> throw IllegalStateException()
@@ -125,6 +127,7 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .replace(R.id.container, when(menuItem.itemId) {
                         R.id.main_tab_overview -> OverviewFragment()
+                        R.id.main_tab_contacts -> ContactsFragment()
                         R.id.main_tab_uninstall -> UninstallFragment()
                         R.id.main_tab_about -> AboutFragment()
                         else -> throw IllegalStateException()

@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
             setActivityCheckout(checkout)
         }
     }
+    override var ignoreStop: Boolean = false
 
     val googleSignInUtil = GoogleSignInUtil(this)
 
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
     override fun onStop() {
         super.onStop()
 
-        if (!isChangingConfigurations) {
+        if ((!isChangingConfigurations) && (!ignoreStop)) {
             getActivityViewModel().logOut()
         }
 
@@ -149,6 +150,10 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+
+        if ((intent?.flags ?: 0) and Intent.FLAG_ACTIVITY_REORDER_TO_FRONT == Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) {
+            return
+        }
 
         getNavController().popBackStack(R.id.overviewFragment, true)
         getNavController().handleDeepLink(

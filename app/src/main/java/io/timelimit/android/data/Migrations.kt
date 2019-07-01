@@ -141,4 +141,10 @@ object DatabaseMigrations {
             // a new possible enum value was added, the version upgrade enables the downgrade mechanism
         }
     }
+
+    val MIGRATE_TO_V20 = object: Migration(19, 20) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `allowed_contact` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `phone` TEXT NOT NULL)")
+        }
+    }
 }

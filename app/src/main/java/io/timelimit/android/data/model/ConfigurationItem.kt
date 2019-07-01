@@ -180,4 +180,5 @@ object HintsToShow {
     const val DEVICE_SCREEN_INTRODUCTION = 2L
     const val CATEGORIES_INTRODUCTION = 4L
     const val TIME_LIMIT_RULE_INTRODUCTION = 8L
+    const val CONTACTS_INTRO = 16L
 }

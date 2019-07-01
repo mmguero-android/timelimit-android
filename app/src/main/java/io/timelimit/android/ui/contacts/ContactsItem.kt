@@ -13,20 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.main
+package io.timelimit.android.ui.contacts
 
-import android.app.Activity
+import io.timelimit.android.data.model.AllowedContact
 
-interface ActivityViewModelHolder {
-    fun getActivityViewModel(): ActivityViewModel
-    fun showAuthenticationScreen()
-    var ignoreStop: Boolean
-}
-
-fun getActivityViewModel(activity: Activity): ActivityViewModel {
-    if (activity is ActivityViewModelHolder) {
-        return activity.getActivityViewModel()
-    } else {
-        throw IllegalStateException()
-    }
-}
+sealed class ContactsItem
+object IntroContactsItem: ContactsItem()
+object AddContactsItem: ContactsItem()
+data class ContactContactsItem(val item: AllowedContact): ContactsItem()
