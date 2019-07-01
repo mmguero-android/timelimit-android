@@ -50,6 +50,7 @@ import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.Man
 import io.timelimit.android.ui.manage.child.category.create.CreateCategoryDialogFragment
 import io.timelimit.android.ui.manage.child.primarydevice.UpdatePrimaryDeviceDialogFragment
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
+import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 
 class LockFragment : Fragment() {
     companion object {
@@ -224,6 +225,8 @@ class LockFragment : Fragment() {
         // bind adding extra time controls
         logic.fullVersion.shouldProvideFullVersionFunctions.observe(this, Observer { hasFullVersion ->
             binding.extraTimeBtnOk.setOnClickListener {
+                binding.extraTimeSelection.clearNumberPickerFocus()
+
                 if (hasFullVersion) {
                     if (auth.isParentAuthenticated()) {
                         runAsync {
@@ -254,6 +257,22 @@ class LockFragment : Fragment() {
                 }
             }
         })
+
+        logic.database.config().getEnableAlternativeDurationSelectionAsync().observe(this, Observer {
+            binding.extraTimeSelection.enablePickerMode(it)
+        })
+
+        binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
+            override fun onTimeSpanChanged(newTimeInMillis: Long) {
+                // ignore
+            }
+
+            override fun setEnablePickerMode(enable: Boolean) {
+                Threads.database.execute {
+                    logic.database.config().setEnableAlternativeDurationSelectionSync(enable)
+                }
+            }
+        }
 
         // bind disable time limits
         mergeLiveData(logic.deviceUserEntry, logic.fullVersion.shouldProvideFullVersionFunctions).observe(this, Observer {

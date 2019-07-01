@@ -26,6 +26,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.timelimit.android.async.Threads
 import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.data.model.TimeLimitRule
 import io.timelimit.android.data.model.UserType
@@ -92,6 +93,7 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
         val view = FragmentEditTimeLimitRuleDialogBinding.inflate(layoutInflater, container, false)
         val listener = targetFragment as EditTimeLimitRuleDialogFragmentListener
         var newRule: TimeLimitRule
+        val database = DefaultAppLogic.with(context!!).database
 
         auth.authenticatedUser.observe(this, Observer {
             if (it == null || it.second.type != UserType.Parent) {
@@ -135,7 +137,7 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
             view.timeSpan.timeInMillis = newRule.maximumTimeInMillis.toLong()
 
             val affectedDays = Math.max(0, (0..6).map { (newRule.dayMask.toInt() shr it) and 1 }.sum())
-            view.timeSpan.maxDays = affectedDays - 1
+            view.timeSpan.maxDays = Math.max(0, affectedDays - 1)   // max prevents crash
             view.affectsMultipleDays = affectedDays >= 2
         }
 
@@ -160,6 +162,8 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
             }
 
             override fun onSaveRule() {
+                view.timeSpan.clearNumberPickerFocus()
+
                 if (existingRule != null) {
                     if (existingRule != newRule) {
                         if (!auth.tryDispatchParentAction(
@@ -213,10 +217,20 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
                     bindRule()
                 }
             }
+
+            override fun setEnablePickerMode(enable: Boolean) {
+                Threads.database.execute {
+                    database.config().setEnableAlternativeDurationSelectionSync(enable)
+                }
+            }
         }
 
+        database.config().getEnableAlternativeDurationSelectionAsync().observe(this, Observer {
+            view.timeSpan.enablePickerMode(it)
+        })
+
         if (existingRule != null) {
-            DefaultAppLogic.with(context!!).database.timeLimitRules()
+            database.timeLimitRules()
                     .getTimeLimitRuleByIdLive(existingRule!!.id).observe(this, Observer {
                         if (it == null) {
                             // rule was deleted

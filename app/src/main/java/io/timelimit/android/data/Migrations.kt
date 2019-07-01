@@ -133,4 +133,12 @@ object DatabaseMigrations {
             database.execSQL("ALTER TABLE `category` ADD COLUMN `time_warnings` INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    val MIGRATE_TO_V19 = object: Migration(18, 19) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // this is empty
+            //
+            // a new possible enum value was added, the version upgrade enables the downgrade mechanism
+        }
+    }
 }

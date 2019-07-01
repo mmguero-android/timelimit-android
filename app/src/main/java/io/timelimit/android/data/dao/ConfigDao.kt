@@ -221,4 +221,7 @@ abstract class ConfigDao {
 
     fun getEnableBackgroundSyncAsync(): LiveData<Boolean> = getValueOfKeyAsync(ConfigurationItemType.EnableBackgroundSync).map { (it ?: "0") != "0" }
     fun setEnableBackgroundSync(enable: Boolean) = updateValueSync(ConfigurationItemType.EnableBackgroundSync, if (enable) "1" else "0")
+
+    fun getEnableAlternativeDurationSelectionAsync() = getValueOfKeyAsync(ConfigurationItemType.EnableAlternativeDurationSelection).map { it == "1" }
+    fun setEnableAlternativeDurationSelectionSync(enable: Boolean) = updateValueSync(ConfigurationItemType.EnableAlternativeDurationSelection, if (enable) "1" else "0")
 }

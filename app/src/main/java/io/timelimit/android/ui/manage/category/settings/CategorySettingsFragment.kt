@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.FragmentCategorySettingsBinding
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
@@ -31,6 +32,7 @@ import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
+import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 
 class CategorySettingsFragment : Fragment() {
     companion object {
@@ -99,6 +101,8 @@ class CategorySettingsFragment : Fragment() {
 
         appLogic.fullVersion.shouldProvideFullVersionFunctions.observe(this, Observer { hasFullVersion ->
             binding.extraTimeBtnOk.setOnClickListener {
+                binding.extraTimeSelection.clearNumberPickerFocus()
+
                 if (hasFullVersion) {
                     val newExtraTime = binding.extraTimeSelection.timeInMillis
 
@@ -117,6 +121,22 @@ class CategorySettingsFragment : Fragment() {
                 }
             }
         })
+
+        appLogic.database.config().getEnableAlternativeDurationSelectionAsync().observe(this, Observer {
+            binding.extraTimeSelection.enablePickerMode(it)
+        })
+
+        binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
+            override fun onTimeSpanChanged(newTimeInMillis: Long) {
+                // ignore
+            }
+
+            override fun setEnablePickerMode(enable: Boolean) {
+                Threads.database.execute {
+                    appLogic.database.config().setEnableAlternativeDurationSelectionSync(enable)
+                }
+            }
+        }
 
         return binding.root
     }
