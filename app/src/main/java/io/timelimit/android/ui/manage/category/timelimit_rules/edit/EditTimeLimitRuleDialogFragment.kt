@@ -27,17 +27,21 @@ import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.timelimit.android.async.Threads
+import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.IdGenerator
+import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.data.model.TimeLimitRule
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.FragmentEditTimeLimitRuleDialogBinding
 import io.timelimit.android.extensions.showSafe
+import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.CreateTimeLimitRuleAction
 import io.timelimit.android.sync.actions.DeleteTimeLimitRuleAction
 import io.timelimit.android.sync.actions.UpdateTimeLimitRuleAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.mustread.MustReadFragment
 import io.timelimit.android.ui.view.SelectDayViewHandlers
 import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 import java.nio.ByteBuffer
@@ -84,6 +88,22 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            val database = DefaultAppLogic.with(context!!).database
+
+            runAsync {
+                val wasShown = database.config().wereHintsShown(HintsToShow.TIMELIMIT_RULE_MUSTREAD).waitForNonNullValue()
+
+                if (!wasShown) {
+                    MustReadFragment.newInstance(io.timelimit.android.R.string.must_read_timelimit_rules).show(fragmentManager!!)
+
+                    Threads.database.execute {
+                        database.config().setHintsShownSync(HintsToShow.TIMELIMIT_RULE_MUSTREAD)
+                    }
+                }
+            }
+        }
 
         existingRule = savedInstanceState?.getParcelable(PARAM_EXISTING_RULE)
                 ?: arguments?.getParcelable<TimeLimitRule?>(PARAM_EXISTING_RULE)

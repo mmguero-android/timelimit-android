@@ -28,6 +28,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
+import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.IdGenerator
@@ -39,6 +40,7 @@ import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.manage.device.manage.advanced.ManageDeviceBackgroundSync
+import io.timelimit.android.ui.mustread.MustReadFragment
 import io.timelimit.android.ui.overview.main.MainFragmentDirections
 import io.timelimit.android.ui.setup.SetupNetworkTimeVerification
 
@@ -114,6 +116,10 @@ class SetupDeviceFragment : Fragment() {
                 when (status) {
                     SetupDeviceModelStatus.Done -> {
                         runAsync {
+                            if (BuildConfig.storeCompilant) {
+                                MustReadFragment.newInstance(R.string.must_read_child_manipulation).show(fragmentManager!!)
+                            }
+
                             val ownDeviceId = logic.deviceId.waitForNullableValue()!!
 
                             navigation.popBackStack()

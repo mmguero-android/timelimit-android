@@ -35,6 +35,7 @@ import io.timelimit.android.data.model.NetworkTime
 import io.timelimit.android.databinding.FragmentSetupLocalModeBinding
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.mustread.MustReadFragment
 import kotlinx.android.synthetic.main.fragment_setup_local_mode.*
 
 class SetupLocalModeFragment : Fragment() {
@@ -56,6 +57,10 @@ class SetupLocalModeFragment : Fragment() {
 
         model.status.observe(this, Observer {
             if (it == SetupLocalModeModel.Status.Done) {
+                if (BuildConfig.storeCompilant) {
+                    MustReadFragment.newInstance(R.string.must_read_child_manipulation).show(fragmentManager!!)
+                }
+
                 navigation.popBackStack(R.id.overviewFragment, false)
             }
         })

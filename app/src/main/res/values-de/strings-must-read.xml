@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="must_read_child_manipulation">
+        Da es immer wieder Beschwerden gab:
+        \n1. In den Standardeinstellungen kann TimeLimit ganz leicht,
+        auch von einem Kind, entfernt werden. Wenn das ein Problem ist wenden Sie sich an den Support.
+        \n2. Wenn \"es nicht funktioniert\" liegt es oft an Energiesparfunktionen die deaktiviert werden müssen.
+        Diese sind oft automatisch aktiviert, ohne das es Ihnen als Nutzer bewusst ist.
+    </string>
+    <string name="must_read_timelimit_rules">
+        Da es häufiger falsch bedient wird:
+        Eine Regel begrenzt die Gesamtnutzungsdauer der Kategorie in einer Woche an den gewählten Tagen.
+        Das bedeutet, dass wenn eine Regel für Montag bis Freitag mit 3 Stunden eingestellt wird,
+        die Kategorie in jeder Woche von Montag bis Freitag insgesamt nur 3 Stunden benutzt werden kann.
+        Wenn je eine Regel für die Tage von Montag bis Freitag mit jeweils 3 Stunden gewählt wird,
+        kann die Kategorie an jedem dieser Tage für 3 Stunden genutzt werden.
+    </string>
+</resources>

@@ -181,4 +181,5 @@ object HintsToShow {
     const val CATEGORIES_INTRODUCTION = 4L
     const val TIME_LIMIT_RULE_INTRODUCTION = 8L
     const val CONTACTS_INTRO = 16L
+    const val TIMELIMIT_RULE_MUSTREAD = 32L
 }
