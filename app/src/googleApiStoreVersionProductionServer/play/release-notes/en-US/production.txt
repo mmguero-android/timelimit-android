@@ -1,2 +1,1 @@
-- allowed contacts (list of contacts which can be called at any time)
-- alternative time duration selection
+- added new info messages

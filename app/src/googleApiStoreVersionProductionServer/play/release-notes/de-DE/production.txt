@@ -1,2 +1,1 @@
-- erlaubte Kontakte (Whitelist von Kontakten, die immer angerufen werden können)
-- alternative Zeitdauereingabe
+- Hinweismeldungen hinzugefügt
