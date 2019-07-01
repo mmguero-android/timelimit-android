@@ -1,1 +1,2 @@
-- refactored sign in by mail
+- allowed contacts (list of contacts which can be called at any time)
+- alternative time duration selection

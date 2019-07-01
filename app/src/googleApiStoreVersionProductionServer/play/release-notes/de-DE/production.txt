@@ -1,1 +1,2 @@
-- Anmeldung per E-Mail-Adresse überarbeitet
+- erlaubte Kontakte (Whitelist von Kontakten, die immer angerufen werden können)
+- alternative Zeitdauereingabe
