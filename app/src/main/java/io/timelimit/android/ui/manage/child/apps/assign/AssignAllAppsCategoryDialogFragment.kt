@@ -50,8 +50,8 @@ class AssignAllAppsCategoryDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    val childId: String by lazy { arguments!!.getString(EXTRA_CHILD_ID) }
-    val appPackageNames: Array<String> by lazy { arguments!!.getStringArray(EXTRA_PACKAGE_NAMES) }
+    val childId: String by lazy { arguments!!.getString(EXTRA_CHILD_ID)!! }
+    val appPackageNames: Array<String> by lazy { arguments!!.getStringArray(EXTRA_PACKAGE_NAMES)!! }
 
     val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     val database: Database by lazy { logic.database }

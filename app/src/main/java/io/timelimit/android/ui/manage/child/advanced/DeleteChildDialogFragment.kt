@@ -45,7 +45,7 @@ class DeleteChildDialogFragment: ConfirmDeleteDialogFragment() {
     val auth: ActivityViewModel by lazy {
         (activity as ActivityViewModelHolder).getActivityViewModel()
     }
-    val childId: String by lazy { arguments!!.getString(CHILD_ID) }
+    val childId: String by lazy { arguments!!.getString(CHILD_ID)!! }
     val userEntry: LiveData<User?> by lazy {
         DefaultAppLogic.with(context!!).database.user().getChildUserByIdLive(childId)
     }

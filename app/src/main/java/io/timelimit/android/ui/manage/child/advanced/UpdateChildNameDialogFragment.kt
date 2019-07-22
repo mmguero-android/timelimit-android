@@ -47,7 +47,7 @@ class UpdateChildNameDialogFragment: EditTextBottomSheetDialog() {
         }
     }
 
-    val userId: String by lazy { arguments!!.getString(EXTRA_USER_ID) }
+    val userId: String by lazy { arguments!!.getString(EXTRA_USER_ID)!! }
     val auth: ActivityViewModel by lazy {
         (activity as ActivityViewModelHolder).getActivityViewModel()
     }

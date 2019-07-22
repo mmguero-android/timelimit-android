@@ -56,7 +56,7 @@ class SetDeviceDefaultUserTimeoutDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    val deviceId: String by lazy { arguments!!.getString(EXTRA_DEVICE_ID) }
+    val deviceId: String by lazy { arguments!!.getString(EXTRA_DEVICE_ID)!! }
     val deviceEntry: LiveData<Device?> by lazy {
         DefaultAppLogic.with(context!!).database.device().getDeviceById(deviceId)
     }

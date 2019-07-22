@@ -49,7 +49,7 @@ class SetDeviceDefaultUserDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    val deviceId: String by lazy { arguments!!.getString(EXTRA_DEVICE_ID) }
+    val deviceId: String by lazy { arguments!!.getString(EXTRA_DEVICE_ID)!! }
     val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     val database: Database by lazy { logic.database }
     val auth: ActivityViewModel by lazy { (activity as ActivityViewModelHolder).getActivityViewModel() }

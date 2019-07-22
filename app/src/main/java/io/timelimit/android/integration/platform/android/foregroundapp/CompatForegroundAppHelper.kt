@@ -25,7 +25,7 @@ class CompatForegroundAppHelper(context: Context) : ForegroundAppHelper() {
 
     override suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long) {
         try {
-            val activity = activityManager.getRunningTasks(1)[0].topActivity
+            val activity = activityManager.getRunningTasks(1)[0].topActivity!!
 
             result.packageName = activity.packageName
             result.activityName = activity.className

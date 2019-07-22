@@ -43,7 +43,7 @@ class SetChildPasswordDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    val childId: String by lazy { arguments!!.getString(EXTRA_CHILD_ID) }
+    val childId: String by lazy { arguments!!.getString(EXTRA_CHILD_ID)!! }
     val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

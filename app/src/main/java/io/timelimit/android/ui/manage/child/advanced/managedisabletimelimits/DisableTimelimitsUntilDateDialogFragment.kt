@@ -54,7 +54,7 @@ class DisableTimelimitsUntilDateDialogFragment: DialogFragment() {
         private const val DIALOG_TAG = "v"
     }
 
-    private val childId: String by lazy { arguments!!.getString(CHILD_ID) }
+    private val childId: String by lazy { arguments!!.getString(CHILD_ID)!! }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(activity!!) }
     private val childEntry: LiveData<User?> by lazy { logic.database.user().getChildUserByIdLive(childId) }

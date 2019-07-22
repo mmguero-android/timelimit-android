@@ -42,7 +42,7 @@ class ConfirmRemoveDeviceDialogFragment: ConfirmDeleteDialogFragment() {
         }
     }
 
-    private val deviceId: String by lazy { arguments!!.getString(DEVICE_ID) }
+    private val deviceId: String by lazy { arguments!!.getString(DEVICE_ID)!! }
     private val appLogic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val deviceEntry: LiveData<Device?> by lazy {

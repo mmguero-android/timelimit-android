@@ -44,8 +44,8 @@ class PendingSyncActionAdapter: PagedListAdapter<PendingSyncAction, PendingSyncA
                     false
             ).apply {
                 copyButton.setOnClickListener {
-                    val clipboard = it.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                    clipboard!!.primaryClip = ClipData.newPlainText("TimeLimit", text)
+                    val clipboard = it.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("TimeLimit", text))
 
                     Toast.makeText(it.context, R.string.diagnose_sync_copied_to_clipboard, Toast.LENGTH_SHORT).show()
                 }

@@ -52,7 +52,7 @@ class SetChildTimezoneDialogFragment : DialogFragment() {
     }
 
     val childId: String by lazy {
-        arguments!!.getString(EXTRA_CHILD_ID)
+        arguments!!.getString(EXTRA_CHILD_ID)!!
     }
 
     val auth: ActivityViewModel by lazy {

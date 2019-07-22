@@ -50,8 +50,8 @@ class SelectParentCategoryDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    val childId: String by lazy { arguments!!.getString(CHILD_ID) }
-    val categoryId: String by lazy { arguments!!.getString(CATEGORY_ID) }
+    val childId: String by lazy { arguments!!.getString(CHILD_ID)!! }
+    val categoryId: String by lazy { arguments!!.getString(CATEGORY_ID)!! }
 
     val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     val database: Database by lazy { logic.database }

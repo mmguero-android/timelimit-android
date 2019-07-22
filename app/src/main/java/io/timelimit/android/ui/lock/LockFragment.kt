@@ -72,7 +72,7 @@ class LockFragment : Fragment() {
         }
     }
 
-    private val packageName: String by lazy { arguments!!.getString(EXTRA_PACKAGE_NAME) }
+    private val packageName: String by lazy { arguments!!.getString(EXTRA_PACKAGE_NAME)!! }
     private val activityName: String? by lazy {
         if (arguments!!.containsKey(EXTRA_ACTIVITY))
             arguments!!.getString(EXTRA_ACTIVITY)

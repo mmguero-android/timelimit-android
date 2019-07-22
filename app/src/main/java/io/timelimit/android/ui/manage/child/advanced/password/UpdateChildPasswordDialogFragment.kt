@@ -42,7 +42,7 @@ class UpdateChildPasswordDialogFragment: BottomSheetDialogFragment() {
         }
     }
 
-    val childId: String by lazy { arguments!!.getString(CHILD_ID) }
+    val childId: String by lazy { arguments!!.getString(CHILD_ID)!! }
     val databae: Database by lazy { DefaultAppLogic.with(context!!).database }
 
     override fun onCreate(savedInstanceState: Bundle?) {

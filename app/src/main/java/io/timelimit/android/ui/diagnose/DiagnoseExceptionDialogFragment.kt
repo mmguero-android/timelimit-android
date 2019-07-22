@@ -57,7 +57,7 @@ class DiagnoseExceptionDialogFragment: DialogFragment() {
         return AlertDialog.Builder(context!!, theme)
                 .setMessage(message)
                 .setNeutralButton(R.string.diagnose_sync_copy_to_clipboard) { _, _ ->
-                    clipboard.primaryClip = ClipData.newPlainText("TimeLimit", message)
+                    clipboard.setPrimaryClip(ClipData.newPlainText("TimeLimit", message))
 
                     Toast.makeText(context, R.string.diagnose_sync_copied_to_clipboard, Toast.LENGTH_SHORT).show()
                 }
