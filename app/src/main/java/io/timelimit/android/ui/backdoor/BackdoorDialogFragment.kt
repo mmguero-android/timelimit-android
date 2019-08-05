@@ -69,7 +69,7 @@ class BackdoorDialogFragment: DialogFragment() {
         }
 
         input.observe(this, Observer {
-            binding.input = it.chunked(8).joinToString(separator = "-")
+            binding.input = it.chunked(4).joinToString(separator = "-")
             binding.progress.max = CODE_LENGTH
             binding.progress.progress = it.length
         })
