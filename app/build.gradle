@@ -47,6 +47,7 @@ android {
             }
         }
         buildConfigField 'String', 'googlePlayKey', '"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqxGPPhjSGrSI4jfIJmw83dDGTO4Sg74nXhOoHl5Omyvxa1Hv+Tzp/wC97emXSmKq9Li2bV4q3yJLjtLJtoDmh9V1vpdyjH13qOidhIUYOtlkGexbwKz56jZwRFXGBIy0RFDDr3j5DLfUWMk0dqplLgIHDqsdUNY50419oMGKAOCX3DEw+ky+0zMY/hlUkZHnd0HLi0CYNkdZyMMYnk8OiOZ3YoDU/vz9PTf93MCAONYcXBlo3Y5hdVY2tyH4qNZh1eyqe0Trz4fRf+y1ljoa0s4ZqYskbsgpy+zUbGb82cxmATAsrdJMnNKMEa30HBvfMzKiOPR6sq3A8PPPoWT5KQIDAQAB"'
+        buildConfigField 'String', 'backdoorPublicKey', '"30819f300d06092a864886f70d010101050003818d0030818902818100bbb0f6029315d9a2344cac25b3af1ae751447eee6308f160d68969704b6cb4674e93ad462b13a166596d0d436a546fafb78ad79fabe158eb9b17aad4945a3cf74a6a2f771e5c836547f1ce47ce866eb2b994e5984b1e3c7457da133dde02bd0d575f588cd5bcca3acbf77c30f76bde4b16911da89caafe532c2f64b4f3f1d44b0203010001"'
     }
 
     flavorDimensions 'api', 'channel', 'server'

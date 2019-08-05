@@ -21,17 +21,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import io.timelimit.android.BuildConfig
-import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.databinding.FragmentUninstallBinding
-import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.work.ReportUninstallWorker
+import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
 
 class UninstallFragment : Fragment() {
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentUninstallBinding.inflate(inflater, container, false)
@@ -41,29 +38,18 @@ class UninstallFragment : Fragment() {
 
         binding.uninstall.setOnClickListener { reset(revokePermissions = binding.checkPermissions.isChecked) }
 
+        binding.checkConfirm.setOnLongClickListener {
+            BackdoorDialogFragment().show(fragmentManager!!)
+
+            true
+        }
+
         return binding.root
     }
 
     private fun reset(revokePermissions: Boolean) {
         if (BuildConfig.storeCompilant || auth.requestAuthenticationOrReturnTrue()) {
-            logic.platformIntegration.setEnableSystemLockdown(false)
-
-            if (revokePermissions) {
-                logic.platformIntegration.disableDeviceAdmin()
-            }
-
-            runAsync {
-                val server = logic.serverLogic.getServerConfigCoroutine()
-
-                if (server.hasAuthToken) {
-                    ReportUninstallWorker.enqueue(
-                            deviceAuthToken = server.deviceAuthToken,
-                            customServerUrl = server.customServerUrl
-                    )
-                }
-
-                logic.appSetupLogic.dangerousResetApp()
-            }
+            DefaultAppLogic.with(context!!).appSetupLogic.resetAppCompletely(revokePermissions)
         }
     }
 }
