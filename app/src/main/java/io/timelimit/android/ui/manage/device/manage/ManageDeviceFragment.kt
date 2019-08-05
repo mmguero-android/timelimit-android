@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
@@ -63,7 +64,8 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 binding = binding.manageManipulation,
                 deviceEntry = deviceEntry,
                 lifecycleOwner = this,
-                activityViewModel = auth
+                activityViewModel = auth,
+                status = ViewModelProviders.of(this).get(ManageDeviceManipulationStatusModel::class.java).data
         )
 
         // auth

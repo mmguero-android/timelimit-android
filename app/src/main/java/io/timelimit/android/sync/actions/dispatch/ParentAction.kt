@@ -307,6 +307,16 @@ object LocalDatabaseParentActionDispatcher {
                         deviceEntry = deviceEntry.copy(hadManipulation = false)
                     }
 
+                    if (action.ignoreHadManipulationFlags != 0L && deviceEntry.hadManipulationFlags != 0L) {
+                        val newFlags = deviceEntry.hadManipulationFlags and (action.ignoreHadManipulationFlags.inv())
+
+                        deviceEntry = deviceEntry.copy(hadManipulationFlags = newFlags)
+
+                        if (newFlags == 0L) {
+                            deviceEntry = deviceEntry.copy(hadManipulation = false)
+                        }
+                    }
+
                     database.device().updateDeviceEntry(deviceEntry)
                 }
                 is SetKeepSignedInAction -> {

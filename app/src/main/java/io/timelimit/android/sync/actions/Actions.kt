@@ -806,7 +806,8 @@ data class IgnoreManipulationAction(
         val ignoreOverlayPermissionManipulation: Boolean,
         val ignoreAccessibilityServiceManipulation: Boolean,
         val ignoreReboot: Boolean,
-        val ignoreHadManipulation: Boolean
+        val ignoreHadManipulation: Boolean,
+        val ignoreHadManipulationFlags: Long
 ): ParentAction() {
     companion object {
         const val TYPE_VALUE = "IGNORE_MANIPULATION"
@@ -820,6 +821,7 @@ data class IgnoreManipulationAction(
         private const val IGNORE_ACCESSIBILITY_SERVICE_MANIPULATION = "accessibilityService"
         private const val IGNORE_HAD_MANIPULATION = "hadManipulation"
         private const val IGNORE_REBOOT = "reboot"
+        private const val IGNORE_HAD_MANIPULATION_FLAGS = "ignoreHadManipulationFlags"
     }
 
     init {
@@ -834,7 +836,8 @@ data class IgnoreManipulationAction(
             (!ignoreOverlayPermissionManipulation) &&
             (!ignoreAccessibilityServiceManipulation) &&
             (!ignoreReboot) &&
-            (!ignoreHadManipulation)
+            (!ignoreHadManipulation) &&
+            (ignoreHadManipulationFlags == 0L)
 
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
@@ -850,6 +853,7 @@ data class IgnoreManipulationAction(
         writer.name(IGNORE_ACCESSIBILITY_SERVICE_MANIPULATION).value(ignoreAccessibilityServiceManipulation)
         writer.name(IGNORE_HAD_MANIPULATION).value(ignoreHadManipulation)
         writer.name(IGNORE_REBOOT).value(ignoreReboot)
+        writer.name(IGNORE_HAD_MANIPULATION_FLAGS).value(ignoreHadManipulationFlags)
 
         writer.endObject()
     }

@@ -67,6 +67,8 @@ data class Device(
         val manipulationDidReboot: Boolean,
         @ColumnInfo(name = "had_manipulation")
         val hadManipulation: Boolean,
+        @ColumnInfo(name = "had_manipulation_flags")
+        val hadManipulationFlags: Long,
         @ColumnInfo(name = "did_report_uninstall")
         val didReportUninstall: Boolean,
         @ColumnInfo(name = "is_user_kept_signed_in")
@@ -111,6 +113,7 @@ data class Device(
         private const val TRIED_DISABLING_DEVICE_ADMIN = "tdda"
         private const val MANIPULATION_DID_REBOOT = "mdr"
         private const val HAD_MANIPULATION = "hm"
+        private const val HAD_MANIPULATION_FLAGS = "hmf"
         private const val DID_REPORT_UNINSTALL = "dru"
         private const val IS_USER_KEPT_SIGNED_IN = "iuksi"
         private const val SHOW_DEVICE_CONNECTED = "sdc"
@@ -143,6 +146,7 @@ data class Device(
             var manipulationTriedDisablingDeviceAdmin: Boolean? = null
             var manipulationDidReboot: Boolean = false
             var hadManipulation: Boolean? = null
+            var hadManipulationFlags: Long = 0
             var didReportUninstall = false  // this was added later, so it has got a default value
             var isUserKeptSignedIn = false
             var showDeviceConnected = false
@@ -178,6 +182,7 @@ data class Device(
                     TRIED_DISABLING_DEVICE_ADMIN -> manipulationTriedDisablingDeviceAdmin = reader.nextBoolean()
                     MANIPULATION_DID_REBOOT -> manipulationDidReboot = reader.nextBoolean()
                     HAD_MANIPULATION -> hadManipulation = reader.nextBoolean()
+                    HAD_MANIPULATION_FLAGS -> hadManipulationFlags = reader.nextLong()
                     DID_REPORT_UNINSTALL -> didReportUninstall = reader.nextBoolean()
                     IS_USER_KEPT_SIGNED_IN -> isUserKeptSignedIn = reader.nextBoolean()
                     SHOW_DEVICE_CONNECTED -> showDeviceConnected = reader.nextBoolean()
@@ -215,6 +220,7 @@ data class Device(
                     manipulationTriedDisablingDeviceAdmin = manipulationTriedDisablingDeviceAdmin!!,
                     manipulationDidReboot = manipulationDidReboot,
                     hadManipulation = hadManipulation!!,
+                    hadManipulationFlags = hadManipulationFlags,
                     didReportUninstall = didReportUninstall,
                     isUserKeptSignedIn = isUserKeptSignedIn,
                     showDeviceConnected = showDeviceConnected,
@@ -284,6 +290,7 @@ data class Device(
         writer.name(TRIED_DISABLING_DEVICE_ADMIN).value(manipulationTriedDisablingDeviceAdmin)
         writer.name(MANIPULATION_DID_REBOOT).value(manipulationDidReboot)
         writer.name(HAD_MANIPULATION).value(hadManipulation)
+        writer.name(HAD_MANIPULATION_FLAGS).value(hadManipulationFlags)
         writer.name(DID_REPORT_UNINSTALL).value(didReportUninstall)
         writer.name(IS_USER_KEPT_SIGNED_IN).value(isUserKeptSignedIn)
         writer.name(SHOW_DEVICE_CONNECTED).value(showDeviceConnected)
@@ -362,4 +369,13 @@ class NetworkTimeAdapter {
 
     @TypeConverter
     fun toNetworkTime(value: String) = NetworkTimeJson.parse(value)
+}
+
+object HadManipulationFlag {
+    const val PROTECTION_LEVEL = 1L shl 0
+    const val USAGE_STATS_ACCESS = 1L shl 1
+    const val NOTIFICATION_ACCESS = 1L shl 2
+    const val APP_VERSION = 1L shl 3
+    const val OVERLAY_PERMISSION = 1L shl 4
+    const val ACCESSIBILITY_SERVICE = 1L shl 5
 }

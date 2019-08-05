@@ -18,6 +18,7 @@ package io.timelimit.android.sync.actions.dispatch
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.AppActivity
+import io.timelimit.android.data.model.HadManipulationFlag
 import io.timelimit.android.data.model.UsedTimeItem
 import io.timelimit.android.integration.platform.NewPermissionStatusUtil
 import io.timelimit.android.integration.platform.ProtectionLevelUtil
@@ -110,7 +111,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                             }
 
                             if (device.currentProtectionLevel != device.highestProtectionLevel) {
-                                device = device.copy(hadManipulation = true)
+                                device = device.copy(
+                                        hadManipulation = true,
+                                        hadManipulationFlags = device.hadManipulationFlags or HadManipulationFlag.PROTECTION_LEVEL
+                                )
                             }
                         }
                     }
@@ -128,7 +132,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                             }
 
                             if (device.currentUsageStatsPermission != device.highestUsageStatsPermission) {
-                                device = device.copy(hadManipulation = true)
+                                device = device.copy(
+                                        hadManipulation = true,
+                                        hadManipulationFlags = device.hadManipulationFlags or HadManipulationFlag.USAGE_STATS_ACCESS
+                                )
                             }
                         }
                     }
@@ -146,7 +153,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                             }
 
                             if (device.currentNotificationAccessPermission != device.highestNotificationAccessPermission) {
-                                device = device.copy(hadManipulation = true)
+                                device = device.copy(
+                                        hadManipulation = true,
+                                        hadManipulationFlags = device.hadManipulationFlags or HadManipulationFlag.NOTIFICATION_ACCESS
+                                )
                             }
                         }
                     }
@@ -164,7 +174,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                             }
 
                             if (device.currentOverlayPermission != device.highestOverlayPermission) {
-                                device = device.copy(hadManipulation = true)
+                                device = device.copy(
+                                        hadManipulation = true,
+                                        hadManipulationFlags = device.hadManipulationFlags or HadManipulationFlag.OVERLAY_PERMISSION
+                                )
                             }
                         }
                     }
@@ -182,7 +195,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                             }
 
                             if (device.accessibilityServiceEnabled != device.wasAccessibilityServiceEnabled) {
-                                device = device.copy(hadManipulation = true)
+                                device = device.copy(
+                                        hadManipulation = true,
+                                        hadManipulationFlags = device.hadManipulationFlags or HadManipulationFlag.ACCESSIBILITY_SERVICE
+                                )
                             }
                         }
                     }
@@ -195,7 +211,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                             )
 
                             if (device.currentAppVersion != device.highestAppVersion) {
-                                device = device.copy(hadManipulation = true)
+                                device = device.copy(
+                                        hadManipulation = true,
+                                        hadManipulationFlags = device.hadManipulationFlags or HadManipulationFlag.APP_VERSION
+                                )
                             }
                         }
                     }

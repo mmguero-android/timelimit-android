@@ -175,6 +175,7 @@ data class ServerDeviceData(
         val triedDisablingAdmin: Boolean,
         val didReboot: Boolean,
         val hadManipulation: Boolean,
+        val hadManipulationFlags: Long,
         val didReportUninstall: Boolean,
         val isUserKeptSignedIn: Boolean,
         val showDeviceConnected: Boolean,
@@ -206,6 +207,7 @@ data class ServerDeviceData(
         private const val TRIED_DISABLING_ADMIN = "tDisablingAdmin"
         private const val DID_REBOOT = "reboot"
         private const val HAD_MANIPULATION = "hadManipulation"
+        private const val HAD_MANIPULATION_FLAGS = "hadManipulationFlags"
         private const val DID_REPORT_UNINSTALL = "reportUninstall"
         private const val IS_USER_KEPT_SIGNED_IN = "isUserKeptSignedIn"
         private const val SHOW_DEVICE_CONNECTED = "showDeviceConnected"
@@ -236,6 +238,7 @@ data class ServerDeviceData(
             var highestAppVersion: Int? = null
             var triedDisablingAdmin: Boolean? = null
             var didReboot: Boolean? = null
+            var hadManipulationFlags: Long = 0
             var hadManipulation: Boolean? = null
             var didReportUninstall: Boolean? = null
             var isUserKeptSignedIn: Boolean? = null
@@ -270,6 +273,7 @@ data class ServerDeviceData(
                     TRIED_DISABLING_ADMIN -> triedDisablingAdmin = reader.nextBoolean()
                     DID_REBOOT -> didReboot = reader.nextBoolean()
                     HAD_MANIPULATION -> hadManipulation = reader.nextBoolean()
+                    HAD_MANIPULATION_FLAGS -> hadManipulationFlags = reader.nextLong()
                     DID_REPORT_UNINSTALL -> didReportUninstall = reader.nextBoolean()
                     IS_USER_KEPT_SIGNED_IN -> isUserKeptSignedIn = reader.nextBoolean()
                     SHOW_DEVICE_CONNECTED -> showDeviceConnected = reader.nextBoolean()
@@ -305,6 +309,7 @@ data class ServerDeviceData(
                     triedDisablingAdmin = triedDisablingAdmin!!,
                     didReboot = didReboot!!,
                     hadManipulation = hadManipulation!!,
+                    hadManipulationFlags = hadManipulationFlags,
                     didReportUninstall = didReportUninstall!!,
                     isUserKeptSignedIn = isUserKeptSignedIn!!,
                     showDeviceConnected = showDeviceConnected!!,

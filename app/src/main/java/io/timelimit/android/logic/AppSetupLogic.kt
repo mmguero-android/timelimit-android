@@ -95,6 +95,7 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             manipulationTriedDisablingDeviceAdmin = false,
                             manipulationDidReboot = false,
                             hadManipulation = false,
+                            hadManipulationFlags = 0,
                             didReportUninstall = false,
                             isUserKeptSignedIn = false,
                             showDeviceConnected = false,

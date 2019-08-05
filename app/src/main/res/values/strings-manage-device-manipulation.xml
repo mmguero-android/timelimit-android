@@ -16,8 +16,11 @@
 <resources>
     <string name="manage_device_manipulation_title">Manipulation</string>
     <string name="manage_device_manipulation_text">
-        The following was manipulated. You can fix the causes or ignore the warnings.
+        The following was manipulated:
     </string>
+    <string name="manage_device_manipulation_type_past">In the past:</string>
+    <string name="manage_device_manipulation_type_current">Currently active:</string>
+
     <string name="manage_device_manipulation_device_admin_disabled">device admin disabled</string>
     <string name="manage_device_manipulation_device_admin_disable_attempt">disabling devcie admin was attempted</string>
     <string name="manage_device_manipulation_usage_stats_access">usage stats access</string>
@@ -27,6 +30,6 @@
     <string name="manage_device_manipulation_app_version">older App version installed</string>
     <string name="manage_device_manipulation_reboot">device was rebooted</string>
     <string name="manage_device_manipulation_existed">there was a manipulation which was stopped again</string>
-    <string name="manage_device_manipulation_btn_ignore">ignore warnings</string>
+    <string name="manage_device_manipulation_btn_ignore">Confirm and hide warnings</string>
     <string name="manage_device_manipulation_toast_nothing_selected">You have to select warnings to ignore first</string>
 </resources>
