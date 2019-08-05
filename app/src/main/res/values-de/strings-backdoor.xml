@@ -14,6 +14,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
+    <string name="backdoor_start_btn">TimeLimit ohne Passwort mit Hilfe des Supports entfernen</string>
     <string name="backdoor_instruction_1">Senden Sie folgende Nonce (mit dem Grund für das Entsperren) an den Support, um einen Entsperrcode zu bekommen:</string>
     <string name="backdoor_instruction_2">Geben Sie den empfangenen Code ein:</string>
     <string name="backdoor_toast_invalid_code">Dieser Code ist ungültig</string>

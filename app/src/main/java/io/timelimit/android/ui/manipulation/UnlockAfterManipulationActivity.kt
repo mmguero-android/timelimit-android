@@ -26,6 +26,7 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
 import io.timelimit.android.ui.login.NewLoginFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
@@ -60,7 +61,14 @@ class UnlockAfterManipulationActivity : AppCompatActivity(), ActivityViewModelHo
             }
         })
 
+        model.logic.deviceId.observe(this, Observer {
+            if (it.isNullOrEmpty()) {
+                finish()
+            }
+        })
+
         auth_btn.setOnClickListener { showAuthenticationScreen() }
+        use_backdoor.setOnClickListener { BackdoorDialogFragment().show(supportFragmentManager) }
     }
 
     override fun showAuthenticationScreen() {
