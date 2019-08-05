@@ -41,7 +41,6 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
     private val mailAddressToWhichCodeWasSentInternal = MutableLiveData<String?>().apply { value = null }
     private var mailLoginToken: String? = null
 
-    val usingDefaultServer = logic.database.config().getCustomServerUrlAsync().map { it.isEmpty() }
     val isBusy = isBusyInternal.castDown()
     val mailAuthToken = mailAuthTokenInternal.castDown()
     val errorMessage = MutableLiveData<ErrorMessage?>().apply { value = null }

@@ -65,13 +65,10 @@ android {
 
         googleApi {
             dimension 'api'
-            buildConfigField 'boolean', 'useGoogleApis', 'true'
-            buildConfigField 'String', "googleAuthClientId", '"700283994167-4vklse9lj88oo41bd5aav8t0r9ohjhh6.apps.googleusercontent.com"'
             applicationIdSuffix ".google"
         }
         noGoogleApi {
             dimension 'api'
-            buildConfigField 'boolean', 'useGoogleApis', 'false'
             applicationIdSuffix ".aosp"
         }
 
@@ -197,8 +194,6 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
-
-    googleApiImplementation 'com.google.android.gms:play-services-auth:16.0.1'
 
     implementation 'org.solovyev.android:checkout:1.2.1'
 

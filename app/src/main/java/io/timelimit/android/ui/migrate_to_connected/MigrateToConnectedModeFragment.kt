@@ -92,9 +92,7 @@ class MigrateToConnectedModeFragment : Fragment(), AuthenticateByMailFragmentLis
 
         if (savedInstanceState == null) {
             childFragmentManager.beginTransaction()
-                    .replace(R.id.mail_auth_container, AuthenticateByMailFragment.newInstance(
-                            hideSignInWithGoogleButton = true
-                    ))
+                    .replace(R.id.mail_auth_container, AuthenticateByMailFragment())
                     .commit()
         }
     }

@@ -30,7 +30,6 @@ import io.timelimit.android.Application
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.extensions.showSafe
-import io.timelimit.android.flavors.GoogleSignInUtil
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
@@ -64,8 +63,6 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         }
     }
     override var ignoreStop: Boolean = false
-
-    val googleSignInUtil = GoogleSignInUtil(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

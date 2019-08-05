@@ -15,7 +15,6 @@
  */
 package io.timelimit.android.ui.authentication
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,40 +26,15 @@ import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentAuthenticateByMailBinding
 import io.timelimit.android.extensions.setOnEnterListenr
-import io.timelimit.android.flavors.GoogleSignInUtil
 import io.timelimit.android.livedata.map
-import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.util.MailValidation
 
 class AuthenticateByMailFragment : Fragment() {
-    companion object {
-        private const val REQUEST_SIGN_IN_WITH_GOOGLE = 1
-        private const val EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON = "hsiwgb"
-
-        fun newInstance(hideSignInWithGoogleButton: Boolean) = AuthenticateByMailFragment().apply {
-            arguments = Bundle().apply {
-                putBoolean(EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON, hideSignInWithGoogleButton)
-            }
-        }
-    }
-
     private val listener: AuthenticateByMailFragmentListener by lazy { parentFragment as AuthenticateByMailFragmentListener }
-    private val googleAuthUtil: GoogleSignInUtil by lazy { (activity as MainActivity).googleSignInUtil }
     val model: AuthenticateByMailModel by lazy { ViewModelProviders.of(this).get(AuthenticateByMailModel::class.java) }
-    private val hideSignInWithGoogleButton: Boolean by lazy {
-        arguments?.getBoolean(EXTRA_HIDE_SIGN_IN_WITH_GOOGLE_BUTTON, false) ?: false
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAuthenticateByMailBinding.inflate(layoutInflater, container, false)
-
-        model.usingDefaultServer.observe(this, Observer {
-            binding.showSignInWithGoogleButton = it && (!hideSignInWithGoogleButton)
-        })
-
-        binding.signInWithGoogleButton.setOnClickListener {
-            startActivityForResult(googleAuthUtil.getSignInIntent(), REQUEST_SIGN_IN_WITH_GOOGLE)
-        }
 
         binding.mailEdit.setOnEnterListenr {
             val mail = binding.mailEdit.text.toString()
@@ -147,16 +121,6 @@ class AuthenticateByMailFragment : Fragment() {
         })
 
         return binding.root
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_SIGN_IN_WITH_GOOGLE) {
-            val googleAuthToken = googleAuthUtil.processActivityResult(data)
-
-            if (googleAuthToken != null) {
-                model.handleGoogleAuthToken(googleAuthToken)
-            }
-        }
     }
 }
 
