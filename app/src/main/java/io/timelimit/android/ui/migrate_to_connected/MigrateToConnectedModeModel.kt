@@ -39,7 +39,6 @@ import io.timelimit.android.sync.network.api.HttpError
 import io.timelimit.android.ui.main.ActivityViewModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.Exception
 
 class MigrateToConnectedModeModel(application: Application): AndroidViewModel(application) {
     companion object {

@@ -24,7 +24,6 @@ import io.timelimit.android.data.model.ConfigurationItemTypeConverter
 import io.timelimit.android.data.model.ConfigurationItemTypeUtil
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.map
-import java.lang.IllegalArgumentException
 
 @Dao
 @TypeConverters(ConfigurationItemTypeConverter::class)

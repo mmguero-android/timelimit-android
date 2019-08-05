@@ -16,11 +16,11 @@
 package io.timelimit.android.ui.diagnose
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
@@ -30,7 +30,6 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
-import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.util.TimeTextUtil
 
 class DiagnoseForegroundAppFragment : Fragment() {

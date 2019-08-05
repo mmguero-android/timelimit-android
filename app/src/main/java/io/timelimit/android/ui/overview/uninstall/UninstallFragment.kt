@@ -23,9 +23,9 @@ import androidx.fragment.app.Fragment
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.databinding.FragmentUninstallBinding
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
 
 class UninstallFragment : Fragment() {
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }

@@ -18,12 +18,9 @@ package io.timelimit.android.ui.manage.category.apps.addactivity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.databinding.FragmentAddCategoryActivitiesItemBinding
-import io.timelimit.android.databinding.FragmentAddCategoryAppsItemBinding
 import io.timelimit.android.extensions.toggle
-import io.timelimit.android.logic.DefaultAppLogic
 import kotlin.properties.Delegates
 
 class AddAppActivityAdapter: RecyclerView.Adapter<ViewHolder>() {

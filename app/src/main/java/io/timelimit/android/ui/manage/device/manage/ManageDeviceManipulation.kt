@@ -17,7 +17,6 @@ package io.timelimit.android.ui.manage.device.manage
 
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -27,12 +26,9 @@ import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.HadManipulationFlag
 import io.timelimit.android.databinding.ManageDeviceManipulationViewBinding
-import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.livedata.map
 import io.timelimit.android.sync.actions.IgnoreManipulationAction
 import io.timelimit.android.ui.main.ActivityViewModel
-import kotlinx.android.parcel.Parcelize
-import java.io.Serializable
 
 object ManageDeviceManipulation {
     fun bindView(

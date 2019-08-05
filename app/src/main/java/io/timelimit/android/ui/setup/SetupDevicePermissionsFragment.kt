@@ -18,6 +18,7 @@ package io.timelimit.android.ui.setup
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -35,7 +36,6 @@ import io.timelimit.android.integration.platform.android.AdminReceiver
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.manage.device.manage.permission.InformAboutDeviceOwnerDialogFragment
-import android.net.Uri
 
 
 class SetupDevicePermissionsFragment : Fragment() {

@@ -17,20 +17,17 @@ package io.timelimit.android.ui.manage.child.advanced
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.User
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.livedata.waitForNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.RenameChildAction
-import io.timelimit.android.sync.actions.UpdateDeviceNameAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.util.EditTextBottomSheetDialog

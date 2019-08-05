@@ -16,7 +16,6 @@
 package io.timelimit.android.logic
 
 import android.content.Context
-import android.os.Build
 import com.jaredrummler.android.device.DeviceName
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads

@@ -23,7 +23,6 @@ import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.User
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.MissingPermissionViewBinding
-import io.timelimit.android.integration.platform.RuntimePermissionStatus
 import io.timelimit.android.livedata.mergeLiveData
 
 object ActivityLaunchPermissionRequiredAndMissing {

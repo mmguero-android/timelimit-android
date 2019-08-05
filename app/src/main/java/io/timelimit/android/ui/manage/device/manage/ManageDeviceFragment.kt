@@ -29,7 +29,10 @@ import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.databinding.FragmentManageDeviceBinding
 import io.timelimit.android.extensions.safeNavigate
-import io.timelimit.android.livedata.*
+import io.timelimit.android.livedata.ignoreUnchanged
+import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.map
+import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.RealTime

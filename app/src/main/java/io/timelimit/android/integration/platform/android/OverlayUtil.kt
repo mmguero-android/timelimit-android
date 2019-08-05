@@ -17,11 +17,11 @@ package io.timelimit.android.integration.platform.android
 
 import android.app.Application
 import android.content.Context
-import android.view.WindowManager
 import android.graphics.PixelFormat
 import android.os.Build
 import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.WindowManager
 import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.BlockingOverlayBinding
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
