@@ -1,1 +1,2 @@
-- Hinweismeldungen hinzugefügt
+- Anzeigen von mehr Details zu Manipulationen
+- Überarbeiteter Anmeldebildschirm

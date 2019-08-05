@@ -1,1 +1,2 @@
-- added new info messages
+- add showing more details about manipulations
+- refactored login screen
