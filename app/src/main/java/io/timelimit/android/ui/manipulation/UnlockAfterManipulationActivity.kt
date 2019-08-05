@@ -63,6 +63,12 @@ class UnlockAfterManipulationActivity : AppCompatActivity(), ActivityViewModelHo
 
         model.logic.deviceId.observe(this, Observer {
             if (it.isNullOrEmpty()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    stopLockTask()
+                }
+
+                DefaultAppLogic.with(this).appSetupLogic.resetAppCompletely()
+
                 finish()
             }
         })
