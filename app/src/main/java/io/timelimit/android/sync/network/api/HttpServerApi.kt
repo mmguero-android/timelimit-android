@@ -104,43 +104,6 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         }
     }
 
-    override suspend fun getMailAuthTokenByGoogleAccountToken(googleToken: String): String {
-        httpClient.newCall(
-                Request.Builder()
-                        .url("$endpointWithoutSlashAtEnd/auth/sign-in-with-google")
-                        .post(createJsonRequestBody {
-                            writer ->
-
-                            writer.beginObject()
-                            writer.name(GOOGLE_AUTH_TOKEN).value(googleToken)
-                            writer.endObject()
-                        })
-                        .header("Content-Encoding", "gzip")
-                        .build()
-        ).waitForResponse().use {
-            it.assertSuccess()
-
-            val body = it.body()!!
-
-            return Threads.network.executeAndWait {
-                val reader = JsonReader(body.charStream())
-
-                var token: String? = null
-
-                reader.beginObject()
-                while (reader.hasNext()) {
-                    when (reader.nextName()) {
-                        MAIL_AUTH_TOKEN -> token = reader.nextString()
-                        else -> reader.skipValue()
-                    }
-                }
-                reader.endObject()
-
-                token!!
-            }
-        }
-    }
-
     override suspend fun sendMailLoginCode(mail: String, locale: String): String {
         httpClient.newCall(
                 Request.Builder()

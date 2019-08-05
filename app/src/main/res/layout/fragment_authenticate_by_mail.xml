@@ -16,91 +16,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="io.timelimit.android.ui.authentication.AuthenticateByMailFragment">
 
-    <data>
-        <variable
-            name="mailAddressToWhichCodeWasSent"
-            type="String" />
-
-        <import type="android.text.TextUtils" />
-        <import type="android.view.View" />
-    </data>
-
-    <ViewSwitcher
-        android:id="@+id/switcher"
+    <ViewFlipper
+        android:id="@+id/flipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ScrollView
-            android:id="@+id/scroll"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:padding="8dp"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
-                <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:text="@string/authenticate_by_mail_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:textAppearance="?android:textAppearanceLarge"
-                    android:text="@string/authenticate_by_mail_other_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:text="@string/authenticate_by_mail_other_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <EditText
-                    android:visibility="@{TextUtils.isEmpty(mailAddressToWhichCodeWasSent) ? View.VISIBLE : View.GONE}"
-                    android:id="@+id/mail_edit"
-                    android:hint="@string/authenticate_by_mail_hint_mail"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"
-                    android:imeOptions="actionGo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:visibility="@{TextUtils.isEmpty(mailAddressToWhichCodeWasSent) ? View.GONE : View.VISIBLE}"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    tools:text="@string/authenticate_by_mail_message_sent"
-                    android:text="@{@string/authenticate_by_mail_message_sent(mailAddressToWhichCodeWasSent)}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <EditText
-                    android:visibility="@{TextUtils.isEmpty(mailAddressToWhichCodeWasSent) ? View.GONE : View.VISIBLE}"
-                    android:id="@+id/code_edit"
-                    android:imeOptions="actionGo"
-                    android:hint="@string/authenticate_by_mail_hint_code"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:text="@string/authenticate_by_mail_hint_enter"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:text="@string/authenticate_by_mail_hint_general"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-        </ScrollView>
-
+        <include layout="@layout/fragment_authenticate_by_mail_step_1" android:id="@+id/step_1" />
+        <include layout="@layout/fragment_authenticate_by_mail_step_2" android:id="@+id/step_2" />
+        <include layout="@layout/fragment_authenticate_by_mail_step_1b" android:id="@+id/step_1_b" />
         <include layout="@layout/circular_progress_indicator" />
-    </ViewSwitcher>
+    </ViewFlipper>
 
 </layout>

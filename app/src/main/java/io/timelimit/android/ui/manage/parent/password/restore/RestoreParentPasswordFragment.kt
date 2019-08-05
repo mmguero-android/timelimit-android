@@ -105,7 +105,7 @@ class RestoreParentPasswordFragment : Fragment(), AuthenticateByMailFragmentList
 
         if (savedInstanceState == null) {
             childFragmentManager.beginTransaction()
-                    .replace(R.id.mail_auth_container, AuthenticateByMailFragment())
+                    .replace(R.id.mail_auth_container, AuthenticateByMailFragment.newInstance(recoveryUserId = params.parentId))
                     .commit()
         }
     }

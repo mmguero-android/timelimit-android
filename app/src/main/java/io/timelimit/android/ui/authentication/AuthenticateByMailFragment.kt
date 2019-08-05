@@ -26,18 +26,29 @@ import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentAuthenticateByMailBinding
 import io.timelimit.android.extensions.setOnEnterListenr
-import io.timelimit.android.livedata.map
 import io.timelimit.android.util.MailValidation
 
 class AuthenticateByMailFragment : Fragment() {
+    companion object {
+        private const val RECOVERY_USER_ID = "userId"
+
+        fun newInstance(recoveryUserId: String) = AuthenticateByMailFragment().apply {
+            arguments = Bundle().apply {
+                putString(RECOVERY_USER_ID, recoveryUserId)
+            }
+        }
+    }
+
     private val listener: AuthenticateByMailFragmentListener by lazy { parentFragment as AuthenticateByMailFragmentListener }
     val model: AuthenticateByMailModel by lazy { ViewModelProviders.of(this).get(AuthenticateByMailModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAuthenticateByMailBinding.inflate(layoutInflater, container, false)
 
-        binding.mailEdit.setOnEnterListenr {
-            val mail = binding.mailEdit.text.toString()
+        model.recoveryUserId.value = arguments?.getString(RECOVERY_USER_ID)
+
+        binding.step1.mailEdit.setOnEnterListenr {
+            val mail = binding.step1.mailEdit.text.toString()
 
             if (!MailValidation.seemsMailAddressValid(mail)) {
                 Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address, Snackbar.LENGTH_SHORT).show()
@@ -54,7 +65,7 @@ class AuthenticateByMailFragment : Fragment() {
                     val mailWithoutDomain = mail.substring(0, mail.length - domain.length)
                     val mailWithSuggestedDomain = mailWithoutDomain + suggestedDomain
 
-                    binding.mailEdit.setText(mailWithSuggestedDomain)
+                    binding.step1.mailEdit.setText(mailWithSuggestedDomain)
                     Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address_suggest, Snackbar.LENGTH_SHORT).show()
                 }
 
@@ -74,28 +85,31 @@ class AuthenticateByMailFragment : Fragment() {
             }
         }
 
-        binding.codeEdit.setOnEnterListenr {
-            val code = binding.codeEdit.text.toString()
+        binding.step2.codeEdit.setOnEnterListenr {
+            val code = binding.step2.codeEdit.text.toString()
 
             if (code.isNotBlank()) {
                 model.confirmCode(code)
 
-                binding.codeEdit.setText("")
+                binding.step2.codeEdit.setText("")
             }
         }
 
+        binding.step1B.goButton.setOnClickListener {
+            model.sendAuthMessageToForcedMailAddress()
+        }
+
         model.mailAddressToWhichCodeWasSent.observe(this, Observer {
-            binding.mailAddressToWhichCodeWasSent = it
+            binding.step2.mailAddressToWhichCodeWasSent = it
         })
 
-        model.isBusy.map {
-            if (it) {
-                1
-            } else {
-                0
+        model.screenToShow.observe(this, Observer {
+            binding.flipper.displayedChild = when (it!!) {
+                ScreenToShow.EnterMailAddress -> 0
+                ScreenToShow.EnterReceivedCode -> 1
+                ScreenToShow.ConfirmCurrentMail -> 2
+                ScreenToShow.Working -> 3
             }
-        }.observe(this, Observer {
-            binding.switcher.displayedChild = it!!
         })
 
         model.mailAuthToken.observe(this, Observer {

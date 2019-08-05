@@ -19,8 +19,6 @@ import io.timelimit.android.sync.network.*
 
 interface ServerApi {
     suspend fun getTimeInMillis(): Long
-    // returns null if the server does not accept the token
-    suspend fun getMailAuthTokenByGoogleAccountToken(googleToken: String): String
     suspend fun sendMailLoginCode(mail: String, locale: String): String
     suspend fun signInByMailCode(mailLoginToken: String, code: String): String
     suspend fun getStatusByMailToken(mailAuthToken: String): StatusOfMailAddressResponse

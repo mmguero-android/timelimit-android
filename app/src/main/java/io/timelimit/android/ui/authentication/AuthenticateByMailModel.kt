@@ -21,10 +21,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.livedata.castDown
-import io.timelimit.android.livedata.map
+import io.timelimit.android.data.model.User
+import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.sync.network.api.BadRequestHttpError
 import io.timelimit.android.sync.network.api.ForbiddenHttpError
 import io.timelimit.android.sync.network.api.GoneHttpError
 import io.timelimit.android.sync.network.api.HttpError
@@ -41,26 +40,49 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
     private val mailAddressToWhichCodeWasSentInternal = MutableLiveData<String?>().apply { value = null }
     private var mailLoginToken: String? = null
 
-    val isBusy = isBusyInternal.castDown()
+    val recoveryUserId = MutableLiveData<String?>().apply { value = null }
+    private val forcedMailAddress = recoveryUserId.switchMap { userId ->
+        if (userId != null) {
+            logic.database.user().getParentUserByIdLive(userId)
+        } else {
+            liveDataFromValue(null as User?)
+        }
+    }.map { it?.mail ?: "" }
+    val screenToShow = isBusyInternal.switchMap { isBusy ->
+        if (isBusy) {
+            liveDataFromValue(ScreenToShow.Working)
+        } else {
+            mailAddressToWhichCodeWasSentInternal.switchMap { receiverMail ->
+                if (receiverMail != null) {
+                    liveDataFromValue(ScreenToShow.EnterReceivedCode)
+                } else {
+                    forcedMailAddress.map { forcedMailAddress ->
+                        if (forcedMailAddress.isEmpty()) {
+                            ScreenToShow.EnterMailAddress
+                        } else {
+                            ScreenToShow.ConfirmCurrentMail
+                        }
+                    }
+                }
+            }
+        }
+    }
     val mailAuthToken = mailAuthTokenInternal.castDown()
     val errorMessage = MutableLiveData<ErrorMessage?>().apply { value = null }
     val mailAddressToWhichCodeWasSent = mailAddressToWhichCodeWasSentInternal.castDown()
 
-    fun handleGoogleAuthToken(googleAuthToken: String) {
+    fun sendAuthMessageToForcedMailAddress() {
         isBusyInternal.value = true
 
         runAsync {
-            try {
-                val api = logic.serverLogic.getServerConfigCoroutine().api
-                val mailAuthToken = api.getMailAuthTokenByGoogleAccountToken(googleAuthToken)
+            val mailAddress = forcedMailAddress.waitForNonNullValue()
 
-                mailAuthTokenInternal.value = mailAuthToken
-            } catch (ex: BadRequestHttpError) {
-                errorMessage.value = ErrorMessage.ServerRejection
-            } catch (ex: Exception) {
-                errorMessage.value = ErrorMessage.NetworkProblem
-            } finally {
+            if (mailAddress.isEmpty()) {
                 isBusyInternal.value = false
+                // not correct, but this would happen if the value would be used
+                errorMessage.value = ErrorMessage.ServerRejection
+            } else {
+                sendAuthMessage(mailAddress)
             }
         }
     }
@@ -133,4 +155,11 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
 
 enum class ErrorMessage {
     NetworkProblem, ServerRejection, WrongCode
+}
+
+enum class ScreenToShow {
+    EnterMailAddress,
+    EnterReceivedCode,
+    ConfirmCurrentMail,
+    Working
 }

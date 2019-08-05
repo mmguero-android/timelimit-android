@@ -29,10 +29,6 @@ class DummyServerApi: ServerApi {
         }
     }
 
-    override suspend fun getMailAuthTokenByGoogleAccountToken(googleToken: String): String {
-        throw IOException()
-    }
-
     override suspend fun sendMailLoginCode(mail: String, locale: String): String {
         throw IOException()
     }
