@@ -20,11 +20,6 @@
     <string name="authenticate_by_mail_text">
         Zum Fortfahren wird eine E-Mail-Adresse sowie der Nachweis, dass Sie zu dieser Zugang haben, benötigt
     </string>
-    <string name="authenticate_by_mail_btn_google">Mit einem Google-Konto anmelden</string>
-    <string name="authenticate_by_mail_google_info">
-        TimeLimit verwendet nur die mit dem Google-Konto verknüpfte E-Mail-Adresse.
-        Es können nur E-Mail-Adressen, die auf @gmail.com oder @googlemail.com enden, verwendet werden.
-    </string>
 
     <string name="authenticate_by_mail_other_title">Mit einer E-Mail-Adresse anmelden</string>
     <string name="authenticate_by_mail_other_text">TimeLimit wird Ihnen eine Nachricht mit einem Code senden, den Sie zum Authentifizieren hier eingeben.</string>

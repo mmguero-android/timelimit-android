@@ -20,11 +20,6 @@
     <string name="authenticate_by_mail_text">
         To continue, you need an e-mail address to which you have got access
     </string>
-    <string name="authenticate_by_mail_btn_google">Sign in with Google</string>
-    <string name="authenticate_by_mail_google_info">
-        TimeLimit only uses the e-mail address which is assigned to the Google account.
-        Only e-mail addresses which end in @gmail.com or @googlemail.com can be used.
-    </string>
 
     <string name="authenticate_by_mail_other_title">Sign in with a mail address</string>
     <string name="authenticate_by_mail_other_text">TimeLimit will send you a message with a code which you enter here to authenticate.</string>
