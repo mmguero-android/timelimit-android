@@ -166,8 +166,10 @@ data class ManipulationWarnings(val current: List<ManipulationWarningType>, val 
                 past.add(ManipulationWarningType.OverlayPermission)
             }
 
-            if (device.accessibilityServiceEnabled) {
-                current.add(ManipulationWarningType.AccessibilityService)
+            if (device.wasAccessibilityServiceEnabled) {
+                if (!device.accessibilityServiceEnabled) {
+                    current.add(ManipulationWarningType.AccessibilityService)
+                }
             }
             if (isFlagSet(HadManipulationFlag.ACCESSIBILITY_SERVICE)) {
                 past.add(ManipulationWarningType.AccessibilityService)
