@@ -1,2 +1,1 @@
-- add showing more details about manipulations
-- refactored login screen
+- added integrated keyboard at the authentication screen

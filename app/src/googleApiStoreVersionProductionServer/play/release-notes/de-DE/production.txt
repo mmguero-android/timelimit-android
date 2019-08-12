@@ -1,2 +1,1 @@
-- Anzeigen von mehr Details zu Manipulationen
-- Überarbeiteter Anmeldebildschirm
+- integrierte Tastatur beim Entsperrbildschirm hinzugefügt
