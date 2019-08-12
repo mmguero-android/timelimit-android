@@ -74,6 +74,7 @@ class AboutFragment : Fragment() {
         binding.termsText1.movementMethod = LinkMovementMethod.getInstance()
         binding.termsText2.movementMethod = LinkMovementMethod.getInstance()
         binding.containedSoftwareText.movementMethod = LinkMovementMethod.getInstance()
+        binding.sourceCodeUrl.movementMethod = LinkMovementMethod.getInstance()
 
         ResetShownHints.bind(
                 binding = binding.resetShownHintsView,

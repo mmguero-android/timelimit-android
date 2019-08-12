@@ -76,4 +76,10 @@
 
     <string name="about_developer_key_title">Developer GPG-Key fingerprint</string>
     <string name="about_developer_key_text" translatable="false">2E5C672DE893055D04F5B7BC36B449FB5364BDC4</string>
+
+    <string name="about_source_title">Source code</string>
+    <string name="about_source_text" translatable="false">
+        <a href="https://gitlab.com/timelimit.io/timelimit-android">https://gitlab.com/timelimit.io/timelimit-android</a>
+    </string>
+
 </resources>
