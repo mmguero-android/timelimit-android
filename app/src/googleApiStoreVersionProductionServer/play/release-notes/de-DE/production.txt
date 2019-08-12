@@ -1,1 +1,3 @@
-- integrierte Tastatur beim Entsperrbildschirm hinzugefügt
+Fehlerkorrekturen:
+- Absturzquelle bei der Sperrzeitenkonfiguration behoben
+- fehlerhafte Anzeige der Manipulation der Bedienhilfeberechtigung behoben

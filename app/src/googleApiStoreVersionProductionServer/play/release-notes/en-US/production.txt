@@ -1,1 +1,3 @@
-- added integrated keyboard at the authentication screen
+Bugfixes:
+- fixed cause of crashs at the blocked time area config
+- fixed wongly showing a accessibility service permission manipulation
