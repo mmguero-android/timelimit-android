@@ -40,4 +40,6 @@
 
     <string name="about_diagnose_title">Fehlerdiagnose</string>
     <string name="about_diagnose_text">Tippen Sie hier, um Details anzuzeigen, die bei einer Fehlerdiagnose helfen können</string>
+
+    <string name="about_developer_key_title">Fingerabdruck des GPG-Schlüssels des Entwicklers</string>
 </resources>

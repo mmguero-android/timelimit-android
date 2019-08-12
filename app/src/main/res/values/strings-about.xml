@@ -74,4 +74,7 @@
 
     <string name="about_diagnose_title">Error diagnose</string>
     <string name="about_diagnose_text">Tap here to access details which help diagnosing errors</string>
+
+    <string name="about_developer_key_title">Developer GPG-Key fingerprint</string>
+    <string name="about_developer_key_text" translatable="false">2E5C672DE893055D04F5B7BC36B449FB5364BDC4</string>
 </resources>
