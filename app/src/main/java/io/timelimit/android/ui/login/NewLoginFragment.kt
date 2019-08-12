@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.login
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.NewLoginFragmentBinding
 import io.timelimit.android.extensions.setOnEnterListenr
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.view.KeyboardViewListener
 
 class NewLoginFragment: DialogFragment() {
     companion object {
@@ -94,7 +96,21 @@ class NewLoginFragment: DialogFragment() {
         binding.userList.recycler.layoutManager = LinearLayoutManager(context)
 
         binding.enterPassword.apply {
-            password.setOnEnterListenr {
+            showKeyboardButton.setOnClickListener {
+                showCustomKeyboard = !showCustomKeyboard
+
+                if (showCustomKeyboard) {
+                    inputMethodManager.hideSoftInputFromWindow(password.windowToken, 0)
+                } else {
+                    inputMethodManager.showSoftInput(password, 0)
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    password.showSoftInputOnFocus = !showCustomKeyboard
+                }
+            }
+
+            fun go() {
                 model.tryParentLogin(
                         password = password.text.toString(),
                         keepSignedIn = checkDontAskAgain.isChecked,
@@ -102,6 +118,21 @@ class NewLoginFragment: DialogFragment() {
                         setAsDeviceUser = checkAssignMyself.isChecked
                 )
             }
+
+            keyboard.listener = object: KeyboardViewListener {
+                override fun onItemClicked(content: String) {
+                    val start = Math.max(password.selectionStart, 0)
+                    val end = Math.max(password.selectionEnd, 0)
+
+                    password.text.replace(Math.min(start, end), Math.max(start, end), content, 0, content.length)
+                }
+
+                override fun onGoClicked() {
+                    go()
+                }
+            }
+
+            password.setOnEnterListenr { go() }
         }
 
         binding.childPassword.apply {
@@ -134,8 +165,10 @@ class NewLoginFragment: DialogFragment() {
                         binding.switcher.displayedChild = PARENT_AUTH
                     }
 
-                    binding.enterPassword.password.requestFocus()
-                    inputMethodManager.showSoftInput(binding.enterPassword.password, 0)
+                    if (!binding.enterPassword.showCustomKeyboard) {
+                        binding.enterPassword.password.requestFocus()
+                        inputMethodManager.showSoftInput(binding.enterPassword.password, 0)
+                    }
 
                     binding.enterPassword.showKeepLoggedInOption = status.isConnectedMode
 
