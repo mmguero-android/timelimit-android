@@ -166,11 +166,9 @@ class ContactsFragment : Fragment() {
                                     .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                     )
 
-                    delay(200)
+                    delay(500)
 
                     logic.backgroundTaskLogic.pauseBackgroundLoop = false
-
-                    delay(500)
 
                     Snackbar.make(view!!, R.string.contacts_snackbar_call_started, Snackbar.LENGTH_LONG).show()
                 }
