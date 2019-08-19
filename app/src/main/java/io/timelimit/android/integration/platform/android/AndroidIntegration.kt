@@ -46,6 +46,7 @@ import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.integration.platform.android.foregroundapp.ForegroundAppHelper
 import io.timelimit.android.ui.lock.LockActivity
+import io.timelimit.android.ui.manipulation.AnnoyActivity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
@@ -223,6 +224,10 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
 
     override fun showAppLockScreen(currentPackageName: String, currentActivityName: String?) {
         LockActivity.start(context, currentPackageName, currentActivityName)
+    }
+
+    override fun showAnnoyScreen(annoyDuration: Long) {
+        AnnoyActivity.start(context, annoyDuration)
     }
 
     override fun muteAudioIfPossible(packageName: String) {

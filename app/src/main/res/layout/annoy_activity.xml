@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.timelimit.android.ui.manipulation.AnnoyActivity">
+
+    <TextView
+        android:gravity="center_horizontal"
+        android:layout_margin="16dp"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:text="@string/annoy_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textAppearance="?android:textAppearanceMedium"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:id="@+id/annoy_timer"
+        android:text="@string/annoy_timer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

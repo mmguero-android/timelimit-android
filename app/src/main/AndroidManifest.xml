@@ -75,6 +75,15 @@
             android:exported="false"
             android:name=".ui.manipulation.UnlockAfterManipulationActivity" />
 
+        <activity
+            tools:ignore="UnusedAttribute"
+            android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true"
+            android:taskAffinity=":annoy"
+            android:showOnLockScreen="true"
+            android:exported="false"
+            android:name=".ui.manipulation.AnnoyActivity" />
+
         <!-- system integration -->
 
         <receiver android:name=".integration.platform.android.receiver.BootReceiver">

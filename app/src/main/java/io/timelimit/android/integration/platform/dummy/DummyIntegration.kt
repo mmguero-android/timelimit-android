@@ -87,6 +87,10 @@ class DummyIntegration(
         launchLockScreenForPackage = currentPackageName
     }
 
+    override fun showAnnoyScreen(annoyDuration: Long) {
+        // ignore
+    }
+
     override fun muteAudioIfPossible(packageName: String) {
         // ignore
     }

@@ -54,7 +54,6 @@ class DiagnoseExperimentalFlagFragment : Fragment() {
         val checkboxes = flags.map {
             CheckBox(context).apply {
                 setText(it.label)
-                isEnabled = it.enable
             }
         }
 
@@ -63,15 +62,20 @@ class DiagnoseExperimentalFlagFragment : Fragment() {
         database.config().experimentalFlags.observe(this, Observer { setFlags ->
             flags.forEachIndexed { index, flag ->
                 val checkbox = checkboxes[index]
-                val isFlagSet = (setFlags and flag.flag) == flag.flag
+                val isFlagSet = (setFlags and flag.enableFlags) == flag.enableFlags
 
                 checkbox.setOnCheckedChangeListener { _, _ -> }
                 checkbox.isChecked = isFlagSet
+                checkbox.isEnabled = flag.enable(setFlags)
                 checkbox.setOnCheckedChangeListener { _, didCheck ->
                     if (didCheck != isFlagSet) {
                         if (auth.requestAuthenticationOrReturnTrue()) {
                             Threads.database.execute {
-                                database.config().setExperimentalFlag(flag.flag, didCheck)
+                                if (didCheck) {
+                                    database.config().setExperimentalFlag(flag.enableFlags, true)
+                                } else {
+                                    database.config().setExperimentalFlag(flag.disableFlags, false)
+                                }
                             }
                         } else {
                             checkbox.isChecked = isFlagSet
@@ -87,20 +91,31 @@ class DiagnoseExperimentalFlagFragment : Fragment() {
 
 data class DiagnoseExperimentalFlagItem(
         val label: Int,
-        val flag: Long,
-        val enable: Boolean
+        val enableFlags: Long,
+        val disableFlags: Long,
+        val enable: (flags: Long) -> Boolean
 ) {
     companion object {
         val items = listOf(
                 DiagnoseExperimentalFlagItem(
                         label = R.string.diagnose_exf_lom,
-                        flag = ExperimentalFlags.DISABLE_BLOCK_ON_MANIPULATION,
-                        enable = !BuildConfig.storeCompilant
+                        enableFlags = ExperimentalFlags.DISABLE_BLOCK_ON_MANIPULATION,
+                        disableFlags = ExperimentalFlags.DISABLE_BLOCK_ON_MANIPULATION,
+                        enable = { flags ->
+                            (!BuildConfig.storeCompilant) and ((flags and ExperimentalFlags.MANIPULATION_ANNOY_USER_ONLY) == 0L)
+                        }
                 ),
                 DiagnoseExperimentalFlagItem(
                         label = R.string.diagnose_exf_slb,
-                        flag = ExperimentalFlags.SYSTEM_LEVEL_BLOCKING,
-                        enable = !BuildConfig.storeCompilant
+                        enableFlags = ExperimentalFlags.SYSTEM_LEVEL_BLOCKING,
+                        disableFlags = ExperimentalFlags.SYSTEM_LEVEL_BLOCKING,
+                        enable = { !BuildConfig.storeCompilant }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_mau,
+                        enableFlags = ExperimentalFlags.MANIPULATION_ANNOY_USER,
+                        disableFlags = ExperimentalFlags.MANIPULATION_ANNOY_USER_ONLY,
+                        enable = { !BuildConfig.storeCompilant }
                 )
         )
     }
