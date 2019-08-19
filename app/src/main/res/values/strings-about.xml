@@ -79,7 +79,7 @@
 
     <string name="about_source_title">Source code</string>
     <string name="about_source_text" translatable="false">
-        <a href="https://gitlab.com/timelimit.io/timelimit-android">https://gitlab.com/timelimit.io/timelimit-android</a>
+        <a href="https://codeberg.org/timelimit/timelimit-android">https://codeberg.org/timelimit/timelimit-android</a>
     </string>
 
 </resources>
