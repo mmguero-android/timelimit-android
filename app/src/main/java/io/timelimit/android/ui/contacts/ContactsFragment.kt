@@ -149,11 +149,33 @@ class ContactsFragment : Fragment() {
 
     private fun startCall(number: String) {
         if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:" + PhoneNumberUtils.normalizeNumber(number)))
+                val resolveInfo = context!!.packageManager.queryIntentActivities(intent, 0)
+
+                if (resolveInfo.size > 1) {
+                    SelectDialerDialogFragment.newInstance(intent, this).show(fragmentManager!!)
+                } else {
+                    startCall(intent)
+                }
+            } catch (ex: Exception) {
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "could not start call", ex)
+                }
+
+                Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
+            }
+        } else {
+            numberToCallWithPermission = number
+            requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), REQ_CALL_PERMISSION)
+        }
+    }
+
+    fun startCall(intent: Intent) {
+        if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
             val logic = DefaultAppLogic.with(context!!)
 
             try {
-                val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:" + PhoneNumberUtils.normalizeNumber(number)))
-
                 logic.backgroundTaskLogic.pauseBackgroundLoop = true
 
                 startActivity(intent)
@@ -182,8 +204,7 @@ class ContactsFragment : Fragment() {
                 Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
             }
         } else {
-            numberToCallWithPermission = number
-            requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), REQ_CALL_PERMISSION)
+            Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
         }
     }
 
