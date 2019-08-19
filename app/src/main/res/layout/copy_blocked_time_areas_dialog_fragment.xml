@@ -14,7 +14,7 @@
 -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="io.timelimit.android.ui.manage.category.blocked_times.copy.CopyBlockedTimeAreasDialogFragment">
+    tools:context="io.timelimit.android.ui.manage.category.blocked_times.CopyBlockedTimeAreasDialogFragment">
 
     <data>
         <variable

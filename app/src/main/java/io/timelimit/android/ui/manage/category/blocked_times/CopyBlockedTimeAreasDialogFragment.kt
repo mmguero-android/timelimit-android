@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.manage.category.blocked_times.copy
+package io.timelimit.android.ui.manage.category.blocked_times
 
 
 import android.os.Bundle
@@ -21,37 +21,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckedTextView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.timelimit.android.R
-import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.CopyBlockedTimeAreasDialogFragmentBinding
 import io.timelimit.android.extensions.showSafe
-import io.timelimit.android.livedata.waitForNullableValue
-import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
-import io.timelimit.android.ui.manage.category.blocked_times.BlockedTimeAreasFragment
-import java.util.*
 
 class CopyBlockedTimeAreasDialogFragment : BottomSheetDialogFragment() {
     companion object {
         private const val TAG = "cbtadf"
         private const val SELECTED_START_DAY = "ssd"
 
-        fun newInstance(params: ManageCategoryFragmentArgs) = CopyBlockedTimeAreasDialogFragment().apply {
-            arguments = params.toBundle()
+        fun newInstance(target: Fragment) = CopyBlockedTimeAreasDialogFragment().apply {
+            setTargetFragment(target, 0)
         }
     }
 
-    val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(arguments!!) }
     var selectedStartDayIndex = -1
     val auth: ActivityViewModel by lazy {
         (activity as ActivityViewModelHolder).getActivityViewModel()
+    }
+    val target: CopyBlockedTimeAreasDialogFragmentListener by lazy {
+        targetFragment as CopyBlockedTimeAreasDialogFragmentListener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,34 +123,18 @@ class CopyBlockedTimeAreasDialogFragment : BottomSheetDialogFragment() {
         bindSecondPage()
 
         binding.saveButton.setOnClickListener {
-            val logic = DefaultAppLogic.with(context!!)
+            val targetDays = mutableSetOf<Int>()
 
-            runAsync {
-                val current = logic.database.category().getCategoryByChildIdAndId(params.childId, params.categoryId).waitForNullableValue()
-                        ?: return@runAsync
-
-                val newBlockedTimes = current.blockedMinutesInWeek.dataNotToModify.clone() as BitSet
-
-                val configForSelectedDay = newBlockedTimes.get(
-                        selectedStartDayIndex * Category.MINUTES_PER_DAY,
-                        (selectedStartDayIndex + 1) * Category.MINUTES_PER_DAY
-                )
-
-                // update all days
-                dayCheckboxes.forEachIndexed { day, checkBox ->
-                    if (checkBox.isChecked) {
-                        val startWriteIndex = day * Category.MINUTES_PER_DAY
-
-                        for (i in 0..(Category.MINUTES_PER_DAY - 1)) {
-                            newBlockedTimes[startWriteIndex + i] = configForSelectedDay[i]
-                        }
-                    }
+            dayCheckboxes.forEachIndexed { day, checkBox ->
+                if (checkBox.isChecked && day != selectedStartDayIndex) {
+                    targetDays.add(day)
                 }
-
-                // apply
-                val target = targetFragment as BlockedTimeAreasFragment
-                target.updateBlockedTimes(current.blockedMinutesInWeek.dataNotToModify, newBlockedTimes)
             }
+
+            target.onCopyBlockedTimeAreasConfirmed(
+                    sourceDay = selectedStartDayIndex,
+                    targetDays = targetDays
+            )
 
             dismissAllowingStateLoss()
         }
@@ -167,4 +148,8 @@ class CopyBlockedTimeAreasDialogFragment : BottomSheetDialogFragment() {
     }
 
     fun show(fragmentManager: FragmentManager) = showSafe(fragmentManager, TAG)
+}
+
+interface CopyBlockedTimeAreasDialogFragmentListener {
+    fun onCopyBlockedTimeAreasConfirmed(sourceDay: Int, targetDays: Set<Int>)
 }

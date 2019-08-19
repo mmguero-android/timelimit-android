@@ -26,6 +26,7 @@ import io.timelimit.android.data.JsonSerializable
 import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.customtypes.ImmutableBitmaskAdapter
 import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
+import java.util.*
 
 @Entity(tableName = "category")
 @TypeConverters(ImmutableBitmaskAdapter::class)
@@ -177,4 +178,24 @@ object CategoryTimeWarnings {
     )
 
     val durations = durationToBitIndex.keys
+}
+
+fun ImmutableBitmask.withConfigCopiedToOtherDates(sourceDay: Int, targetDays: Set<Int>): ImmutableBitmask {
+    val result = dataNotToModify.clone() as BitSet
+
+    val configForSelectedDay = result.get(
+            sourceDay * Category.MINUTES_PER_DAY,
+            (sourceDay + 1) * Category.MINUTES_PER_DAY
+    )
+
+    // update all days
+    targetDays.forEach { day ->
+        val startWriteIndex = day * Category.MINUTES_PER_DAY
+
+        for (i in 0..(Category.MINUTES_PER_DAY - 1)) {
+            result[startWriteIndex + i] = configForSelectedDay[i]
+        }
+    }
+
+    return ImmutableBitmask(result)
 }

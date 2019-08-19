@@ -44,6 +44,8 @@ class NewLoginFragment: DialogFragment() {
         private const val CHILD_ALREADY_CURRENT_USER = 3
         private const val CHILD_AUTH = 4
         private const val CHILD_LOGIN_REQUIRES_PREMIUM = 5
+        private const val BLOCKED_LOGIN_TIME = 6
+        private const val UNVERIFIED_TIME = 7
     }
 
     private val model: LoginDialogFragmentModel by lazy {
@@ -196,6 +198,24 @@ class NewLoginFragment: DialogFragment() {
                         binding.enterPassword.password.setText("")
 
                         model.resetPasswordWrong()
+                    }
+
+                    null
+                }
+                ParentUserLoginMissingTrustedTime -> {
+                    if (binding.switcher.displayedChild != UNVERIFIED_TIME) {
+                        binding.switcher.setInAnimation(context!!, R.anim.wizard_open_step_in)
+                        binding.switcher.setOutAnimation(context!!, R.anim.wizard_open_step_out)
+                        binding.switcher.displayedChild = UNVERIFIED_TIME
+                    }
+
+                    null
+                }
+                ParentUserLoginBlockedTime -> {
+                    if (binding.switcher.displayedChild != BLOCKED_LOGIN_TIME) {
+                        binding.switcher.setInAnimation(context!!, R.anim.wizard_open_step_in)
+                        binding.switcher.setOutAnimation(context!!, R.anim.wizard_open_step_out)
+                        binding.switcher.displayedChild = BLOCKED_LOGIN_TIME
                     }
 
                     null

@@ -127,7 +127,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             currentDevice = "",
                             categoryForNotAssignedApps = "",
                             relaxPrimaryDevice = false,
-                            mailNotificationFlags = 0
+                            mailNotificationFlags = 0,
+                            blockedTimes = ImmutableBitmask(BitSet())
                     )
 
                     appLogic.database.user().addUserSync(child)
@@ -148,7 +149,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             currentDevice = "",
                             categoryForNotAssignedApps = "",
                             relaxPrimaryDevice = false,
-                            mailNotificationFlags = 0
+                            mailNotificationFlags = 0,
+                            blockedTimes = ImmutableBitmask(BitSet())
                     )
 
                     appLogic.database.user().addUserSync(parent)

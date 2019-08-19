@@ -27,4 +27,6 @@
     <string name="login_child_already_current_user">Du bist schon der aktuelle Benutzer dieses Gerätes</string>
     <string name="login_child_info">Dadurch wirst du als aktueller Nutzer dieses Gerätes festgelegt</string>
     <string name="login_child_done_toast">Der Benutzer dieses Gerätes wurde geändert</string>
+    <string name="login_missing_trusted_time">Zum Anmelden mit diesem Benutzer wird die Uhrzeit benötigt</string>
+    <string name="login_blocked_time">Das Anmelden mit diesem Benutzer zu dieser Zeit wurde gesperrt</string>
 </resources>

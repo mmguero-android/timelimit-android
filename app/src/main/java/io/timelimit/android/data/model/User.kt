@@ -20,10 +20,17 @@ import android.util.JsonWriter
 import androidx.room.*
 import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.data.JsonSerializable
+import io.timelimit.android.data.customtypes.ImmutableBitmask
+import io.timelimit.android.data.customtypes.ImmutableBitmaskAdapter
+import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
 import io.timelimit.android.util.parseJsonArray
+import java.util.*
 
 @Entity(tableName = "user")
-@TypeConverters(UserTypeConverter::class)
+@TypeConverters(
+        UserTypeConverter::class,
+        ImmutableBitmaskAdapter::class
+)
 data class User(
         @PrimaryKey
         @ColumnInfo(name = "id")
@@ -53,7 +60,9 @@ data class User(
         @ColumnInfo(name = "relax_primary_device")
         val relaxPrimaryDevice: Boolean,
         @ColumnInfo(name = "mail_notification_flags")
-        val mailNotificationFlags: Int
+        val mailNotificationFlags: Int,
+        @ColumnInfo(name = "blocked_times")
+        val blockedTimes: ImmutableBitmask
 ): JsonSerializable {
     companion object {
         private const val ID = "id"
@@ -68,6 +77,7 @@ data class User(
         private const val CATEGORY_FOR_NOT_ASSIGNED_APPS = "categoryForNotAssignedApps"
         private const val RELAX_PRIMARY_DEVICE = "relaxPrimaryDevice"
         private const val MAIL_NOTIFICATION_FLAGS = "mailNotificationFlags"
+        private const val BLOCKED_TIMES = "blockedTimes"
 
         fun parse(reader: JsonReader): User {
             var id: String? = null
@@ -82,6 +92,7 @@ data class User(
             var categoryForNotAssignedApps = ""
             var relaxPrimaryDevice = false
             var mailNotificationFlags = 0
+            var blockedTimes = ImmutableBitmask(BitSet())
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -98,6 +109,7 @@ data class User(
                     CATEGORY_FOR_NOT_ASSIGNED_APPS -> categoryForNotAssignedApps = reader.nextString()
                     RELAX_PRIMARY_DEVICE -> relaxPrimaryDevice = reader.nextBoolean()
                     MAIL_NOTIFICATION_FLAGS -> mailNotificationFlags = reader.nextInt()
+                    BLOCKED_TIMES -> blockedTimes = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
                     else -> reader.skipValue()
                 }
             }
@@ -115,7 +127,8 @@ data class User(
                     currentDevice = currentDevice!!,
                     categoryForNotAssignedApps = categoryForNotAssignedApps,
                     relaxPrimaryDevice = relaxPrimaryDevice,
-                    mailNotificationFlags = mailNotificationFlags
+                    mailNotificationFlags = mailNotificationFlags,
+                    blockedTimes = blockedTimes
             )
         }
 
@@ -161,6 +174,7 @@ data class User(
         writer.name(CATEGORY_FOR_NOT_ASSIGNED_APPS).value(categoryForNotAssignedApps)
         writer.name(RELAX_PRIMARY_DEVICE).value(relaxPrimaryDevice)
         writer.name(MAIL_NOTIFICATION_FLAGS).value(mailNotificationFlags)
+        writer.name(BLOCKED_TIMES).value(ImmutableBitmaskJson.serialize(blockedTimes))
 
         writer.endObject()
     }

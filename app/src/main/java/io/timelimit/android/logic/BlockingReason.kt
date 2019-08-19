@@ -278,7 +278,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             Log.d(LOG_TAG, "step 5")
         }
 
-        return Transformations.switchMap(getTrustedMinuteOfWeekLive(appLogic.timeApi, timeZone)) {
+        return Transformations.switchMap(getTrustedMinuteOfWeekLive(timeZone)) {
             trustedMinuteOfWeek ->
 
             if (category.blockedMinutesInWeek.dataNotToModify.isEmpty) {
@@ -298,7 +298,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             Log.d(LOG_TAG, "step 6")
         }
 
-        return getTrustedDateLive(appLogic.timeApi, timeZone).switchMap {
+        return getTrustedDateLive(timeZone).switchMap {
             nowTrustedDate ->
 
             appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id).switchMap {
@@ -371,7 +371,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         }
     }
 
-    private fun getTrustedMinuteOfWeekLive(api: TimeApi, timeZone: TimeZone): LiveData<Int?> {
+    fun getTrustedMinuteOfWeekLive(timeZone: TimeZone): LiveData<Int?> {
         val realTime = RealTime.newInstance()
 
         return object: LiveData<Int?>() {
@@ -395,11 +395,11 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             }
 
             fun scheduleUpdate() {
-                api.runDelayed(scheduledUpdateRunnable, 1000L /* every second */)
+                appLogic.timeApi.runDelayed(scheduledUpdateRunnable, 1000L /* every second */)
             }
 
             fun cancelScheduledUpdate() {
-                api.cancelScheduledAction(scheduledUpdateRunnable)
+                appLogic.timeApi.cancelScheduledAction(scheduledUpdateRunnable)
             }
 
             override fun onActive() {
@@ -417,7 +417,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         }.ignoreUnchanged()
     }
 
-    private fun getTrustedDateLive(api: TimeApi, timeZone: TimeZone): LiveData<DateInTimezone?> {
+    private fun getTrustedDateLive(timeZone: TimeZone): LiveData<DateInTimezone?> {
         val realTime = RealTime.newInstance()
 
         return object: LiveData<DateInTimezone?>() {
@@ -441,11 +441,11 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             }
 
             fun scheduleUpdate() {
-                api.runDelayed(scheduledUpdateRunnable, 1000L /* every second */)
+                appLogic.timeApi.runDelayed(scheduledUpdateRunnable, 1000L /* every second */)
             }
 
             fun cancelScheduledUpdate() {
-                api.cancelScheduledAction(scheduledUpdateRunnable)
+                appLogic.timeApi.cancelScheduledAction(scheduledUpdateRunnable)
             }
 
             override fun onActive() {
