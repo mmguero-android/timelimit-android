@@ -51,4 +51,7 @@
     <string name="diagnose_fga_title">Erkennung der aktiven App</string>
     <string name="diagnose_fga_query_range">Abfragezeitraum</string>
     <string name="diagnose_fga_query_range_min">Minimal (Standard)</string>
+
+    <string name="diagnose_exf_title">Experimentelle Parameter</string>
+    <string name="diagnose_exf_lom">Sperrung nach Manipulationen deaktivieren</string>
 </resources>

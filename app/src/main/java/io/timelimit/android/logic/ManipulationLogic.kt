@@ -20,6 +20,7 @@ import android.os.Build
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
+import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.transaction
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.manipulation.UnlockAfterManipulationActivity
@@ -40,17 +41,19 @@ class ManipulationLogic(val appLogic: AppLogic) {
     }
 
     fun lockDeviceSync() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (appLogic.platformIntegration.setLockTaskPackages(listOf(appLogic.context.packageName))) {
-                appLogic.database.config().setWasDeviceLockedSync(true)
+        if (!appLogic.database.config().isExperimentalFlagsSetSync(ExperimentalFlags.DISABLE_BLOCK_ON_MANIPULATION)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (appLogic.platformIntegration.setLockTaskPackages(listOf(appLogic.context.packageName))) {
+                    appLogic.database.config().setWasDeviceLockedSync(true)
 
-                showManipulationScreen()
-            }
-        } else {
-            if (lockDeviceSync("12timelimit34")) {
-                appLogic.database.config().setWasDeviceLockedSync(true)
+                    showManipulationScreen()
+                }
+            } else {
+                if (lockDeviceSync("12timelimit34")) {
+                    appLogic.database.config().setWasDeviceLockedSync(true)
 
-                showManipulationScreen()
+                    showManipulationScreen()
+                }
             }
         }
     }

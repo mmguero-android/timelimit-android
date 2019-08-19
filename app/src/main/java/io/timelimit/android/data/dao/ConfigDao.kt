@@ -223,4 +223,39 @@ abstract class ConfigDao {
 
     fun getEnableAlternativeDurationSelectionAsync() = getValueOfKeyAsync(ConfigurationItemType.EnableAlternativeDurationSelection).map { it == "1" }
     fun setEnableAlternativeDurationSelectionSync(enable: Boolean) = updateValueSync(ConfigurationItemType.EnableAlternativeDurationSelection, if (enable) "1" else "0")
+    fun getExperimentalFlagsLive(): LiveData<Long> {
+        return getValueOfKeyAsync(ConfigurationItemType.ExperimentalFlags).map {
+            if (it == null) {
+                0
+            } else {
+                it.toLong(16)
+            }
+        }
+    }
+
+    private fun getExperimentalFlagsSync(): Long {
+        val v = getValueOfKeySync(ConfigurationItemType.ExperimentalFlags)
+
+        if (v == null) {
+            return 0
+        } else {
+            return v.toLong(16)
+        }
+    }
+
+    fun isExperimentalFlagsSetAsync(flags: Long) = getExperimentalFlagsLive().map {
+        (it and flags) == flags
+    }.ignoreUnchanged()
+
+    fun isExperimentalFlagsSetSync(flags: Long) = (getExperimentalFlagsSync() and flags) == flags
+
+    fun setExperimentalFlag(flags: Long, enable: Boolean) {
+        updateValueSync(
+                ConfigurationItemType.ExperimentalFlags,
+                if (enable)
+                    (getShownHintsSync() or flags).toString(16)
+                else
+                    (getShownHintsSync() and (flags.inv())).toString(16)
+        )
+    }
 }

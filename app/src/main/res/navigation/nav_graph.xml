@@ -332,6 +332,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_diagnoseMainFragment_to_diagnoseExperimentalFlagFragment"
+            app:destination="@id/diagnoseExperimentalFlagFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/diagnoseClockFragment"
@@ -403,4 +410,9 @@
             android:name="parentUserId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/diagnoseExperimentalFlagFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseExperimentalFlagFragment"
+        android:label="diagnose_experimental_flag_fragment"
+        tools:layout="@layout/diagnose_experimental_flag_fragment" />
 </navigation>

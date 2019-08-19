@@ -91,7 +91,8 @@ enum class ConfigurationItemType {
     CustomServerUrl,
     ForegroundAppQueryRange,
     EnableBackgroundSync,
-    EnableAlternativeDurationSelection
+    EnableAlternativeDurationSelection,
+    ExperimentalFlags
 }
 
 object ConfigurationItemTypeUtil {
@@ -110,6 +111,7 @@ object ConfigurationItemTypeUtil {
     private const val FOREGROUND_APP_QUERY_RANGE = 14
     private const val ENABLE_BACKGROUND_SYNC = 15
     private const val ENABLE_ALTERNATIVE_DURATION_SELECTION = 16
+    private const val EXPERIMENTAL_FLAGS = 17
 
     val TYPES = listOf(
             ConfigurationItemType.OwnDeviceId,
@@ -126,7 +128,8 @@ object ConfigurationItemTypeUtil {
             ConfigurationItemType.CustomServerUrl,
             ConfigurationItemType.ForegroundAppQueryRange,
             ConfigurationItemType.EnableBackgroundSync,
-            ConfigurationItemType.EnableAlternativeDurationSelection
+            ConfigurationItemType.EnableAlternativeDurationSelection,
+            ConfigurationItemType.ExperimentalFlags
     )
 
     fun serialize(value: ConfigurationItemType) = when(value) {
@@ -145,6 +148,7 @@ object ConfigurationItemTypeUtil {
         ConfigurationItemType.ForegroundAppQueryRange -> FOREGROUND_APP_QUERY_RANGE
         ConfigurationItemType.EnableBackgroundSync -> ENABLE_BACKGROUND_SYNC
         ConfigurationItemType.EnableAlternativeDurationSelection -> ENABLE_ALTERNATIVE_DURATION_SELECTION
+        ConfigurationItemType.ExperimentalFlags -> EXPERIMENTAL_FLAGS
     }
 
     fun parse(value: Int) = when(value) {
@@ -163,6 +167,7 @@ object ConfigurationItemTypeUtil {
         FOREGROUND_APP_QUERY_RANGE -> ConfigurationItemType.ForegroundAppQueryRange
         ENABLE_BACKGROUND_SYNC -> ConfigurationItemType.EnableBackgroundSync
         ENABLE_ALTERNATIVE_DURATION_SELECTION -> ConfigurationItemType.EnableAlternativeDurationSelection
+        EXPERIMENTAL_FLAGS -> ConfigurationItemType.ExperimentalFlags
         else -> throw IllegalArgumentException()
     }
 }
@@ -182,4 +187,8 @@ object HintsToShow {
     const val TIME_LIMIT_RULE_INTRODUCTION = 8L
     const val CONTACTS_INTRO = 16L
     const val TIMELIMIT_RULE_MUSTREAD = 32L
+}
+
+object ExperimentalFlags {
+    const val DISABLE_BLOCK_ON_MANIPULATION = 1L
 }

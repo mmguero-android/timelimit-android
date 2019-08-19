@@ -51,4 +51,7 @@
     <string name="diagnose_fga_title">Foreground-App-Detection</string>
     <string name="diagnose_fga_query_range">Requested time range</string>
     <string name="diagnose_fga_query_range_min">Minimum (Default)</string>
+
+    <string name="diagnose_exf_title">Experimental flags</string>
+    <string name="diagnose_exf_lom">Disable locking after manipulations</string>
 </resources>

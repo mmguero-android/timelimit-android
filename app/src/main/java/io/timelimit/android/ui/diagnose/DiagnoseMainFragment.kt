@@ -58,6 +58,13 @@ class DiagnoseMainFragment : Fragment() {
             )
         }
 
+        binding.diagnoseExfButton.setOnClickListener {
+            navigation.safeNavigate(
+                    DiagnoseMainFragmentDirections.actionDiagnoseMainFragmentToDiagnoseExperimentalFlagFragment(),
+                    R.id.diagnoseMainFragment
+            )
+        }
+
         return binding.root
     }
 }
