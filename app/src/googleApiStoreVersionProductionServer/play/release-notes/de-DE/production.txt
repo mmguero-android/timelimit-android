@@ -1,3 +1,5 @@
+Neue Funktionen:
+- Zeitschloss - Möglichkeit, die Zeiten einzuschränken, zu denen sich ein Elternteil anmelden kann
+
 Fehlerkorrekturen:
-- Fehler bei den erlaubten Kontakten, wenn es mehr als eine Telefonie-App gibt, behoben
-- Absturzquelle bei der Sperrzeitenkonfiguration behoben
+- Synchronisieren von Änderungen, auch wenn diese während einer Synchronisation stattfinden

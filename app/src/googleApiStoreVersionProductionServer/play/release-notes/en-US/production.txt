@@ -1,3 +1,5 @@
+new features:
+- time lock - limit the times at which a parent can sign in
+
 Bugfixes:
-- fixed error when calling an allowed contact if multiple phone Apps are available
-- fixed cause of crashes at the blocked time area config
+- syncing changes, even if they occur while syncing
