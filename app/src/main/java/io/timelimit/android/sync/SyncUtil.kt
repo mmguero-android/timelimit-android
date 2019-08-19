@@ -99,6 +99,9 @@ class SyncUtil (private val logic: AppLogic) {
                 }
 
                 shouldSync.waitUntilValueMatches { it == true }
+                importantSyncRequested.value = false
+                unimportantSyncRequested.value = false
+                veryUnimportantSyncRequested.value = false
 
                 try {
                     if (BuildConfig.DEBUG) {
@@ -111,9 +114,6 @@ class SyncUtil (private val logic: AppLogic) {
                         Log.d(LOG_TAG, "sync done - force pause")
                     }
 
-                    importantSyncRequested.value = false
-                    unimportantSyncRequested.value = false
-                    veryUnimportantSyncRequested.value = false
                     lastSync.value = logic.timeApi.getCurrentUptimeInMillis()
 
                     SyncInBackgroundWorker.deschedule()
