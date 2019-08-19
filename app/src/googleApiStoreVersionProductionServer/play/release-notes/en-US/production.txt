@@ -1,3 +1,3 @@
 Bugfixes:
-- fixed cause of crashs at the blocked time area config
-- fixed wongly showing a accessibility service permission manipulation
+- fixed error when calling an allowed contact if multiple phone Apps are available
+- fixed cause of crashes at the blocked time area config

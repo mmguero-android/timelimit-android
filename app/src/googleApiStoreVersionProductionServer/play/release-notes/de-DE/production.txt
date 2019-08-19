@@ -1,3 +1,3 @@
 Fehlerkorrekturen:
+- Fehler bei den erlaubten Kontakten, wenn es mehr als eine Telefonie-App gibt, behoben
 - Absturzquelle bei der Sperrzeitenkonfiguration behoben
-- fehlerhafte Anzeige der Manipulation der Bedienhilfeberechtigung behoben
