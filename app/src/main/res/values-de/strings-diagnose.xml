@@ -54,4 +54,5 @@
 
     <string name="diagnose_exf_title">Experimentelle Parameter</string>
     <string name="diagnose_exf_lom">Sperrung nach Manipulationen deaktivieren</string>
+    <string name="diagnose_exf_slb">Apps auf Systemebene sperren</string>
 </resources>

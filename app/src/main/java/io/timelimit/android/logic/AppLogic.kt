@@ -99,6 +99,7 @@ class AppLogic(
     }
 
     val manipulationLogic = ManipulationLogic(this)
+    val suspendAppsLogic = SuspendAppsLogic(this)
 
     fun shutdown() {
         enable.value = false

@@ -54,4 +54,5 @@
 
     <string name="diagnose_exf_title">Experimental flags</string>
     <string name="diagnose_exf_lom">Disable locking after manipulations</string>
+    <string name="diagnose_exf_slb">Block Apps at system level</string>
 </resources>

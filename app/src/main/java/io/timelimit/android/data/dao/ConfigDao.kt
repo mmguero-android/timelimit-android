@@ -223,7 +223,8 @@ abstract class ConfigDao {
 
     fun getEnableAlternativeDurationSelectionAsync() = getValueOfKeyAsync(ConfigurationItemType.EnableAlternativeDurationSelection).map { it == "1" }
     fun setEnableAlternativeDurationSelectionSync(enable: Boolean) = updateValueSync(ConfigurationItemType.EnableAlternativeDurationSelection, if (enable) "1" else "0")
-    fun getExperimentalFlagsLive(): LiveData<Long> {
+
+    protected fun getExperimentalFlagsLive(): LiveData<Long> {
         return getValueOfKeyAsync(ConfigurationItemType.ExperimentalFlags).map {
             if (it == null) {
                 0
@@ -232,6 +233,8 @@ abstract class ConfigDao {
             }
         }
     }
+
+    val experimentalFlags: LiveData<Long> by lazy { getExperimentalFlagsLive() }
 
     private fun getExperimentalFlagsSync(): Long {
         val v = getValueOfKeySync(ConfigurationItemType.ExperimentalFlags)
@@ -243,7 +246,7 @@ abstract class ConfigDao {
         }
     }
 
-    fun isExperimentalFlagsSetAsync(flags: Long) = getExperimentalFlagsLive().map {
+    fun isExperimentalFlagsSetAsync(flags: Long) = experimentalFlags.map {
         (it and flags) == flags
     }.ignoreUnchanged()
 
@@ -253,9 +256,9 @@ abstract class ConfigDao {
         updateValueSync(
                 ConfigurationItemType.ExperimentalFlags,
                 if (enable)
-                    (getShownHintsSync() or flags).toString(16)
+                    (getExperimentalFlagsSync() or flags).toString(16)
                 else
-                    (getShownHintsSync() and (flags.inv())).toString(16)
+                    (getExperimentalFlagsSync() and (flags.inv())).toString(16)
         )
     }
 }

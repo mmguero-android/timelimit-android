@@ -357,7 +357,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         }
     }
 
-    private fun getTemporarilyTrustedTimeInMillis(): LiveData<Long?> {
+    fun getTemporarilyTrustedTimeInMillis(): LiveData<Long?> {
         val realTime = RealTime.newInstance()
 
         return liveDataFromFunction {
@@ -417,7 +417,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         }.ignoreUnchanged()
     }
 
-    private fun getTrustedDateLive(timeZone: TimeZone): LiveData<DateInTimezone?> {
+    fun getTrustedDateLive(timeZone: TimeZone): LiveData<DateInTimezone?> {
         val realTime = RealTime.newInstance()
 
         return object: LiveData<DateInTimezone?>() {

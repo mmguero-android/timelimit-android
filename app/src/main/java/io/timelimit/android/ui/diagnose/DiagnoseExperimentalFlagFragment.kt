@@ -60,7 +60,7 @@ class DiagnoseExperimentalFlagFragment : Fragment() {
 
         checkboxes.forEach { binding.container.addView(it) }
 
-        database.config().getExperimentalFlagsLive().observe(this, Observer { setFlags ->
+        database.config().experimentalFlags.observe(this, Observer { setFlags ->
             flags.forEachIndexed { index, flag ->
                 val checkbox = checkboxes[index]
                 val isFlagSet = (setFlags and flag.flag) == flag.flag
@@ -95,6 +95,11 @@ data class DiagnoseExperimentalFlagItem(
                 DiagnoseExperimentalFlagItem(
                         label = R.string.diagnose_exf_lom,
                         flag = ExperimentalFlags.DISABLE_BLOCK_ON_MANIPULATION,
+                        enable = !BuildConfig.storeCompilant
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_slb,
+                        flag = ExperimentalFlags.SYSTEM_LEVEL_BLOCKING,
                         enable = !BuildConfig.storeCompilant
                 )
         )

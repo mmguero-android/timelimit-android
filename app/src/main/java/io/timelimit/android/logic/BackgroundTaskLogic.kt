@@ -296,7 +296,9 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                 AndroidIntegrationApps.IgnoredAppHandling.Ignore -> true
                                 AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable -> BuildConfig.storeCompilant
                             }
-                        })
+                        }) ||
+                        (foregroundAppPackageName != null && foregroundAppActivityName != null &&
+                                AndroidIntegrationApps.shouldIgnoreActivity(foregroundAppPackageName, foregroundAppActivityName))
                 ) {
                     usedTimeUpdateHelper?.commit(appLogic)
                     showStatusMessageWithCurrentAppTitle(
