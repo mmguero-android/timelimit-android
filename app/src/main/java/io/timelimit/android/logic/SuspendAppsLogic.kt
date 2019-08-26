@@ -147,8 +147,15 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
     }
 
     private fun applySuspendedApps(packageNames: List<String>) {
-        appLogic.platformIntegration.stopSuspendingForAllApps()
-        appLogic.platformIntegration.setSuspendedApps(packageNames, true)
+        if (packageNames.isEmpty()) {
+            appLogic.platformIntegration.stopSuspendingForAllApps()
+        } else {
+            val allApps = appLogic.platformIntegration.getLocalAppPackageNames()
+            val appsToNotBlock = allApps.subtract(packageNames)
+
+            appLogic.platformIntegration.setSuspendedApps(appsToNotBlock.toList(), false)
+            appLogic.platformIntegration.setSuspendedApps(packageNames, true)
+        }
     }
 
     init {

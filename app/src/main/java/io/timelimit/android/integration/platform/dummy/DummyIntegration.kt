@@ -38,6 +38,8 @@ class DummyIntegration(
         return localApps.map{ it.copy(deviceId = deviceId) }
     }
 
+    override fun getLocalAppPackageNames(): List<String> = localApps.map { it.packageName }
+
     override fun getLocalAppTitle(packageName: String): String? {
         return localApps.find { it.packageName == packageName }?.title
     }

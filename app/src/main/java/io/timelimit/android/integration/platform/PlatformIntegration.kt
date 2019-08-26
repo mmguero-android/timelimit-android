@@ -26,6 +26,7 @@ abstract class PlatformIntegration(
         val maximumProtectionLevel: ProtectionLevel
 ) {
     abstract fun getLocalApps(deviceId: String): Collection<App>
+    abstract fun getLocalAppPackageNames(): List<String>
     abstract fun getLocalAppActivities(deviceId: String): Collection<AppActivity>
     abstract fun getLocalAppTitle(packageName: String): String?
     abstract fun getAppIcon(packageName: String): Drawable?
