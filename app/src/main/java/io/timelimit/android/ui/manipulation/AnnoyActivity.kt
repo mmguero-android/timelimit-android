@@ -23,6 +23,7 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
+import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.util.TimeTextUtil
 import kotlinx.android.synthetic.main.annoy_activity.*
 
@@ -46,11 +47,14 @@ class AnnoyActivity : AppCompatActivity() {
 
         val duration = intent!!.getLongExtra(EXTRA_DURATION, 10)
         val model = ViewModelProviders.of(this).get(AnnoyModel::class.java)
+        val logic = DefaultAppLogic.with(this)
 
         setContentView(R.layout.annoy_activity)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startLockTask()
+            if (logic.platformIntegration.setLockTaskPackages(listOf(packageName))) {
+                startLockTask()
+            }
         }
 
         model.init(duration = duration)
