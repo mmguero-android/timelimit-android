@@ -53,7 +53,9 @@ object AndroidIntegrationApps {
     }
 
     private val ignoredActivities = setOf<String>(
-            "com.android.settings:com.android.settings.enterprise.ActionDisabledByAdminDialog"
+            "com.android.settings:com.android.settings.enterprise.ActionDisabledByAdminDialog",
+            "com.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionActivity",
+            "com.google.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionsActivity"
     )
 
     fun shouldIgnoreActivity(packageName: String, activityName: String) = ignoredActivities.contains("$packageName:$activityName")
