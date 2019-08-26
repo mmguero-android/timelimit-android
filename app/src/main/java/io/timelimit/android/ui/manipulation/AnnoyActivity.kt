@@ -20,10 +20,14 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
+import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.manage.device.manage.ManipulationWarningTypeLabel
+import io.timelimit.android.ui.manage.device.manage.ManipulationWarnings
 import io.timelimit.android.util.TimeTextUtil
 import kotlinx.android.synthetic.main.annoy_activity.*
 
@@ -66,6 +70,27 @@ class AnnoyActivity : AppCompatActivity() {
             annoy_timer.setText(
                     getString(R.string.annoy_timer, TimeTextUtil.seconds(it.toInt(), this@AnnoyActivity))
             )
+        })
+
+        logic.deviceEntry.map {
+            val reasonItems = (it?.let { ManipulationWarnings.getFromDevice(it) } ?: ManipulationWarnings.empty)
+                    .current
+                    .map {
+                        getString(ManipulationWarningTypeLabel.getLabel(it))
+                    }
+
+            if (reasonItems.isEmpty()) {
+                null
+            } else {
+                getString(R.string.annoy_reason, reasonItems.joinToString(separator = ", "))
+            }
+        }.observe(this, Observer {
+            if (it.isNullOrEmpty()) {
+                annoy_reason.visibility = View.GONE
+            } else {
+                annoy_reason.visibility = View.VISIBLE
+                annoy_reason.setText(it)
+            }
         })
     }
 

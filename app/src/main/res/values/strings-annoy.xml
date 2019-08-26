@@ -20,4 +20,7 @@
     <string name="annoy_timer">
         The device will be unlocked in %s.
     </string>
+    <string name="annoy_reason">
+        This was manipulated: %s
+    </string>
 </resources>

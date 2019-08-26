@@ -14,13 +14,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
-        android:textAppearance="?android:textAppearanceMedium"
-        android:layout_margin="16dp"
-        android:gravity="center"
-        android:id="@+id/annoy_timer"
-        android:text="@string/annoy_timer"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_margin="8dp"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_margin="4dp"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:gravity="center"
+                android:id="@+id/annoy_reason"
+                android:text="@string/annoy_reason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_margin="4dp"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:gravity="center"
+                android:id="@+id/annoy_timer"
+                android:text="@string/annoy_timer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

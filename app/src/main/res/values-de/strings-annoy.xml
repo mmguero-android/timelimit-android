@@ -20,4 +20,7 @@
     <string name="annoy_timer">
         Das Gerät wird in %s entsperrt.
     </string>
+    <string name="annoy_reason">
+        Folgendes wurde manipuliert: %s
+    </string>
 </resources>
