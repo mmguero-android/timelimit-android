@@ -87,18 +87,35 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
             blockingReason.getTrustedDateLive(timeZone)
         }
 
-        fun handleCategory(categoryId: String) {
+        fun handleCategory(categoryId: String, depth: Int) {
+            if (depth > 2) {
+                return
+            }
+
             categoryById[categoryId]?.let { category ->
-                result[categoryId] = result[categoryId] ?: getCategoryBlockingReason(
-                        category = liveDataFromValue(category),
-                        temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek,
-                        temporarilyTrustedDate = temporarilyTrustedDate,
-                        areLimitsTemporarilyDisabled = areLimitsTemporarilyDisabled
-                )
+                result[categoryId] = result[categoryId] ?: kotlin.run {
+                    handleCategory(category.parentCategoryId, depth + 1)
+
+                    val parentCategoryBlockingReason  = result[category.parentCategoryId]
+                    val selfReason = getCategoryBlockingReason(
+                            category = liveDataFromValue(category),
+                            temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek,
+                            temporarilyTrustedDate = temporarilyTrustedDate,
+                            areLimitsTemporarilyDisabled = areLimitsTemporarilyDisabled
+                    )
+
+                    selfReason.switchMap { self ->
+                        if (self == BlockingReason.None && parentCategoryBlockingReason != null) {
+                            parentCategoryBlockingReason
+                        } else {
+                            liveDataFromValue(self)
+                        }
+                    }
+                }
             }
         }
 
-        categoryById.keys.forEach { handleCategory(it) }
+        categoryById.keys.forEach { handleCategory(it, 0) }
 
         return result
     }
