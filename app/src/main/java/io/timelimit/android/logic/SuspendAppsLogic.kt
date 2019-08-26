@@ -106,7 +106,7 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
         } else {
             liveDataFromValue(emptyList())
         }
-    }
+    }.ignoreUnchanged()
 
     private fun getAppsWithCategories(packageNames: List<String>, data: RealCategoryData, blockingAtActivityLevel: Boolean): Map<String, Set<String>> {
         val categoryForUnassignedApps = if (data.categories.find { it.id == data.categoryForUnassignedApps } != null) data.categoryForUnassignedApps else null
@@ -146,11 +146,13 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
         }
     }
 
+    private fun applySuspendedApps(packageNames: List<String>) {
+        appLogic.platformIntegration.stopSuspendingForAllApps()
+        appLogic.platformIntegration.setSuspendedApps(packageNames, true)
+    }
+
     init {
-        realAppsToBlock.observeForever { appsToBlock ->
-            appLogic.platformIntegration.stopSuspendingForAllApps()
-            appLogic.platformIntegration.setSuspendedApps(appsToBlock, true)
-        }
+        realAppsToBlock.observeForever { appsToBlock -> applySuspendedApps(appsToBlock) }
     }
 }
 
