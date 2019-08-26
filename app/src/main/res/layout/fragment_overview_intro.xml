@@ -42,7 +42,7 @@
 
             <TextView
                 android:textAppearance="?android:textAppearanceSmall"
-                android:text="@string/overview_intro_swipe_to_dismiss"
+                android:text="@string/generic_swipe_to_dismiss"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

@@ -38,7 +38,7 @@
 
         <TextView
             android:textAppearance="?android:textAppearanceSmall"
-            android:text="@string/contacts_intro_swipe"
+            android:text="@string/generic_swipe_to_dismiss"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

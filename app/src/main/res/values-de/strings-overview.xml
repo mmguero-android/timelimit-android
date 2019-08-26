@@ -29,7 +29,6 @@
         \n\nBei den Geräten können Sie den Status der Geräte einsehen und den Nutzer eines Gerätes festlegen.
         \n\nBei den Benutzern können Sie die erlaubten Apps und die Zeitbeschränkungen wählen.
     </string>
-    <string name="overview_intro_swipe_to_dismiss">Sie können diesen Hinweis entfernen, indem Sie ihn nach rechts schieben</string>
 
     <string name="overview_device_item_manipulation">An diesem Gerät wurden Manipulationen durchgeführt</string>
     <string name="overview_device_item_missing_permission">An diesem Gerät wurde eine erforderliche Berechtigung nicht gewährt</string>

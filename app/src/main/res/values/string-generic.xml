@@ -29,4 +29,6 @@
         <item quantity="one">%d App</item>
         <item quantity="other">%d Apps</item>
     </plurals>
+
+    <string name="generic_swipe_to_dismiss">Swipe to the side to remove this message</string>
 </resources>

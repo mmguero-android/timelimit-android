@@ -91,11 +91,7 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
                             LayoutInflater.from(parent.context),
                             parent,
                             false
-                    ).apply {
-                        okButton.setOnClickListener {
-                            handlers?.onConfirmIntroduction()
-                        }
-                    }.root
+                    ).root
             )
         }
         else -> throw IllegalStateException()
@@ -148,5 +144,4 @@ class ItemViewHolder(val view: FragmentCategoryTimeLimitRuleItemBinding): ViewHo
 interface Handlers {
     fun onTimeLimitRuleClicked(rule: TimeLimitRule)
     fun onAddTimeLimitRuleClicked()
-    fun onConfirmIntroduction()
 }

@@ -95,8 +95,8 @@ class ManageChildCategoriesFragment : Fragment() {
                 val item = if (index == RecyclerView.NO_POSITION) null else adapter.categories!![index]
 
                 if (item == CategoriesIntroductionHeader) {
-                    return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END) or
-                            makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END)
+                    return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END or ItemTouchHelper.START) or
+                            makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END or ItemTouchHelper.START)
                 } else {
                     return 0
                 }

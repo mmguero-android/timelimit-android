@@ -29,4 +29,6 @@
         <item quantity="one">%d App</item>
         <item quantity="other">%d Apps</item>
     </plurals>
+
+    <string name="generic_swipe_to_dismiss">Se können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
 </resources>

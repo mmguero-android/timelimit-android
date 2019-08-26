@@ -23,7 +23,6 @@
         This works if the phone app is blocked.
         The phone numbers are only saved at this device and are never transmitted.
     </string>
-    <string name="contacts_intro_swipe">Swipe to the side to remove this message</string>
     <string name="contacts_add">Add contact</string>
     <string name="contacts_snackbar_remove_auth">You must sign in to remove contacts</string>
     <string name="contacts_snackbar_removed">%s was removed</string>

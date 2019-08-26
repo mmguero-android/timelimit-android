@@ -23,7 +23,6 @@
         auch wenn die Telefon-App gesperrt ist.
         Die Telefonnummern werden nur auf diesem Gerät gespeichert.
     </string>
-    <string name="contacts_intro_swipe">Se können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
     <string name="contacts_add">Kontakt hinzufügen</string>
     <string name="contacts_snackbar_remove_auth">Sie müssen sich anmelden um Kontakte zu entfernen</string>
     <string name="contacts_snackbar_removed">%s wurde entfernt</string>

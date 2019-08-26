@@ -22,7 +22,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
@@ -117,13 +119,31 @@ class CategoryTimeLimitRulesFragment : Fragment(), EditTimeLimitRuleDialogFragme
                     EditTimeLimitRuleDialogFragment.newInstance(params.categoryId, this@CategoryTimeLimitRulesFragment).show(fragmentManager!!)
                 }
             }
+        }
 
-            override fun onConfirmIntroduction() {
-                Threads.database.execute {
+        ItemTouchHelper(object: ItemTouchHelper.Callback() {
+            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                val index = viewHolder.adapterPosition
+                val item = if (index == RecyclerView.NO_POSITION) null else adapter.data[index]
+
+                if (item == TimeLimitRuleIntroductionItem) {
+                    return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END or ItemTouchHelper.START) or
+                            makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END or ItemTouchHelper.START)
+                } else {
+                    return 0
+                }
+            }
+
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = throw IllegalStateException()
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val database = logic.database
+
+                Threads.database.submit {
                     database.config().setHintsShownSync(HintsToShow.TIME_LIMIT_RULE_INTRODUCTION)
                 }
             }
-        }
+        }).attachToRecyclerView(recycler)
     }
 
     override fun notifyRuleCreated() {

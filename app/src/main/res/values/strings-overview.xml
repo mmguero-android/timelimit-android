@@ -29,7 +29,6 @@
         \n\nUnder devices, you can see the status of a device and assign a user.
         \n\nUnder users, you can configure the allowed Apps and time limits.
     </string>
-    <string name="overview_intro_swipe_to_dismiss">You can remove this message by swiping it to the right</string>
 
     <string name="overview_device_item_manipulation">There was a manipulation on this device</string>
     <string name="overview_device_item_missing_permission">A required permission was not granted on this device</string>
