@@ -1,5 +1,6 @@
-new features:
-- time lock - limit the times at which a parent can sign in
+small changes:
 
-Bugfixes:
-- syncing changes, even if they occur while syncing
+- use swipe to dismiss in both directions in all lists
+- add option to show error details in some cases
+- better inform users about the privacy when chosing the connected mode
+- add handling for unsupported mail providers

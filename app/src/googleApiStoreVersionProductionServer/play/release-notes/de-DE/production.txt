@@ -1,5 +1,6 @@
-Neue Funktionen:
-- Zeitschloss - Möglichkeit, die Zeiten einzuschränken, zu denen sich ein Elternteil anmelden kann
+kleine Änderungen:
 
-Fehlerkorrekturen:
-- Synchronisieren von Änderungen, auch wenn diese während einer Synchronisation stattfinden
+- Wischen-zum-Entfernen in allen Listen in beide Richtungen aktiviert
+- Option zum Anzeigen von mehr Fehlerdetails in einigen Fällen hinzugefügt
+- besseres Informieren der Benutzer über den Datenschutz, wenn der vernetzte Modus gewählt wird
+- Meldung, wenn ein E-Mail-Anbieter nicht unterstützt wird, hinzugefügt
