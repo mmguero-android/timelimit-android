@@ -49,6 +49,7 @@ import java.util.*
 
 class BackgroundTaskLogic(val appLogic: AppLogic) {
     var pauseBackgroundLoop = false
+    val lastLoopException = MutableLiveData<Exception?>().apply { value = null }
 
     companion object {
         private const val CHECK_PERMISSION_INTERVAL = 10 * 1000L    // all 10 seconds
@@ -531,6 +532,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }
             } catch (ex: SecurityException) {
                 // this is handled by an other main loop (with a delay)
+                lastLoopException.postValue(ex)
 
                 appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
                         appLogic.context.getString(R.string.background_logic_error),
@@ -541,6 +543,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 if (BuildConfig.DEBUG) {
                     Log.w(LOG_TAG, "exception during running main loop", ex)
                 }
+
+                lastLoopException.postValue(ex)
 
                 appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
                         appLogic.context.getString(R.string.background_logic_error),

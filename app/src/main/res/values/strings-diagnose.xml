@@ -56,4 +56,6 @@
     <string name="diagnose_exf_lom">Disable locking after manipulations</string>
     <string name="diagnose_exf_slb">Block Apps at system level</string>
     <string name="diagnose_exf_mau">Annoy user after manipulation</string>
+
+    <string name="diagnose_bg_task_loop_ex">Background task loop exception</string>
 </resources>

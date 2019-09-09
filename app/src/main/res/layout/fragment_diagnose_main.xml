@@ -56,6 +56,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <Button
+                android:id="@+id/diagnose_bg_task_loop_ex_button"
+                android:text="@string/diagnose_bg_task_loop_ex"
+                android:enabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 

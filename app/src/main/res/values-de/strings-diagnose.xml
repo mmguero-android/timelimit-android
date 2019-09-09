@@ -56,4 +56,6 @@
     <string name="diagnose_exf_lom">Sperrung nach Manipulationen deaktivieren</string>
     <string name="diagnose_exf_slb">Apps auf Systemebene sperren</string>
     <string name="diagnose_exf_mau">Nutzer nach Manipulation nerven</string>
+
+    <string name="diagnose_bg_task_loop_ex">Hintergrundaufgabenschleifenfehler</string>
 </resources>

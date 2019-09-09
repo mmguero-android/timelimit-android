@@ -20,15 +20,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseMainBinding
 import io.timelimit.android.extensions.safeNavigate
+import io.timelimit.android.logic.DefaultAppLogic
 
 class DiagnoseMainFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentDiagnoseMainBinding.inflate(inflater, container, false)
         val navigation = Navigation.findNavController(container!!)
+        val logic = DefaultAppLogic.with(context!!)
 
         binding.diagnoseClockButton.setOnClickListener {
             navigation.safeNavigate(
@@ -64,6 +67,17 @@ class DiagnoseMainFragment : Fragment() {
                     R.id.diagnoseMainFragment
             )
         }
+
+        logic.backgroundTaskLogic.lastLoopException.observe(this, Observer { ex ->
+            if (ex != null) {
+                binding.diagnoseBgTaskLoopExButton.isEnabled = true
+                binding.diagnoseBgTaskLoopExButton.setOnClickListener {
+                    DiagnoseExceptionDialogFragment.newInstance(ex).show(fragmentManager!!)
+                }
+            } else {
+                binding.diagnoseBgTaskLoopExButton.isEnabled = false
+            }
+        })
 
         return binding.root
     }
