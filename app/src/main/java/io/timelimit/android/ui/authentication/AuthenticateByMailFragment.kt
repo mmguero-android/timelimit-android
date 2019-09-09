@@ -120,15 +120,20 @@ class AuthenticateByMailFragment : Fragment() {
 
         model.errorMessage.observe(this, Observer {
             if (it != null) {
-                Snackbar.make(
-                        binding.root,
-                        when(it) {
-                            ErrorMessage.NetworkProblem -> R.string.error_network
-                            ErrorMessage.ServerRejection -> R.string.error_server_rejected
-                            ErrorMessage.WrongCode -> R.string.authenticate_by_mail_snackbar_wrong_code
-                        },
-                        Snackbar.LENGTH_SHORT
-                ).show()
+                if (it == ErrorMessage.BlacklistedMailServer) {
+                    BlacklistedMailServerDialogFragment().show(fragmentManager!!)
+                } else {
+                    Snackbar.make(
+                            binding.root,
+                            when(it) {
+                                ErrorMessage.NetworkProblem -> R.string.error_network
+                                ErrorMessage.ServerRejection -> R.string.error_server_rejected
+                                ErrorMessage.WrongCode -> R.string.authenticate_by_mail_snackbar_wrong_code
+                                ErrorMessage.BlacklistedMailServer -> throw IllegalStateException("should be handled above")
+                            },
+                            Snackbar.LENGTH_SHORT
+                    ).show()
+                }
 
                 model.errorMessage.value = null
             }

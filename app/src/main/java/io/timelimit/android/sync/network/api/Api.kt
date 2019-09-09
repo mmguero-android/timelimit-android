@@ -60,3 +60,5 @@ interface ServerApi {
     suspend fun removeDevice(deviceAuthToken: String, parentUserId: String, parentPasswordSecondHash: String, deviceId: String)
     suspend fun isDeviceRemoved(deviceAuthToken: String): Boolean
 }
+
+class MailServerBlacklistedException: RuntimeException()

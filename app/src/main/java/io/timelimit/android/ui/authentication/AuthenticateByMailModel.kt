@@ -27,6 +27,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.network.api.ForbiddenHttpError
 import io.timelimit.android.sync.network.api.GoneHttpError
 import io.timelimit.android.sync.network.api.HttpError
+import io.timelimit.android.sync.network.api.MailServerBlacklistedException
 import java.io.IOException
 
 class AuthenticateByMailModel(application: Application): AndroidViewModel(application) {
@@ -106,7 +107,9 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
                 }
 
                 errorMessage.value = ErrorMessage.ServerRejection
-            } catch (ex: IOException) {
+            } catch (ex: MailServerBlacklistedException) {
+                errorMessage.value = ErrorMessage.BlacklistedMailServer
+            } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) {
                     Log.w(LOG_TAG, "sendAuthMessage()", ex)
                 }
@@ -154,7 +157,7 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
 }
 
 enum class ErrorMessage {
-    NetworkProblem, ServerRejection, WrongCode
+    NetworkProblem, ServerRejection, WrongCode, BlacklistedMailServer
 }
 
 enum class ScreenToShow {

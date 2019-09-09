@@ -107,7 +107,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
     override suspend fun sendMailLoginCode(mail: String, locale: String): String {
         httpClient.newCall(
                 Request.Builder()
-                        .url("$endpointWithoutSlashAtEnd/auth/send-mail-login-code")
+                        .url("$endpointWithoutSlashAtEnd/auth/send-mail-login-code-v2")
                         .post(createJsonRequestBody {
                             writer ->
 
@@ -132,6 +132,11 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
                     while (reader.hasNext()) {
                         when (reader.nextName()) {
                             MAIL_LOGIN_TOKEN -> response = reader.nextString()
+                            "mailServerBlacklisted" -> {
+                                if (reader.nextBoolean()) {
+                                    throw MailServerBlacklistedException()
+                                }
+                            }
                             else -> reader.skipValue()
                         }
                     }

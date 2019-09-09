@@ -29,10 +29,11 @@
     <string name="authenticate_by_mail_hint_enter">Use the enter button of the keyboard to continue</string>
     <string name="authenticate_by_mail_hint_general">
         If you signed in earlier using your Google account, then just use the mail address which is assigned to your Google account.
-        Using a Microsoft mail service (hotmail, outlook.com, &#8230;) does not work because delivery of mails to their servers fails.
     </string>
 
     <string name="authenticate_by_mail_snackbar_wrong_code">The entered code is invalid</string>
     <string name="authenticate_by_mail_snackbar_invalid_address">Invalid mail address</string>
     <string name="authenticate_by_mail_snackbar_invalid_address_suggest">Invalid mail address, correction suggested</string>
+    <string name="authenticate_blacklisted_mail_server_title">Mail provider not supported</string>
+    <string name="authenticate_blacklisted_mail_server_text">Sorry, but we can not send messages to users of this mail provider. Please use a different mail address.</string>
 </resources>
