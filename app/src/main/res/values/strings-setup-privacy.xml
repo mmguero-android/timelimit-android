@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="setup_privacy_connected_title">Networking and Privacy</string>
+    <string name="setup_privacy_connected_text_general_intro">For the connected mode,
+        there is a central unit - the server. This server saves the settings, the usage durations
+        and the status of the devices (granted permissions, installed Apps, App and OS version).
+    </string>
+    <string name="setup_privacy_connected_text_default_server">Because you have not selected anything different,
+        you are using the default server which is provided by the developer of the App.
+        The privacy policy applies.
+    </string>
+    <string name="setup_privacy_connected_text_custom_server">You have selected a server.
+        The privacy policy of the provider of this server applies.
+    </string>
+    <string name="setup_privacy_connected_text_general_outro">You can prevent
+        the data transmission by using the local mode.
+    </string>
+</resources>

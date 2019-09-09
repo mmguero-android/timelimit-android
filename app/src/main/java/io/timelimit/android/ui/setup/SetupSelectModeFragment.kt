@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.setup
 
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -25,14 +26,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentSetupSelectModeBinding
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.setup.privacy.PrivacyInfoDialogFragment
 import kotlinx.android.synthetic.main.fragment_setup_select_mode.*
 
 class SetupSelectModeFragment : Fragment() {
+    companion object {
+        private const val REQ_SETUP_CONNECTED_PARENT = 1
+        private const val REQ_SETUP_CONNECTED_CHILD = 2
+    }
+
+    private lateinit var navigation: NavController
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentSetupSelectModeBinding.inflate(inflater, container, false)
 
@@ -42,7 +52,7 @@ class SetupSelectModeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val navigation = Navigation.findNavController(view)
+        navigation = Navigation.findNavController(view)
 
         btn_local_mode.setOnClickListener {
             navigation.safeNavigate(
@@ -52,17 +62,15 @@ class SetupSelectModeFragment : Fragment() {
         }
 
         btn_parent_mode.setOnClickListener {
-            navigation.safeNavigate(
-                    SetupSelectModeFragmentDirections.actionSetupSelectModeFragmentToSetupParentModeFragment(),
-                    R.id.setupSelectModeFragment
-            )
+            PrivacyInfoDialogFragment().apply {
+                setTargetFragment(this@SetupSelectModeFragment, REQ_SETUP_CONNECTED_PARENT)
+            }.show(fragmentManager!!)
         }
 
         btn_network_child_mode.setOnClickListener {
-            navigation.safeNavigate(
-                    SetupSelectModeFragmentDirections.actionSetupSelectModeFragmentToSetupRemoteChildFragment(),
-                    R.id.setupSelectModeFragment
-            )
+            PrivacyInfoDialogFragment().apply {
+                setTargetFragment(this@SetupSelectModeFragment, REQ_SETUP_CONNECTED_CHILD)
+            }.show(fragmentManager!!)
         }
 
         btn_uninstall.setOnClickListener {
@@ -77,6 +85,24 @@ class SetupSelectModeFragment : Fragment() {
             } else {
                 startActivity(
                         Intent(Intent.ACTION_UNINSTALL_PACKAGE, Uri.parse("package:${context!!.packageName}"))
+                )
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQ_SETUP_CONNECTED_CHILD) {
+                navigation.safeNavigate(
+                        SetupSelectModeFragmentDirections.actionSetupSelectModeFragmentToSetupRemoteChildFragment(),
+                        R.id.setupSelectModeFragment
+                )
+            } else if (requestCode == REQ_SETUP_CONNECTED_PARENT) {
+                navigation.safeNavigate(
+                        SetupSelectModeFragmentDirections.actionSetupSelectModeFragmentToSetupParentModeFragment(),
+                        R.id.setupSelectModeFragment
                 )
             }
         }

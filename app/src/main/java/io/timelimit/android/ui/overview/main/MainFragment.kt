@@ -15,6 +15,8 @@
  */
 package io.timelimit.android.ui.overview.main
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -46,10 +48,14 @@ import io.timelimit.android.ui.overview.overview.CanNotAddDevicesInLocalModeDial
 import io.timelimit.android.ui.overview.overview.OverviewFragment
 import io.timelimit.android.ui.overview.overview.OverviewFragmentParentHandlers
 import io.timelimit.android.ui.overview.uninstall.UninstallFragment
+import io.timelimit.android.ui.setup.privacy.PrivacyInfoDialogFragment
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers,
         CanNotAddDevicesInLocalModeDialogFragmentListener {
+    companion object {
+        private const val REQ_MIGRATE_TO_CONNECTED_PRIVACY = 1
+    }
 
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private lateinit var navigation: NavController
@@ -202,9 +208,19 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
     }
 
     override fun migrateToConnectedMode() {
-        navigation.safeNavigate(
-                MainFragmentDirections.actionOverviewFragmentToMigrateToConnectedModeFragment(),
-                R.id.overviewFragment
-        )
+        PrivacyInfoDialogFragment().apply {
+            setTargetFragment(this@MainFragment, REQ_MIGRATE_TO_CONNECTED_PRIVACY)
+        }.show(fragmentManager!!)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQ_MIGRATE_TO_CONNECTED_PRIVACY && resultCode == Activity.RESULT_OK) {
+            navigation.safeNavigate(
+                    MainFragmentDirections.actionOverviewFragmentToMigrateToConnectedModeFragment(),
+                    R.id.overviewFragment
+            )
+        }
     }
 }

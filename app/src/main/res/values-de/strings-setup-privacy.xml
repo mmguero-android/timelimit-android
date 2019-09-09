@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="setup_privacy_connected_title">Vernetzung und Datenschutz</string>
+    <string name="setup_privacy_connected_text_general_intro">Für den vernetzten Modus
+        gibt es eine Zentrale - den Server. Auf diesen werden die Einstellungen,
+        die Nutzungsdauern und die Gerätezustände (erteilte Berechtigungen, installierte Apps und die App- und System-Version)
+        gespeichert.
+    </string>
+    <string name="setup_privacy_connected_text_default_server">Sie verwenden - da Sie Nichts anderes gewählt haben -
+        den Standardserver, d.h. den Server des App-Anbieters. Für diesen gelten die Angaben von der Datenschutzerklärung.
+    </string>
+    <string name="setup_privacy_connected_text_custom_server">Sie haben einen Server gewählt.
+        Dadurch gelten die Datenschutzbestimmungen des Anbieteres von diesem Server.
+    </string>
+    <string name="setup_privacy_connected_text_general_outro">Sie können die Übertragung der Daten
+        verhindern, indem Sie den lokalen Modus verwenden.
+    </string>
+</resources>
