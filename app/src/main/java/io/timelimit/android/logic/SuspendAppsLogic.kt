@@ -20,6 +20,7 @@ import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.CategoryApp
 import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.UserType
+import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
@@ -87,7 +88,9 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
                                     val appCategories = prepared[packageName] ?: emptySet()
 
                                     if (appCategories.find { categoryId -> (blockingReasons[categoryId] ?: BlockingReason.None) == BlockingReason.None } == null) {
-                                        result.add(packageName)
+                                        if (!AndroidIntegrationApps.appsToNotSuspend.contains(packageName)) {
+                                            result.add(packageName)
+                                        }
                                     }
                                 }
 

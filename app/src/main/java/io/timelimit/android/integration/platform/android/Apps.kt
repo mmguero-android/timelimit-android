@@ -50,12 +50,19 @@ object AndroidIntegrationApps {
         ignoredApps["com.android.nfc"] = AndroidIntegrationApps.IgnoredAppHandling.Ignore
         ignoredApps["com.android.packageinstaller"] = AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable
         ignoredApps["com.google.android.packageinstaller"] = AndroidIntegrationApps.IgnoredAppHandling.IgnoreOnStoreOtherwiseWhitelistAndDontDisable
+        ignoredApps["com.android.emergency"] = IgnoredAppHandling.Ignore
     }
+
+    val appsToNotSuspend = setOf<String>(
+            "com.android.emergency",
+            "com.android.phone"
+    )
 
     private val ignoredActivities = setOf<String>(
             "com.android.settings:com.android.settings.enterprise.ActionDisabledByAdminDialog",
             "com.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionActivity",
-            "com.google.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionsActivity"
+            "com.google.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionsActivity",
+            "com.android.phone:com.android.phone.EmergencyDialer"
     )
 
     fun shouldIgnoreActivity(packageName: String, activityName: String) = ignoredActivities.contains("$packageName:$activityName")
