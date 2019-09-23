@@ -1,6 +1,2 @@
-small changes:
-
-- use swipe to dismiss in both directions in all lists
-- add option to show error details in some cases
-- better inform users about the privacy when chosing the connected mode
-- add handling for unsupported mail providers
+- whitelist emergency dialer
+- remove going back to the start of the App at a relaunch in some cases

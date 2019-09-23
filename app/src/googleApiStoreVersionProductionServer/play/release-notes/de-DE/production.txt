@@ -1,6 +1,2 @@
-kleine Änderungen:
-
-- Wischen-zum-Entfernen in allen Listen in beide Richtungen aktiviert
-- Option zum Anzeigen von mehr Fehlerdetails in einigen Fällen hinzugefügt
-- besseres Informieren der Benutzer über den Datenschutz, wenn der vernetzte Modus gewählt wird
-- Meldung, wenn ein E-Mail-Anbieter nicht unterstützt wird, hinzugefügt
+- Notrufansicht auf die Whitelist gesetzt
+- in bestimmten Fällen nicht mehr zum Start der App zurückkehren, wenn die App erneut aufgerufen wird
