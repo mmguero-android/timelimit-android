@@ -39,9 +39,13 @@ import io.timelimit.android.ui.login.NewLoginFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
+import io.timelimit.android.ui.manage.parent.link.LinkParentMailFragment
+import io.timelimit.android.ui.manage.parent.password.restore.RestoreParentPasswordFragment
+import io.timelimit.android.ui.migrate_to_connected.MigrateToConnectedModeFragment
 import io.timelimit.android.ui.overview.main.MainFragment
 import io.timelimit.android.ui.payment.ActivityPurchaseModel
 import io.timelimit.android.ui.setup.SetupTermsFragment
+import io.timelimit.android.ui.setup.parent.SetupParentModeFragment
 import io.timelimit.android.ui.util.SyncStatusModel
 import org.solovyev.android.checkout.ActivityCheckout
 import org.solovyev.android.checkout.Checkout
@@ -104,7 +108,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         val fragmentContainerManager = fragmentContainer.childFragmentManager
         getNavController().addOnDestinationChangedListener { _, _, _ ->
             Threads.mainThreadHandler.post {
-                currentNavigatorFragment.value = fragmentContainerManager.fragments.first()
+                currentNavigatorFragment.value = fragmentContainerManager.primaryNavigationFragment
             }
         }
 
@@ -149,6 +153,22 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         super.onNewIntent(intent)
 
         if ((intent?.flags ?: 0) and Intent.FLAG_ACTIVITY_REORDER_TO_FRONT == Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) {
+            return
+        }
+
+        val currentFragment = currentNavigatorFragment.value
+
+        // at these screens, some users restart the App
+        // if they want to continue after opening the mail
+        // because they don't understand how to use the list of running Apps ...
+        // Due to that, on the relevant screens, the App does not
+        // go back to the start when opening it again
+        if (
+                currentFragment is SetupParentModeFragment ||
+                currentFragment is RestoreParentPasswordFragment ||
+                currentFragment is LinkParentMailFragment ||
+                currentFragment is MigrateToConnectedModeFragment
+        ) {
             return
         }
 
