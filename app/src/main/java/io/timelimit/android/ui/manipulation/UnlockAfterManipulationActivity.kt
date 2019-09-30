@@ -78,7 +78,11 @@ class UnlockAfterManipulationActivity : AppCompatActivity(), ActivityViewModelHo
     }
 
     override fun showAuthenticationScreen() {
-        NewLoginFragment().showSafe(supportFragmentManager, "nlf")
+        NewLoginFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(NewLoginFragment.SHOW_ON_LOCKSCREEN, true)
+            }
+        }.showSafe(supportFragmentManager, "nlf")
     }
 
     override fun getActivityViewModel() = model

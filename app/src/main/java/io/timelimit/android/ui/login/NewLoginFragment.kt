@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -37,6 +38,8 @@ import io.timelimit.android.ui.view.KeyboardViewListener
 
 class NewLoginFragment: DialogFragment() {
     companion object {
+        const val SHOW_ON_LOCKSCREEN = "showOnLockscreen"
+
         private const val SELECTED_USER_ID = "selectedUserId"
         private const val USER_LIST = 0
         private const val PARENT_AUTH = 1
@@ -67,6 +70,21 @@ class NewLoginFragment: DialogFragment() {
         override fun onBackPressed() {
             if (!model.goBack()) {
                 super.onBackPressed()
+            }
+        }
+
+        override fun onAttachedToWindow() {
+            super.onAttachedToWindow()
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                if (arguments?.getBoolean(SHOW_ON_LOCKSCREEN, false) == true) {
+                    window!!.addFlags(
+                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                                    or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                                    or WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                    or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                    )
+                }
             }
         }
     }
