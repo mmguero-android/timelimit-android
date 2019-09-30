@@ -1,2 +1,1 @@
-- Notrufansicht auf die Whitelist gesetzt
-- in bestimmten Fällen nicht mehr zum Start der App zurückkehren, wenn die App erneut aufgerufen wird
+- Beschreibung einer Funktion in der App überarbeitet

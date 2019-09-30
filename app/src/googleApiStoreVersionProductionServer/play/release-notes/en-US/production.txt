@@ -1,2 +1,1 @@
-- whitelist emergency dialer
-- remove going back to the start of the App at a relaunch in some cases
+- updated description for one feature in the App
