@@ -14,11 +14,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="manage_device_reboot_manipulation_title">Neustart als Manipulation einstufen</string>
+    <string name="manage_device_reboot_manipulation_title">Gerätneustart als Manipulation einstufen</string>
     <string name="manage_device_reboot_manipulation_text">
         Wenn TimeLimit nach einem Neustart nicht schnell genug startet,
         dann können Sie hier einstellen,
         dass das als Manipulation gewertet werden soll.
+        Dadurch wird JEDER Gerät(neu)start als Manipulation eingestuft.
     </string>
     <string name="manage_device_reboot_manipulation_checkbox">Neustart als Manipulation einstufen</string>
 </resources>

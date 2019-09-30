@@ -14,10 +14,11 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="manage_device_reboot_manipulation_title">Consider reboot a manipulation</string>
+    <string name="manage_device_reboot_manipulation_title">Consider device reboot a manipulation</string>
     <string name="manage_device_reboot_manipulation_text">
         If TimeLimit does not start fast enough after a reboot, then you can
         enable considering that as a manipulation.
+        This considers EVERY device (re)boot a manipulation.
     </string>
     <string name="manage_device_reboot_manipulation_checkbox">consider reboot a manipulation</string>
 </resources>
