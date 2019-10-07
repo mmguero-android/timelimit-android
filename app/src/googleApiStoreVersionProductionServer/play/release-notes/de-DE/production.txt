@@ -1,1 +1,1 @@
-- Beschreibung einer Funktion in der App überarbeitet
+- Erkennung der Internetverbindung überarbeitet

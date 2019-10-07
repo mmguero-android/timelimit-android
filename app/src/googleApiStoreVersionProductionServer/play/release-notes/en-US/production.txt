@@ -1,1 +1,1 @@
-- updated description for one feature in the App
+- improved detection of the internet connection
