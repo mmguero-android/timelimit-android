@@ -1,6 +1,6 @@
 Flexible
 
-Apps are grouped to categories (a category can contain only 1 App).
+Apps are grouped to categories (a category can contain one or multiple App).
 
 You can chose per category at which times it should be allowed. This allows preventing playing games too late.
 
@@ -24,6 +24,8 @@ It is possible to view and change settings from any linked device. This connecti
 Notes
 
 Some features cost money if you don't use your own server. These features cost 0,99 € per month/ 9,99 € per year (in Germany).
+
+TimeLimit does not work good at some smartphone brands (mostly Huawei and Wiko). With the correct settings, it can work better. But better is not good.
 
 If it "does not work": This can be caused by power saving features. You can find at https://dontkillmyapp.com/ how you can disable these features. Get in touch with the support if that does not help.
 

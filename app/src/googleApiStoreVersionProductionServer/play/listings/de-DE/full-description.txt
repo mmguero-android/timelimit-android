@@ -24,6 +24,8 @@ Hinweise
 
 Einige Funktionen sind kostenpflichtig, wenn kein eigener Server verwendet wird. Die Vollversion kostet in Deutschland 0,99 € je Monat oder 9,99 € je Jahr.
 
+Einige Smartphone-Hersteller, insbesondere Huawei und Wiko, sind problematisch. Dort kann es passieren, dass TimeLimit nicht gut funktioniert. Je nach Modell kann man mit den passenden Einstellungen dafür sorgen, dass TimeLimit besser funktioniert. Besser beduetet aber nicht gut.
+
 Falls die App "nicht funktioniert" kann das an Energiesparfunktionen liegen. Wie Sie diese abschalten können, wird unter https://dontkillmyapp.com/ beschrieben. Wenden Sie sich an den Support, wenn das nicht hilft.
 
 Je nach Android-Version verwendet TimeLimit die Berechtigung zum Nutzungsdatenzugriff oder die "GET_TASKS"-Berechtigung. Diese werden ausschließlich zur Erkennung der momentan genutzten App verwendet. Auf der Basis der momentan genutzten App erfolgt eine Sperrung, eine Freigabe oder eine Berechnung und Anpassung der verbleibenden Nutzungsdauer.
