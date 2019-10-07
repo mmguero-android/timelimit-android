@@ -116,6 +116,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.MANIPULATION_ANNOY_USER,
                         disableFlags = ExperimentalFlags.MANIPULATION_ANNOY_USER_ONLY,
                         enable = { !BuildConfig.storeCompilant }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_isc,
+                        enableFlags = ExperimentalFlags.IGNORE_SYSTEM_CONNECTION_STATUS,
+                        disableFlags = ExperimentalFlags.IGNORE_SYSTEM_CONNECTION_STATUS,
+                        enable = { true }
                 )
         )
     }

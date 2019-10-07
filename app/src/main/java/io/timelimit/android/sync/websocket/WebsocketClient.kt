@@ -67,6 +67,10 @@ class SocketIoWebsocketClient(serverUrl: String, private val deviceAuthTokenToCo
             listener.onConnectionLost()
         }
 
+        client.on(Socket.EVENT_RECONNECT) {
+            listener.onConnectionLost()
+        }
+
         client.on("should sync") {
             val params = it[0] as JSONObject
 

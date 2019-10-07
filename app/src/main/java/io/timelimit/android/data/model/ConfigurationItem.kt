@@ -194,4 +194,5 @@ object ExperimentalFlags {
     const val SYSTEM_LEVEL_BLOCKING = 2L
     const val MANIPULATION_ANNOY_USER_ONLY = 4L
     const val MANIPULATION_ANNOY_USER = MANIPULATION_ANNOY_USER_ONLY or DISABLE_BLOCK_ON_MANIPULATION // otherwise there would be a conflict between both features
+    const val IGNORE_SYSTEM_CONNECTION_STATUS = 8L
 }

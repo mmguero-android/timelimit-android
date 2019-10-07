@@ -20,6 +20,7 @@ import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.coroutines.runAsyncExpectForever
+import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.websocket.NetworkStatus
@@ -53,7 +54,7 @@ class WebsocketClientLogic(
 
             val okFromNetworkStatus = appLogic.networkStatus.map { networkStatus ->
                 networkStatus == NetworkStatus.Online
-            }
+            }.or(appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.IGNORE_SYSTEM_CONNECTION_STATUS))
 
             okForCurrentUser.and(okFromNetworkStatus)
         } else {
@@ -93,6 +94,7 @@ class WebsocketClientLogic(
                 // shutdown any current connection
                 currentWebsocketClient?.shutdown()
                 currentWebsocketClient = null
+                isConnectedInternal.postValue(false)
 
                 if (deviceAuthToken.isNotEmpty()) {
                     val serverConfig = appLogic.serverLogic.getServerConfigCoroutine()
