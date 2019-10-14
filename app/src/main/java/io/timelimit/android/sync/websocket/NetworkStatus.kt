@@ -21,10 +21,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.util.Log
 import androidx.core.net.ConnectivityManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
+import io.timelimit.android.async.Threads
 
 object NetworkStatusUtil {
     fun getSystemNetworkStatusLive(context: Context): LiveData<NetworkStatus> {
@@ -36,14 +38,16 @@ object NetworkStatusUtil {
         if (BuildConfig.hasServer) {
             context.applicationContext.registerReceiver(object : BroadcastReceiver() {
                 override fun onReceive(context: Context?, intent: Intent) {
-                    val networkInfo = ConnectivityManagerCompat.getNetworkInfoFromBroadcast(connectivityManager, intent)
+                    Threads.mainThreadHandler.post {
+                        val networkInfo = connectivityManager.activeNetworkInfo
 
-                    if (networkInfo == null) {
-                        status.value = NetworkStatus.Offline
-                    } else if (networkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED) {
-                        status.value = NetworkStatus.Online
-                    } else {
-                        status.value = NetworkStatus.Offline
+                        if (networkInfo == null) {
+                            status.value = NetworkStatus.Offline
+                        } else if (networkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED) {
+                            status.value = NetworkStatus.Online
+                        } else {
+                            status.value = NetworkStatus.Offline
+                        }
                     }
                 }
             }, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
