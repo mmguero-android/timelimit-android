@@ -23,7 +23,7 @@ It is possible to view and change settings from any linked device. This connecti
 
 Notes
 
-Some features cost money if you don't use your own server. These features cost 0,99 € per month/ 9,99 € per year (in Germany).
+Some features cost money if you don't use your own server. These features cost 1 € per month/ 10 € per year (in Germany).
 
 TimeLimit does not work good at some smartphone brands (mostly Huawei and Wiko). With the correct settings, it can work better. But better is not good.
 

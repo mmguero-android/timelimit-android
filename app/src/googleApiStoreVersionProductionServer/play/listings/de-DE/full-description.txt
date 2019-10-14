@@ -22,7 +22,7 @@ Es ist möglich, die Einstellungen von jedem verknüpften Geräte aus einzusehen
 
 Hinweise
 
-Einige Funktionen sind kostenpflichtig, wenn kein eigener Server verwendet wird. Die Vollversion kostet in Deutschland 0,99 € je Monat oder 9,99 € je Jahr.
+Einige Funktionen sind kostenpflichtig, wenn kein eigener Server verwendet wird. Die Vollversion kostet in Deutschland 1 € je Monat oder 10 € je Jahr.
 
 Bei einigen Smartphone-Marken, insbesondere Huawei und Wiko, funktioniert TimeLimit nicht gut. Je nach Modell kann es mit den passenden Einstellungen besser funktionieren. Besser bedeutet aber nicht gut.
 
