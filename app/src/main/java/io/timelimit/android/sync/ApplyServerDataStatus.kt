@@ -390,14 +390,6 @@ object ApplyServerDataStatus {
                             categoryId = item.categoryId,
                             assignedAppsVersion = item.version
                     )
-
-                    if (!database.config().isExperimentalFlagsSetSync(ExperimentalFlags.SYSTEM_LEVEL_BLOCKING)) {
-                        if (thisDeviceUserCategoryIds.contains(item.categoryId)) {
-                            runAsync {
-                                platformIntegration.setSuspendedApps(item.assignedApps, false)
-                            }
-                        }
-                    }
                 }
             }
 

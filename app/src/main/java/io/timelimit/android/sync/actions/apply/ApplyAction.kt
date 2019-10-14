@@ -22,7 +22,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.crypto.Sha512
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.PendingSyncAction
 import io.timelimit.android.data.model.PendingSyncActionType
 import io.timelimit.android.data.model.UserType
@@ -163,22 +162,6 @@ object ApplyActionUtil {
                 } else null
 
                 LocalDatabaseParentActionDispatcher.dispatchParentActionSync(action, database)
-
-                // disable suspending the assigned app
-                if (!database.config().isExperimentalFlagsSetSync(ExperimentalFlags.SYSTEM_LEVEL_BLOCKING)) {
-                    if (action is AddCategoryAppsAction) {
-                        val thisDeviceId = database.config().getOwnDeviceIdSync()!!
-                        val thisDeviceEntry = database.device().getDeviceByIdSync(thisDeviceId)!!
-
-                        if (thisDeviceEntry.currentUserId != "") {
-                            val userCategories = database.category().getCategoriesByChildIdSync(thisDeviceEntry.currentUserId)
-
-                            if (userCategories.find { category -> category.id == action.categoryId } != null) {
-                                platformIntegration.setSuspendedApps(action.packageNames, false)
-                            }
-                        }
-                    }
-                }
 
                 if (action is SetDeviceUserAction) {
                     val thisDeviceId = database.config().getOwnDeviceIdSync()!!
