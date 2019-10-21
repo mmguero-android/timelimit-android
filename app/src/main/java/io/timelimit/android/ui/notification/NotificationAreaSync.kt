@@ -28,10 +28,7 @@ import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.Notification
 import io.timelimit.android.data.model.NotificationTypes
-import io.timelimit.android.integration.platform.android.BackgroundService
-import io.timelimit.android.integration.platform.android.NotificationChannels
-import io.timelimit.android.integration.platform.android.NotificationIds
-import io.timelimit.android.integration.platform.android.PendingIntentIds
+import io.timelimit.android.integration.platform.android.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.random.Random
@@ -80,10 +77,10 @@ object NotificationAreaSync {
         val markReadIntent = PendingIntent.getService(
                 context,
                 pendingIntentId + 1,
-                BackgroundService.prepareDismissNotification(context, notification.type, notification.id),
+                BackgroundActionService.prepareDismissNotification(context, notification.type, notification.id),
                 PendingIntent.FLAG_CANCEL_CURRENT
         )
-        val openAppIntent = BackgroundService.getOpenAppIntent(context)
+        val openAppIntent = BackgroundActionService.getOpenAppIntent(context)
 
         suspend fun getDeviceName(deviceId: String) = Threads.database.executeAndWait {
             database.device().getDeviceByIdSync(deviceId)?.name ?: "???"
@@ -130,7 +127,7 @@ object NotificationAreaSync {
 
     private suspend fun scheduleNextNotificationPosting(context: Context, database: Database, now: Long) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val syncIntent = BackgroundService.getSyncNotificationsPendingIntent(context)
+        val syncIntent = BackgroundActionService.getSyncNotificationsPendingIntent(context)
         val nextNotification = Threads.database.executeAndWait { database.notification().getNextVisibleNotifications(now) }
 
         alarmManager.cancel(syncIntent)

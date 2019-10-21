@@ -275,7 +275,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
             val actionIntent = PendingIntent.getService(
                     context,
                     PendingIntentIds.REVOKE_TEMPORARILY_ALLOWED,
-                    BackgroundService.prepareRevokeTemporarilyAllowed(context),
+                    BackgroundActionService.prepareRevokeTemporarilyAllowed(context),
                     PendingIntent.FLAG_UPDATE_CURRENT
             )
 

@@ -102,6 +102,10 @@
             android:name=".integration.platform.android.BackgroundService"
             android:exported="false" />
 
+        <service
+            android:name=".integration.platform.android.BackgroundActionService"
+            android:exported="false" />
+
         <receiver
             android:name=".integration.platform.android.AdminReceiver"
             android:description="@string/admin_description"
