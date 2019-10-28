@@ -27,7 +27,7 @@
 
         <variable
             name="handlers"
-            type="io.timelimit.android.ui.manage.category.apps.add.ItemHandlers" />
+            type="io.timelimit.android.ui.manage.category.apps.add.AddAppAdapterListener" />
 
         <variable
             name="checked"

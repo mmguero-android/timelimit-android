@@ -29,4 +29,8 @@
         If there is one rule per day with 3 hours,
         then there is a limit of 3 hours per day.
     </string>
+    <string name="must_read_add_already_assigned_apps">
+        Apps with category are removed from the previous category when they are added to a new category -
+        use parent and child categories to \"add\" an App to multiple categories
+    </string>
 </resources>

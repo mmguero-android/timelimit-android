@@ -29,4 +29,7 @@
         Wenn je eine Regel für die Tage von Montag bis Freitag mit jeweils 3 Stunden gewählt wird,
         kann die Kategorie an jedem dieser Tage für 3 Stunden genutzt werden.
     </string>
+    <string name="must_read_add_already_assigned_apps">
+        Apps mit Kategorie werden beim Hinzufügen aus der vorherigen Kategorie entfernt - für mehrere Kategorien gleichzeitig können Sie Ober- und Unter-Kategorien verwenden
+    </string>
 </resources>

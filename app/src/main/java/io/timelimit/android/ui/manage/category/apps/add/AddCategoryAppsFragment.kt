@@ -49,6 +49,7 @@ class AddCategoryAppsFragment : DialogFragment() {
     companion object {
         private const val DIALOG_TAG = "x"
         private const val STATUS_PACKAGE_NAMES = "d"
+        private const val STATUS_EDUCATED = "e"
 
         fun newInstance(params: ManageCategoryFragmentArgs) = AddCategoryAppsFragment().apply {
             arguments = params.toBundle()
@@ -59,6 +60,7 @@ class AddCategoryAppsFragment : DialogFragment() {
     private val database: Database by lazy { DefaultAppLogic.with(context!!).database }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val adapter = AddAppAdapter()
+    private var didEducateAboutAddingAssignedApps = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,9 +72,8 @@ class AddCategoryAppsFragment : DialogFragment() {
         })
 
         if (savedInstanceState != null) {
-            adapter.selectedApps.addAll(
-                    savedInstanceState.getStringArrayList(STATUS_PACKAGE_NAMES)!!
-            )
+            adapter.selectedApps = savedInstanceState.getStringArrayList(STATUS_PACKAGE_NAMES)!!.toSet()
+            didEducateAboutAddingAssignedApps = savedInstanceState.getBoolean(STATUS_EDUCATED)
         }
     }
 
@@ -80,6 +81,7 @@ class AddCategoryAppsFragment : DialogFragment() {
         super.onSaveInstanceState(outState)
 
         outState.putStringArrayList(STATUS_PACKAGE_NAMES, ArrayList(adapter.selectedApps))
+        outState.putBoolean(STATUS_EDUCATED, didEducateAboutAddingAssignedApps)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -194,14 +196,26 @@ class AddCategoryAppsFragment : DialogFragment() {
         }
 
         binding.selectAllButton.setOnClickListener {
-            adapter.selectedApps.addAll(
-                    adapter.data?.map { it.packageName } ?: emptySet()
-            )
-
-            adapter.notifyDataSetChanged()
+            adapter.selectedApps = adapter.selectedApps + (adapter.data?.map { it.packageName }?.toSet() ?: emptySet())
         }
 
         adapter.listener = object: AddAppAdapterListener {
+            override fun onAppClicked(app: App) {
+                if (adapter.selectedApps.contains(app.packageName)) {
+                    adapter.selectedApps = adapter.selectedApps - setOf(app.packageName)
+                } else {
+                    if (!didEducateAboutAddingAssignedApps) {
+                        if (adapter.categoryTitleByPackageName[app.packageName] != null) {
+                            didEducateAboutAddingAssignedApps = true
+
+                            AddAlreadyAssignedAppsInfoDialog().show(fragmentManager!!)
+                        }
+                    }
+
+                    adapter.selectedApps = adapter.selectedApps + setOf(app.packageName)
+                }
+            }
+
             override fun onAppLongClicked(app: App): Boolean {
                 return if (adapter.selectedApps.isEmpty()) {
                     AddAppActivitiesDialogFragment.newInstance(

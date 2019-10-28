@@ -20,7 +20,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.timelimit.android.data.model.App
 import io.timelimit.android.databinding.FragmentAddCategoryAppsItemBinding
-import io.timelimit.android.extensions.toggle
 import io.timelimit.android.logic.DefaultAppLogic
 import kotlin.properties.Delegates
 
@@ -28,17 +27,7 @@ class AddAppAdapter: RecyclerView.Adapter<ViewHolder>() {
     var data: List<App>? by Delegates.observable(null as List<App>?) { _, _, _ -> notifyDataSetChanged() }
     var listener: AddAppAdapterListener? = null
     var categoryTitleByPackageName: Map<String, String> by Delegates.observable(emptyMap()) { _, _, _ -> notifyDataSetChanged() }
-    val selectedApps = mutableSetOf<String>()
-
-    private val itemHandlers = object: ItemHandlers {
-        override fun onAppClicked(app: App) {
-            selectedApps.toggle(app.packageName)
-
-            notifyDataSetChanged()
-        }
-
-        override fun onAppLongClicked(app: App) = listener?.onAppLongClicked(app) ?: false
-    }
+    var selectedApps: Set<String> by Delegates.observable(emptySet()) { _, _, _ -> notifyDataSetChanged() }
 
     init {
         setHasStableIds(true)
@@ -67,7 +56,7 @@ class AddAppAdapter: RecyclerView.Adapter<ViewHolder>() {
                     LayoutInflater.from(parent.context),
                     parent,
                     false
-            ).apply { handlers = itemHandlers }
+            )
     )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -77,6 +66,7 @@ class AddAppAdapter: RecyclerView.Adapter<ViewHolder>() {
             binding.item = item
             binding.checked = selectedApps.contains(item.packageName)
             binding.currentCategoryTitle = categoryTitleByPackageName[item.packageName]
+            binding.handlers = listener
             binding.executePendingBindings()
 
             binding.icon.setImageDrawable(
@@ -89,10 +79,7 @@ class AddAppAdapter: RecyclerView.Adapter<ViewHolder>() {
 
 class ViewHolder(val binding: FragmentAddCategoryAppsItemBinding): RecyclerView.ViewHolder(binding.root)
 
-interface ItemHandlers: AddAppAdapterListener {
-    fun onAppClicked(app: App)
-}
-
 interface AddAppAdapterListener {
+    fun onAppClicked(app: App)
     fun onAppLongClicked(app: App): Boolean
 }
