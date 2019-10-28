@@ -181,7 +181,7 @@ object BlockedTimeAreasLogic {
                 if (currentlyVisiblePosition == RecyclerView.NO_POSITION) {
                     items.value = newValue
                 } else {
-                    val currentlyVisibleItem = oldValue!!.getItemAtPosition(currentlyVisiblePosition)
+                    val currentlyVisibleItem = try { oldValue!!.getItemAtPosition(currentlyVisiblePosition) } catch (ex: IllegalStateException) { DayHeader(0) }
                     val newVisiblePosition = newValue.getPositionOfItem(currentlyVisibleItem)
 
                     items.value = newValue
