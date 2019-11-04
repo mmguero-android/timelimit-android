@@ -78,17 +78,21 @@ class ManageChildFragment : Fragment(), FragmentWithCustomTitle {
 
         bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
         bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
-            childFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .replace(R.id.container, when (menuItem.itemId) {
-                        R.id.manage_child_tab_categories -> ManageChildCategoriesFragment.newInstance(params)
-                        R.id.manage_child_tab_apps -> ChildAppsFragment.newInstance(params)
-                        R.id.manage_child_tab_manage -> ManageChildAdvancedFragment.newInstance(params)
-                        else -> throw IllegalStateException()
-                    })
-                    .commit()
+            if (childFragmentManager.isStateSaved) {
+                false
+            } else {
+                childFragmentManager.beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .replace(R.id.container, when (menuItem.itemId) {
+                            R.id.manage_child_tab_categories -> ManageChildCategoriesFragment.newInstance(params)
+                            R.id.manage_child_tab_apps -> ChildAppsFragment.newInstance(params)
+                            R.id.manage_child_tab_manage -> ManageChildAdvancedFragment.newInstance(params)
+                            else -> throw IllegalStateException()
+                        })
+                        .commit()
 
-            true
+                true
+            }
         }
 
         if (childFragmentManager.findFragmentById(R.id.container) == null) {

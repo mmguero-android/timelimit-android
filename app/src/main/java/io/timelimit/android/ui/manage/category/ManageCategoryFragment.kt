@@ -76,19 +76,23 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
 
         bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
         bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
-            childFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .replace(R.id.container, when(menuItem.itemId) {
-                        R.id.manage_category_tab_apps -> CategoryAppsFragment.newInstance(params)
-                        R.id.manage_category_tab_time_limit_rules -> CategoryTimeLimitRulesFragment.newInstance(params)
-                        R.id.manage_category_tab_blocked_time_areas -> BlockedTimeAreasFragment.newInstance(params)
-                        R.id.manage_category_tab_usage_log -> UsageHistoryFragment.newInstance(params)
-                        R.id.manage_category_tab_settings -> CategorySettingsFragment.newInstance(params)
-                        else -> throw IllegalStateException()
-                    })
-                    .commit()
+            if (childFragmentManager.isStateSaved) {
+                false
+            } else {
+                childFragmentManager.beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .replace(R.id.container, when (menuItem.itemId) {
+                            R.id.manage_category_tab_apps -> CategoryAppsFragment.newInstance(params)
+                            R.id.manage_category_tab_time_limit_rules -> CategoryTimeLimitRulesFragment.newInstance(params)
+                            R.id.manage_category_tab_blocked_time_areas -> BlockedTimeAreasFragment.newInstance(params)
+                            R.id.manage_category_tab_usage_log -> UsageHistoryFragment.newInstance(params)
+                            R.id.manage_category_tab_settings -> CategorySettingsFragment.newInstance(params)
+                            else -> throw IllegalStateException()
+                        })
+                        .commit()
 
-            true
+                true
+            }
         }
 
         if (childFragmentManager.findFragmentById(R.id.container) == null) {

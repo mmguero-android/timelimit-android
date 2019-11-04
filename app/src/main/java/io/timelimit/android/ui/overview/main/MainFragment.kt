@@ -129,20 +129,24 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
 
         bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
         bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
-            childFragmentManager.beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .replace(R.id.container, when(menuItem.itemId) {
-                        R.id.main_tab_overview -> OverviewFragment()
-                        R.id.main_tab_contacts -> ContactsFragment()
-                        R.id.main_tab_uninstall -> UninstallFragment()
-                        R.id.main_tab_about -> AboutFragment()
-                        else -> throw IllegalStateException()
-                    })
-                    .commit()
+            if (childFragmentManager.isStateSaved) {
+                false
+            } else {
+                childFragmentManager.beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .replace(R.id.container, when (menuItem.itemId) {
+                            R.id.main_tab_overview -> OverviewFragment()
+                            R.id.main_tab_contacts -> ContactsFragment()
+                            R.id.main_tab_uninstall -> UninstallFragment()
+                            R.id.main_tab_about -> AboutFragment()
+                            else -> throw IllegalStateException()
+                        })
+                        .commit()
 
-            updateShowFab(menuItem.itemId)
+                updateShowFab(menuItem.itemId)
 
-            true
+                true
+            }
         }
 
         if (childFragmentManager.findFragmentById(R.id.container) == null) {
