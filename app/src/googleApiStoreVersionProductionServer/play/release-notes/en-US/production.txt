@@ -1,1 +1,4 @@
-- improved detection of the internet connection
+- add warning when assigning Apps which are already assigned
+- bugfixes
+  - crashes in the blocked time area editor
+  - crashes when opening two screens at the same time

@@ -1,1 +1,4 @@
-- Erkennung der Internetverbindung überarbeitet
+- Warnung beim Zuordnen von bereits zugeordneten Apps hinzugefügt
+- Fehler behoben
+  - Abstürze im Sperrzeiteneditor
+  - Abstürze beim gleichzeitigen Aufrufen von mehreren Ansichten
