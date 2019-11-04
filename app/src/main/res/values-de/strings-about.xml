@@ -25,6 +25,7 @@
     <string name="about_full_version">Vollversion</string>
     <string name="about_full_version_not_in_local_mode">
         Die Vollversion ist im lokalen Modus nicht verfügbar.
+        Sie können eine Stay Awesome License erwerben.
     </string>
     <string name="about_full_version_expired">
         Sie haben die Vollversion nicht erworben bzw. die Vollversion ist abgelaufen.
@@ -34,6 +35,9 @@
     </string>
     <string name="about_full_version_tap_hint">
         Zum Erwerben oder Verlängern der Vollversion hier tippen.
+    </string>
+    <string name="about_sla_tap_hint">
+        Zum Erwerben einer Stay Awesome License hier tippen.
     </string>
 
     <string name="about_contained_software_title">enthaltene Software</string>

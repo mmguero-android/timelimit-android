@@ -15,10 +15,7 @@
  */
 package io.timelimit.android.extensions
 
-import org.solovyev.android.checkout.BillingRequests
-import org.solovyev.android.checkout.Checkout
-import org.solovyev.android.checkout.RequestListener
-import org.solovyev.android.checkout.Skus
+import org.solovyev.android.checkout.*
 import java.io.Closeable
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -106,6 +103,14 @@ suspend fun BillingRequests.consumeAsync(token: String) {
             }
         })
     }
+}
+
+suspend fun Inventory.loadAsync(request: Inventory.Request) = suspendCoroutine<Inventory.Products> { continuation ->
+    this.load(request, object: Inventory.Callback {
+        override fun onLoaded(products: Inventory.Products) {
+            continuation.resume(products)
+        }
+    })
 }
 
 class CheckoutStartResponse (

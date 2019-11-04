@@ -19,5 +19,6 @@ object PurchaseIds {
     const val SKU_YEAR = "premium_year_2018"
     const val SKU_MONTH = "premium_month_2018"
 
-    val SKUS = listOf(SKU_YEAR, SKU_MONTH)
+    val BUY_SKUS = listOf(SKU_YEAR, SKU_MONTH)
+    val SLA_SKUS = listOf("sal100", "sal500", "sal1000", "sal2000")
 }

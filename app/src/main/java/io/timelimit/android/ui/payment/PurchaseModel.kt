@@ -74,7 +74,7 @@ class PurchaseModel(application: Application): AndroidViewModel(application) {
                                 } else {
                                     val skus = it.requests.getSkusAsync(
                                             ProductTypes.IN_APP,
-                                            PurchaseIds.SKUS
+                                            PurchaseIds.BUY_SKUS
                                     )
 
                                     statusInternal.value = PurchaseFragmentReady(

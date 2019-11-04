@@ -22,8 +22,10 @@
     </string>
 
     <string name="about_full_version">Premium version</string>
+    <string name="about_sla" translatable="false">Stay Awesome License</string>
     <string name="about_full_version_not_in_local_mode">
         The premium version is not available in the local mode.
+        You can buy a stay awesome license.
     </string>
     <string name="about_full_version_expired">
         You did not buy the premium version or the premium version expired.
@@ -33,6 +35,9 @@
     </string>
     <string name="about_full_version_tap_hint">
         Tap here to buy or extend the premium version.
+    </string>
+    <string name="about_sla_tap_hint">
+        Tap here to buy a stay awesome license.
     </string>
 
     <string name="about_contained_software_title">contained Software</string>

@@ -15,10 +15,18 @@
 -->
 <resources>
     <string name="purchase_intro">Please select an option</string>
+    <string name="purchase_sla_intro">
+        If you like TimeLimit and want to pay for it,
+        then you can buy a stay awesome license here.
+        This does not unlock additional features.
+    </string>
     <!-- https://support.google.com/googleplay/android-developer/answer/112622?hl=en -->
     <string name="purchase_info_assigned_to_account">
         The purchase is assigned to your family and is valid on all devices.
         The family are all devices which are linked to this device now and in the future.
+        For apps and in-app products offered through Google Play, the transaction fee is equivalent to 30% of the price.
+    </string>
+    <string name="purchase_sla_provision_info">
         For apps and in-app products offered through Google Play, the transaction fee is equivalent to 30% of the price.
     </string>
     <string name="purchase_one_month">Premium version for one month</string>

@@ -81,7 +81,7 @@ class ActivityPurchaseModel(application: Application): AndroidViewModel(applicat
             }
 
             override fun onSuccess(result: Purchase) {
-                if (PurchaseIds.SKUS.contains(result.sku)) {
+                if (PurchaseIds.BUY_SKUS.contains(result.sku)) {
                     runAsync {
                         lock.withLock {
                             isWorkingInternal.setTemporarily(true).use { _ ->
@@ -116,7 +116,7 @@ class ActivityPurchaseModel(application: Application): AndroidViewModel(applicat
                                 object: Inventory.Callback {
                                     override fun onLoaded(products: Inventory.Products) {
                                         products[ProductTypes.IN_APP].purchases.forEach { purchase ->
-                                            if (PurchaseIds.SKUS.contains(purchase.sku)) {
+                                            if (PurchaseIds.BUY_SKUS.contains(purchase.sku)) {
                                                 runAsync {
                                                     handlePurchase(purchase)
                                                 }
@@ -178,23 +178,25 @@ class ActivityPurchaseModel(application: Application): AndroidViewModel(applicat
         }
     }
 
-    fun startPurchase(sku: String) {
+    fun startPurchase(sku: String, checkAtBackend: Boolean) {
         runAsync {
             lock.withLock {
                 isWorkingInternal.setTemporarily(true).use {
                     _ ->
 
                     try {
-                        val server = logic.serverLogic.getServerConfigCoroutine()
+                        if (checkAtBackend) {
+                            val server = logic.serverLogic.getServerConfigCoroutine()
 
-                        if (!server.hasAuthToken) {
-                            Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
+                            if (!server.hasAuthToken) {
+                                Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
 
-                            return@runAsync
-                        }
+                                return@runAsync
+                            }
 
-                        if (server.api.canDoPurchase(server.deviceAuthToken) != CanDoPurchaseStatus.Yes) {
-                            throw IOException("can not do purchase right now")
+                            if (server.api.canDoPurchase(server.deviceAuthToken) != CanDoPurchaseStatus.Yes) {
+                                throw IOException("can not do purchase right now")
+                            }
                         }
 
                         // start the purchase

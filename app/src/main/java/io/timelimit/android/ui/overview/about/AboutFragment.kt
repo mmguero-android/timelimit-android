@@ -62,11 +62,13 @@ class AboutFragment : Fragment() {
         })
 
         binding.handlers = object: AboutFragmentHandlers {
-            override fun startFullVersionPurchase() {
+            override fun startPurchase() {
                 val status = binding.fullVersionStatus
 
                 if (status == FullVersionStatus.Expired || status == FullVersionStatus.Available) {
                     listener.onShowPurchaseScreen()
+                } else if (status == FullVersionStatus.InLocalMode) {
+                    listener.onShowStayAwesomeScreen()
                 }
             }
         }
@@ -91,7 +93,7 @@ class AboutFragment : Fragment() {
 }
 
 interface AboutFragmentHandlers {
-    fun startFullVersionPurchase()
+    fun startPurchase()
 }
 
 enum class FullVersionStatus {
@@ -100,5 +102,6 @@ enum class FullVersionStatus {
 
 interface AboutFragmentParentHandlers {
     fun onShowPurchaseScreen()
+    fun onShowStayAwesomeScreen()
     fun onShowDiagnoseScreen()
 }

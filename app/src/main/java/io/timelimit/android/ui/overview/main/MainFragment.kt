@@ -190,6 +190,13 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
         )
     }
 
+    override fun onShowStayAwesomeScreen() {
+        navigation.safeNavigate(
+                MainFragmentDirections.actionOverviewFragmentToStayAwesomeFragment(),
+                R.id.overviewFragment
+        )
+    }
+
     override fun openManageParentScreen(parentId: String) {
         navigation.safeNavigate(
                 MainFragmentDirections.actionOverviewFragmentToManageParentFragment(parentId),

@@ -111,11 +111,11 @@ class PurchaseFragment : Fragment() {
             }
 
             override fun buyForOneMonth() {
-                activityModel.startPurchase(PurchaseIds.SKU_MONTH)
+                activityModel.startPurchase(PurchaseIds.SKU_MONTH, checkAtBackend = true)
             }
 
             override fun buyForOneYear() {
-                activityModel.startPurchase(PurchaseIds.SKU_YEAR)
+                activityModel.startPurchase(PurchaseIds.SKU_YEAR, checkAtBackend = true)
             }
         }
 

@@ -15,10 +15,19 @@
 -->
 <resources>
     <string name="purchase_intro">Wählen Sie eine Variante aus</string>
+    <string name="purchase_sla_intro">
+        Wenn Ihnen TimeLimit gefällt und Sie meinen, dass es Geld Wert ist,
+        dann können Sie hier eine Stay Awesome License erwerben.
+        Dadurch werden keine zusätzlichen Funktionen freigeschaltet.
+    </string>
+
     <!-- https://support.google.com/googleplay/android-developer/answer/112622?hl=de -->
     <string name="purchase_info_assigned_to_account">
         Der Kauf wird mit der Familie verknüpft und gilt auf allen Geräten.
         Zur Familie gehören alle momentan und zukünftig mit dieser TimeLimit-Installation gekoppelten Geräte.
+        Für Apps und In-App-Produkte, die bei Google Play angeboten werden, beträgt die Transaktionsgebühr 30 % des Preises.
+    </string>
+    <string name="purchase_sla_provision_info">
         Für Apps und In-App-Produkte, die bei Google Play angeboten werden, beträgt die Transaktionsgebühr 30 % des Preises.
     </string>
     <string name="purchase_one_month">Vollversion für einen Monat</string>

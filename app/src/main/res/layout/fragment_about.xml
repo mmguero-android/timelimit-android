@@ -90,8 +90,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:clickable="@{fullVersionStatus == FullVersionStatus.Available || fullVersionStatus == FullVersionStatus.Expired}"
-                android:onClick="@{() -> handlers.startFullVersionPurchase()}"
+                android:onClick="@{() -> handlers.startPurchase()}"
                 android:foreground="?selectableItemBackground"
                 app:cardUseCompatPadding="true"
                 android:layout_width="match_parent"
@@ -104,7 +103,8 @@
 
                     <TextView
                         android:textAppearance="?android:textAppearanceLarge"
-                        android:text="@string/about_full_version"
+                        tools:text="@string/about_full_version"
+                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sla : @string/about_full_version}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -131,8 +131,8 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
-                        android:visibility="@{fullVersionStatus == FullVersionStatus.Available || fullVersionStatus == FullVersionStatus.Expired ? View.VISIBLE : View.GONE}"
-                        android:text="@string/about_full_version_tap_hint"
+                        tools:text="@string/about_full_version_tap_hint"
+                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sla_tap_hint : @string/about_full_version_tap_hint}"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
