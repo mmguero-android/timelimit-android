@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,8 @@ class ManageDeviceUserFragment : Fragment(), FragmentWithCustomTitle {
         val binding = ManageDeviceUserFragmentBinding.inflate(inflater, container, false)
         val userEntries = logic.database.user().getAllUsersLive()
 
+        var isUpdatingSelectedUser = false
+
         // auth
         AuthenticationFab.manageAuthenticationFab(
                 fab = binding.fab,
@@ -91,6 +93,8 @@ class ManageDeviceUserFragment : Fragment(), FragmentWithCustomTitle {
         }
 
         fun bindUserListSelection() {
+            isUpdatingSelectedUser = true
+
             val selectedUserId = deviceEntry.value?.currentUserId
             val selectedIndex = userListItems.indexOfFirst { it.second == selectedUserId }
 
@@ -103,6 +107,8 @@ class ManageDeviceUserFragment : Fragment(), FragmentWithCustomTitle {
                     binding.userList.check(fallbackSelectedIndex)
                 }
             }
+
+            isUpdatingSelectedUser = false
         }
 
         binding.handlers = object: ManageDeviceUserFragmentHandlers {
@@ -115,7 +121,7 @@ class ManageDeviceUserFragment : Fragment(), FragmentWithCustomTitle {
             val userId = userListItems[checkedId].second
             val device = deviceEntry.value
 
-            if (device != null && device.currentUserId != userId) {
+            if (device != null && device.currentUserId != userId && !isUpdatingSelectedUser) {
                 if (!auth.tryDispatchParentAction(
                                 SetDeviceUserAction(
                                         deviceId = args.deviceId,
