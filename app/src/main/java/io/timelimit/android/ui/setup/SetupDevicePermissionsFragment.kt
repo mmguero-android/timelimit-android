@@ -73,10 +73,24 @@ class SetupDevicePermissionsFragment : Fragment() {
 
             override fun openUsageStatsSettings() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    startActivity(
-                            Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
+                    try {
+                        // According to user reports, some devices open the wrong screen
+                        // with the Settings.ACTION_USAGE_ACCESS_SETTINGS
+                        // but using an activity launcher to open this intent works for them.
+                        // This intent works at regular android too, so try this first
+                        // and use the "correct" one as fallback.
+
+                        startActivity(
+                                Intent()
+                                        .setClassName("com.android.settings", "com.android.settings.Settings\$UsageAccessSettingsActivity")
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    } catch (ex: Exception) {
+                        startActivity(
+                                Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    }
                 }
             }
 
