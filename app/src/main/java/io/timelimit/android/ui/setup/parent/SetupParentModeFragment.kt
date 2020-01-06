@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
             when (status.status) {
                 StatusOfMailAddress.MailAddressWithoutFamily -> {
                     model.createFamily(
-                            parentPassword = binding.password.password.value!!,
+                            parentPassword = binding.password.readPassword(),
                             parentName = binding.prename.text.toString(),
                             deviceName = binding.deviceName.text.toString(),
                             enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked

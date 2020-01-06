@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,8 @@ class ChangeParentPasswordFragment : Fragment(), FragmentWithCustomTitle {
             }
         })
 
+        logic.fullVersion.isLocalMode.observe(this, Observer { binding.newPassword.allowNoPassword.value = it })
+
         binding.newPassword.passwordOk.observe(this, Observer {
             isPasswordOk ->
 
@@ -67,7 +69,7 @@ class ChangeParentPasswordFragment : Fragment(), FragmentWithCustomTitle {
             model.changePassword(
                     parentUserId = params.parentUserId,
                     oldPassword = binding.oldPassword.text.toString(),
-                    newPassword = binding.newPassword.password.value!!
+                    newPassword = binding.newPassword.readPassword()
             )
         }
 

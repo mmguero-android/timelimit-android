@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -274,16 +274,18 @@ class SetupDeviceFragment : Fragment() {
         val hasSelectedName = selectedName.map { it.isNotBlank() }
         val isNameRequired = isNewUser
         val validationOfName = hasSelectedName.or(isNameRequired.invert())
-        val isPasswordRequired = isNewUser.and(isParentUser)
+        val isPasswordRequired = isNewUser.and(isParentUser).and(logic.fullVersion.isLocalMode.invert())
         val isPasswordValid = binding.setPasswordView.passwordOk
-        val isPasswordEmpty = binding.setPasswordView.passwordEmpty
+        val isPasswordEmpty = binding.setPasswordView.noPasswordChecked
         val validationOfPassword = isPasswordValid.or(
                 isPasswordRequired.invert()
                         .and(isPasswordEmpty)
         )
-        val validationOfAll = validationOfName.and(validationOfPassword)
+        val validationOfAll = (validationOfName.and(validationOfPassword)).or(isNewUser.invert())
 
         validationOfAll.observe(this, Observer { binding.confirmBtn.isEnabled = it })
+
+        isPasswordRequired.observe(this, Observer { binding.setPasswordView.allowNoPassword.value = !it })
 
         ManageDeviceBackgroundSync.bind(
                 view = binding.backgroundSync,
@@ -296,7 +298,7 @@ class SetupDeviceFragment : Fragment() {
             model.doSetup(
                     userId = selectedUser.value!!,
                     username = binding.newUserName.text.toString(),
-                    password = binding.setPasswordView.password.value!!,
+                    password = binding.setPasswordView.readPassword(),
                     allowedAppsCategory = allowedAppsCategory,
                     appsToNotWhitelist = selectedAppsToNotWhitelist,
                     model = activity.getActivityViewModel(),

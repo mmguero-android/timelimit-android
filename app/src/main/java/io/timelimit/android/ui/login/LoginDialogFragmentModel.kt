@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,6 +142,48 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
 
     fun startSignIn(user: User) {
         selectedUserId.value = user.id
+    }
+
+    fun tryDefaultLogin(model: ActivityViewModel) {
+        runAsync {
+            loginLock.withLock {
+                logic.database.user().getParentUsersLive().waitForNonNullValue().singleOrNull()?.let { user ->
+                    val emptyPasswordValid = Threads.crypto.executeAndWait { PasswordHashing.validateSync("", user.password) }
+
+                    val shouldSignIn = if (emptyPasswordValid) {
+                        val hasBlockedTimes = !user.blockedTimes.dataNotToModify.isEmpty
+
+                        if (hasBlockedTimes) {
+                            val hasPremium = logic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue()
+
+                            if (hasPremium) {
+                                val isGoodTime = blockingReasonUtil.getTrustedMinuteOfWeekLive(TimeZone.getTimeZone(user.timeZone)).map { minuteOfWeek ->
+                                    minuteOfWeek != null && user.blockedTimes.dataNotToModify[minuteOfWeek] == false
+                                }.waitForNonNullValue()
+
+                                isGoodTime
+                            } else {
+                                true
+                            }
+                        } else {
+                            true
+                        }
+                    } else {
+                        false
+                    }
+
+                    if (shouldSignIn) {
+                        model.setAuthenticatedUser(AuthenticatedUser(
+                                userId = user.id,
+                                firstPasswordHash = user.password,
+                                secondPasswordHash = Threads.crypto.executeAndWait { PasswordHashing.hashSyncWithSalt("", user.secondPasswordSalt) }
+                        ))
+
+                        isLoginDone.value = true
+                    }
+                }
+            }
+        }
     }
 
     fun tryParentLogin(

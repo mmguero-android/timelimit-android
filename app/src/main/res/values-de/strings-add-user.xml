@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -21,6 +21,7 @@
     <string name="add_user_confirmation_done">Benutzer wurde erstellt</string>
     <string name="add_user_child_password_info">Wenn Sie ein Passwort für das Kind wählen,
         dann kann das Kind sich selbst an einem Gerät anmelden mit seinem Passwort.
+        Wenn der Passwortschutz deaktiviert wird ist das nicht möglich.
     </string>
 
     <string name="add_user_authentication_required_text">

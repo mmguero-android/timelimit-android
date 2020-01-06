@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,8 @@ class SetupLocalModeFragment : Fragment() {
         val model = ViewModelProviders.of(this).get(SetupLocalModeModel::class.java)
         val navigation = Navigation.findNavController(container!!)
 
+        binding.setPasswordView.allowNoPassword.value = true
+
         mergeLiveData(binding.setPasswordView.passwordOk, model.status).observe(this, Observer {
             binding.nextBtn.isEnabled = it!!.first == true && it.second == SetupLocalModeModel.Status.Idle
         })
@@ -67,7 +69,7 @@ class SetupLocalModeFragment : Fragment() {
 
         binding.nextBtn.setOnClickListener {
             model.trySetupWithPassword(
-                    set_password_view.password.value!!,
+                    set_password_view.readPassword(),
                     SetupNetworkTimeVerification.readSelection(binding.networkTimeVerification)
             )
         }

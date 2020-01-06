@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,13 +63,15 @@ class AddUserFragment : Fragment() {
 
         // password
 
-        val isPasswordRequired = userType.map { it == UserType.Parent }
+        val isPasswordRequired = userType.map { it == UserType.Parent }.and(auth.logic.fullVersion.isLocalMode.invert())
+
+        isPasswordRequired.observe(this, Observer { binding.password.allowNoPassword.value = !it })
 
         userType.observe(this, Observer {
             binding.isCreatingChildUser = it == UserType.Child
         })
 
-        val isPasswordEmpty = binding.password.passwordEmpty
+        val isPasswordEmpty = binding.password.noPasswordChecked
         val isPasswordOk = binding.password.passwordOk.or(
                 isPasswordRequired.invert()
                         .and(isPasswordEmpty)
@@ -93,7 +95,7 @@ class AddUserFragment : Fragment() {
                 model.tryCreateUser(
                         name = binding.name.text.toString(),
                         type = userType.value!!,
-                        password = binding.password.password.value!!,
+                        password = binding.password.readPassword(),
                         model = auth
                 )
             }
