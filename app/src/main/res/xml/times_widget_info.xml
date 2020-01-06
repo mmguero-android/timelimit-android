@@ -13,19 +13,10 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
-    <color name="colorPrimary">#009688</color>
-    <color name="colorPrimaryDark">#00796B</color>
-    <color name="colorAccent">#1976d2</color>
-    <color name="widget_background">#33000000</color>
-
-    <color name="transparent">#00000000</color>
-    <color name="gray">#9E9E9E</color>
-    <color name="white">#FFF</color>
-    <color name="green">#0a0</color>
-    <color name="red">#a00</color>
-    <color name="black">#000</color>
-    <color name="orange">#E64A19</color>
-    <color name="yellow">#cccc00</color>
-    <color name="divider">#33000000</color>
-</resources>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp"
+    android:minHeight="100dp"
+    android:updatePeriodMillis="0"
+    android:resizeMode="horizontal|vertical"
+    android:previewImage="@drawable/widget_preview"
+    android:widgetCategory="home_screen" />

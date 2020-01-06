@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -120,6 +120,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".ui.widget.TimesWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/times_widget_info" />
+        </receiver>
+
         <service
             android:name=".integration.platform.android.NotificationListener"
             android:label="@string/app_name"
@@ -140,6 +148,9 @@
                 android:resource="@xml/accesibility" />
 
         </service>
+
+        <service android:name=".ui.widget.TimesWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
     </application>
 
