@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,6 +59,14 @@ class CategorySettingsFragment : Fragment() {
                 childId = params.childId,
                 database = appLogic.database,
                 auth = auth
+        )
+
+        CategoryBatteryLimitView.bind(
+                binding = binding.batteryLimit,
+                lifecycleOwner = this,
+                category = categoryEntry,
+                auth = auth,
+                categoryId = params.categoryId
         )
 
         ParentCategoryView.bind(

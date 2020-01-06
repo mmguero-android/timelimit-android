@@ -346,6 +346,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_diagnoseMainFragment_to_diagnoseBatteryFragment"
+            app:destination="@id/diagnoseBatteryFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/diagnoseClockFragment"
@@ -427,4 +434,9 @@
         android:name="io.timelimit.android.ui.payment.StayAwesomeFragment"
         android:label="stay_awesome_fragment"
         tools:layout="@layout/stay_awesome_fragment" />
+    <fragment
+        android:id="@+id/diagnoseBatteryFragment"
+        android:name="io.timelimit.android.ui.diagnose.DiagnoseBatteryFragment"
+        android:label="diagnose_battery_fragment"
+        tools:layout="@layout/diagnose_battery_fragment" />
 </navigation>

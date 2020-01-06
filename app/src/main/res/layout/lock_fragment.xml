@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -220,6 +220,14 @@
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@{@string/lock_reason_requires_current_device(blockedKindLabel)}"
                             tools:text="@string/lock_reason_requires_current_device"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:visibility="@{reason == BlockingReason.BatteryLimit ? View.VISIBLE : View.GONE}"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:text="@{@string/lock_reason_battery_limit(blockedKindLabel)}"
+                            tools:text="@string/lock_reason_battery_limit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 

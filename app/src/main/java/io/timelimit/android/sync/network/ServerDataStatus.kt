@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -339,7 +339,9 @@ data class ServerUpdatedCategoryBaseData(
         val baseDataVersion: String,
         val parentCategoryId: String,
         val blockAllNotifications: Boolean,
-        val timeWarnings: Int
+        val timeWarnings: Int,
+        val minBatteryLevelCharging: Int,
+        val minBatteryLevelMobile: Int
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -352,6 +354,8 @@ data class ServerUpdatedCategoryBaseData(
         private const val PARENT_CATEGORY_ID = "parentCategoryId"
         private const val BLOCK_ALL_NOTIFICATIONS = "blockAllNotifications"
         private const val TIME_WARNINGS = "timeWarnings"
+        private const val MIN_BATTERY_LEVEL_MOBILE = "mblMobile"
+        private const val MIN_BATTERY_LEVEL_CHARGING = "mblCharging"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -365,6 +369,8 @@ data class ServerUpdatedCategoryBaseData(
             // added later -> default values
             var blockAllNotifications = false
             var timeWarnings = 0
+            var minBatteryLevelCharging = 0
+            var minBatteryLevelMobile = 0
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -379,6 +385,8 @@ data class ServerUpdatedCategoryBaseData(
                     PARENT_CATEGORY_ID -> parentCategoryId = reader.nextString()
                     BLOCK_ALL_NOTIFICATIONS -> blockAllNotifications = reader.nextBoolean()
                     TIME_WARNINGS -> timeWarnings = reader.nextInt()
+                    MIN_BATTERY_LEVEL_CHARGING -> minBatteryLevelCharging = reader.nextInt()
+                    MIN_BATTERY_LEVEL_MOBILE -> minBatteryLevelMobile = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -394,7 +402,9 @@ data class ServerUpdatedCategoryBaseData(
                     baseDataVersion = baseDataVersion!!,
                     parentCategoryId = parentCategoryId!!,
                     blockAllNotifications = blockAllNotifications,
-                    timeWarnings = timeWarnings
+                    timeWarnings = timeWarnings,
+                    minBatteryLevelCharging = minBatteryLevelCharging,
+                    minBatteryLevelMobile = minBatteryLevelMobile
             )
         }
 

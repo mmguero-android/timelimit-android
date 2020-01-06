@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -677,7 +677,47 @@ data class SetParentCategory(val categoryId: String, val parentCategory: String)
         writer.endObject()
     }
 }
+data class UpdateCategoryBatteryLimit(val categoryId: String, val chargingLimit: Int?, val mobileLimit: Int?): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_CATEGORY_BATTERY_LIMIT"
+        private const val CATEGORY_ID = "categoryId"
+        private const val CHARGE_LIMIT = "chargeLimit"
+        private const val MOBILE_LIMIT = "mobileLimit"
+    }
 
+    init {
+        IdGenerator.assertIdValid(categoryId)
+
+        if (chargingLimit != null) {
+            if (chargingLimit < 0 || chargingLimit > 100) {
+                throw IllegalArgumentException()
+            }
+        }
+
+        if (mobileLimit != null) {
+            if (mobileLimit < 0 || mobileLimit > 100) {
+                throw IllegalArgumentException()
+            }
+        }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+
+        if (chargingLimit != null) {
+            writer.name(CHARGE_LIMIT).value(chargingLimit)
+        }
+
+        if (mobileLimit != null) {
+            writer.name(MOBILE_LIMIT).value(mobileLimit)
+        }
+
+        writer.endObject()
+    }
+}
 // DeviceDao
 
 data class UpdateDeviceStatusAction(

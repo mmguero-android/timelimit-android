@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 package io.timelimit.android.integration.platform.dummy
 
 import android.graphics.drawable.Drawable
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
@@ -33,6 +35,7 @@ class DummyIntegration(
     var lastAppStatusMessage: AppStatusMessage? = null
     var launchLockScreenForPackage: String? = null
     var showRevokeTemporarilyAllowedNotification = false
+    val batteryStatus = MutableLiveData<BatteryStatus>().apply { value = BatteryStatus(true, 100) }
 
     override fun getLocalApps(deviceId: String): Collection<App> {
         return localApps.map{ it.copy(deviceId = deviceId) }
@@ -159,4 +162,7 @@ class DummyIntegration(
     override fun setEnableSystemLockdown(enableLockdown: Boolean) = false
 
     override fun setLockTaskPackages(packageNames: List<String>) = false
+
+    override fun getBatteryStatus(): BatteryStatus = batteryStatus.value!!
+    override fun getBatteryStatusLive(): LiveData<BatteryStatus> = batteryStatus
 }

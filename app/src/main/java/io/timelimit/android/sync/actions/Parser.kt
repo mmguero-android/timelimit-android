@@ -65,6 +65,7 @@ object ActionParser {
         // UpdateCategoryBlockAllNotificationsAction
         // UpdateEnableActivityLevelBlocking
         // UpdateCategoryTimeWarningsAction
+        // UpdateCategoryBatteryLimit
         else -> throw IllegalStateException()
     }
 }

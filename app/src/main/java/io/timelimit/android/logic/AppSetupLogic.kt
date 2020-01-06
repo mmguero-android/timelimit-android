@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,7 +179,9 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             usedTimesVersion = "",
                             parentCategoryId = "",
                             blockAllNotifications = false,
-                            timeWarnings = 0
+                            timeWarnings = 0,
+                            minBatteryLevelWhileCharging = 0,
+                            minBatteryLevelMobile = 0
                     ))
 
                     appLogic.database.category().addCategory(Category(
@@ -195,7 +197,9 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             usedTimesVersion = "",
                             parentCategoryId = "",
                             blockAllNotifications = false,
-                            timeWarnings = 0
+                            timeWarnings = 0,
+                            minBatteryLevelWhileCharging = 0,
+                            minBatteryLevelMobile = 0
                     ))
 
                     // add default allowed apps

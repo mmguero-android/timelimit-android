@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
 import io.timelimit.android.integration.time.TimeApi
 import io.timelimit.android.livedata.*
+import io.timelimit.android.logic.extension.isCategoryAllowed
 import java.util.*
 
 enum class BlockingReason {
@@ -37,7 +38,8 @@ enum class BlockingReason {
     TimeOverExtraTimeCanBeUsedLater,
     MissingNetworkTime,
     RequiresCurrentDevice,
-    NotificationsAreBlocked
+    NotificationsAreBlocked,
+    BatteryLimit
 }
 
 enum class BlockingLevel {
@@ -74,6 +76,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
     }
 
     private val enableActivityLevelFiltering = appLogic.deviceEntry.map { it?.enableActivityLevelBlocking ?: false }
+    private val batteryLevel = appLogic.platformIntegration.getBatteryStatusLive()
 
     fun getBlockingReason(packageName: String, activityName: String?): LiveData<BlockingReasonDetail> {
         // check precondition that the app is running
@@ -211,7 +214,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         else
             liveDataFromValue(false)
 
-        val nextLevel = getBlockingReasonStep4Point7(category, child, timeZone, isParentCategory, blockingLevel)
+        val nextLevel = getBlockingReasonStep4Point6(category, child, timeZone, isParentCategory, blockingLevel)
 
         return shouldBlockNotifications.switchMap { blockNotifications ->
             nextLevel.map { blockingReason ->
@@ -224,6 +227,24 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
                             reason = blockingReason,
                             categoryId = category.id
                     )
+                }
+            }
+        }
+    }
+
+    private fun getBlockingReasonStep4Point6(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, blockingLevel: BlockingLevel): LiveData<BlockingReason> {
+        val next = getBlockingReasonStep4Point7(category, child, timeZone, isParentCategory, blockingLevel)
+
+        return if (category.minBatteryLevelWhileCharging == 0 && category.minBatteryLevelMobile == 0) {
+            next
+        } else {
+            val batteryLevelOk = batteryLevel.map { it.isCategoryAllowed(category) }.ignoreUnchanged()
+
+            batteryLevelOk.switchMap { ok ->
+                if (ok) {
+                    next
+                } else {
+                    liveDataFromValue(BlockingReason.BatteryLimit)
                 }
             }
         }
@@ -264,7 +285,7 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
                     if (parentCategory == null) {
                         liveDataFromValue(BlockingReason.None)
                     } else {
-                        getBlockingReasonStep4Point7(parentCategory, child, timeZone, true, blockingLevel)
+                        getBlockingReasonStep4Point6(parentCategory, child, timeZone, true, blockingLevel)
                     }
                 }
             } else {

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -309,7 +309,9 @@ object ApplyServerDataStatus {
                                     timeLimitRulesVersion = "",
                                     usedTimesVersion = "",
                                     parentCategoryId = newCategory.parentCategoryId,
-                                    timeWarnings = newCategory.timeWarnings
+                                    timeWarnings = newCategory.timeWarnings,
+                                    minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
+                                    minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging
                             ))
                         } else {
                             val updatedCategory = oldCategory.copy(
@@ -321,7 +323,9 @@ object ApplyServerDataStatus {
                                     blockAllNotifications = newCategory.blockAllNotifications,
                                     baseVersion = newCategory.baseDataVersion,
                                     parentCategoryId = newCategory.parentCategoryId,
-                                    timeWarnings = newCategory.timeWarnings
+                                    timeWarnings = newCategory.timeWarnings,
+                                    minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
+                                    minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging
                             )
 
                             if (updatedCategory != oldCategory) {

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import io.timelimit.android.BuildConfig
 import io.timelimit.android.data.model.*
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.livedata.*
+import io.timelimit.android.logic.extension.isCategoryAllowed
 import java.util.*
 
 class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
@@ -32,6 +33,7 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
 
     private val blockingReason = BlockingReasonUtil(appLogic)
     private val temporarilyTrustedTimeInMillis = blockingReason.getTemporarilyTrustedTimeInMillis()
+    private val batteryLevel = appLogic.platformIntegration.getBatteryStatusLive()
 
     // NOTE: this ignores the current device rule
     fun getCategoryBlockingReasons(
@@ -129,25 +131,31 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
             areLimitsTemporarilyDisabled: LiveData<Boolean>
     ): LiveData<BlockingReason> {
         return category.switchMap { category ->
-            if (category.temporarilyBlocked) {
-                liveDataFromValue(BlockingReason.TemporarilyBlocked)
-            } else {
-                areLimitsTemporarilyDisabled.switchMap { areLimitsTemporarilyDisabled ->
-                    if (areLimitsTemporarilyDisabled) {
-                        liveDataFromValue(BlockingReason.None)
-                    } else {
-                        checkCategoryBlockedTimeAreas(
-                                temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek,
-                                blockedMinutesInWeek = category.blockedMinutesInWeek.dataNotToModify
-                        ).switchMap { blockedTimeAreasReason ->
-                            if (blockedTimeAreasReason != BlockingReason.None) {
-                                liveDataFromValue(blockedTimeAreasReason)
-                            } else {
-                                checkCategoryTimeLimitRules(
-                                        temporarilyTrustedDate = temporarilyTrustedDate,
-                                        category = category,
-                                        rules = appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id)
-                                )
+            val batteryOk = batteryLevel.map { it.isCategoryAllowed(category) }.ignoreUnchanged()
+
+            batteryOk.switchMap { ok ->
+                if (!ok) {
+                    liveDataFromValue(BlockingReason.BatteryLimit)
+                } else if (category.temporarilyBlocked) {
+                    liveDataFromValue(BlockingReason.TemporarilyBlocked)
+                } else {
+                    areLimitsTemporarilyDisabled.switchMap { areLimitsTemporarilyDisabled ->
+                        if (areLimitsTemporarilyDisabled) {
+                            liveDataFromValue(BlockingReason.None)
+                        } else {
+                            checkCategoryBlockedTimeAreas(
+                                    temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek,
+                                    blockedMinutesInWeek = category.blockedMinutesInWeek.dataNotToModify
+                            ).switchMap { blockedTimeAreasReason ->
+                                if (blockedTimeAreasReason != BlockingReason.None) {
+                                    liveDataFromValue(blockedTimeAreasReason)
+                                } else {
+                                    checkCategoryTimeLimitRules(
+                                            temporarilyTrustedDate = temporarilyTrustedDate,
+                                            category = category,
+                                            rules = appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id)
+                                    )
+                                }
                             }
                         }
                     }
