@@ -1,4 +1,3 @@
-- Warnung beim Zuordnen von bereits zugeordneten Apps hinzugefügt
-- Fehler behoben
-  - Abstürze im Sperrzeiteneditor
-  - Abstürze beim gleichzeitigen Aufrufen von mehreren Ansichten
+- Widget mit Restnutzungsdauern hinzugefügt
+- Elternbenutzer ohne Passwort im lokalen Modus ermöglicht
+- Akkulimit - Mindestakkustand für die Nutzung einer Kategorie

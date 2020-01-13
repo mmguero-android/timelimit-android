@@ -1,4 +1,3 @@
-- add warning when assigning Apps which are already assigned
-- bugfixes
-  - crashes in the blocked time area editor
-  - crashes when opening two screens at the same time
+- added widget with remaining times
+- allow parent users without password in the local mode
+- battery limit - minimum battery level per category
