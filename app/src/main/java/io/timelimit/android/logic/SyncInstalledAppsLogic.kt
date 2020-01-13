@@ -15,7 +15,11 @@
  */
 package io.timelimit.android.logic
 
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import io.timelimit.android.BuildConfig
+import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsyncExpectForever
@@ -28,6 +32,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class SyncInstalledAppsLogic(val appLogic: AppLogic) {
+    companion object {
+        private const val LOG_TAG = "SyncInstalledAppsLogic"
+    }
+
     private val doSyncLock = Mutex()
     private var requestSync = MutableLiveData<Boolean>().apply { value = false }
 
@@ -52,10 +60,21 @@ class SyncInstalledAppsLogic(val appLogic: AppLogic) {
             requestSync.waitUntilValueMatches { it == true }
             requestSync.value = false
 
-            doSyncNow()
+            try {
+                doSyncNow()
 
-            // maximal 1 time per 5 seconds
-            appLogic.timeApi.sleep(5 * 1000)
+                // maximal 1 time per 5 seconds
+                appLogic.timeApi.sleep(5 * 1000)
+            } catch (ex: Exception) {
+                if (BuildConfig.DEBUG) {
+                    Log.w(LOG_TAG, "could not sync installed app list", ex)
+                }
+
+                Toast.makeText(appLogic.context, R.string.background_logic_toast_sync_apps, Toast.LENGTH_SHORT).show()
+
+                appLogic.timeApi.sleep(45 * 1000)
+                requestSync.value = true
+            }
         }
     }
 

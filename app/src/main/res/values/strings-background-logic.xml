@@ -34,4 +34,6 @@
 
     <string name="background_logic_paused_title">Temporarily disabled</string>
     <string name="background_logic_paused_text">No limitations apply</string>
+
+    <string name="background_logic_toast_sync_apps">TimeLimit: Failure while trying to update the app list</string>
 </resources>
