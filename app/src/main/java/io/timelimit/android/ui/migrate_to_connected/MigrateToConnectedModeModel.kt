@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,11 +65,16 @@ class MigrateToConnectedModeModel(application: Application): AndroidViewModel(ap
 
                     val api = logic.serverLogic.getServerConfigCoroutine().api
 
-                    val status = api.getStatusByMailToken(mailAuthToken).status
+                    val status = api.getStatusByMailToken(mailAuthToken)
 
-                    when (status) {
+                    when (status.status) {
                         StatusOfMailAddress.MailAddressWithFamily -> statusInternal.value = ConflictAlreadyHasAccountMigrationStatus
-                        StatusOfMailAddress.MailAddressWithoutFamily -> statusInternal.value = WaitingForConfirmationByParentMigrationStatus
+                        StatusOfMailAddress.MailAddressWithoutFamily -> {
+                            statusInternal.value = if (status.canCreateFamily)
+                                WaitingForConfirmationByParentMigrationStatus
+                            else
+                                SingupDisabledMigrationStatus
+                        }
                     }.let { /* require handling all paths */ }
                 } catch (ex: Exception) {
                     if (BuildConfig.DEBUG) {
@@ -186,3 +191,4 @@ object WaitingForConfirmationByParentMigrationStatus: MigrateToConnectedModeStat
 object ConflictAlreadyHasAccountMigrationStatus: MigrateToConnectedModeStatus()
 object WorkingMigrationStatus: MigrateToConnectedModeStatus()
 object DoneMigrationStatus: MigrateToConnectedModeStatus()
+object SingupDisabledMigrationStatus: MigrateToConnectedModeStatus()

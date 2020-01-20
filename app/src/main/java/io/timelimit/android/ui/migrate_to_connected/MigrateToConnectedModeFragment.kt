@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ class MigrateToConnectedModeFragment : Fragment(), AuthenticateByMailFragmentLis
         private const val PAGE_WORKING = 2
         private const val PAGE_EXISTING_ACCOUNT = 3
         private const val PAGE_DONE = 4
+        private const val PAGE_SIGNUP_DISABLED = 5
     }
 
     private val model: MigrateToConnectedModeModel by lazy {
@@ -81,6 +82,7 @@ class MigrateToConnectedModeFragment : Fragment(), AuthenticateByMailFragmentLis
                 WorkingMigrationStatus -> binding.flipper.displayedChild = PAGE_WORKING
                 DoneMigrationStatus -> binding.flipper.displayedChild = PAGE_DONE
                 ConflictAlreadyHasAccountMigrationStatus -> binding.flipper.displayedChild = PAGE_EXISTING_ACCOUNT
+                SingupDisabledMigrationStatus -> binding.flipper.displayedChild = PAGE_SIGNUP_DISABLED
             }.let { /* require handling all cases */ }
         })
 

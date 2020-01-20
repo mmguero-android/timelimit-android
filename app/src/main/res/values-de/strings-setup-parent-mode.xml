@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -27,4 +27,6 @@
     </string>
     <string name="setup_parent_mode_explaination_device_title">Jedes Gerät bekommt einen Namen zugewiesen, damit Sie es besser zuordnen können</string>
     <string name="setup_parent_mode_explaination_device_title_field_hint">Gerät-Name</string>
+
+    <string name="setup_parent_mode_error_signup_disabled">Momentan sind keine Neuanmeldungen möglich</string>
 </resources>

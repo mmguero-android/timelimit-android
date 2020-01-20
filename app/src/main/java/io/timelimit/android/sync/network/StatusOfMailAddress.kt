@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,14 @@ import android.util.JsonReader
 
 data class StatusOfMailAddressResponse(
         val mail: String,
-        val status: StatusOfMailAddress
+        val status: StatusOfMailAddress,
+        val canCreateFamily: Boolean
 ) {
     companion object {
         fun parse(reader: JsonReader): StatusOfMailAddressResponse {
             var mail: String? = null
             var status: StatusOfMailAddress? = null
+            var canCreateFamily = true
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -35,6 +37,7 @@ data class StatusOfMailAddressResponse(
                         else -> throw IllegalArgumentException()
                     }
                     "mail" -> mail = reader.nextString()
+                    "canCreateFamily" -> canCreateFamily = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -42,7 +45,8 @@ data class StatusOfMailAddressResponse(
 
             return StatusOfMailAddressResponse(
                     mail = mail!!,
-                    status = status!!
+                    status = status!!,
+                    canCreateFamily = canCreateFamily
             )
         }
     }

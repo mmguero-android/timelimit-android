@@ -51,6 +51,8 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
 
                     if (status == null) {
                         liveDataFromValue(2)    // loading screen
+                    } else if (status.status == StatusOfMailAddress.MailAddressWithoutFamily && status.canCreateFamily == false) {
+                        liveDataFromValue(3)    // signup disabled screen
                     } else {
                         model.isDoingSetup.map {
                             if (it!!) {
