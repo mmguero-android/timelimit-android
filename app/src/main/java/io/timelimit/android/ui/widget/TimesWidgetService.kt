@@ -24,6 +24,7 @@ import android.widget.RemoteViewsService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.util.TimeTextUtil
 
@@ -52,11 +53,11 @@ class TimesWidgetService: RemoteViewsService() {
 
     private val factory = object : RemoteViewsFactory {
         override fun onCreate() {
-            categoriesLive.observeForever(categoriesObserver)
+            Threads.mainThreadHandler.post { categoriesLive.observeForever(categoriesObserver) }
         }
 
         override fun onDestroy() {
-            categoriesLive.removeObserver(categoriesObserver)
+            Threads.mainThreadHandler.post { categoriesLive.removeObserver(categoriesObserver) }
         }
 
         override fun onDataSetChanged() {
