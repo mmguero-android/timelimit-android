@@ -1,1 +1,1 @@
-Möglichkeit hinzugefügt, die Zeitzone eines Elternteils zu ändern
+Verbesserungen bei der Nutzung von TimeLimit mit einem eigenen Server

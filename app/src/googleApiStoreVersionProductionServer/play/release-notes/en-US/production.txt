@@ -1,1 +1,1 @@
-Add option to change parent user timezone
+Improvments when using TimeLimit with a own server
