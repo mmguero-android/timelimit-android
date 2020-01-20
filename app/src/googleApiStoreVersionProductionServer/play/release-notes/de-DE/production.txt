@@ -1,3 +1,1 @@
-- Widget mit Restnutzungsdauern hinzugefügt
-- Elternbenutzer ohne Passwort im lokalen Modus ermöglicht
-- Akkulimit - Mindestakkustand für die Nutzung einer Kategorie
+Erklärungstexte in Dialoge verschoben

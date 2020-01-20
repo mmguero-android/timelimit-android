@@ -1,3 +1,1 @@
-- added widget with remaining times
-- allow parent users without password in the local mode
-- battery limit - minimum battery level per category
+Move explanations to dialogs
