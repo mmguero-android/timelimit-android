@@ -1,1 +1,1 @@
-Erklärungstexte in Dialoge verschoben
+Möglichkeit hinzugefügt, die Zeitzone eines Elternteils zu ändern

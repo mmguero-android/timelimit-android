@@ -1,1 +1,1 @@
-Move explanations to dialogs
+Add option to change parent user timezone
