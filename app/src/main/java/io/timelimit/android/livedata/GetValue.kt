@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ package io.timelimit.android.livedata
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import io.timelimit.android.async.Threads
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -33,7 +34,11 @@ suspend fun <T> LiveData<T>.waitUntilValueMatches(check: (T?) -> Boolean): T? {
     }
 
     return suspendCancellableCoroutine { continuation ->
-        continuation.invokeOnCancellation { removeObserver() }
+        continuation.invokeOnCancellation {
+            Threads.mainThreadHandler.post {
+                removeObserver()
+            }
+        }
 
         observer = Observer { t ->
             if (check(t)) {
