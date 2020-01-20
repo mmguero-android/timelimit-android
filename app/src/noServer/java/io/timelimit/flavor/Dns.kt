@@ -13,25 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.sync.network.api
+package io.timelimit.flavor
 
-import android.util.Log
-import io.timelimit.android.BuildConfig
-import io.timelimit.flavor.CertificatePinning
-import io.timelimit.flavor.Dns
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.Dns
 
-val httpClient: OkHttpClient by lazy {
-    val builder = OkHttpClient.Builder()
-            .certificatePinner(CertificatePinning.configuration)
-            .dns(Dns.instance)
-
-    if (BuildConfig.DEBUG) {
-        builder.addInterceptor (HttpLoggingInterceptor {
-            Log.d("HttpClient", it)
-        })
-    }
-
-    builder.build()
+object Dns {
+    val instance: Dns = Dns.SYSTEM
 }

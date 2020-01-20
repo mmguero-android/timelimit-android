@@ -83,6 +83,7 @@ android {
             dimension 'server'
             buildConfigField 'String', 'serverUrl', '"https://api.timelimit.io"'
             buildConfigField 'String', 'serverDomain', '"api.timelimit.io"'
+            buildConfigField 'String', 'backupServerDomain', '"api.timelimitapp.de"'
             buildConfigField 'boolean', 'hasServer', 'true'
             // no applicationIdSuffix
         }
