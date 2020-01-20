@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -173,8 +173,11 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
 
                 Threads.database.executeAndWait {
                     logic.database.transaction().use { transaction ->
+                        val customServerUrl = logic.database.config().getCustomServerUrlSync()
 
                         database.deleteAllData()
+
+                        database.config().setCustomServerUrlSync(customServerUrl)
                         database.config().setOwnDeviceIdSync(registerResponse.ownDeviceId)
                         database.config().setDeviceAuthTokenSync(registerResponse.deviceAuthToken)
                         database.config().setEnableBackgroundSync(enableBackgroundSync)
