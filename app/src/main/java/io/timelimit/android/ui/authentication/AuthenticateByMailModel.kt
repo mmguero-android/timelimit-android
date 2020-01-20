@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,7 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.User
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.sync.network.api.ForbiddenHttpError
-import io.timelimit.android.sync.network.api.GoneHttpError
-import io.timelimit.android.sync.network.api.HttpError
-import io.timelimit.android.sync.network.api.MailServerBlacklistedException
+import io.timelimit.android.sync.network.api.*
 import java.io.IOException
 
 class AuthenticateByMailModel(application: Application): AndroidViewModel(application) {
@@ -109,6 +106,8 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
                 errorMessage.value = ErrorMessage.ServerRejection
             } catch (ex: MailServerBlacklistedException) {
                 errorMessage.value = ErrorMessage.BlacklistedMailServer
+            } catch (ex: MailAddressNotWhitelistedException) {
+                errorMessage.value = ErrorMessage.NotWhitelistedMailAddress
             } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) {
                     Log.w(LOG_TAG, "sendAuthMessage()", ex)
@@ -157,7 +156,7 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
 }
 
 enum class ErrorMessage {
-    NetworkProblem, ServerRejection, WrongCode, BlacklistedMailServer
+    NetworkProblem, ServerRejection, WrongCode, BlacklistedMailServer, NotWhitelistedMailAddress
 }
 
 enum class ScreenToShow {

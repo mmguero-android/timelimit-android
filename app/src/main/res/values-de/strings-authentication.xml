@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -38,5 +38,10 @@
     <string name="authenticate_blacklisted_mail_server_title">E-Mail-Anbieter nicht unterstützt</string>
     <string name="authenticate_blacklisted_mail_server_text">Wir können keine Nachrichten an E-Mail-Adressen bei diesen Anbieter senden.
         Bitte verwenden Sie eine andere E-Mail-Adresse.
+    </string>
+    <string name="authenticate_not_whitelisted_address_title">E-Mail-Adresse nicht in der Whitelist</string>
+    <string name="authenticate_not_whitelisted_address_text">Es wurde
+        serverseitig eine Whitelist mit E-Mail-Adressen festgelegt und die angegebene E-Mail-Adresse war nicht
+        in dieser Whitelist
     </string>
 </resources>

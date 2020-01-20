@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,6 +135,11 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
                             "mailServerBlacklisted" -> {
                                 if (reader.nextBoolean()) {
                                     throw MailServerBlacklistedException()
+                                }
+                            }
+                            "mailAddressNotWhitelisted" -> {
+                                if (reader.nextBoolean()) {
+                                    throw MailAddressNotWhitelistedException()
                                 }
                             }
                             else -> reader.skipValue()

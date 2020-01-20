@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -122,6 +122,8 @@ class AuthenticateByMailFragment : Fragment() {
             if (it != null) {
                 if (it == ErrorMessage.BlacklistedMailServer) {
                     BlacklistedMailServerDialogFragment().show(fragmentManager!!)
+                } else if (it == ErrorMessage.NotWhitelistedMailAddress) {
+                    NotWhitelistedMailAddressDialogFragment().show(fragmentManager!!)
                 } else {
                     Snackbar.make(
                             binding.root,
@@ -130,6 +132,7 @@ class AuthenticateByMailFragment : Fragment() {
                                 ErrorMessage.ServerRejection -> R.string.error_server_rejected
                                 ErrorMessage.WrongCode -> R.string.authenticate_by_mail_snackbar_wrong_code
                                 ErrorMessage.BlacklistedMailServer -> throw IllegalStateException("should be handled above")
+                                ErrorMessage.NotWhitelistedMailAddress -> throw IllegalStateException("should be handled above")
                             },
                             Snackbar.LENGTH_SHORT
                     ).show()
