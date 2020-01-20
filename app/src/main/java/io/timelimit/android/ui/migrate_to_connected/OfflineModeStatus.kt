@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,6 +144,35 @@ data class OfflineModeStatus(
                     )
                 }
 
+                if (category.minBatteryLevelMobile > 0 || category.minBatteryLevelWhileCharging > 0) {
+                    apply(
+                            UpdateCategoryBatteryLimit(
+                                    categoryId = category.id,
+                                    mobileLimit = category.minBatteryLevelMobile,
+                                    chargingLimit = category.minBatteryLevelWhileCharging
+                            )
+                    )
+                }
+
+                if (category.timeWarnings != 0) {
+                    apply(
+                            UpdateCategoryTimeWarningsAction(
+                                    categoryId = category.id,
+                                    enable = true,
+                                    flags = category.timeWarnings
+                            )
+                    )
+                }
+
+                if (category.blockAllNotifications) {
+                    apply(
+                            UpdateCategoryBlockAllNotificationsAction(
+                                    categoryId = category.id,
+                                    blocked = true
+                            )
+                    )
+                }
+
                 // add category apps
                 val thisCategoryApps = categoryApps.filter { it.categoryId == category.id }
                 if (thisCategoryApps.isNotEmpty()) {
@@ -217,6 +246,13 @@ data class OfflineModeStatus(
             apply(SetConsiderRebootManipulationAction(
                     deviceId = newDeviceId,
                     considerRebootManipulation = true
+            ))
+        }
+
+        if (device.enableActivityLevelBlocking) {
+            apply(UpdateEnableActivityLevelBlocking(
+                    deviceId = newDeviceId,
+                    enable = true
             ))
         }
     }
