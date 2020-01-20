@@ -41,14 +41,11 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/title_view"
+                android:background="?selectableItemBackground"
+                android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                 android:text="@string/device_background_sync_title"
                 android:textAppearance="?android:textAppearanceLarge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="@string/device_background_sync_text"
-                android:textAppearance="?android:textAppearanceMedium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

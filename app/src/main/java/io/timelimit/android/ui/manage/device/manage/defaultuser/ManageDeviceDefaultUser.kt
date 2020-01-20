@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.sync.actions.SignOutAtDeviceAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 import io.timelimit.android.util.TimeTextUtil
@@ -43,6 +44,13 @@ object ManageDeviceDefaultUser {
             fragmentManager: FragmentManager
     ) {
         val context = view.root.context
+
+        view.titleView.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.manage_device_default_user_title,
+                    text = R.string.manage_device_default_user_info
+            ).show(fragmentManager)
+        }
 
         device.switchMap { deviceEntry ->
             users.map { users ->

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AdminReceiver
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.manage.device.manage.permission.InformAboutDeviceOwnerDialogFragment
 
 
@@ -132,6 +133,34 @@ class SetupDevicePermissionsFragment : Fragment() {
                         R.id.setupDevicePermissionsFragment
                 )
             }
+
+            override fun helpUsageStatsAccess() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permissions_usagestats_title,
+                        text = R.string.manage_device_permissions_usagestats_text
+                ).show(fragmentManager!!)
+            }
+
+            override fun helpNotificationAccess() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permission_notification_access_title,
+                        text = R.string.manage_device_permission_notification_access_text
+                ).show(fragmentManager!!)
+            }
+
+            override fun helpDrawOverOtherApps() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permissions_overlay_title,
+                        text = R.string.manage_device_permissions_overlay_text
+                ).show(fragmentManager!!)
+            }
+
+            override fun helpAccesibility() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permission_accessibility_title,
+                        text = R.string.manage_device_permission_accessibility_text
+                ).show(fragmentManager!!)
+            }
         }
 
         refreshStatus()
@@ -163,4 +192,8 @@ interface SetupDevicePermissionsHandlers {
     fun openDrawOverOtherAppsScreen()
     fun openAccessibilitySettings()
     fun gotoNextStep()
+    fun helpUsageStatsAccess()
+    fun helpNotificationAccess()
+    fun helpDrawOverOtherApps()
+    fun helpAccesibility()
 }

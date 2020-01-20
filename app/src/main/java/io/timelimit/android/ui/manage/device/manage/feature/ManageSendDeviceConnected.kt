@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,12 +15,15 @@
  */
 package io.timelimit.android.ui.manage.device.manage.feature
 
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.sync.actions.SetSendDeviceConnected
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 
 object ManageSendDeviceConnected {
@@ -28,9 +31,17 @@ object ManageSendDeviceConnected {
             binding: io.timelimit.android.databinding.ManageSendDeviceConnectedBinding,
             auth: ActivityViewModel,
             deviceEntry: LiveData<Device?>,
-            lifecycleOwner: LifecycleOwner
+            lifecycleOwner: LifecycleOwner,
+            fragmentManager: FragmentManager
     ) {
         val ownDeviceIdLive = auth.logic.deviceId
+
+        binding.titleView.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.manage_send_device_connected_title,
+                    text = R.string.manage_send_device_connected_info
+            ).show(fragmentManager)
+        }
 
         mergeLiveData(ownDeviceIdLive, deviceEntry).observe(lifecycleOwner, Observer { (ownDeviceId, device) ->
             binding.isThisDevice = ownDeviceId == device?.id && device?.id != null

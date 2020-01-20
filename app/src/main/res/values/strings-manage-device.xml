@@ -105,6 +105,8 @@
     <string name="manage_device_permission_status_not_required">The permission is not needed due to the old Android version</string>
     <string name="manage_device_permission_status_not_supported">This feature is not supported by this device</string>
 
+    <string name="manage_device_permission_btn_modify">Modify</string>
+
     <string name="manage_device_downgrade_title">Downgrade</string>
     <string name="manage_device_downgrade_text">On this device, a newer version of TimeLimit was replaced by an older one</string>
 

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,11 @@
  */
 package io.timelimit.android.ui.setup
 
+import androidx.fragment.app.FragmentManager
 import io.timelimit.android.R
 import io.timelimit.android.data.model.NetworkTime
 import io.timelimit.android.databinding.SetupNetworkTimeVerificationBinding
+import io.timelimit.android.ui.help.HelpDialogFragment
 
 object SetupNetworkTimeVerification {
     fun readSelection(view: SetupNetworkTimeVerificationBinding) = when (view.networkTimeVerificationRadioGroup.checkedRadioButtonId) {
@@ -25,5 +27,14 @@ object SetupNetworkTimeVerification {
         R.id.network_time_verification_if_possible -> NetworkTime.IfPossible
         R.id.network_time_verification_enabled -> NetworkTime.Enabled
         else -> throw IllegalStateException()
+    }
+
+    fun prepareHelpButton(view: SetupNetworkTimeVerificationBinding, fragmentManager: FragmentManager) {
+        view.titleView.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.manage_device_network_time_verification_title,
+                    text = R.string.manage_device_network_time_verification_description
+            ).show(fragmentManager)
+        }
     }
 }

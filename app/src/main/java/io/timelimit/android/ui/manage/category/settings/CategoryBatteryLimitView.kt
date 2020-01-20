@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.manage.category.settings
 
 import android.widget.SeekBar
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -26,6 +27,7 @@ import io.timelimit.android.databinding.CategoryBatteryLimitViewBinding
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.map
 import io.timelimit.android.sync.actions.UpdateCategoryBatteryLimit
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 
 object CategoryBatteryLimitView {
@@ -34,8 +36,16 @@ object CategoryBatteryLimitView {
             lifecycleOwner: LifecycleOwner,
             category: LiveData<Category?>,
             auth: ActivityViewModel,
-            categoryId: String
+            categoryId: String,
+            fragmentManager: FragmentManager
     ) {
+        binding.titleView.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.category_settings_battery_limit_title,
+                    text = R.string.category_settings_battery_limit_description
+            ).show(fragmentManager)
+        }
+
         binding.seekbarCharging.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) = Unit
             override fun onStopTrackingTouch(p0: SeekBar?) = Unit

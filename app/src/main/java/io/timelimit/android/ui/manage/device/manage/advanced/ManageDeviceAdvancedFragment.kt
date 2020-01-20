@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,7 +93,8 @@ class ManageDeviceAdvancedFragment : Fragment(), FragmentWithCustomTitle {
                 view = binding.manageBackgroundSync,
                 isThisDevice = isThisDevice,
                 lifecycleOwner = this,
-                activityViewModel = auth
+                activityViewModel = auth,
+                fragmentManager = fragmentManager!!
         )
 
         binding.handlers = object: ManageDeviceAdvancedFragmentHandlers {

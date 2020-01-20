@@ -28,6 +28,7 @@ import io.timelimit.android.databinding.FragmentCategorySettingsBinding
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.SetCategoryExtraTimeAction
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
@@ -58,7 +59,8 @@ class CategorySettingsFragment : Fragment() {
                 categoryId = params.categoryId,
                 childId = params.childId,
                 database = appLogic.database,
-                auth = auth
+                auth = auth,
+                fragmentManager = fragmentManager!!
         )
 
         CategoryBatteryLimitView.bind(
@@ -66,7 +68,8 @@ class CategorySettingsFragment : Fragment() {
                 lifecycleOwner = this,
                 category = categoryEntry,
                 auth = auth,
-                categoryId = params.categoryId
+                categoryId = params.categoryId,
+                fragmentManager = fragmentManager!!
         )
 
         ParentCategoryView.bind(
@@ -91,11 +94,19 @@ class CategorySettingsFragment : Fragment() {
                 view = binding.timeWarnings,
                 auth = auth,
                 categoryLive = categoryEntry,
-                lifecycleOwner = this
+                lifecycleOwner = this,
+                fragmentManager = fragmentManager!!
         )
 
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }
         binding.editCategoryTitleGo.setOnClickListener { renameCategory() }
+
+        binding.extraTimeTitle.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.category_settings_extra_time_title,
+                    text = R.string.category_settings_extra_time_info
+            ).show(fragmentManager!!)
+        }
 
         categoryEntry.observe(this, Observer {
             if (it != null) {

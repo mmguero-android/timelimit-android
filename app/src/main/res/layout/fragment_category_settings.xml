@@ -39,14 +39,11 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:background="?selectableItemBackground"
+                        android:drawableEnd="@drawable/ic_info_outline_black_24dp"
+                        android:id="@+id/extra_time_title"
                         android:text="@string/category_settings_extra_time_title"
                         android:textAppearance="?android:textAppearanceLarge"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:textAppearance="?android:textAppearanceMedium"
-                        android:text="@string/category_settings_extra_time_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 

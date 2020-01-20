@@ -74,6 +74,8 @@ class SetupLocalModeFragment : Fragment() {
             )
         }
 
+        SetupNetworkTimeVerification.prepareHelpButton(binding.networkTimeVerification, fragmentManager!!)
+
         return binding.root
     }
 }

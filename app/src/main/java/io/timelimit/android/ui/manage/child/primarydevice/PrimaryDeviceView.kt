@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@ package io.timelimit.android.ui.manage.child.primarydevice
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import io.timelimit.android.R
 import io.timelimit.android.databinding.PrimaryDeviceViewBinding
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.sync.actions.SetRelaxPrimaryDeviceAction
 import io.timelimit.android.sync.network.UpdatePrimaryDeviceRequestType
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 
 object PrimaryDeviceView {
@@ -34,6 +36,13 @@ object PrimaryDeviceView {
             lifecycleOwner: LifecycleOwner,
             auth: ActivityViewModel
     ) {
+        view.titleView.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.primary_device_title,
+                    text = R.string.primary_device_description
+            ).show(fragmentManager)
+        }
+
         val userEntry = logic.database.user().getUserByIdLive(childId)
         val ownDeviceId = logic.deviceId
         val ownDeviceUser = logic.deviceUserId

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.NetworkTime
+import io.timelimit.android.databinding.HelpDialogFragmentBinding
 import io.timelimit.android.databinding.ManageDeviceFeaturesFragmentBinding
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
@@ -35,6 +36,7 @@ import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.RealTime
 import io.timelimit.android.sync.actions.UpdateNetworkTimeVerificationAction
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
@@ -114,6 +116,13 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
             override fun showAuthenticationScreen() {
                 activity.showAuthenticationScreen()
             }
+
+            override fun showNetworkTimeHelp() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_network_time_verification_title,
+                        text = R.string.manage_device_network_time_verification_description
+                ).show(fragmentManager!!)
+            }
         }
 
         // network time status
@@ -135,7 +144,8 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 view = binding.deviceRebootManipulation,
                 lifecycleOwner = this,
                 deviceEntry = deviceEntry,
-                auth = auth
+                auth = auth,
+                fragmentManager = fragmentManager!!
         )
 
         // activity level blocking
@@ -143,7 +153,8 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 view = binding.activityLevelBlocking,
                 auth = auth,
                 deviceEntry = deviceEntry,
-                lifecycleOwner = this
+                lifecycleOwner = this,
+                fragmentManager = fragmentManager!!
         )
 
         // send connected
@@ -151,7 +162,8 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 binding = binding.sendDeviceConnected,
                 deviceEntry = deviceEntry,
                 auth = auth,
-                lifecycleOwner = this
+                lifecycleOwner = this,
+                fragmentManager = fragmentManager!!
         )
 
 
@@ -164,4 +176,5 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
 interface ManageDeviceFeaturesFragmentHandlers {
     fun changeNetworkTimeVerification(newValue: NetworkTime)
     fun showAuthenticationScreen()
+    fun showNetworkTimeHelp()
 }

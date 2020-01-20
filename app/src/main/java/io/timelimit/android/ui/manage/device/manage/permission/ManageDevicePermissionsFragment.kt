@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
+import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.ManageDevicePermissionsFragmentBinding
 import io.timelimit.android.integration.platform.NewPermissionStatus
 import io.timelimit.android.integration.platform.ProtectionLevel
@@ -43,6 +44,7 @@ import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
@@ -101,6 +103,10 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
                 fragment = this,
                 doesSupportAuth = liveDataFromValue(true)
         )
+
+        auth.authenticatedUser.map { it?.second?.type == UserType.Parent }.observe(this, Observer {
+            binding.isUserSignedIn = it
+        })
 
         // handlers
         binding.handlers = object: ManageDevicePermissionsFragmentHandlers {
@@ -189,6 +195,34 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
             override fun showAuthenticationScreen() {
                 activity.showAuthenticationScreen()
             }
+
+            override fun helpUsageStatsAccess() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permissions_usagestats_title,
+                        text = R.string.manage_device_permissions_usagestats_text
+                ).show(fragmentManager!!)
+            }
+
+            override fun helpNotificationAccess() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permission_notification_access_title,
+                        text = R.string.manage_device_permission_notification_access_text
+                ).show(fragmentManager!!)
+            }
+
+            override fun helpDrawOverOtherApps() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permissions_overlay_title,
+                        text = R.string.manage_device_permissions_overlay_text
+                ).show(fragmentManager!!)
+            }
+
+            override fun helpAccesibility() {
+                HelpDialogFragment.newInstance(
+                        title = R.string.manage_device_permission_accessibility_title,
+                        text = R.string.manage_device_permission_accessibility_text
+                ).show(fragmentManager!!)
+            }
         }
 
         // is this device
@@ -233,4 +267,8 @@ interface ManageDevicePermissionsFragmentHandlers {
     fun openAccessibilitySettings()
     fun manageDeviceAdmin()
     fun showAuthenticationScreen()
+    fun helpUsageStatsAccess()
+    fun helpNotificationAccess()
+    fun helpDrawOverOtherApps()
+    fun helpAccesibility()
 }

@@ -291,7 +291,8 @@ class SetupDeviceFragment : Fragment() {
                 view = binding.backgroundSync,
                 isThisDevice = liveDataFromValue(true),
                 lifecycleOwner = this,
-                activityViewModel = activity.getActivityViewModel()
+                activityViewModel = activity.getActivityViewModel(),
+                fragmentManager = fragmentManager!!
         )
 
         binding.confirmBtn.setOnClickListener {
@@ -305,6 +306,8 @@ class SetupDeviceFragment : Fragment() {
                     networkTime = SetupNetworkTimeVerification.readSelection(binding.networkTimeVerification)
             )
         }
+
+        SetupNetworkTimeVerification.prepareHelpButton(binding.networkTimeVerification, fragmentManager!!)
 
         return binding.root
     }

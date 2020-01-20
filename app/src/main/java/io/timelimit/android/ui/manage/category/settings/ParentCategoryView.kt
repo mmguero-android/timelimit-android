@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@ package io.timelimit.android.ui.manage.category.settings
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import io.timelimit.android.R
 import io.timelimit.android.data.Database
 import io.timelimit.android.databinding.ManageParentCategoryBinding
+import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 
 object ParentCategoryView {
@@ -32,6 +34,13 @@ object ParentCategoryView {
             database: Database,
             fragmentManager: FragmentManager
     ) {
+        binding.titleView.setOnClickListener {
+            HelpDialogFragment.newInstance(
+                    title = R.string.category_settings_parent_category_title,
+                    text = R.string.category_settings_parent_category_intro
+            ).show(fragmentManager)
+        }
+
         database.category().getCategoriesByChildId(childId).observe(lifecycleOwner, Observer { categories ->
             val ownCategory = categories.find { it.id == categoryId }
             val parentCategory = categories.find { it.id == ownCategory?.parentCategoryId }

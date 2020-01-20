@@ -39,14 +39,11 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/title_view"
+                android:background="?selectableItemBackground"
+                android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                 android:text="@string/manage_send_device_connected_title"
                 android:textAppearance="?android:textAppearanceLarge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:textAppearance="?android:textAppearanceMedium"
-                android:text="@string/manage_send_device_connected_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

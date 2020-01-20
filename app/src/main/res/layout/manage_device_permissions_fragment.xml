@@ -1,5 +1,5 @@
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -46,6 +46,10 @@
             name="handlers"
             type="io.timelimit.android.ui.manage.device.manage.permission.ManageDevicePermissionsFragmentHandlers" />
 
+        <variable
+            name="isUserSignedIn"
+            type="boolean" />
+
         <import type="android.view.View" />
         <import type="io.timelimit.android.data.model.NetworkTime" />
         <import type="io.timelimit.android.integration.platform.RuntimePermissionStatus" />
@@ -68,9 +72,6 @@
                 android:layout_height="wrap_content">
 
                 <androidx.cardview.widget.CardView
-                    android:foreground="?selectableItemBackground"
-                    android:clickable="@{safeUnbox(isThisDevice)}"
-                    android:onClick="@{() -> handlers.manageDeviceAdmin()}"
                     app:cardUseCompatPadding="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -114,11 +115,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <TextView
-                            android:visibility="@{safeUnbox(isThisDevice) ? View.VISIBLE : View.GONE}"
-                            android:text="@string/manage_device_permission_tap_top_open_settings"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:layout_width="match_parent"
+                        <Button
+                            android:background="?selectableItemBackground"
+                            android:text="@string/manage_device_permission_btn_modify"
+                            android:layout_gravity="end"
+                            android:enabled="@{safeUnbox(isThisDevice)}"
+                            android:onClick="@{() -> handlers.manageDeviceAdmin()}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
                         <TextView
@@ -132,9 +135,6 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:onClick="@{() -> handlers.openUsageStatsSettings()}"
-                    android:foreground="?selectableItemBackground"
-                    android:clickable="@{safeUnbox(isThisDevice) &amp;&amp; (usageStatsAccess != RuntimePermissionStatus.NotRequired)}"
                     app:cardUseCompatPadding="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -145,18 +145,17 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:background="?selectableItemBackground"
+                            android:drawableEnd="@drawable/ic_info_outline_black_24dp"
+                            android:onClick="@{() -> handlers.helpUsageStatsAccess()}"
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/manage_device_permissions_usagestats_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
                         <TextView
-                            android:textAppearance="?android:textAppearanceMedium"
-                            android:text="@string/manage_device_permissions_usagestats_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{usageStatsAccess == RuntimePermissionStatus.Granted ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/green"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -165,6 +164,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{usageStatsAccess == RuntimePermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/red"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -173,6 +174,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{usageStatsAccess == RuntimePermissionStatus.NotRequired ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/green"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -180,11 +183,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <TextView
-                            android:visibility="@{(( usageStatsAccess != RuntimePermissionStatus.NotRequired) &amp;&amp; (safeUnbox(isThisDevice))) ? View.VISIBLE : View.GONE}"
-                            android:text="@string/manage_device_permission_tap_top_open_settings"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:layout_width="match_parent"
+                        <Button
+                            android:background="?selectableItemBackground"
+                            android:text="@string/manage_device_permission_btn_modify"
+                            android:layout_gravity="end"
+                            android:onClick="@{() -> handlers.openUsageStatsSettings()}"
+                            android:enabled="@{safeUnbox(isThisDevice) &amp;&amp; (usageStatsAccess != RuntimePermissionStatus.NotRequired)}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
                         <TextView
@@ -198,9 +203,6 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:onClick="@{() -> handlers.openNotificationAccessSettings()}"
-                    android:foreground="?selectableItemBackground"
-                    android:clickable="@{safeUnbox(isThisDevice) &amp;&amp; (notificationAccessPermission != NewPermissionStatus.NotSupported)}"
                     app:cardUseCompatPadding="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -211,18 +213,17 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:background="?selectableItemBackground"
+                            android:drawableEnd="@drawable/ic_info_outline_black_24dp"
+                            android:onClick="@{() -> handlers.helpNotificationAccess()}"
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/manage_device_permission_notification_access_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
                         <TextView
-                            android:textAppearance="?android:textAppearanceMedium"
-                            android:text="@string/manage_device_permission_notification_access_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{notificationAccessPermission == NewPermissionStatus.Granted ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/green"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -231,6 +232,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{notificationAccessPermission == NewPermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/red"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -239,6 +242,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{notificationAccessPermission == NewPermissionStatus.NotSupported ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/red"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -246,11 +251,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <TextView
-                            android:visibility="@{(( notificationAccessPermission != NewPermissionStatus.NotSupported) &amp;&amp; (safeUnbox(isThisDevice))) ? View.VISIBLE : View.GONE}"
-                            android:text="@string/manage_device_permission_tap_top_open_settings"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:layout_width="match_parent"
+                        <Button
+                            android:background="?selectableItemBackground"
+                            android:text="@string/manage_device_permission_btn_modify"
+                            android:layout_gravity="end"
+                            android:onClick="@{() -> handlers.openNotificationAccessSettings()}"
+                            android:enabled="@{safeUnbox(isThisDevice) &amp;&amp; (notificationAccessPermission != NewPermissionStatus.NotSupported)}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
                         <TextView
@@ -264,9 +271,6 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:onClick="@{() -> handlers.openDrawOverOtherAppsScreen()}"
-                    android:foreground="?selectableItemBackground"
-                    android:clickable="@{safeUnbox(isThisDevice) &amp;&amp; (overlayPermission != RuntimePermissionStatus.NotRequired)}"
                     app:cardUseCompatPadding="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -277,18 +281,17 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:background="?selectableItemBackground"
+                            android:drawableEnd="@drawable/ic_info_outline_black_24dp"
+                            android:onClick="@{() -> handlers.helpDrawOverOtherApps()}"
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/manage_device_permissions_overlay_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
                         <TextView
-                            android:textAppearance="?android:textAppearanceMedium"
-                            android:text="@string/manage_device_permissions_overlay_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{overlayPermission == RuntimePermissionStatus.Granted ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/green"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -297,6 +300,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{overlayPermission == RuntimePermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/red"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -305,6 +310,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{overlayPermission == RuntimePermissionStatus.NotRequired ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/green"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -312,11 +319,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <TextView
-                            android:visibility="@{(( overlayPermission != RuntimePermissionStatus.NotRequired) &amp;&amp; (safeUnbox(isThisDevice))) ? View.VISIBLE : View.GONE}"
-                            android:text="@string/manage_device_permission_tap_top_open_settings"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:layout_width="match_parent"
+                        <Button
+                            android:background="?selectableItemBackground"
+                            android:text="@string/manage_device_permission_btn_modify"
+                            android:layout_gravity="end"
+                            android:onClick="@{() -> handlers.openDrawOverOtherAppsScreen()}"
+                            android:enabled="@{safeUnbox(isThisDevice) &amp;&amp; (overlayPermission != RuntimePermissionStatus.NotRequired)}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
                         <TextView
@@ -330,9 +339,6 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
-                    android:onClick="@{() -> handlers.openAccessibilitySettings()}"
-                    android:foreground="?selectableItemBackground"
-                    android:clickable="@{safeUnbox(isThisDevice)}"
                     app:cardUseCompatPadding="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -343,18 +349,17 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:background="?selectableItemBackground"
+                            android:drawableEnd="@drawable/ic_info_outline_black_24dp"
+                            android:onClick="@{() -> handlers.helpAccesibility()}"
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/manage_device_permission_accessibility_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
                         <TextView
-                            android:textAppearance="?android:textAppearanceMedium"
-                            android:text="@string/manage_device_permission_accessibility_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{accessibilityServiceEnabled == true ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/green"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -363,6 +368,8 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingTop="8dp"
+                            android:gravity="center_horizontal"
                             android:visibility="@{accessibilityServiceEnabled == false ? View.VISIBLE : View.GONE}"
                             android:textColor="@color/red"
                             android:textAppearance="?android:textAppearanceMedium"
@@ -370,12 +377,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-
-                        <TextView
-                            android:visibility="@{safeUnbox(isThisDevice) ? View.VISIBLE : View.GONE}"
-                            android:text="@string/manage_device_permission_tap_top_open_settings"
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:layout_width="match_parent"
+                        <Button
+                            android:background="?selectableItemBackground"
+                            android:text="@string/manage_device_permission_btn_modify"
+                            android:layout_gravity="end"
+                            android:onClick="@{() -> handlers.openAccessibilitySettings()}"
+                            android:enabled="@{safeUnbox(isThisDevice)}"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 
                         <TextView
@@ -387,6 +395,11 @@
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
+
+                <View
+                    android:visibility="@{isUserSignedIn ? View.GONE : View.VISIBLE}"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp" />
 
             </LinearLayout>
         </ScrollView>

@@ -26,14 +26,11 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/title_view"
+                android:background="?selectableItemBackground"
+                android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                 android:textAppearance="?android:textAppearanceLarge"
                 android:text="@string/manage_device_network_time_verification_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:textAppearance="?android:textAppearanceMedium"
-                android:text="@string/manage_device_network_time_verification_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
