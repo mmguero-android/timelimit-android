@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
+import io.timelimit.android.ui.manage.child.advanced.timezone.UserTimezoneView
 import io.timelimit.android.ui.manage.parent.delete.DeleteParentView
 
 class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
@@ -101,6 +102,15 @@ class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
         ManageParentNotifications.bind(
                 view = binding.manageNotifications,
                 lifecycleOwner = this,
+                auth = activity.getActivityViewModel(),
+                userEntry = parentUser
+        )
+
+        UserTimezoneView.bind(
+                view = binding.timezone,
+                userId = params.parentId,
+                lifecycleOwner = this,
+                fragmentManager = fragmentManager!!,
                 auth = activity.getActivityViewModel(),
                 userEntry = parentUser
         )

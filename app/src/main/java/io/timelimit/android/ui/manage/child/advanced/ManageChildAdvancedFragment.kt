@@ -38,10 +38,9 @@ import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.advanced.password.ManageChildPassword
-import io.timelimit.android.ui.manage.child.advanced.timezone.SetChildTimezoneDialogFragment
+import io.timelimit.android.ui.manage.child.advanced.timezone.UserTimezoneView
 import io.timelimit.android.ui.manage.child.primarydevice.PrimaryDeviceView
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
-import java.util.*
 
 class ManageChildAdvancedFragment : Fragment() {
     companion object {
@@ -142,20 +141,14 @@ class ManageChildAdvancedFragment : Fragment() {
             })
         }
 
-        run {
-            // timezone
-            childEntry.observe(this, Observer {
-                binding.timezone = TimeZone.getTimeZone(it?.timeZone ?: "").displayName
-            })
-
-            binding.changeTimezoneButton.setOnClickListener {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    SetChildTimezoneDialogFragment.newInstance(
-                            childId = params.childId
-                    ).show(fragmentManager!!)
-                }
-            }
-        }
+        UserTimezoneView.bind(
+                userEntry = childEntry,
+                view = binding.userTimezone,
+                fragmentManager = fragmentManager!!,
+                lifecycleOwner = this,
+                userId = params.childId,
+                auth = auth
+        )
 
         binding.renameChildButton.setOnClickListener {
             if (auth.requestAuthenticationOrReturnTrue()) {

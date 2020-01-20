@@ -14,7 +14,7 @@
 -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="io.timelimit.android.ui.manage.child.advanced.timezone.SetChildTimezoneDialogFragment">
+    tools:context="io.timelimit.android.ui.manage.child.advanced.timezone.SetUserTimezoneDialogFragment">
 
     <LinearLayout
         android:orientation="vertical"

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,20 +39,20 @@ import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import java.util.*
 
-class SetChildTimezoneDialogFragment : DialogFragment() {
+class SetUserTimezoneDialogFragment : DialogFragment() {
     companion object {
-        private const val EXTRA_CHILD_ID = "childId"
-        private const val DIALOG_TAG = "SetChildTimezoneDialogFragment"
+        private const val EXTRA_USER_ID = "userId"
+        private const val DIALOG_TAG = "SetUserTimezoneDialogFragment"
 
-        fun newInstance(childId: String) = SetChildTimezoneDialogFragment().apply {
+        fun newInstance(userId: String) = SetUserTimezoneDialogFragment().apply {
             arguments = Bundle().apply {
-                putString(EXTRA_CHILD_ID, childId)
+                putString(EXTRA_USER_ID, userId)
             }
         }
     }
 
-    val childId: String by lazy {
-        arguments!!.getString(EXTRA_CHILD_ID)!!
+    val userId: String by lazy {
+        arguments!!.getString(EXTRA_USER_ID)!!
     }
 
     val auth: ActivityViewModel by lazy {
@@ -81,7 +81,7 @@ class SetChildTimezoneDialogFragment : DialogFragment() {
             override fun onTimezoneClicked(timeZone: TimeZone) {
                 auth.tryDispatchParentAction(
                         SetUserTimezoneAction(
-                                userId = childId,
+                                userId = userId,
                                 timezone = timeZone.id
                         )
                 )
