@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -158,10 +158,17 @@ class Adapter(items: BlockedTimeItems): RecyclerView.Adapter<ViewHolder>() {
 
 class SpanSizeLookup(private val items: BlockedTimeItems): GridLayoutManager.SpanSizeLookup() {
     override fun getSpanSize(position: Int): Int {
-        return if (items.getItemAtPosition(position) is MinuteTile) {
-             1
-        } else {
-            items.recommendColumns
+        return try {
+            if (items.getItemAtPosition(position) is MinuteTile) {
+                1
+            } else {
+                items.recommendColumns
+            }
+        } catch (ex: IllegalStateException) {
+            // element is out of bounds => don't care about the size
+            // this case occurs only at some devices
+
+            1
         }
     }
 }
