@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019- 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@ import android.util.SparseLongArray
 import io.timelimit.android.data.model.TimeLimitRule
 
 data class RemainingTime(val includingExtraTime: Long, val default: Long) {
+    val hasRemainingTime = includingExtraTime > 0
+    val usingExtraTime = includingExtraTime > 0 && default == 0L
+
     init {
         if (includingExtraTime < 0 || default < 0) {
             throw IllegalStateException("time is < 0")

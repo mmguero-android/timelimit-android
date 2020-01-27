@@ -121,6 +121,8 @@ class DummyIntegration(
         result.activityName = null
     }
 
+    override fun getMusicPlaybackPackage(): String? = null
+
     override fun setAppStatusMessage(message: AppStatusMessage?) {
         lastAppStatusMessage = message
     }

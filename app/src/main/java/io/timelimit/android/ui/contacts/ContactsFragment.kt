@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -176,7 +176,7 @@ class ContactsFragment : Fragment() {
             val logic = DefaultAppLogic.with(context!!)
 
             try {
-                logic.backgroundTaskLogic.pauseBackgroundLoop = true
+                logic.backgroundTaskLogic.pauseForegroundAppBackgroundLoop = true
 
                 startActivity(intent)
 
@@ -190,7 +190,7 @@ class ContactsFragment : Fragment() {
 
                     delay(500)
 
-                    logic.backgroundTaskLogic.pauseBackgroundLoop = false
+                    logic.backgroundTaskLogic.pauseForegroundAppBackgroundLoop = false
 
                     Snackbar.make(view!!, R.string.contacts_snackbar_call_started, Snackbar.LENGTH_LONG).show()
                 }
@@ -199,7 +199,7 @@ class ContactsFragment : Fragment() {
                     Log.w(LOG_TAG, "could not start call", ex)
                 }
 
-                logic.backgroundTaskLogic.pauseBackgroundLoop = false
+                logic.backgroundTaskLogic.pauseForegroundAppBackgroundLoop = false
 
                 Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
             }
