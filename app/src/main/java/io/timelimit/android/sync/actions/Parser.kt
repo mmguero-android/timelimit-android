@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ object ActionParser {
         SignOutAtDeviceAction.TYPE_VALUE -> SignOutAtDeviceAction
         UpdateAppActivitiesAction.TYPE_VALUE -> UpdateAppActivitiesAction.parse(action)
         UpdateDeviceStatusAction.TYPE_VALUE -> UpdateDeviceStatusAction.parse(action)
+        AddUsedTimeActionVersion2.TYPE_VALUE -> AddUsedTimeActionVersion2.parse(action)
         else -> throw IllegalStateException()
     }
 

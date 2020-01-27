@@ -109,8 +109,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
     private val shouldDoAutomaticSignOut = cache.shouldDoAutomaticSignOut
     private val liveDataCaches = cache.liveDataCaches
 
-    private var usedTimeUpdateHelperForegroundApp: UsedTimeItemBatchUpdateHelper? = null
-    private var usedTimeUpdateHelperBackgroundPlayback: UsedTimeItemBatchUpdateHelper? = null
+    private var usedTimeUpdateHelper: UsedTimeUpdateHelper? = null
     private var previousMainLogicExecutionTime = 0
     private var previousMainLoopEndTime = 0L
     private val dayChangeTracker = DayChangeTracker(
@@ -140,8 +139,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
     val audioPlaybackHandling = BackgroundTaskRestrictionLogicResult()
 
     private suspend fun commitUsedTimeUpdaters() {
-        usedTimeUpdateHelperForegroundApp?.commit(appLogic)
-        usedTimeUpdateHelperBackgroundPlayback?.commit(appLogic)
+        usedTimeUpdateHelper?.forceCommit(appLogic)
     }
 
     private suspend fun backgroundServiceLoop() {
@@ -281,84 +279,55 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         result = audioPlaybackHandling
                 )
 
+                // update used time helper if date does not match
+                if (usedTimeUpdateHelper?.date != nowDate) {
+                    usedTimeUpdateHelper?.forceCommit(appLogic)
+                    usedTimeUpdateHelper = UsedTimeUpdateHelper(nowDate)
+                }
+
+                val usedTimeUpdateHelper = usedTimeUpdateHelper!!
+
                 // check times
                 fun buildUsedTimesSparseArray(items: SparseArray<UsedTimeItem>, categoryId: String): SparseLongArray {
-                    val a = usedTimeUpdateHelperForegroundApp
-                    val b = usedTimeUpdateHelperBackgroundPlayback
-
                     val result = SparseLongArray()
 
                     for (i in 0..6) {
-                        val usedTimesItem = items[i]?.usedMillis
+                        val usedTimesItem = items[i]?.usedMillis ?: 0
+                        val timeToAddButNotCommited = usedTimeUpdateHelper.timeToAdd[categoryId] ?: 0
 
-                        if (a?.date?.dayOfWeek == i && a.childCategoryId == categoryId) {
-                            result.put(i, a.getTotalUsedTimeChild())
-                        } else if (a?.date?.dayOfWeek == i && a.parentCategoryId == categoryId) {
-                            result.put(i, a.getTotalUsedTimeParent())
-                        } else if (b?.date?.dayOfWeek == i && b.childCategoryId == categoryId) {
-                            result.put(i, b.getTotalUsedTimeChild())
-                        } else if (b?.date?.dayOfWeek == i && b.parentCategoryId == categoryId) {
-                            result.put(i, b.getTotalUsedTimeParent())
-                        } else {
-                            result.put(i, usedTimesItem ?: 0)
-                        }
+                        result.put(i, usedTimesItem + timeToAddButNotCommited)
                     }
 
                     return result
                 }
 
-                fun getCachedExtraTimeToSubstract(categoryId: String): Int {
-                    val a = usedTimeUpdateHelperForegroundApp
-                    val b = usedTimeUpdateHelperBackgroundPlayback
-
-                    if (a?.childCategoryId == categoryId || a?.parentCategoryId == categoryId) {
-                        return a.getCachedExtraTimeToSubtract()
-                    }
-
-                    if (b?.childCategoryId == categoryId || b?.parentCategoryId == categoryId) {
-                        return b.getCachedExtraTimeToSubtract()
-                    }
-
-                    return 0
-                }
-
-                suspend fun getRemainingTime(categoryId: String?, parentCategoryId: String?): RemainingTime? {
+                suspend fun getRemainingTime(categoryId: String?): RemainingTime? {
                     categoryId ?: return null
 
                     val category = categories.find { it.id == categoryId } ?: return null
-                    val parentCategory = categories.find { it.id == parentCategoryId }
-
                     val rules = timeLimitRules.get(category.id).waitForNonNullValue()
-                    val parentRules = parentCategory?.let {
-                        timeLimitRules.get(it.id).waitForNonNullValue()
-                    } ?: emptyList()
+
+                    if (rules.isEmpty()) {
+                        return null
+                    }
 
                     val usedTimes = usedTimesOfCategoryAndWeekByFirstDayOfWeek.get(Pair(category.id, nowDate.dayOfEpoch - nowDate.dayOfWeek)).waitForNonNullValue()
-                    val parentUsedTimes = parentCategory?.let {
-                        usedTimesOfCategoryAndWeekByFirstDayOfWeek.get(Pair(it.id, nowDate.dayOfEpoch - nowDate.dayOfWeek)).waitForNonNullValue()
-                    } ?: SparseArray()
 
-                    val remainingChild = RemainingTime.getRemainingTime(
+                    return RemainingTime.getRemainingTime(
                             nowDate.dayOfWeek,
                             buildUsedTimesSparseArray(usedTimes, categoryId),
                             rules,
-                            Math.max(0, category.extraTimeInMillis - getCachedExtraTimeToSubstract(category.id))
+                            Math.max(0, category.extraTimeInMillis - (usedTimeUpdateHelper.extraTimeToSubtract.get(categoryId) ?: 0))
                     )
-
-                    val remainingParent = parentCategory?.let {
-                        RemainingTime.getRemainingTime(
-                                nowDate.dayOfWeek,
-                                buildUsedTimesSparseArray(parentUsedTimes, parentCategory.id),
-                                parentRules,
-                                Math.max(0, parentCategory.extraTimeInMillis - getCachedExtraTimeToSubstract(parentCategory.id))
-                        )
-                    }
-
-                    return RemainingTime.min(remainingChild, remainingParent)
                 }
 
-                val remainingTimeForegroundApp = getRemainingTime(foregroundAppHandling.categoryId, foregroundAppHandling.parentCategoryId)
-                val remainingTimeBackgroundApp = getRemainingTime(audioPlaybackHandling.categoryId, audioPlaybackHandling.parentCategoryId)
+                val remainingTimeForegroundAppChild = getRemainingTime(foregroundAppHandling.categoryId)
+                val remainingTimeForegroundAppParent = getRemainingTime(foregroundAppHandling.parentCategoryId)
+                val remainingTimeForegroundApp = RemainingTime.min(remainingTimeForegroundAppChild, remainingTimeForegroundAppParent)
+
+                val remainingTimeBackgroundAppChild = getRemainingTime(audioPlaybackHandling.categoryId)
+                val remainingTimeBackgroundAppParent = getRemainingTime(audioPlaybackHandling.parentCategoryId)
+                val remainingTimeBackgroundApp = RemainingTime.min(remainingTimeBackgroundAppChild, remainingTimeBackgroundAppParent)
 
                 // eventually block
                 if (remainingTimeForegroundApp?.hasRemainingTime == false) {
@@ -370,126 +339,75 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }
 
                 // update times
-                suspend fun getUsedTimeItem(categoryId: String?): UsedTimeItem? {
-                    categoryId ?: return null
-
-                    return cache.usedTimesOfCategoryAndDayOfEpoch.get(categoryId to nowDate.dayOfEpoch).waitForNullableValue()
-                }
+                val timeToSubtract = Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND)
 
                 val shouldCountForegroundApp = remainingTimeForegroundApp != null && isScreenOn && remainingTimeForegroundApp.hasRemainingTime
                 val shouldCountBackgroundApp = remainingTimeBackgroundApp != null && remainingTimeBackgroundApp.hasRemainingTime
-                val countTwoTypes = shouldCountForegroundApp && shouldCountBackgroundApp
-                val doCategoriesMatch = (
-                        foregroundAppHandling.categoryId != null && (
-                                foregroundAppHandling.categoryId == audioPlaybackHandling.categoryId ||
-                                        foregroundAppHandling.categoryId == audioPlaybackHandling.parentCategoryId
-                                )
-                        ) || (
-                        foregroundAppHandling.parentCategoryId != null && (
-                                foregroundAppHandling.parentCategoryId == audioPlaybackHandling.categoryId ||
-                                        foregroundAppHandling.parentCategoryId == audioPlaybackHandling.parentCategoryId
-                                )
-                        )
-                val useSingleCounter = countTwoTypes && doCategoriesMatch
 
-                if (useSingleCounter) {
-                    val isBackgroundCategoryHigher = audioPlaybackHandling.categoryId != null &&
-                            audioPlaybackHandling.categoryId == foregroundAppHandling.parentCategoryId
+                val categoriesToCount = mutableSetOf<String>()
+                val categoriesToCountExtraTime = mutableSetOf<String>()
 
-                    if (usedTimeUpdateHelperForegroundApp !== usedTimeUpdateHelperBackgroundPlayback) {
-                        if (isBackgroundCategoryHigher) {
-                            usedTimeUpdateHelperForegroundApp?.commit(appLogic)
-                            usedTimeUpdateHelperForegroundApp = null
-                        } else {
-                            usedTimeUpdateHelperBackgroundPlayback?.commit(appLogic)
-                            usedTimeUpdateHelperBackgroundPlayback = null
+                if (shouldCountForegroundApp) {
+                    remainingTimeForegroundAppChild?.let { remainingTime ->
+                        foregroundAppHandling.categoryId?.let { categoryId ->
+                            categoriesToCount.add(categoryId)
+
+                            if (remainingTime.usingExtraTime) {
+                                categoriesToCountExtraTime.add(categoryId)
+                            }
                         }
                     }
 
-                    if (isBackgroundCategoryHigher) {
-                        usedTimeUpdateHelperBackgroundPlayback = UsedTimeItemBatchUpdateHelper.eventuallyUpdateInstance(
-                                date = nowDate,
-                                childCategoryId = audioPlaybackHandling.categoryId!!,
-                                parentCategoryId = audioPlaybackHandling.parentCategoryId,
-                                oldInstance = usedTimeUpdateHelperBackgroundPlayback,
-                                usedTimeItemForDayChild = getUsedTimeItem(audioPlaybackHandling.categoryId),
-                                usedTimeItemForDayParent = getUsedTimeItem(audioPlaybackHandling.parentCategoryId),
-                                logic = appLogic
-                        )
+                    remainingTimeForegroundAppParent?.let { remainingTime ->
+                        foregroundAppHandling.parentCategoryId?.let {
+                            categoriesToCount.add(it)
 
-                        usedTimeUpdateHelperForegroundApp = usedTimeUpdateHelperBackgroundPlayback
-                    } else {
-                        usedTimeUpdateHelperForegroundApp = UsedTimeItemBatchUpdateHelper.eventuallyUpdateInstance(
-                                date = nowDate,
-                                childCategoryId = foregroundAppHandling.categoryId!!,
-                                parentCategoryId = foregroundAppHandling.parentCategoryId,
-                                oldInstance = usedTimeUpdateHelperForegroundApp,
-                                usedTimeItemForDayChild = getUsedTimeItem(foregroundAppHandling.categoryId),
-                                usedTimeItemForDayParent = getUsedTimeItem(foregroundAppHandling.parentCategoryId),
-                                logic = appLogic
-                        )
-
-                        usedTimeUpdateHelperBackgroundPlayback = usedTimeUpdateHelperForegroundApp
-                    }
-                } else {
-                    if (shouldCountForegroundApp) {
-                        usedTimeUpdateHelperForegroundApp = UsedTimeItemBatchUpdateHelper.eventuallyUpdateInstance(
-                                date = nowDate,
-                                childCategoryId = foregroundAppHandling.categoryId!!,
-                                parentCategoryId = foregroundAppHandling.parentCategoryId,
-                                oldInstance = usedTimeUpdateHelperForegroundApp,
-                                usedTimeItemForDayChild = getUsedTimeItem(foregroundAppHandling.categoryId),
-                                usedTimeItemForDayParent = getUsedTimeItem(foregroundAppHandling.parentCategoryId),
-                                logic = appLogic
-                        )
-                    } else {
-                        usedTimeUpdateHelperForegroundApp?.commit(appLogic)
-                        usedTimeUpdateHelperForegroundApp = null
-                    }
-
-                    if (shouldCountBackgroundApp) {
-                        usedTimeUpdateHelperBackgroundPlayback = UsedTimeItemBatchUpdateHelper.eventuallyUpdateInstance(
-                                date = nowDate,
-                                childCategoryId = audioPlaybackHandling.categoryId!!,
-                                parentCategoryId = audioPlaybackHandling.parentCategoryId,
-                                oldInstance = usedTimeUpdateHelperBackgroundPlayback,
-                                usedTimeItemForDayChild = getUsedTimeItem(audioPlaybackHandling.categoryId),
-                                usedTimeItemForDayParent = getUsedTimeItem(audioPlaybackHandling.parentCategoryId),
-                                logic = appLogic
-                        )
-                    } else {
-                        usedTimeUpdateHelperBackgroundPlayback?.commit(appLogic)
-                        usedTimeUpdateHelperBackgroundPlayback = null
+                            if (remainingTime.usingExtraTime) {
+                                categoriesToCountExtraTime.add(it)
+                            }
+                        }
                     }
                 }
 
-                // count times
-                // never save more than a second of used time
-                // FIXME: currently, this uses extra time if the parent or the child category needs it and it subtracts it from both
-                val timeToSubtract = Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND)
+                if (shouldCountBackgroundApp) {
+                    remainingTimeBackgroundAppChild?.let { remainingTime ->
+                        audioPlaybackHandling.categoryId?.let {
+                            categoriesToCount.add(it)
 
-                if (usedTimeUpdateHelperForegroundApp === usedTimeUpdateHelperBackgroundPlayback) {
-                    usedTimeUpdateHelperForegroundApp?.addUsedTime(
-                            time = timeToSubtract,
-                            subtractExtraTime = remainingTimeForegroundApp!!.usingExtraTime or remainingTimeBackgroundApp!!.usingExtraTime,
-                            appLogic = appLogic
-                    )
-                } else {
-                    usedTimeUpdateHelperForegroundApp?.addUsedTime(
-                            time = timeToSubtract,
-                            subtractExtraTime = remainingTimeForegroundApp!!.usingExtraTime,
-                            appLogic = appLogic
-                    )
+                            if (remainingTime.usingExtraTime) {
+                                categoriesToCountExtraTime.add(it)
+                            }
+                        }
+                    }
 
-                    usedTimeUpdateHelperBackgroundPlayback?.addUsedTime(
-                            time = timeToSubtract,
-                            subtractExtraTime = remainingTimeBackgroundApp!!.usingExtraTime,
-                            appLogic = appLogic
-                    )
+                    remainingTimeBackgroundAppParent?.let { remainingTime ->
+                        audioPlaybackHandling.parentCategoryId?.let {
+                            categoriesToCount.add(it)
+
+                            if (remainingTime.usingExtraTime) {
+                                categoriesToCountExtraTime.add(it)
+                            }
+                        }
+                    }
+                }
+
+                if (categoriesToCount.isNotEmpty()) {
+                    categoriesToCount.forEach { categoryId ->
+                        usedTimeUpdateHelper.add(
+                                categoryId = categoryId,
+                                time = timeToSubtract,
+                                includingExtraTime = categoriesToCountExtraTime.contains(categoryId)
+                        )
+                    }
+                }
+
+                usedTimeUpdateHelper.reportCurrentCategories(categoriesToCount)
+
+                if (usedTimeUpdateHelper.shouldDoAutoCommit) {
+                    usedTimeUpdateHelper.forceCommit(appLogic)
                 }
 
                 // trigger time warnings
-                // FIXME: this uses the resulting time, not the time per category
                 fun eventuallyTriggerTimeWarning(remaining: RemainingTime, categoryId: String?) {
                     val category = categories.find { it.id == categoryId } ?: return
                     val oldRemainingTime = remaining.includingExtraTime
@@ -509,13 +427,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
                 }
 
-                if (remainingTimeForegroundApp != null) {
-                    eventuallyTriggerTimeWarning(remainingTimeForegroundApp, foregroundAppHandling.categoryId)
-                }
-
-                if (remainingTimeBackgroundApp != null) {
-                    eventuallyTriggerTimeWarning(remainingTimeBackgroundApp, foregroundAppHandling.categoryId)
-                }
+                remainingTimeForegroundAppChild?.let { eventuallyTriggerTimeWarning(it, foregroundAppHandling.categoryId) }
+                remainingTimeForegroundAppParent?.let { eventuallyTriggerTimeWarning(it, foregroundAppHandling.parentCategoryId) }
+                remainingTimeBackgroundAppChild?.let { eventuallyTriggerTimeWarning(it, audioPlaybackHandling.categoryId) }
+                remainingTimeBackgroundAppParent?.let { eventuallyTriggerTimeWarning(it, audioPlaybackHandling.parentCategoryId) }
 
                 // show notification
                 fun buildStatusMessageWithCurrentAppTitle(
@@ -633,7 +548,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.ShouldBlock) {
                     openLockscreen(foregroundAppPackageName!!, foregroundAppActivityName)
 
-                    usedTimeUpdateHelperForegroundApp?.commit(appLogic)
+                    commitUsedTimeUpdaters()
                 } else {
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
                 }
@@ -641,7 +556,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.ShouldBlock && audioPlaybackPackageName != null) {
                     appLogic.platformIntegration.muteAudioIfPossible(audioPlaybackPackageName)
 
-                    usedTimeUpdateHelperBackgroundPlayback?.commit(appLogic)
+                    commitUsedTimeUpdaters()
                 }
             } catch (ex: SecurityException) {
                 // this is handled by an other main loop (with a delay)

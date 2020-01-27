@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,6 +72,37 @@ object LocalDatabaseAppLogicActionDispatcher {
 
                     if (parentCategoryEntry?.childId == categoryEntry.childId) {
                         handleAddUsedTime(parentCategoryEntry.id)
+                    }
+
+                    null
+                }
+                is AddUsedTimeActionVersion2 -> {
+                    action.items.forEach { item ->
+                        database.category().getCategoryByIdSync(item.categoryId)!!
+
+                        val updatedRows = database.usedTimes().addUsedTime(
+                                categoryId = item.categoryId,
+                                timeToAdd = item.timeToAdd,
+                                dayOfEpoch = action.dayOfEpoch
+                        )
+
+                        if (updatedRows == 0) {
+                            // create new entry
+
+                            database.usedTimes().insertUsedTime(UsedTimeItem(
+                                    categoryId = item.categoryId,
+                                    dayOfEpoch = action.dayOfEpoch,
+                                    usedMillis = item.timeToAdd.toLong()
+                            ))
+                        }
+
+
+                        if (item.extraTimeToSubtract != 0) {
+                            database.category().subtractCategoryExtraTime(
+                                    categoryId = item.categoryId,
+                                    removedExtraTime = item.extraTimeToSubtract
+                            )
+                        }
                     }
 
                     null

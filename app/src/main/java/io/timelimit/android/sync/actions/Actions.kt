@@ -142,6 +142,82 @@ data class AddUsedTimeAction(val categoryId: String, val dayOfEpoch: Int, val ti
     }
 }
 
+data class AddUsedTimeActionVersion2(val dayOfEpoch: Int, val items: List<AddUsedTimeActionItem>): AppLogicAction() {
+    companion object {
+        const val TYPE_VALUE = "ADD_USED_TIME_V2"
+        private const val DAY_OF_EPOCH = "d"
+        private const val ITEMS = "i"
+
+        fun parse(action: JSONObject): AddUsedTimeActionVersion2 = AddUsedTimeActionVersion2(
+                dayOfEpoch = action.getInt(DAY_OF_EPOCH),
+                items = ParseUtils.readObjectArray(action.getJSONArray(ITEMS)).map { AddUsedTimeActionItem.parse(it) }
+        )
+    }
+
+    init {
+        if (dayOfEpoch < 0) {
+            throw IllegalArgumentException()
+        }
+
+        if (items.isEmpty()) {
+            throw IllegalArgumentException()
+        }
+
+        if (items.distinctBy { it.categoryId }.size != items.size) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(DAY_OF_EPOCH).value(dayOfEpoch)
+
+        writer.name(ITEMS).beginArray()
+        items.forEach { it.serialize(writer) }
+        writer.endArray()
+
+        writer.endObject()
+    }
+}
+
+data class AddUsedTimeActionItem(val categoryId: String, val timeToAdd: Int, val extraTimeToSubtract: Int) {
+    companion object {
+        private const val CATEGORY_ID = "categoryId"
+        private const val TIME_TO_ADD = "tta"
+        private const val EXTRA_TIME_TO_SUBTRACT = "etts"
+
+        fun parse(item: JSONObject): AddUsedTimeActionItem = AddUsedTimeActionItem(
+                categoryId = item.getString(CATEGORY_ID),
+                timeToAdd = item.getInt(TIME_TO_ADD),
+                extraTimeToSubtract = item.getInt(EXTRA_TIME_TO_SUBTRACT)
+        )
+    }
+
+    init {
+        IdGenerator.assertIdValid(categoryId)
+
+        if (timeToAdd < 0) {
+            throw IllegalArgumentException()
+        }
+
+        if (extraTimeToSubtract < 0) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(TIME_TO_ADD).value(timeToAdd)
+        writer.name(EXTRA_TIME_TO_SUBTRACT).value(extraTimeToSubtract)
+
+        writer.endObject()
+    }
+}
+
 // data class ClearTemporarilyAllowedAppsAction(val deviceId: String): AppLogicAction(), LocalOnlyAction
 
 data class InstalledApp(val packageName: String, val title: String, val isLaunchable: Boolean, val recommendation: AppRecommendation) {

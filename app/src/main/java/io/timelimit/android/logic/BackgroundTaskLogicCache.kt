@@ -54,11 +54,6 @@ class BackgroundTaskLogicCache (private val appLogic: AppLogic) {
             return appLogic.database.usedTimes().getUsedTimesOfWeek(key.first, key.second)
         }
     }
-    val usedTimesOfCategoryAndDayOfEpoch = object: MultiKeyLiveDataCache<UsedTimeItem?, Pair<String, Int>>() {
-        override fun createValue(key: Pair<String, Int>): LiveData<UsedTimeItem?> {
-            return appLogic.database.usedTimes().getUsedTimesByCategoryIdAndDayOfEpoch(key.first, key.second)
-        }
-    }
     val shouldDoAutomaticSignOut = SingleItemLiveDataCacheWithRequery { -> appLogic.defaultUserLogic.hasAutomaticSignOut()}
 
     val liveDataCaches = LiveDataCaches(arrayOf(
@@ -68,7 +63,6 @@ class BackgroundTaskLogicCache (private val appLogic: AppLogic) {
             appCategories,
             timeLimitRules,
             usedTimesOfCategoryAndWeekByFirstDayOfWeek,
-            usedTimesOfCategoryAndDayOfEpoch,
             shouldDoAutomaticSignOut
     ))
 }

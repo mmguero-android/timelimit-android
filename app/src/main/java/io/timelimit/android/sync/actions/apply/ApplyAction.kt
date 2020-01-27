@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,6 +109,51 @@ object ApplyActionUtil {
                                 return@executeAndWait
                             }
                         }
+                    } else if (action is AddUsedTimeActionVersion2) {
+                        val previousAction = database.pendingSyncAction().getLatestUnscheduledActionSync()
+
+                        if (previousAction != null && previousAction.type == PendingSyncActionType.AppLogic) {
+                            val parsed = ActionParser.parseAppLogicAction(JSONObject(previousAction.encodedAction))
+
+                            if (parsed is AddUsedTimeActionVersion2 && parsed.dayOfEpoch == action.dayOfEpoch) {
+                                var updatedAction: AddUsedTimeActionVersion2 = parsed
+
+                                action.items.forEach { newItem ->
+                                    val oldItem = updatedAction.items.find { it.categoryId == newItem.categoryId }
+
+                                    if (oldItem == null) {
+                                        updatedAction = updatedAction.copy(
+                                                items = updatedAction.items + listOf(newItem)
+                                        )
+                                    } else {
+                                        val mergedItem = AddUsedTimeActionItem(
+                                                timeToAdd = oldItem.timeToAdd + newItem.timeToAdd,
+                                                extraTimeToSubtract = oldItem.extraTimeToSubtract + newItem.extraTimeToSubtract,
+                                                categoryId = newItem.categoryId
+                                        )
+
+                                        updatedAction = updatedAction.copy(
+                                                items = updatedAction.items.filter { it.categoryId != mergedItem.categoryId } + listOf(mergedItem)
+                                        )
+                                    }
+                                }
+
+                                // update the previous action
+                                database.pendingSyncAction().updateEncodedActionSync(
+                                        sequenceNumber = previousAction.sequenceNumber,
+                                        action = StringWriter().apply {
+                                            JsonWriter(this).apply {
+                                                updatedAction.serialize(this)
+                                            }
+                                        }.toString()
+                                )
+
+                                database.setTransactionSuccessful()
+                                syncUtil.requestVeryUnimportantSync()
+
+                                return@executeAndWait
+                            }
+                        }
                     }
 
                     val serializedAction = StringWriter().apply {
@@ -126,7 +171,7 @@ object ApplyActionUtil {
                             userId = ""
                     ))
 
-                    if (action is AddUsedTimeAction) {
+                    if (action is AddUsedTimeAction || action is AddUsedTimeActionVersion2) {
                         syncUtil.requestVeryUnimportantSync()
                     } else {
                         if (BuildConfig.DEBUG) {
