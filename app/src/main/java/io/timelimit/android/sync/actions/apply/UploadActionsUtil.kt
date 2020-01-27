@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import io.timelimit.android.logic.ServerLogic
 import io.timelimit.android.sync.network.ActionUploadItem
 import io.timelimit.android.sync.network.ActionUploadRequest
 
-class UploadActionsUtil(private val database: Database) {
+class UploadActionsUtil(private val database: Database, private val syncConflictHandler: () -> Unit) {
     companion object {
         private const val BATCH_SIZE = 25
 
@@ -116,6 +116,8 @@ class UploadActionsUtil(private val database: Database) {
 
                 if (response.shouldDoFullSync) {
                     deleteAllVersionNumbersSync(database)
+
+                    Threads.mainThreadHandler.post { syncConflictHandler() }
                 }
 
                 // delete now processed items

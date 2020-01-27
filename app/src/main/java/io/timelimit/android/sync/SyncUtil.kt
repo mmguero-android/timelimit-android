@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
 package io.timelimit.android.sync
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
+import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
@@ -45,7 +47,10 @@ class SyncUtil (private val logic: AppLogic) {
     }
 
     private val upload = UploadActionsUtil(
-            database = logic.database
+            database = logic.database,
+            syncConflictHandler = {
+                Toast.makeText(logic.context, R.string.sync_status_conflict_toast, Toast.LENGTH_SHORT).show()
+            }
     )
 
     private val importantSyncRequested = MutableLiveData<Boolean>().apply { value = false }
