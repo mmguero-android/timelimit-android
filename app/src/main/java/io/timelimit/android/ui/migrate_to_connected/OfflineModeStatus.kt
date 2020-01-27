@@ -139,7 +139,8 @@ data class OfflineModeStatus(
                     apply(
                             UpdateCategoryTemporarilyBlockedAction(
                                     categoryId = category.id,
-                                    blocked = true
+                                    blocked = true,
+                                    endTime = category.temporarilyBlockedEndTime
                             )
                     )
                 }

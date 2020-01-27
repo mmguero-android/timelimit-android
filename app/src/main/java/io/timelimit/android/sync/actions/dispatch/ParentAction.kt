@@ -74,6 +74,7 @@ object LocalDatabaseParentActionDispatcher {
                             blockedMinutesInWeek = ImmutableBitmask(BitSet()),
                             extraTimeInMillis = 0,
                             temporarilyBlocked = false,
+                            temporarilyBlockedEndTime = 0,
                             baseVersion = "",
                             assignedAppsVersion = "",
                             timeLimitRulesVersion = "",
@@ -135,7 +136,11 @@ object LocalDatabaseParentActionDispatcher {
                 is UpdateCategoryTemporarilyBlockedAction -> {
                     DatabaseValidation.assertCategoryExists(database, action.categoryId)
 
-                    database.category().updateCategoryTemporarilyBlocked(action.categoryId, action.blocked)
+                    database.category().updateCategoryTemporarilyBlocked(
+                            categoryId = action.categoryId,
+                            blocked = action.blocked,
+                            endTime = if (action.blocked) action.endTime ?: 0 else 0
+                    )
                 }
                 is DeleteTimeLimitRuleAction -> {
                     DatabaseValidation.assertTimelimitRuleExists(database, action.ruleId)

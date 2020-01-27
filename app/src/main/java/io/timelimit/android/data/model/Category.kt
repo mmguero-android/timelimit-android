@@ -44,6 +44,8 @@ data class Category(
         val extraTimeInMillis: Long,
         @ColumnInfo(name = "temporarily_blocked")
         val temporarilyBlocked: Boolean,
+        @ColumnInfo(name = "temporarily_blocked_end_time")
+        val temporarilyBlockedEndTime: Long,
         @ColumnInfo(name = "base_version")
         val baseVersion: String,
         @ColumnInfo(name = "apps_version")
@@ -73,6 +75,7 @@ data class Category(
         private const val BLOCKED_MINUTES_IN_WEEK = "b"
         private const val EXTRA_TIME_IN_MILLIS = "et"
         private const val TEMPORARILY_BLOCKED = "tb"
+        private const val TEMPORARILY_BLOCKED_NED_TIME = "tbet"
         private const val BASE_VERSION = "vb"
         private const val ASSIGNED_APPS_VERSION = "va"
         private const val RULES_VERSION = "vr"
@@ -90,6 +93,7 @@ data class Category(
             var blockedMinutesInWeek: ImmutableBitmask? = null
             var extraTimeInMillis: Long? = null
             var temporarilyBlocked: Boolean? = null
+            var temporarilyBlockedEndTime: Long = 0
             var baseVersion: String? = null
             var assignedAppsVersion: String? = null
             var timeLimitRulesVersion: String? = null
@@ -111,6 +115,7 @@ data class Category(
                     BLOCKED_MINUTES_IN_WEEK -> blockedMinutesInWeek = ImmutableBitmaskJson.parse(reader.nextString(), BLOCKED_MINUTES_IN_WEEK_LENGTH)
                     EXTRA_TIME_IN_MILLIS -> extraTimeInMillis = reader.nextLong()
                     TEMPORARILY_BLOCKED -> temporarilyBlocked = reader.nextBoolean()
+                    TEMPORARILY_BLOCKED_NED_TIME -> temporarilyBlockedEndTime = reader.nextLong()
                     BASE_VERSION -> baseVersion = reader.nextString()
                     ASSIGNED_APPS_VERSION -> assignedAppsVersion = reader.nextString()
                     RULES_VERSION -> timeLimitRulesVersion = reader.nextString()
@@ -133,6 +138,7 @@ data class Category(
                     blockedMinutesInWeek = blockedMinutesInWeek!!,
                     extraTimeInMillis = extraTimeInMillis!!,
                     temporarilyBlocked = temporarilyBlocked!!,
+                    temporarilyBlockedEndTime = temporarilyBlockedEndTime,
                     baseVersion = baseVersion!!,
                     assignedAppsVersion = assignedAppsVersion!!,
                     timeLimitRulesVersion = timeLimitRulesVersion!!,
@@ -176,6 +182,7 @@ data class Category(
         writer.name(BLOCKED_MINUTES_IN_WEEK).value(ImmutableBitmaskJson.serialize(blockedMinutesInWeek))
         writer.name(EXTRA_TIME_IN_MILLIS).value(extraTimeInMillis)
         writer.name(TEMPORARILY_BLOCKED).value(temporarilyBlocked)
+        writer.name(TEMPORARILY_BLOCKED_NED_TIME).value(temporarilyBlockedEndTime)
         writer.name(BASE_VERSION).value(baseVersion)
         writer.name(ASSIGNED_APPS_VERSION).value(assignedAppsVersion)
         writer.name(RULES_VERSION).value(timeLimitRulesVersion)

@@ -644,20 +644,26 @@ data class IncrementCategoryExtraTimeAction(val categoryId: String, val addedExt
         writer.endObject()
     }
 }
-data class UpdateCategoryTemporarilyBlockedAction(val categoryId: String, val blocked: Boolean): ParentAction() {
+data class UpdateCategoryTemporarilyBlockedAction(val categoryId: String, val blocked: Boolean, val endTime: Long?): ParentAction() {
     companion object {
         const val TYPE_VALUE = "UPDATE_CATEGORY_TEMPORARILY_BLOCKED"
         private const val CATEGORY_ID = "categoryId"
         private const val BLOCKED = "blocked"
+        private const val END_TIME = "endTime"
 
         fun parse(action: JSONObject) = UpdateCategoryTemporarilyBlockedAction(
                 categoryId = action.getString(CATEGORY_ID),
-                blocked = action.getBoolean(BLOCKED)
+                blocked = action.getBoolean(BLOCKED),
+                endTime = if (action.has(END_TIME)) action.getLong(END_TIME) else null
         )
     }
 
     init {
         IdGenerator.assertIdValid(categoryId)
+
+        if (endTime != null && (!blocked)) {
+            throw IllegalArgumentException()
+        }
     }
 
     override fun serialize(writer: JsonWriter) {
@@ -666,6 +672,10 @@ data class UpdateCategoryTemporarilyBlockedAction(val categoryId: String, val bl
         writer.name(TYPE).value(TYPE_VALUE)
         writer.name(CATEGORY_ID).value(categoryId)
         writer.name(BLOCKED).value(blocked)
+
+        if (endTime != null) {
+            writer.name(END_TIME).value(endTime)
+        }
 
         writer.endObject()
     }

@@ -336,6 +336,7 @@ data class ServerUpdatedCategoryBaseData(
         val blockedMinutesInWeek: ImmutableBitmask,
         val extraTimeInMillis: Long,
         val temporarilyBlocked: Boolean,
+        val temporarilyBlockedEndTime: Long,
         val baseDataVersion: String,
         val parentCategoryId: String,
         val blockAllNotifications: Boolean,
@@ -350,6 +351,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val BLOCKED_MINUTES_IN_WEEK = "blockedTimes"
         private const val EXTRA_TIME_IN_MILLIS = "extraTime"
         private const val TEMPORARILY_BLOCKED = "tempBlocked"
+        private const val TEMPORARILY_BLOCKED_END_TIME = "tempBlockTime"
         private const val BASE_DATA_VERSION = "version"
         private const val PARENT_CATEGORY_ID = "parentCategoryId"
         private const val BLOCK_ALL_NOTIFICATIONS = "blockAllNotifications"
@@ -364,6 +366,7 @@ data class ServerUpdatedCategoryBaseData(
             var blockedMinutesInWeek: ImmutableBitmask? = null
             var extraTimeInMillis: Long? = null
             var temporarilyBlocked: Boolean? = null
+            var temporarilyBlockedEndTime: Long = 0
             var baseDataVersion: String? = null
             var parentCategoryId: String? = null
             // added later -> default values
@@ -381,6 +384,7 @@ data class ServerUpdatedCategoryBaseData(
                     BLOCKED_MINUTES_IN_WEEK -> blockedMinutesInWeek = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
                     EXTRA_TIME_IN_MILLIS -> extraTimeInMillis = reader.nextLong()
                     TEMPORARILY_BLOCKED -> temporarilyBlocked = reader.nextBoolean()
+                    TEMPORARILY_BLOCKED_END_TIME -> temporarilyBlockedEndTime = reader.nextLong()
                     BASE_DATA_VERSION -> baseDataVersion = reader.nextString()
                     PARENT_CATEGORY_ID -> parentCategoryId = reader.nextString()
                     BLOCK_ALL_NOTIFICATIONS -> blockAllNotifications = reader.nextBoolean()
@@ -399,6 +403,7 @@ data class ServerUpdatedCategoryBaseData(
                     blockedMinutesInWeek = blockedMinutesInWeek!!,
                     extraTimeInMillis = extraTimeInMillis!!,
                     temporarilyBlocked = temporarilyBlocked!!,
+                    temporarilyBlockedEndTime = temporarilyBlockedEndTime,
                     baseDataVersion = baseDataVersion!!,
                     parentCategoryId = parentCategoryId!!,
                     blockAllNotifications = blockAllNotifications,

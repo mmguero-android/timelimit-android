@@ -132,33 +132,47 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
     ): LiveData<BlockingReason> {
         return category.switchMap { category ->
             val batteryOk = batteryLevel.map { it.isCategoryAllowed(category) }.ignoreUnchanged()
+            val elseCase = areLimitsTemporarilyDisabled.switchMap { areLimitsTemporarilyDisabled ->
+                if (areLimitsTemporarilyDisabled) {
+                    liveDataFromValue(BlockingReason.None)
+                } else {
+                    checkCategoryBlockedTimeAreas(
+                            temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek,
+                            blockedMinutesInWeek = category.blockedMinutesInWeek.dataNotToModify
+                    ).switchMap { blockedTimeAreasReason ->
+                        if (blockedTimeAreasReason != BlockingReason.None) {
+                            liveDataFromValue(blockedTimeAreasReason)
+                        } else {
+                            checkCategoryTimeLimitRules(
+                                    temporarilyTrustedDate = temporarilyTrustedDate,
+                                    category = category,
+                                    rules = appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id)
+                            )
+                        }
+                    }
+                }
+            }
+
 
             batteryOk.switchMap { ok ->
                 if (!ok) {
                     liveDataFromValue(BlockingReason.BatteryLimit)
                 } else if (category.temporarilyBlocked) {
-                    liveDataFromValue(BlockingReason.TemporarilyBlocked)
-                } else {
-                    areLimitsTemporarilyDisabled.switchMap { areLimitsTemporarilyDisabled ->
-                        if (areLimitsTemporarilyDisabled) {
-                            liveDataFromValue(BlockingReason.None)
-                        } else {
-                            checkCategoryBlockedTimeAreas(
-                                    temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek,
-                                    blockedMinutesInWeek = category.blockedMinutesInWeek.dataNotToModify
-                            ).switchMap { blockedTimeAreasReason ->
-                                if (blockedTimeAreasReason != BlockingReason.None) {
-                                    liveDataFromValue(blockedTimeAreasReason)
-                                } else {
-                                    checkCategoryTimeLimitRules(
-                                            temporarilyTrustedDate = temporarilyTrustedDate,
-                                            category = category,
-                                            rules = appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id)
-                                    )
-                                }
+                    if (category.temporarilyBlockedEndTime == 0L) {
+                        liveDataFromValue(BlockingReason.TemporarilyBlocked)
+                    } else {
+                        temporarilyTrustedTimeInMillis.switchMap { timeInMillis ->
+                            if (timeInMillis == null) {
+                                liveDataFromValue(BlockingReason.MissingNetworkTime)
+                            } else if (timeInMillis < category.temporarilyBlockedEndTime) {
+                                liveDataFromValue(BlockingReason.TemporarilyBlocked)
+                            } else {
+                                elseCase
                             }
                         }
                     }
+                } else {
+                    elseCase
                 }
             }
         }

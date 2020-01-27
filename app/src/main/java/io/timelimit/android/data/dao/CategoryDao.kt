@@ -65,8 +65,8 @@ abstract class CategoryDao {
     @Query("UPDATE category SET blocked_times = :blockedMinutesInWeek WHERE id = :categoryId")
     abstract fun updateCategoryBlockedTimes(categoryId: String, blockedMinutesInWeek: ImmutableBitmask)
 
-    @Query("UPDATE category SET temporarily_blocked = :blocked WHERE id = :categoryId")
-    abstract fun updateCategoryTemporarilyBlocked(categoryId: String, blocked: Boolean)
+    @Query("UPDATE category SET temporarily_blocked = :blocked, temporarily_blocked_end_time = :endTime WHERE id = :categoryId")
+    abstract fun updateCategoryTemporarilyBlocked(categoryId: String, blocked: Boolean, endTime: Long)
 
     @Query("SELECT id, base_version, apps_version, rules_version, usedtimes_version FROM category")
     abstract fun getCategoriesWithVersionNumbers(): LiveData<List<CategoryWithVersionNumbers>>
@@ -89,7 +89,7 @@ abstract class CategoryDao {
     @Query("SELECT * FROM category LIMIT :pageSize OFFSET :offset")
     abstract fun getCategoryPageSync(offset: Int, pageSize: Int): List<Category>
 
-    @Query("SELECT id, child_id, temporarily_blocked FROM category")
+    @Query("SELECT id, child_id, temporarily_blocked, temporarily_blocked_end_time FROM category")
     abstract fun getAllCategoriesShortInfo(): LiveData<List<CategoryShortInfo>>
 
     @Query("UPDATE category SET parent_category_id = :parentCategoryId WHERE id = :categoryId")
@@ -118,5 +118,7 @@ data class CategoryShortInfo(
         @ColumnInfo(name = "id")
         val categoryId: String,
         @ColumnInfo(name = "temporarily_blocked")
-        val temporarilyBlocked: Boolean
+        val temporarilyBlocked: Boolean,
+        @ColumnInfo(name = "temporarily_blocked_end_time")
+        val temporarilyBlockedEndTime: Long
 )

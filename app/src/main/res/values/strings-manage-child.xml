@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -19,9 +19,11 @@
     <string name="manage_child_block_temporarily_title">block temporarily</string>
     <string name="manage_child_block_temporarily_text">
         Select categories which should be blocked temporarily.
-        Temporarily does not mean that the blocking is disabled automatically.
-        If you need a recurring blocking, use blocked time areas.
+        You can disable the blocking automatically by holding a category
+        and selecting an end time.
     </string>
+    <string name="manage_child_block_temporarily_until">%1$s (until %2$s)</string>
+    <string name="manage_child_block_temporarily_dialog_until">until %s</string>
 
     <string name="manage_child_category_no_time_limits">no time limit</string>
 

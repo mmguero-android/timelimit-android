@@ -19,7 +19,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -31,16 +30,15 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
 import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
+import io.timelimit.android.ui.manage.child.advanced.manageblocktemporarily.ManageBlockTemporarilyView
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.advanced.password.ManageChildPassword
 import io.timelimit.android.ui.manage.child.advanced.timezone.UserTimezoneView
 import io.timelimit.android.ui.manage.child.primarydevice.PrimaryDeviceView
-import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 
 class ManageChildAdvancedFragment : Fragment() {
     companion object {
@@ -59,6 +57,9 @@ class ManageChildAdvancedFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentManageChildAdvancedBinding.inflate(layoutInflater, container, false)
 
+        val categories = logic.database.category().getCategoriesByChildId(params.childId)
+        val shouldProvideFullVersionFunctions = logic.fullVersion.shouldProvideFullVersionFunctions
+
         run {
             // blocked categories
 
@@ -69,47 +70,15 @@ class ManageChildAdvancedFragment : Fragment() {
                 ).show(fragmentManager!!)
             }
 
-            val categoriesLive = logic.database.category().getCategoriesByChildId(params.childId)
-
-            mergeLiveData(categoriesLive, logic.fullVersion.shouldProvideFullVersionFunctions).observe(this, Observer {
-                (categories, hasFullVersion) ->
-
-                binding.blockedCategoriesCheckboxContainer.removeAllViews()
-
-                categories?.forEach {
-                    category ->
-
-                    val checkbox = CheckBox(context)
-
-                    checkbox.isChecked = category.temporarilyBlocked
-                    checkbox.text = category.title
-
-                    checkbox.setOnCheckedChangeListener { _, isChecked ->
-                        if (isChecked != category.temporarilyBlocked) {
-                            if (isChecked) {
-                                if (hasFullVersion != true) {
-                                    checkbox.isChecked = false
-
-                                    RequiresPurchaseDialogFragment().show(fragmentManager!!)
-
-                                    return@setOnCheckedChangeListener
-                                }
-                            }
-
-                            if (!auth.tryDispatchParentAction(
-                                            UpdateCategoryTemporarilyBlockedAction(
-                                                    categoryId = category.id,
-                                                    blocked = !category.temporarilyBlocked
-                                            )
-                                    )) {
-                                checkbox.isChecked = category.temporarilyBlocked
-                            }
-                        }
-                    }
-
-                    binding.blockedCategoriesCheckboxContainer.addView(checkbox)
-                }
-            })
+            ManageBlockTemporarilyView.bind(
+                    lifecycleOwner = this,
+                    fragmentManager = fragmentManager!!,
+                    categories = categories,
+                    shouldProvideFullVersionFunctions = shouldProvideFullVersionFunctions,
+                    container = binding.blockedCategoriesCheckboxContainer,
+                    auth = auth,
+                    childId = params.childId
+            )
         }
 
         run {

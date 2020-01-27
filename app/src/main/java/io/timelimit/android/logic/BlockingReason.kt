@@ -256,9 +256,25 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
         }
 
         if (category.temporarilyBlocked) {
-            return liveDataFromValue(BlockingReason.TemporarilyBlocked)
+            if (category.temporarilyBlockedEndTime == 0L) {
+                return liveDataFromValue(BlockingReason.TemporarilyBlocked)
+            } else {
+                return getTemporarilyTrustedTimeInMillis().switchMap { time ->
+                    if (time == null) {
+                        liveDataFromValue(BlockingReason.MissingNetworkTime)
+                    } else if (time < category.temporarilyBlockedEndTime) {
+                        liveDataFromValue(BlockingReason.TemporarilyBlocked)
+                    } else {
+                        getBlockingReasonStep4Point8(category, child, timeZone, isParentCategory, blockingLevel)
+                    }
+                }
+            }
+        } else {
+            return getBlockingReasonStep4Point8(category, child, timeZone, isParentCategory, blockingLevel)
         }
+    }
 
+    private fun getBlockingReasonStep4Point8(category: Category, child: User, timeZone: TimeZone, isParentCategory: Boolean, blockingLevel: BlockingLevel): LiveData<BlockingReason> {
         val areLimitsDisabled: LiveData<Boolean>
 
         if (child.disableLimitsUntil == 0L) {
