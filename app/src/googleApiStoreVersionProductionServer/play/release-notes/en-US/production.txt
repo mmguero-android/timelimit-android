@@ -1,1 +1,1 @@
-fix rare crashes which occurred when opening TimeLimit
+fix rare sync loop

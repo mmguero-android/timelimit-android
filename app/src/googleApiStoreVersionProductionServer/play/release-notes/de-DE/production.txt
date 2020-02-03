@@ -1,1 +1,1 @@
-seltene Abstürze beim Öffnen von TimeLimit behoben
+unter bestimmten Umständen auftretende Synchronisationsendlosschleife behoben
