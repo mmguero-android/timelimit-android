@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,6 +126,7 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
                 }
                 binding.usedForAppsWithoutCategory = item.usedForNotAssignedApps
                 binding.parentCategoryTitle = item.parentCategoryTitle
+                binding.isChildCategory = item.parentCategoryTitle != null
 
                 binding.card.setOnClickListener { handlers?.onCategoryClicked(item.category) }
 
