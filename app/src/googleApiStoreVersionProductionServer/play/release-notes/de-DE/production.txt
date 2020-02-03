@@ -1,1 +1,2 @@
-Verbesserungen bei der Nutzung von TimeLimit mit einem eigenen Server
+- Erfassung von Hintergrundmusikwiedergaben verbessert
+- Möglichkeit hinzugefügt, eine Endzeit beim vorübergehenden Sperren festzulegen
