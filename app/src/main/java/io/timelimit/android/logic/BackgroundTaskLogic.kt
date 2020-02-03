@@ -321,12 +321,13 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     )
                 }
 
-                val remainingTimeForegroundAppChild = getRemainingTime(foregroundAppHandling.categoryId)
-                val remainingTimeForegroundAppParent = getRemainingTime(foregroundAppHandling.parentCategoryId)
+                // note: remainingTime != null implicates that there are limits and they are currently not ignored
+                val remainingTimeForegroundAppChild = if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(foregroundAppHandling.categoryId) else null
+                val remainingTimeForegroundAppParent = if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(foregroundAppHandling.parentCategoryId) else null
                 val remainingTimeForegroundApp = RemainingTime.min(remainingTimeForegroundAppChild, remainingTimeForegroundAppParent)
 
-                val remainingTimeBackgroundAppChild = getRemainingTime(audioPlaybackHandling.categoryId)
-                val remainingTimeBackgroundAppParent = getRemainingTime(audioPlaybackHandling.parentCategoryId)
+                val remainingTimeBackgroundAppChild = if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(audioPlaybackHandling.categoryId) else null
+                val remainingTimeBackgroundAppParent = if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(audioPlaybackHandling.parentCategoryId) else null
                 val remainingTimeBackgroundApp = RemainingTime.min(remainingTimeBackgroundAppChild, remainingTimeBackgroundAppParent)
 
                 // eventually block
@@ -341,6 +342,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 // update times
                 val timeToSubtract = Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND)
 
+                // see note above declaration of remainingTimeForegroundAppChild
                 val shouldCountForegroundApp = remainingTimeForegroundApp != null && isScreenOn && remainingTimeForegroundApp.hasRemainingTime
                 val shouldCountBackgroundApp = remainingTimeBackgroundApp != null && remainingTimeBackgroundApp.hasRemainingTime
 
