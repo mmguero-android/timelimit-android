@@ -42,17 +42,20 @@ interface PendingSyncActionDao {
     @Query("SELECT * FROM pending_sync_action WHERE scheduled_for_upload = 1 ORDER BY sequence_number ASC LIMIT :limit")
     fun getScheduledActionsSync(limit: Int): List<PendingSyncAction>
 
-    @Query("SELECT COUNT(*) FROM pending_sync_action WHERE scheduled_for_upload = 1")
-    fun countScheduledActionsSync(): Long
+    @Query("SELECT COUNT(*) FROM pending_sync_action WHERE scheduled_for_upload = 1 AND sequence_number <= :maxSequenceNumber")
+    fun countScheduledActionsSync(maxSequenceNumber: Long): Long
 
-    @Query("SELECT COUNT(*) FROM pending_sync_action WHERE scheduled_for_upload = 0")
-    fun countUnscheduledActionsSync(): Long
+    @Query("SELECT COUNT(*) FROM pending_sync_action WHERE scheduled_for_upload = 0 AND sequence_number <= :maxSequenceNumber")
+    fun countUnscheduledActionsSync(maxSequenceNumber: Long): Long
 
     @Query("SELECT COUNT(*) FROM pending_sync_action")
     fun countAllActionsLive(): LiveData<Long>
 
     @Query("SELECT * FROM pending_sync_action WHERE scheduled_for_upload = 0 ORDER BY sequence_number DESC")
     fun getLatestUnscheduledActionSync(): PendingSyncAction?
+
+    @Query("SELECT MAX(sequence_number) FROM pending_sync_action")
+    fun getMaxSequenceNumber(): Long?
 
     @Query("SELECT * FROM pending_sync_action LIMIT :pageSize OFFSET :offset")
     fun getPendingSyncActionPageSync(offset: Int, pageSize: Int): List<PendingSyncAction>

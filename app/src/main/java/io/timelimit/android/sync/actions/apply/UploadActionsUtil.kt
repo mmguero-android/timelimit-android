@@ -42,25 +42,29 @@ class UploadActionsUtil(private val database: Database, private val syncConflict
     }
 
     suspend fun uploadActions(server: ServerLogic.ServerConfig) {
-        while (uploadActionsRound(server)) {
-            // do nothing
+        val highestSequenceNumber = Threads.database.executeAndWait { database.pendingSyncAction().getMaxSequenceNumber() }
+
+        if (highestSequenceNumber != null) {
+            while (uploadActionsRound(server, highestSequenceNumber)) {
+                // do nothing
+            }
         }
     }
 
-    private suspend fun uploadActionsRound(server: ServerLogic.ServerConfig): Boolean {
+    private suspend fun uploadActionsRound(server: ServerLogic.ServerConfig, highestSequenceNumber: Long): Boolean {
         val didUploadSomething = handleUploadIfItemsWhileAvailable(server)
-        val didPrepareSomething = markItemsForUploadingIfNeeded()
+        val didPrepareSomething = markItemsForUploadingIfNeeded(highestSequenceNumber)
 
         return didUploadSomething or didPrepareSomething
     }
 
-    private suspend fun markItemsForUploadingIfNeeded(): Boolean {
+    private suspend fun markItemsForUploadingIfNeeded(highestSequenceNumber: Long): Boolean {
         return Threads.database.executeAndWait {
             database.transaction().use {
                 transaction ->
 
-                val preparedItems = database.pendingSyncAction().countScheduledActionsSync()
-                val unpreparedItems = database.pendingSyncAction().countUnscheduledActionsSync()
+                val preparedItems = database.pendingSyncAction().countScheduledActionsSync(highestSequenceNumber)
+                val unpreparedItems = database.pendingSyncAction().countUnscheduledActionsSync(highestSequenceNumber)
                 val missingItems = BATCH_SIZE - preparedItems
 
                 if (missingItems > 0 && unpreparedItems > 0) {
