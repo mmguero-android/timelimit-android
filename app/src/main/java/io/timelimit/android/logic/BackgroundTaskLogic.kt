@@ -547,16 +547,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 // handle blocking
                 if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.ShouldBlock) {
                     openLockscreen(foregroundAppPackageName!!, foregroundAppActivityName)
-
-                    commitUsedTimeUpdaters()
                 } else {
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
                 }
 
                 if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.ShouldBlock && audioPlaybackPackageName != null) {
                     appLogic.platformIntegration.muteAudioIfPossible(audioPlaybackPackageName)
-
-                    commitUsedTimeUpdaters()
                 }
             } catch (ex: SecurityException) {
                 // this is handled by an other main loop (with a delay)

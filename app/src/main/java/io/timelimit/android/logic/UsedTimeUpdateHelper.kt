@@ -79,5 +79,6 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
 
         timeToAdd.clear()
         extraTimeToSubtract.clear()
+        shouldDoAutoCommit = false
     }
 }
