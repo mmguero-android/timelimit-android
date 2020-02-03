@@ -1,2 +1,1 @@
-- Erfassung von Hintergrundmusikwiedergaben verbessert
-- Möglichkeit hinzugefügt, eine Endzeit beim vorübergehenden Sperren festzulegen
+seltene Abstürze beim Öffnen von TimeLimit behoben

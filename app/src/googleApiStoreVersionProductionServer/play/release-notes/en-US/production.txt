@@ -1,2 +1,1 @@
-- Improve handling of background music playback
-- added option to select an end time for temporarily blocking
+fix rare crashes which occurred when opening TimeLimit
