@@ -25,7 +25,7 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
     val extraTimeToSubtract = mutableMapOf<String, Int>()
     var shouldDoAutoCommit = false
 
-    suspend fun add(categoryId: String, time: Int, includingExtraTime: Boolean) {
+    fun add(categoryId: String, time: Int, includingExtraTime: Boolean) {
         if (time < 0) {
             throw IllegalArgumentException()
         }
