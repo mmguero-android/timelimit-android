@@ -1,1 +1,1 @@
-fix rare sync loop
+fix issues which occured when disabling time limits temporarily

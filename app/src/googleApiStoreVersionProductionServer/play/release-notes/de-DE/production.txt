@@ -1,1 +1,1 @@
-unter bestimmten Umständen auftretende Synchronisationsendlosschleife behoben
+Behebung von Fehlern beim vorübergehenden Deaktivieren von Zeitbeschränkungen
