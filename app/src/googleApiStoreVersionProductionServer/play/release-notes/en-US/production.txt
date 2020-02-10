@@ -1,1 +1,1 @@
-fix issues which occured when disabling time limits temporarily
+Added option to sort the categories

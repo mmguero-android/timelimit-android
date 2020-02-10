@@ -1,1 +1,1 @@
-Behebung von Fehlern beim vorübergehenden Deaktivieren von Zeitbeschränkungen
+Möglichkeit hinzugefügt, die Kategorien zu sortieren
