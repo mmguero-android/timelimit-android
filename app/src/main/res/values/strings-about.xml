@@ -80,7 +80,7 @@
     <string name="about_diagnose_title">Error diagnose</string>
     <string name="about_diagnose_text">Tap here to access details which help diagnosing errors</string>
 
-    <string name="about_developer_key_title">Developer GPG-Key fingerprint</string>
+    <string name="about_developer_key_title">Developer PGP-Key fingerprint</string>
     <string name="about_developer_key_text" translatable="false">2E5C 672D E893 055D 04F5 B7BC 36B4 49FB 5364 BDC4</string>
 
     <string name="about_source_title">Source code</string>
