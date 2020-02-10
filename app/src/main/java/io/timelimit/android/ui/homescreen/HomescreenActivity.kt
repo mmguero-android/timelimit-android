@@ -25,7 +25,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.databinding.ActivityHomescreenItemBinding
 import kotlinx.android.synthetic.main.activity_homescreen.*
@@ -132,5 +131,17 @@ class HomescreenActivity: AppCompatActivity() {
 
     private fun hideProgress() {
         progress_card.visibility = View.GONE
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        model.handleResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        model.handlePause()
     }
 }
