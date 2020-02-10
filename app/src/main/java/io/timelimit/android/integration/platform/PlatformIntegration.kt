@@ -69,6 +69,9 @@ abstract class PlatformIntegration(
 
     abstract fun setEnableCustomHomescreen(enable: Boolean)
 
+    // this function requires the device owner permission and a recent android version
+    abstract fun setForceNetworkTime(enable: Boolean)
+
     var installedAppsChangeListener: Runnable? = null
 }
 

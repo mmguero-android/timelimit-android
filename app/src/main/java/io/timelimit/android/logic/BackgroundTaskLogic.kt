@@ -103,6 +103,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.CUSTOM_HOME_SCREEN).observeForever {
             appLogic.platformIntegration.setEnableCustomHomescreen(it)
         }
+
+        appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.NETWORKTIME_AT_SYSTEMLEVEL).observeForever {
+            appLogic.platformIntegration.setForceNetworkTime(it)
+        }
     }
 
     private val cache = BackgroundTaskLogicCache(appLogic)

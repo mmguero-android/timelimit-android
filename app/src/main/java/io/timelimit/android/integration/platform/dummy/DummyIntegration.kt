@@ -169,4 +169,5 @@ class DummyIntegration(
     override fun getBatteryStatusLive(): LiveData<BatteryStatus> = batteryStatus
 
     override fun setEnableCustomHomescreen(enable: Boolean) = Unit
+    override fun setForceNetworkTime(enable: Boolean) = Unit
 }

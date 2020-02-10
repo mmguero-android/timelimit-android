@@ -59,6 +59,7 @@
     <string name="diagnose_exf_isc">Ignore system connection status</string>
     <string name="diagnose_exf_chs">TimeLimit as launcher</string>
     <string name="diagnose_exf_chd">Delay launcher redirection</string>
+    <string name="diagnose_exf_nas">Force network time at system level</string>
 
     <string name="diagnose_bg_task_loop_ex">Background task loop exception</string>
 

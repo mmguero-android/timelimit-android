@@ -474,7 +474,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         )
 
         if (enable) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && (!BuildConfig.storeCompilant)) {
                 if (policyManager.isDeviceOwnerApp(context.packageName)) {
                     policyManager.addPersistentPreferredActivity(
                             deviceAdmin,
@@ -485,6 +485,14 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
                             homescreen
                     )
                 }
+            }
+        }
+    }
+
+    override fun setForceNetworkTime(enable: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && (!BuildConfig.storeCompilant)) {
+            if (policyManager.isDeviceOwnerApp(context.packageName)) {
+                policyManager.setAutoTimeRequired(deviceAdmin, enable)
             }
         }
     }
