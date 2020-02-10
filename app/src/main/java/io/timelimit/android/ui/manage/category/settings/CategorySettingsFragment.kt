@@ -114,6 +114,8 @@ class CategorySettingsFragment : Fragment() {
 
                 if (binding.extraTimeSelection.timeInMillis != roundedCurrentTimeInMillis) {
                     binding.extraTimeSelection.timeInMillis = roundedCurrentTimeInMillis
+
+                    binding.extraTimeBtnOk.visibility = View.GONE
                 }
             }
         })
@@ -134,6 +136,8 @@ class CategorySettingsFragment : Fragment() {
                             )
                     ) {
                         Snackbar.make(binding.root, R.string.category_settings_extra_time_change_toast, Snackbar.LENGTH_SHORT).show()
+
+                        binding.extraTimeBtnOk.visibility = View.GONE
                     }
                 } else {
                     RequiresPurchaseDialogFragment().show(fragmentManager!!)
@@ -147,7 +151,9 @@ class CategorySettingsFragment : Fragment() {
 
         binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
             override fun onTimeSpanChanged(newTimeInMillis: Long) {
-                // ignore
+                val roundedCurrentTimeInMillis = categoryEntry.value?.let { (it.extraTimeInMillis / (1000 * 60)) * (1000 * 60) } ?: 0
+
+                binding.extraTimeBtnOk.visibility = if (newTimeInMillis != roundedCurrentTimeInMillis) View.VISIBLE else View.GONE
             }
 
             override fun setEnablePickerMode(enable: Boolean) {

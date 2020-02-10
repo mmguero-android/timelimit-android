@@ -331,6 +331,10 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            style="?materialButtonOutlinedStyle"
+                            android:layout_gravity="end"
+                            android:layout_marginEnd="4dp"
+                            android:layout_marginTop="8dp"
                             android:onClick="@{() -> handlers.confirmLocalTime()}"
                             android:text="@string/lock_confirm_time_btn"
                             android:layout_width="wrap_content"
@@ -390,6 +394,11 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            android:visibility="gone"
+                            tools:visibility="visible"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="4dp"
+                            android:layout_gravity="end"
                             android:id="@+id/extra_time_btn_ok"
                             android:text="@string/generic_ok"
                             android:layout_width="wrap_content"
@@ -426,17 +435,21 @@
                             android:layout_height="wrap_content">
 
                             <Button
+                                style="?materialButtonOutlinedStyle"
+                                android:layout_marginEnd="4dp"
                                 android:onClick="@{() -> handlers.disableTemporarilyLockForCurrentCategory()}"
                                 tools:text="Erlaubte Spiele"
                                 android:text="@{appCategoryTitle}"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="match_parent" />
 
                             <Button
+                                android:layout_marginStart="4dp"
+                                style="?materialButtonOutlinedStyle"
                                 android:onClick="@{() -> handlers.disableTemporarilyLockForAllCategories()}"
                                 android:text="@string/lock_disable_temporarily_all_categories"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_height="match_parent" />
 
                         </LinearLayout>
 

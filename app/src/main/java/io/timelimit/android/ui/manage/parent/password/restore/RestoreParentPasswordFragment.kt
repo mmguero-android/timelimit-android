@@ -26,8 +26,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import io.timelimit.android.R
+import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.RestoreParentPasswordFragmentBinding
 import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.map
+import io.timelimit.android.logic.AppLogic
+import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragment
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragmentListener
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
@@ -47,6 +51,9 @@ class RestoreParentPasswordFragment : Fragment(), AuthenticateByMailFragmentList
     val model: RestoreParentPasswordViewModel by lazy {
         ViewModelProviders.of(this).get(RestoreParentPasswordViewModel::class.java)
     }
+
+    val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    val parentUser: LiveData<User?> by lazy { logic.database.user().getParentUserByIdLive(params.parentId) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = RestoreParentPasswordFragmentBinding.inflate(inflater, container, false)
@@ -110,5 +117,5 @@ class RestoreParentPasswordFragment : Fragment(), AuthenticateByMailFragmentList
         }
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue(getString(R.string.restore_parent_password_title))
+    override fun getCustomTitle() = parentUser.map { "${getString(R.string.restore_parent_password_title)} < ${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
 }

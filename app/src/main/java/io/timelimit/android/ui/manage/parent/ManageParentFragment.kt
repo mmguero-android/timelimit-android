@@ -160,7 +160,7 @@ class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle() = parentUser.map { it?.name }
+    override fun getCustomTitle() = parentUser.map { "${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
 }
 
 interface ManageParentFragmentHandlers {

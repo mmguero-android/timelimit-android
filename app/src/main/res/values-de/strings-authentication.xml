@@ -26,7 +26,6 @@
     <string name="authenticate_by_mail_message_sent">Es wurde ein Code an %s gesendet.</string>
     <string name="authenticate_by_mail_hint_mail">E-Mail-Adresse</string>
     <string name="authenticate_by_mail_hint_code">empfangener Code</string>
-    <string name="authenticate_by_mail_hint_enter">Verwenden Sie die Enter-Taste der Tastatur, um fortzufahren</string>
     <string name="authenticate_by_mail_hint_general">
         Wenn Sie sich in der Vergangneheit mit Ihrem Google-Konto angemeldet haben,
         dann verwenden Sie die E-Mail-Adresse, die mit diesem Google-Konto verknüpft ist.

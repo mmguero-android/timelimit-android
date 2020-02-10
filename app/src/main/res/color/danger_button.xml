@@ -13,12 +13,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    style="?materialButtonOutlinedStyle"
-    android:layout_marginLeft="4dp"
-    android:layout_marginRight="4dp"
-    tools:text="A"
-    android:minWidth="48dp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorError" android:state_enabled="true"/>
+    <item android:alpha="0.25" android:color="?attr/colorOnSurface"/>
+</selector>

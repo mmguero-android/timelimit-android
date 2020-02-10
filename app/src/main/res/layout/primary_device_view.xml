@@ -87,9 +87,9 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/btn_assign"
                 android:visibility="@{((status == PrimaryDeviceStatus.NoDeviceSelected) || (status == PrimaryDeviceStatus.OtherDeviceSelected)) &amp;&amp; safeUnbox(canAssignThisDevice) ? View.VISIBLE : View.GONE}"
-                android:background="?selectableItemBackground"
                 android:layout_gravity="end"
                 android:text="@string/primary_device_btn_assign_this"
                 android:layout_width="wrap_content"
@@ -103,9 +103,9 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/btn_unassign"
                 android:visibility="@{status == PrimaryDeviceStatus.ThisDeviceSelected ? View.VISIBLE : View.GONE}"
-                android:background="?selectableItemBackground"
                 android:layout_gravity="end"
                 android:text="@string/primary_device_btn_unassign_this"
                 android:layout_width="wrap_content"

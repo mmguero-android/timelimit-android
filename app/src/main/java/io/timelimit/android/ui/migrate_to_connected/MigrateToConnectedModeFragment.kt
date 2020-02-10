@@ -20,18 +20,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.MigrateToConnectedModeFragmentBinding
+import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragment
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragmentListener
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.main.getActivityViewModel
 
-class MigrateToConnectedModeFragment : Fragment(), AuthenticateByMailFragmentListener {
+class MigrateToConnectedModeFragment : Fragment(), AuthenticateByMailFragmentListener, FragmentWithCustomTitle {
     companion object {
         private const val PAGE_READY = 0
         private const val PAGE_AUTH = 1
@@ -102,4 +105,6 @@ class MigrateToConnectedModeFragment : Fragment(), AuthenticateByMailFragmentLis
     override fun onLoginSucceeded(mailAuthToken: String) {
         model.onLoginSucceeded(mailAuthToken)
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.migrate_to_connected_mode_title)} < ${getString(R.string.main_tab_overview)}")
 }

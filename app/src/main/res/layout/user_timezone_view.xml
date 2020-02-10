@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/change_timezone_button"
                 android:text="@string/manage_child_timezone_change_button"
                 android:layout_gravity="end"

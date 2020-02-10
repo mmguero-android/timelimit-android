@@ -59,10 +59,13 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                style="?materialButtonOutlinedStyle"
                 android:onClick="@{() -> handlers.enableTimeLimits()}"
                 android:visibility="@{TextUtils.isEmpty(disabledUntilString) ? View.GONE : View.VISIBLE}"
                 android:text="@string/manage_disable_time_limits_btn_enable"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <com.google.android.flexbox.FlexboxLayout
@@ -72,48 +75,80 @@
                 android:layout_height="wrap_content">
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsForDuration(1000 * 60 * 10)}"
                     android:text="@string/manage_disable_time_limits_btn_10_min"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsForDuration(1000 * 60 * 30)}"
                     android:text="@string/manage_disable_time_limits_btn_30_min"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsForDuration(1000 * 60 * 60)}"
                     android:text="@string/manage_disable_time_limits_btn_1_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsForDuration(1000 * 60 * 60 * 2)}"
                     android:text="@string/manage_disable_time_limits_btn_2_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsForDuration(1000 * 60 * 60 * 4)}"
                     android:text="@string/manage_disable_time_limits_btn_4_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsForToday()}"
                     android:text="@string/manage_disable_time_limits_btn_today"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsUntilSelectedTimeOfToday()}"
                     android:text="@string/manage_disable_time_limits_btn_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
                 <Button
+                    app:layout_flexGrow="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    style="?materialButtonOutlinedStyle"
                     android:onClick="@{() -> handlers.disableTimeLimitsUntilSelectedDate()}"
                     android:text="@string/manage_disable_time_limits_btn_date"
                     android:layout_width="wrap_content"

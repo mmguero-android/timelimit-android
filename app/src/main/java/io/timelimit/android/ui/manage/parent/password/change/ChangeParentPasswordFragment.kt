@@ -114,5 +114,5 @@ class ChangeParentPasswordFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle() = parentUser.map { it?.name }
+    override fun getCustomTitle() = parentUser.map { "${getString(R.string.manage_parent_change_password_title)} < ${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
 }

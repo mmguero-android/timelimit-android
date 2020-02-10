@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -41,6 +42,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.contacts.ContactsFragment
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.device.add.AddDeviceFragment
 import io.timelimit.android.ui.overview.about.AboutFragment
 import io.timelimit.android.ui.overview.about.AboutFragmentParentHandlers
@@ -52,7 +54,7 @@ import io.timelimit.android.ui.setup.privacy.PrivacyInfoDialogFragment
 import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers,
-        CanNotAddDevicesInLocalModeDialogFragmentListener {
+        CanNotAddDevicesInLocalModeDialogFragmentListener, FragmentWithCustomTitle {
     companion object {
         private const val REQ_MIGRATE_TO_CONNECTED_PRIVACY = 1
     }
@@ -234,4 +236,6 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
             )
         }
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.main_tab_overview)} (${getString(R.string.app_name)})")
 }

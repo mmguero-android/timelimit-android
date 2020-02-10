@@ -26,7 +26,6 @@
     <string name="authenticate_by_mail_message_sent">A code was sent to %s.</string>
     <string name="authenticate_by_mail_hint_mail">Mail address</string>
     <string name="authenticate_by_mail_hint_code">Received code</string>
-    <string name="authenticate_by_mail_hint_enter">Use the enter button of the keyboard to continue</string>
     <string name="authenticate_by_mail_hint_general">
         If you signed in earlier using your Google account, then just use the mail address which is assigned to your Google account.
     </string>

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
@@ -32,8 +33,9 @@ import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class DiagnoseExperimentalFlagFragment : Fragment() {
+class DiagnoseExperimentalFlagFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val activity: ActivityViewModelHolder = activity as ActivityViewModelHolder
         val database = DefaultAppLogic.with(context!!).database
@@ -90,6 +92,8 @@ class DiagnoseExperimentalFlagFragment : Fragment() {
 
         return binding.root
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_exf_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }
 
 data class DiagnoseExperimentalFlagItem(

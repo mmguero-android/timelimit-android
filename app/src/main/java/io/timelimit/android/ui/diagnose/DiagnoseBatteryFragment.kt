@@ -20,11 +20,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import io.timelimit.android.R
 import io.timelimit.android.databinding.DiagnoseBatteryFragmentBinding
+import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class DiagnoseBatteryFragment : Fragment() {
+class DiagnoseBatteryFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DiagnoseBatteryFragmentBinding.inflate(inflater, container, false)
         val logic = DefaultAppLogic.with(context!!)
@@ -36,4 +40,6 @@ class DiagnoseBatteryFragment : Fragment() {
 
         return binding.root
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_bat_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

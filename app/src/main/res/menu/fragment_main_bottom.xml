@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -15,12 +15,12 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:icon="@drawable/ic_list_white_24dp"
+        android:icon="@drawable/ic_account_circle_black_24dp"
         android:title="@string/main_tab_overview"
         android:id="@+id/main_tab_overview" />
 
     <item
-        android:icon="@drawable/ic_perm_contact_calendar_black_24dp"
+        android:icon="@drawable/ic_phone_black_24dp"
         android:title="@string/contacts_title"
         android:id="@+id/main_tab_contacts" />
 

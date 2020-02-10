@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
@@ -116,10 +117,15 @@ class SetUserTimezoneDialogFragment : DialogFragment() {
             adapter.timezones = it
         })
 
-        return AlertDialog.Builder(context!!, R.style.AppTheme)
+        return AlertDialog.Builder(context!!, R.style.FullscreenDialogTheme)
                 .setView(binding.root)
                 .setNegativeButton(R.string.generic_cancel, null)
                 .create()
+                .apply {
+                    setOnShowListener {
+                        dialog!!.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT)
+                    }
+                }
     }
 
     fun show(fragmentManager: FragmentManager) = showSafe(fragmentManager, DIALOG_TAG)

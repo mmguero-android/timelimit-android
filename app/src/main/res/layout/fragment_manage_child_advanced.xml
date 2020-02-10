@@ -113,12 +113,14 @@
                         android:layout_height="wrap_content" />
 
                     <Button
+                        style="?materialButtonOutlinedStyle"
                         android:id="@+id/rename_child_button"
                         android:text="@string/rename_child_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <Button
+                        style="?materialButtonOutlinedStyle"
                         android:id="@+id/delete_user_button"
                         android:text="@string/delete_child_title"
                         android:layout_width="match_parent"

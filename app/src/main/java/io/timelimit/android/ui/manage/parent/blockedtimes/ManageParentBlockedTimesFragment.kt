@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class ManageParentBlockedTimesFragment : Fragment(), FragmentWithCustomTitle, Co
         DefaultAppLogic.with(context!!).database.user().getParentUserByIdLive(params.parentUserId)
     }
 
-    override fun getCustomTitle(): LiveData<String?> = parent.map { it?.name }
+    override fun getCustomTitle() = parent.map { "${getString(R.string.manage_parent_blocked_times_title)} < ${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
 
     override fun onCopyBlockedTimeAreasConfirmed(sourceDay: Int, targetDays: Set<Int>) {
         parent.value?.blockedTimes?.let { current ->

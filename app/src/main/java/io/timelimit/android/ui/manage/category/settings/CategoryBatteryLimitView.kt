@@ -15,6 +15,7 @@
  */
 package io.timelimit.android.ui.manage.category.settings
 
+import android.view.View
 import android.widget.SeekBar
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
@@ -46,12 +47,21 @@ object CategoryBatteryLimitView {
             ).show(fragmentManager)
         }
 
+        fun updateButtonVisibility() {
+            val category = category.value
+            val modified = category == null || (category.minBatteryLevelMobile != binding.minLevelMobile) || (category.minBatteryLevelWhileCharging != binding.minLevelCharging)
+
+            binding.confirmBtn.visibility = if (modified) View.VISIBLE else View.GONE
+        }
+
         binding.seekbarCharging.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) = Unit
             override fun onStopTrackingTouch(p0: SeekBar?) = Unit
 
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 binding.minLevelCharging = p1 * 10
+
+                updateButtonVisibility()
             }
         })
 
@@ -61,6 +71,8 @@ object CategoryBatteryLimitView {
 
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 binding.minLevelMobile = p1 * 10
+
+                updateButtonVisibility()
             }
         })
 
@@ -72,6 +84,8 @@ object CategoryBatteryLimitView {
 
                 binding.seekbarMobile.progress = mobile
                 binding.seekbarCharging.progress = charging
+
+                updateButtonVisibility()
             }
         })
 
@@ -86,6 +100,8 @@ object CategoryBatteryLimitView {
                     )
             ) {
                 Snackbar.make(binding.root, R.string.category_settings_battery_limit_confirm_toast, Snackbar.LENGTH_SHORT).show()
+
+                binding.confirmBtn.visibility = View.GONE
             }
         }
     }

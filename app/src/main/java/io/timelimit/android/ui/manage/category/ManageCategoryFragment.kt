@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import io.timelimit.android.data.model.User
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.mergeLiveData
+import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
@@ -112,9 +113,9 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
         }
     }
 
-    override fun getCustomTitle(): LiveData<String?> = mergeLiveData(user, category).map {
-        (user, category) ->
-
-        "${category?.title} - ${user?.name}"
+    override fun getCustomTitle(): LiveData<String?> = user.switchMap { user ->
+        category.map { category ->
+            "${category?.title} < ${user?.name} < ${getString(R.string.main_tab_overview)}" as String?
+        }
     }
 }

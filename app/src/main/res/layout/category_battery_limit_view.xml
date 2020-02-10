@@ -73,7 +73,10 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/seekbar_mobile" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:icon="@drawable/ic_check_black_24dp"
                 android:text="@string/generic_save"
                 android:id="@+id/confirm_btn"
                 android:layout_gravity="end"

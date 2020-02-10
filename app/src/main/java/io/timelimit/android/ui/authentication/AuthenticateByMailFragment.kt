@@ -47,12 +47,12 @@ class AuthenticateByMailFragment : Fragment() {
 
         model.recoveryUserId.value = arguments?.getString(RECOVERY_USER_ID)
 
-        binding.step1.mailEdit.setOnEnterListenr {
+        fun step1Go() {
             val mail = binding.step1.mailEdit.text.toString()
 
             if (!MailValidation.seemsMailAddressValid(mail)) {
                 Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address, Snackbar.LENGTH_SHORT).show()
-                return@setOnEnterListenr
+                return
             }
 
             val domain = MailValidation.getDomain(mail)
@@ -69,7 +69,7 @@ class AuthenticateByMailFragment : Fragment() {
                     Snackbar.make(binding.root, R.string.authenticate_by_mail_snackbar_invalid_address_suggest, Snackbar.LENGTH_SHORT).show()
                 }
 
-                return@setOnEnterListenr
+                return
             } else {
                 if (suggestedDomain != null) {
                     val mailWithoutDomain = mail.substring(0, mail.length - domain.length)
@@ -85,7 +85,10 @@ class AuthenticateByMailFragment : Fragment() {
             }
         }
 
-        binding.step2.codeEdit.setOnEnterListenr {
+        binding.step1.mailEdit.setOnEnterListenr { step1Go() }
+        binding.step1.goButton.setOnClickListener { step1Go() }
+
+        fun step2Go() {
             val code = binding.step2.codeEdit.text.toString()
 
             if (code.isNotBlank()) {
@@ -94,6 +97,9 @@ class AuthenticateByMailFragment : Fragment() {
                 binding.step2.codeEdit.setText("")
             }
         }
+
+        binding.step2.codeEdit.setOnEnterListenr { step2Go() }
+        binding.step2.goButton.setOnClickListener { step2Go() }
 
         binding.step1B.goButton.setOnClickListener {
             model.sendAuthMessageToForcedMailAddress()

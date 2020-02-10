@@ -50,6 +50,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/change_mode_button"
                 tools:text="@string/manage_category_for_unassigned_apps_btn_disable"
                 android:text="@{isThisCategoryUsed ? @string/manage_category_for_unassigned_apps_btn_disable : @string/manage_category_for_unassigned_apps_btn_enable}"

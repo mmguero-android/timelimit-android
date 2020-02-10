@@ -52,7 +52,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
+                        app:icon="@drawable/ic_check_black_24dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        android:layout_gravity="end"
                         android:id="@+id/extra_time_btn_ok"
                         android:text="@string/category_settings_extra_time_change"
                         android:layout_width="wrap_content"
@@ -99,12 +103,14 @@
                         android:layout_height="wrap_content" />
 
                     <Button
+                        style="?materialButtonOutlinedStyle"
                         android:id="@+id/edit_category_title_go"
                         android:text="@string/category_settings_rename"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <Button
+                        style="?materialButtonOutlinedStyle"
                         android:id="@+id/btn_delete_category"
                         android:text="@string/category_settings_delete"
                         android:layout_width="match_parent"

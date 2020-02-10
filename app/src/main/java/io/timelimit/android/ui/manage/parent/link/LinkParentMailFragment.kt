@@ -20,15 +20,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import io.timelimit.android.R
+import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.LinkParentMailFragmentBinding
+import io.timelimit.android.livedata.map
+import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragment
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragmentListener
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class LinkParentMailFragment : Fragment(), AuthenticateByMailFragmentListener {
+class LinkParentMailFragment : Fragment(), AuthenticateByMailFragmentListener, FragmentWithCustomTitle {
     companion object {
         private const val PAGE_READY = 0
         private const val PAGE_LOGIN = 1
@@ -43,6 +48,12 @@ class LinkParentMailFragment : Fragment(), AuthenticateByMailFragmentListener {
     val args: LinkParentMailFragmentArgs by lazy {
         LinkParentMailFragmentArgs.fromBundle(arguments!!)
     }
+
+    private val parent: LiveData<User?> by lazy {
+        DefaultAppLogic.with(context!!).database.user().getParentUserByIdLive(args.parentId)
+    }
+
+    override fun getCustomTitle() = parent.map { "${getString(R.string.manage_parent_link_mail_title)} < ${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = LinkParentMailFragmentBinding.inflate(inflater, container, false)

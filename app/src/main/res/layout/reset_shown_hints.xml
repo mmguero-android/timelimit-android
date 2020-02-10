@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -54,9 +54,11 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/reshow_hints_btn"
                 android:visibility="@{canReshowHints == Boolean.TRUE ? View.VISIBLE : View.GONE}"
-                android:background="?selectableItemBackground"
                 android:layout_gravity="end"
                 android:text="@string/reset_hidden_hints_btn"
                 android:layout_width="wrap_content"

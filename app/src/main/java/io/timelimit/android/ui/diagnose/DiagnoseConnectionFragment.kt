@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseConnectionBinding
+import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.websocket.NetworkStatus
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class DiagnoseConnectionFragment : Fragment() {
+class DiagnoseConnectionFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentDiagnoseConnectionBinding.inflate(inflater, container, false)
         val logic = DefaultAppLogic.with(context!!)
@@ -49,4 +52,6 @@ class DiagnoseConnectionFragment : Fragment() {
 
         return binding.root
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_connection_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

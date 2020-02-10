@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import io.timelimit.android.R
 import io.timelimit.android.databinding.StayAwesomeFragmentBinding
 import io.timelimit.android.databinding.StayAwesomeFragmentItemBinding
+import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.ui.MainActivity
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class StayAwesomeFragment : Fragment() {
+class StayAwesomeFragment : Fragment(), FragmentWithCustomTitle {
     val model: StayAwesomeModel by lazy {
         ViewModelProviders.of(this).get(StayAwesomeModel::class.java)
     }
@@ -78,4 +82,6 @@ class StayAwesomeFragment : Fragment() {
 
         model.load()
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.about_sal)} < ${getString(R.string.main_tab_overview)}")
 }

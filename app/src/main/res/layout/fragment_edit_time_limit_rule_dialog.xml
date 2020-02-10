@@ -1,5 +1,5 @@
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -51,30 +51,15 @@
 
         <include layout="@layout/view_select_days" android:id="@+id/day_selection" />
 
-        <View
-            android:background="@color/gray"
-            android:layout_width="match_parent"
-            android:layout_height="1px" />
-
-        <CheckBox
-            android:onClick="@{() -> handlers.updateApplyToExtraTime(!safeUnbox(applyToExtraTime))}"
-            android:checked="@{safeUnbox(applyToExtraTime)}"
-            android:text="@string/category_time_limit_rules_apply_to_extra_time"
+        <io.timelimit.android.ui.view.SelectTimeSpanView
+            android:id="@+id/time_span"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <View
-            android:background="@color/gray"
-            android:layout_width="match_parent"
-            android:layout_height="1px" />
-
-        <View
-            android:background="@color/gray"
-            android:layout_width="match_parent"
-            android:layout_height="1px" />
-
-        <io.timelimit.android.ui.view.SelectTimeSpanView
-            android:id="@+id/time_span"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:onClick="@{() -> handlers.updateApplyToExtraTime(!safeUnbox(applyToExtraTime))}"
+            android:checked="@{safeUnbox(applyToExtraTime)}"
+            android:text="@string/category_time_limit_rules_apply_to_extra_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -96,19 +81,20 @@
                 android:layout_height="0dp" />
 
             <Button
+                android:layout_marginEnd="4dp"
+                style="?borderlessButtonStyle"
                 android:onClick="@{() -> handlers.onDeleteRule()}"
                 android:visibility="@{safeUnbox(isNewRule) ? View.GONE : View.VISIBLE}"
                 android:textColor="@color/red"
-                android:background="?selectableItemBackground"
                 android:text="@string/generic_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <Button
+                android:layout_marginStart="4dp"
                 android:onClick="@{() -> handlers.onSaveRule()}"
                 tools:text="@string/generic_create"
                 android:text="@{safeUnbox(isNewRule) ? @string/generic_create : @string/generic_save}"
-                android:background="?selectableItemBackground"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

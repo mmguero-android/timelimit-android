@@ -27,42 +27,49 @@
             android:layout_height="wrap_content">
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_clock_button"
                 android:text="@string/diagnose_clock_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_connection_button"
                 android:text="@string/diagnose_connection_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_sync_button"
                 android:text="@string/diagnose_sync_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_battery_button"
                 android:text="@string/diagnose_bat_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_fga_button"
                 android:text="@string/diagnose_fga_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_exf_button"
                 android:text="@string/diagnose_exf_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/diagnose_bg_task_loop_ex_button"
                 android:text="@string/diagnose_bg_task_loop_ex"
                 android:enabled="false"

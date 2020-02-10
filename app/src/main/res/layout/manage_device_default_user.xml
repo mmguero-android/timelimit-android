@@ -73,6 +73,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:id="@+id/set_default_user_button"
                 tools:text="@string/manage_device_default_user_set_btn_set"
                 android:text="@{hasDefaultUser ? @string/manage_device_default_user_set_btn_change : @string/manage_device_default_user_set_btn_set}"
@@ -116,6 +117,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:visibility="@{hasDefaultUser ? View.VISIBLE : View.GONE}"
                 android:id="@+id/configure_auto_logout_button"
                 android:text="@{isAutomaticallySwitchingToDefaultUserEnabled ? @string/manage_device_default_user_timeout_btn_change : @string/manage_device_default_user_timeout_btn_enable}"

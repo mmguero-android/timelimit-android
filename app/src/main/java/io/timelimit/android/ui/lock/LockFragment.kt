@@ -273,7 +273,7 @@ class LockFragment : Fragment() {
 
         binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
             override fun onTimeSpanChanged(newTimeInMillis: Long) {
-                // ignore
+                binding.extraTimeBtnOk.visibility = if (newTimeInMillis == 0L) View.GONE else View.VISIBLE
             }
 
             override fun setEnablePickerMode(enable: Boolean) {

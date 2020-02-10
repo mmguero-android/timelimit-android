@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,14 +20,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentPurchaseBinding
+import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.ui.MainActivity
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class PurchaseFragment : Fragment() {
+class PurchaseFragment : Fragment(), FragmentWithCustomTitle {
     private val activityModel: ActivityPurchaseModel by lazy { (activity as MainActivity).purchaseModel }
     private val model: PurchaseModel by lazy {
         ViewModelProviders.of(this).get(PurchaseModel::class.java)
@@ -121,6 +124,8 @@ class PurchaseFragment : Fragment() {
 
         return binding.root
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.about_full_version)} < ${getString(R.string.main_tab_overview)}")
 }
 
 interface PurchaseFragmentHandlers {

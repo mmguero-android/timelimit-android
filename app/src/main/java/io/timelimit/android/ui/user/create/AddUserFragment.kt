@@ -20,6 +20,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -31,8 +32,9 @@ import io.timelimit.android.databinding.FragmentAddUserBinding
 import io.timelimit.android.livedata.*
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
-class AddUserFragment : Fragment() {
+class AddUserFragment : Fragment(), FragmentWithCustomTitle {
     companion object {
         private const val PAGE_INPUT = 0
         private const val PAGE_WAIT = 1
@@ -134,4 +136,6 @@ class AddUserFragment : Fragment() {
 
         return binding.root
     }
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.add_user_title)} < ${getString(R.string.main_tab_overview)}")
 }

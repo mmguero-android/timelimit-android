@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -42,12 +42,14 @@
                 android:layout_height="wrap_content" />
 
             <Button
+                style="?materialButtonOutlinedStyle"
                 android:text="@string/manage_device_rename"
                 android:id="@+id/rename_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="?materialButtonOutlinedStyle"
                 android:visibility="@{isLocalMode == Boolean.FALSE &amp;&amp; BuildConfig.hasServer ? View.VISIBLE : View.GONE}"
                 android:id="@+id/remove_btn"
                 android:text="@string/remove_device_title"

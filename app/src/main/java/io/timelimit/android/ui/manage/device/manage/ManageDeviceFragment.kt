@@ -185,7 +185,7 @@ class ManageDeviceFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle() = deviceEntry.map { it?.name }
+    override fun getCustomTitle(): LiveData<String?> = deviceEntry.map { "${it?.name} < ${getString(R.string.main_tab_overview)}" }
 }
 
 interface ManageDeviceFragmentHandlers {

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.databinding.SetupRemoteChildFragmentBinding
 import io.timelimit.android.extensions.safeNavigate
+import io.timelimit.android.extensions.setOnEnterListenr
 import io.timelimit.android.ui.overview.main.MainFragmentDirections
 
 class SetupRemoteChildFragment : Fragment() {
@@ -37,9 +38,12 @@ class SetupRemoteChildFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = SetupRemoteChildFragmentBinding.inflate(inflater, container, false)
 
-        binding.btnOk.setOnClickListener {
+        fun go() {
             model.trySetup(binding.editCode.text.toString())
         }
+
+        binding.btnOk.setOnClickListener { go() }
+        binding.editCode.setOnEnterListenr { go() }
 
         model.status.observe(this, Observer {
             status ->

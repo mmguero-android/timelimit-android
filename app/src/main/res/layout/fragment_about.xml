@@ -104,7 +104,7 @@
                     <TextView
                         android:textAppearance="?android:textAppearanceLarge"
                         tools:text="@string/about_full_version"
-                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sla : @string/about_full_version}"
+                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sal : @string/about_full_version}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -132,7 +132,7 @@
 
                     <TextView
                         tools:text="@string/about_full_version_tap_hint"
-                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sla_tap_hint : @string/about_full_version_tap_hint}"
+                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sal_tap_hint : @string/about_full_version_tap_hint}"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
