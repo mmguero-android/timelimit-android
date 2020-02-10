@@ -84,6 +84,23 @@
             android:exported="false"
             android:name=".ui.manipulation.AnnoyActivity" />
 
+        <activity
+            tools:ignore="UnusedAttribute"
+            android:enabled="false"
+            android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true"
+            android:taskAffinity=":dummyhome"
+            android:launchMode="singleTop"
+            android:theme="@style/AppHomescreenTheme"
+            android:name=".ui.homescreen.HomescreenActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- system integration -->
 
         <receiver android:name=".integration.platform.android.receiver.BootReceiver">

@@ -67,6 +67,8 @@ abstract class PlatformIntegration(
     abstract fun getBatteryStatus(): BatteryStatus
     abstract fun getBatteryStatusLive(): LiveData<BatteryStatus>
 
+    abstract fun setEnableCustomHomescreen(enable: Boolean)
+
     var installedAppsChangeListener: Runnable? = null
 }
 

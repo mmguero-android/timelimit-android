@@ -167,4 +167,6 @@ class DummyIntegration(
 
     override fun getBatteryStatus(): BatteryStatus = batteryStatus.value!!
     override fun getBatteryStatusLive(): LiveData<BatteryStatus> = batteryStatus
+
+    override fun setEnableCustomHomescreen(enable: Boolean) = Unit
 }

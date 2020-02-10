@@ -21,10 +21,7 @@ import android.app.Application
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.admin.DevicePolicyManager
-import android.content.BroadcastReceiver
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -47,6 +44,7 @@ import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.integration.platform.android.foregroundapp.ForegroundAppHelper
+import io.timelimit.android.ui.homescreen.HomescreenActivity
 import io.timelimit.android.ui.lock.LockActivity
 import io.timelimit.android.ui.manipulation.AnnoyActivity
 import kotlinx.coroutines.channels.Channel
@@ -465,4 +463,29 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
 
     override fun getBatteryStatus(): BatteryStatus = battery.status.value!!
     override fun getBatteryStatusLive(): LiveData<BatteryStatus> = battery.status
+
+    override fun setEnableCustomHomescreen(enable: Boolean) {
+        val homescreen = ComponentName(context, HomescreenActivity::class.java)
+
+        context.packageManager.setComponentEnabledSetting(
+                homescreen,
+                if (enable) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
+        )
+
+        if (enable) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (policyManager.isDeviceOwnerApp(context.packageName)) {
+                    policyManager.addPersistentPreferredActivity(
+                            deviceAdmin,
+                            IntentFilter(Intent.ACTION_MAIN).apply {
+                                addCategory(Intent.CATEGORY_HOME)
+                                addCategory(Intent.CATEGORY_DEFAULT)
+                            },
+                            homescreen
+                    )
+                }
+            }
+        }
+    }
 }
