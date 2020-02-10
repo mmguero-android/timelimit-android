@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.manage.child.advanced.manageblocktemporarily
 
 import androidx.lifecycle.LiveData
+import io.timelimit.android.data.extensions.sorted
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.RealTimeLogic
@@ -35,7 +36,7 @@ object ManageBlockTemporarilyItems {
         val time = liveDataFromFunction { realTimeLogic.getCurrentTimeInMillis() }
 
         return categories.map { categories ->
-            categories.map { category ->
+            categories.sorted().map { category ->
                 ManageBlockTemporarilyItem(
                         categoryId = category.id,
                         categoryTitle = category.title,

@@ -66,6 +66,8 @@ object LocalDatabaseParentActionDispatcher {
                     DatabaseValidation.assertChildExists(database, action.childId)
 
                     // create the category
+                    val sort = database.category().getNextCategorySortKeyByChildId(action.childId)
+
                     database.category().addCategory(Category(
                             id = action.categoryId,
                             childId = action.childId,
@@ -83,7 +85,8 @@ object LocalDatabaseParentActionDispatcher {
                             blockAllNotifications = false,
                             timeWarnings = 0,
                             minBatteryLevelWhileCharging = 0,
-                            minBatteryLevelMobile = 0
+                            minBatteryLevelMobile = 0,
+                            sort = sort
                     ))
                 }
                 is DeleteCategoryAction -> {
@@ -556,6 +559,16 @@ object LocalDatabaseParentActionDispatcher {
                                     minBatteryLevelMobile = action.mobileLimit ?: categoryEntry.minBatteryLevelMobile
                             )
                     )
+                }
+                is UpdateCategorySortingAction -> {
+                    // no validation here:
+                    // - only parents can do it
+                    // - using it over categories which don't belong together destroys the sorting for both,
+                    //   but does not cause any trouble
+
+                    action.categoryIds.forEachIndexed { index, categoryId ->
+                        database.category().updateCategorySorting(categoryId, index)
+                    }
                 }
             }.let { }
 

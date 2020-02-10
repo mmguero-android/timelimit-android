@@ -97,6 +97,14 @@ abstract class CategoryDao {
 
     @Query("SELECT * FROM category")
     abstract fun getAllCategoriesSync(): List<Category>
+
+    // if there is no category, then the result is null
+    // Room converts null to 0 si it works
+    @Query("SELECT MAX(sort) + 1 FROM category WHERE child_id = :childId")
+    abstract fun getNextCategorySortKeyByChildId(childId: String): Int
+
+    @Query("UPDATE category SET sort = :sort WHERE id = :categoryId")
+    abstract fun updateCategorySorting(categoryId: String, sort: Int)
 }
 
 data class CategoryWithVersionNumbers(

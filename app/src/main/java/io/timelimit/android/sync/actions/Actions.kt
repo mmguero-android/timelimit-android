@@ -804,6 +804,36 @@ data class UpdateCategoryBatteryLimit(val categoryId: String, val chargingLimit:
         writer.endObject()
     }
 }
+data class UpdateCategorySortingAction(val categoryIds: List<String>): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_CATEGORY_SORTING"
+        private const val CATEGORY_IDS = "categoryIds"
+    }
+
+    init {
+        if (categoryIds.isEmpty()) {
+            throw IllegalArgumentException()
+        }
+
+        if (categoryIds.distinct().size != categoryIds.size) {
+            throw IllegalArgumentException()
+        }
+
+        categoryIds.forEach { IdGenerator.assertIdValid(it) }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+
+        writer.name(CATEGORY_IDS).beginArray()
+        categoryIds.forEach { writer.value(it) }
+        writer.endArray()
+
+        writer.endObject()
+    }
+}
 // DeviceDao
 
 data class UpdateDeviceStatusAction(

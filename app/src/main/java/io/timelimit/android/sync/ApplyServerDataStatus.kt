@@ -312,7 +312,8 @@ object ApplyServerDataStatus {
                                     parentCategoryId = newCategory.parentCategoryId,
                                     timeWarnings = newCategory.timeWarnings,
                                     minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
-                                    minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging
+                                    minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging,
+                                    sort = newCategory.sort
                             ))
                         } else {
                             val updatedCategory = oldCategory.copy(
@@ -327,7 +328,8 @@ object ApplyServerDataStatus {
                                     parentCategoryId = newCategory.parentCategoryId,
                                     timeWarnings = newCategory.timeWarnings,
                                     minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
-                                    minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging
+                                    minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging,
+                                    sort = newCategory.sort
                             )
 
                             if (updatedCategory != oldCategory) {

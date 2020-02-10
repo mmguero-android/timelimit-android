@@ -63,7 +63,9 @@ data class Category(
         @ColumnInfo(name = "min_battery_charging")
         val minBatteryLevelWhileCharging: Int,
         @ColumnInfo(name = "min_battery_mobile")
-        val minBatteryLevelMobile: Int
+        val minBatteryLevelMobile: Int,
+        @ColumnInfo(name = "sort")
+        val sort: Int
 ): JsonSerializable {
     companion object {
         const val MINUTES_PER_DAY = 60 * 24
@@ -85,6 +87,7 @@ data class Category(
         private const val TIME_WARNINGS = "tw"
         private const val MIN_BATTERY_CHARGING = "minBatteryCharging"
         private const val MIN_BATTERY_MOBILE = "minBatteryMobile"
+        private const val SORT = "sort"
 
         fun parse(reader: JsonReader): Category {
             var id: String? = null
@@ -104,6 +107,7 @@ data class Category(
             var timeWarnings = 0
             var minBatteryCharging = 0
             var minBatteryMobile = 0
+            var sort = 0
 
             reader.beginObject()
 
@@ -125,6 +129,7 @@ data class Category(
                     TIME_WARNINGS -> timeWarnings = reader.nextInt()
                     MIN_BATTERY_CHARGING -> minBatteryCharging = reader.nextInt()
                     MIN_BATTERY_MOBILE -> minBatteryMobile = reader.nextInt()
+                    SORT -> sort = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -147,7 +152,8 @@ data class Category(
                     blockAllNotifications = blockAllNotifications,
                     timeWarnings = timeWarnings,
                     minBatteryLevelWhileCharging = minBatteryCharging,
-                    minBatteryLevelMobile = minBatteryMobile
+                    minBatteryLevelMobile = minBatteryMobile,
+                    sort = sort
             )
         }
     }
@@ -192,6 +198,7 @@ data class Category(
         writer.name(TIME_WARNINGS).value(timeWarnings)
         writer.name(MIN_BATTERY_CHARGING).value(minBatteryLevelWhileCharging)
         writer.name(MIN_BATTERY_MOBILE).value(minBatteryLevelMobile)
+        writer.name(SORT).value(sort)
 
         writer.endObject()
     }

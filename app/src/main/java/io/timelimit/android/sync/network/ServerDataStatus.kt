@@ -342,7 +342,8 @@ data class ServerUpdatedCategoryBaseData(
         val blockAllNotifications: Boolean,
         val timeWarnings: Int,
         val minBatteryLevelCharging: Int,
-        val minBatteryLevelMobile: Int
+        val minBatteryLevelMobile: Int,
+        val sort: Int
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -358,6 +359,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val TIME_WARNINGS = "timeWarnings"
         private const val MIN_BATTERY_LEVEL_MOBILE = "mblMobile"
         private const val MIN_BATTERY_LEVEL_CHARGING = "mblCharging"
+        private const val SORT = "sort"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -374,6 +376,7 @@ data class ServerUpdatedCategoryBaseData(
             var timeWarnings = 0
             var minBatteryLevelCharging = 0
             var minBatteryLevelMobile = 0
+            var sort = 0
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -391,6 +394,7 @@ data class ServerUpdatedCategoryBaseData(
                     TIME_WARNINGS -> timeWarnings = reader.nextInt()
                     MIN_BATTERY_LEVEL_CHARGING -> minBatteryLevelCharging = reader.nextInt()
                     MIN_BATTERY_LEVEL_MOBILE -> minBatteryLevelMobile = reader.nextInt()
+                    SORT -> sort = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -409,7 +413,8 @@ data class ServerUpdatedCategoryBaseData(
                     blockAllNotifications = blockAllNotifications,
                     timeWarnings = timeWarnings,
                     minBatteryLevelCharging = minBatteryLevelCharging,
-                    minBatteryLevelMobile = minBatteryLevelMobile
+                    minBatteryLevelMobile = minBatteryLevelMobile,
+                    sort = sort
             )
         }
 

@@ -20,7 +20,7 @@ import android.util.SparseLongArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.data.extensions.mapToTimezone
-import io.timelimit.android.data.model.Category
+import io.timelimit.android.data.extensions.sorted
 import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
@@ -30,7 +30,6 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.RemainingTime
-import java.util.*
 
 class ManageChildCategoriesModel(application: Application): AndroidViewModel(application) {
     private val logic = DefaultAppLogic.with(application)
@@ -78,22 +77,7 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
         )
     }
 
-    private val sortedCategories = categories.map { categories ->
-        val categoryById = categories.associateBy { it.id }
-
-        val sortedCategories = mutableListOf<Category>()
-        val childCategories = categories.filter { categoryById.containsKey(it.parentCategoryId) }.groupBy { it.parentCategoryId }
-
-        categories.filterNot { categoryById.containsKey(it.parentCategoryId) }.sortedBy { it.title.toLowerCase(Locale.getDefault()) }.forEach { category ->
-            sortedCategories.add(category)
-
-            childCategories[category.id]?.sortedBy { it.title.toLowerCase(Locale.getDefault()) }?.let { items ->
-                sortedCategories.addAll(items)
-            }
-        }
-
-        sortedCategories.toList()
-    }
+    private val sortedCategories = categories.map { it.sorted() }
 
     private val categoryItems = categoryForUnassignedAppsLive.switchMap { categoryForUnassignedApps ->
         sortedCategories.switchMap { categories ->

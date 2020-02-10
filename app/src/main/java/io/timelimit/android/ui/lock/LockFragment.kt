@@ -32,6 +32,7 @@ import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
+import io.timelimit.android.data.extensions.sorted
 import io.timelimit.android.data.model.*
 import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.livedata.*
@@ -186,7 +187,7 @@ class LockFragment : Fragment() {
             } else {
                 val (user, categoryEntries) = status
 
-                categoryEntries.forEach {
+                categoryEntries.sorted().forEach {
                     category ->
 
                     val button = Button(context)

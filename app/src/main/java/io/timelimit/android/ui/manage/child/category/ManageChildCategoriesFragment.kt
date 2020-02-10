@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.actions.UpdateCategorySortingAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
@@ -97,12 +98,74 @@ class ManageChildCategoriesFragment : Fragment() {
                 if (item == CategoriesIntroductionHeader) {
                     return makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.END or ItemTouchHelper.START) or
                             makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END or ItemTouchHelper.START)
+                } else if (item is CategoryItem) {
+                    return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.UP or ItemTouchHelper.DOWN) or
+                            makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.UP or ItemTouchHelper.DOWN)
                 } else {
                     return 0
                 }
             }
 
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = throw IllegalStateException()
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                val fromIndex = viewHolder.adapterPosition
+                val toIndex = target.adapterPosition
+                val categories = adapter.categories!!
+
+                if (fromIndex == RecyclerView.NO_POSITION || toIndex == RecyclerView.NO_POSITION) {
+                    return false
+                }
+
+                val fromItem = categories[fromIndex]
+                val toItem = categories[toIndex]
+
+                if (!(fromItem is CategoryItem)) {
+                    throw IllegalStateException()
+                }
+
+                if (!(toItem is CategoryItem)) {
+                    return false
+                }
+
+                if (fromItem.parentCategoryTitle == null) {
+                    if (toItem.parentCategoryTitle != null) {
+                        return false
+                    }
+
+                    val parentCategories = mutableListOf<CategoryItem>()
+
+                    categories.forEach { if (it is CategoryItem && it.parentCategoryTitle == null) { parentCategories.add(it) } }
+
+                    val targetIndex = parentCategories.indexOf(toItem)
+                    val sourceIndex = parentCategories.indexOf(fromItem)
+
+                    parentCategories.add(targetIndex, parentCategories.removeAt(sourceIndex))
+
+                    return auth.tryDispatchParentAction(
+                            UpdateCategorySortingAction(
+                                    categoryIds = parentCategories.map { it.category.id }
+                            )
+                    )
+                } else {
+                    if (toItem.category.parentCategoryId != fromItem.category.parentCategoryId) {
+                        return false
+                    }
+
+                    val childCategories = mutableListOf<CategoryItem>()
+
+                    categories.forEach { if (it is CategoryItem && it.category.parentCategoryId == fromItem.category.parentCategoryId) { childCategories.add(it) } }
+
+                    val targetIndex = childCategories.indexOf(toItem)
+                    val sourceIndex = childCategories.indexOf(fromItem)
+
+                    childCategories.add(targetIndex, childCategories.removeAt(sourceIndex))
+
+                    return auth.tryDispatchParentAction(
+                            UpdateCategorySortingAction(
+                                    categoryIds = childCategories.map { it.category.id }
+                            )
+                    )
+                }
+            }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val database = logic.database
