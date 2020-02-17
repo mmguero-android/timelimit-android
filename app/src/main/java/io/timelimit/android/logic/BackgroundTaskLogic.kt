@@ -48,12 +48,17 @@ import java.util.*
 class BackgroundTaskLogic(val appLogic: AppLogic) {
     var pauseForegroundAppBackgroundLoop = false
     val lastLoopException = MutableLiveData<Exception?>().apply { value = null }
+    private var slowMainLoop = false
 
     companion object {
-        private const val CHECK_PERMISSION_INTERVAL = 10 * 1000L    // all 10 seconds
-        private const val BACKGROUND_SERVICE_INTERVAL = 100L    // all 100 ms
-        private const val MAX_USED_TIME_PER_ROUND = 1000        // 1 second
         private const val LOG_TAG = "BackgroundTaskLogic"
+
+        private const val CHECK_PERMISSION_INTERVAL = 10 * 1000L        // all 10 seconds
+
+        private const val BACKGROUND_SERVICE_INTERVAL_SHORT = 100L      // all 100 ms
+        private const val MAX_USED_TIME_PER_ROUND_SHORT = 1000          // 1 second
+        private const val BACKGROUND_SERVICE_INTERVAL_LONG = 1000L      // every second
+        private const val MAX_USED_TIME_PER_ROUND_LONG = 2000           // 1 second
     }
 
     private val temporarilyAllowedApps = appLogic.deviceId.switchMap {
@@ -107,6 +112,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.NETWORKTIME_AT_SYSTEMLEVEL).observeForever {
             appLogic.platformIntegration.setForceNetworkTime(it)
         }
+
+        appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.HIGH_MAIN_LOOP_DELAY).observeForever {
+            slowMainLoop = it
+        }
     }
 
     private val cache = BackgroundTaskLogicCache(appLogic)
@@ -154,6 +163,16 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         val realTime = RealTime.newInstance()
 
         while (true) {
+            val backgroundServiceInterval = when (slowMainLoop) {
+                true -> BACKGROUND_SERVICE_INTERVAL_LONG
+                false -> BACKGROUND_SERVICE_INTERVAL_SHORT
+            }
+
+            val maxUsedTimeToAdd = when (slowMainLoop) {
+                true -> MAX_USED_TIME_PER_ROUND_LONG
+                false -> MAX_USED_TIME_PER_ROUND_SHORT
+            }
+
             // app must be enabled
             if (!appLogic.enable.waitForNonNullValue()) {
                 commitUsedTimeUpdaters()
@@ -185,7 +204,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
 
                     liveDataCaches.reportLoopDone()
-                    appLogic.timeApi.sleep(BACKGROUND_SERVICE_INTERVAL)
+                    appLogic.timeApi.sleep(backgroundServiceInterval)
                 } else {
                     liveDataCaches.removeAllItems()
                     appLogic.platformIntegration.setAppStatusMessage(null)
@@ -348,7 +367,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }
 
                 // update times
-                val timeToSubtract = Math.min(previousMainLogicExecutionTime, MAX_USED_TIME_PER_ROUND)
+                val timeToSubtract = Math.min(previousMainLogicExecutionTime, maxUsedTimeToAdd)
 
                 // see note above declaration of remainingTimeForegroundAppChild
                 val shouldCountForegroundApp = remainingTimeForegroundApp != null && isScreenOn && remainingTimeForegroundApp.hasRemainingTime
@@ -594,7 +613,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
             previousMainLogicExecutionTime = (endTime - previousMainLoopEndTime).toInt()
             previousMainLoopEndTime = endTime
 
-            val timeToWait = Math.max(10, BACKGROUND_SERVICE_INTERVAL - previousMainLogicExecutionTime)
+            val timeToWait = Math.max(10, backgroundServiceInterval - previousMainLogicExecutionTime)
             appLogic.timeApi.sleep(timeToWait)
         }
     }

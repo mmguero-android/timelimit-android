@@ -160,6 +160,12 @@ data class DiagnoseExperimentalFlagItem(
                         disableFlags = ExperimentalFlags.CUSTOM_HOMESCREEN_DELAY,
                         enable = { flags -> flags and ExperimentalFlags.CUSTOM_HOME_SCREEN == ExperimentalFlags.CUSTOM_HOME_SCREEN },
                         configHook = { fragmentManager -> ConfigureHomescreenDelayDialogFragment().show(fragmentManager) }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_mld,
+                        enableFlags = ExperimentalFlags.HIGH_MAIN_LOOP_DELAY,
+                        disableFlags = ExperimentalFlags.HIGH_MAIN_LOOP_DELAY,
+                        enable = { true }
                 )
         )
     }
