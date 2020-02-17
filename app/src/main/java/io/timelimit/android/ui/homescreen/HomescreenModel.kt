@@ -29,8 +29,6 @@ import kotlinx.coroutines.delay
 
 class HomescreenModel(application: Application): AndroidViewModel(application) {
     companion object {
-        private const val DELAY = 5000L                  // 5 seconds
-
         private const val COUNTER_DURATION = 1000 * 60L  // 1 minute
         private const val COUNTER_MIN = 20               // 20 times
 
@@ -64,18 +62,22 @@ class HomescreenModel(application: Application): AndroidViewModel(application) {
         isHandlingLaunch = true
 
         runAsync {
-            val enableDelay = Threads.database.executeAndWait {
-                logic.database.config().isExperimentalFlagsSetSync(ExperimentalFlags.CUSTOM_HOMESCREEN_DELAY)
+            val delay = Threads.database.executeAndWait {
+                if (logic.database.config().isExperimentalFlagsSetSync(ExperimentalFlags.CUSTOM_HOMESCREEN_DELAY)) {
+                    logic.database.config().getHomescreenDelaySync() * 1000
+                } else {
+                    0
+                }
             }
 
-            if (enableDelay && (!hadFirstRunAfterLaunch)) {
+            if (delay > 0 && (!hadFirstRunAfterLaunch)) {
                 val timeApi = logic.timeApi
                 var start = timeApi.getCurrentUptimeInMillis()
-                var end = start + DELAY
+                var end = start + delay
 
                 while (true) {
                     val now = timeApi.getCurrentUptimeInMillis()
-                    val progress = (now - start) * 100L / DELAY
+                    val progress = (now - start) * 100L / delay
 
                     if (now >= end) {
                         break
@@ -94,10 +96,10 @@ class HomescreenModel(application: Application): AndroidViewModel(application) {
                         }
 
                         val afterPause = timeApi.getCurrentUptimeInMillis()
-                        val delay = afterPause - beforePause
+                        val timeToAdd = afterPause - beforePause
 
-                        start += delay
-                        end += delay
+                        start += timeToAdd
+                        end += timeToAdd
                     }
                 }
             }

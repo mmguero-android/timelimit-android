@@ -17,4 +17,7 @@
     <string name="homescreen_selection_title">Startbildschirmauswahl</string>
     <string name="homescreen_selection_intro">TimeLimit ist kein vollständiger Startbildschirm, aber Sie können auswählen, was angezeigt werden soll</string>
     <string name="homescreen_selection_change_info">Dieses Menü kann jederzeit wieder aufgerufen werden durch das wiederholte Tippen auf den Home-Button</string>
+
+    <string name="homescreen_delay_config_dialog_title">Startbildschirmweiterleitungverzögerung</string>
+    <string name="homescreen_delay_config_dialog_text">Hier können Sie die Verzögerung für die Startbildschirmweiterleitung in Sekunden einstellen</string>
 </resources>

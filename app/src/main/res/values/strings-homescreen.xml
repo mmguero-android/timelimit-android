@@ -17,4 +17,7 @@
     <string name="homescreen_selection_title">Homescreen selection</string>
     <string name="homescreen_selection_intro">TimeLimit itself is no complete homescreen, so you can chose what should be shown</string>
     <string name="homescreen_selection_change_info">You can open this menu at any time by repeating tapping the home button</string>
+
+    <string name="homescreen_delay_config_dialog_title">Homescreen redirection delay</string>
+    <string name="homescreen_delay_config_dialog_text">Here you can configure the delay for the redirection in seconds</string>
 </resources>

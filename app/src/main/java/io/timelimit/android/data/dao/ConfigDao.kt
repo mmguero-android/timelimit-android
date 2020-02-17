@@ -268,4 +268,7 @@ abstract class ConfigDao {
     }
 
     fun setDefaultHomescreenSync(componentName: ComponentName?) = updateValueSync(ConfigurationItemType.DefaultHomescreen, componentName?.flattenToString())
+
+    fun getHomescreenDelaySync(): Int = getValueOfKeySync(ConfigurationItemType.HomescreenDelay)?.toIntOrNull(radix = 10) ?: 5
+    fun setHomescreenDelaySync(delay: Int) = updateValueSync(ConfigurationItemType.HomescreenDelay, delay.toString(radix = 10))
 }

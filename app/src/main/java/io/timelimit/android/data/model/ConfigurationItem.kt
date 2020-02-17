@@ -93,7 +93,8 @@ enum class ConfigurationItemType {
     EnableBackgroundSync,
     EnableAlternativeDurationSelection,
     ExperimentalFlags,
-    DefaultHomescreen
+    DefaultHomescreen,
+    HomescreenDelay
 }
 
 object ConfigurationItemTypeUtil {
@@ -114,6 +115,7 @@ object ConfigurationItemTypeUtil {
     private const val ENABLE_ALTERNATIVE_DURATION_SELECTION = 16
     private const val EXPERIMENTAL_FLAGS = 17
     private const val DEFAULT_HOMESCREEN = 18
+    private const val HOMESCREEN_DELAY = 19
 
     val TYPES = listOf(
             ConfigurationItemType.OwnDeviceId,
@@ -132,7 +134,8 @@ object ConfigurationItemTypeUtil {
             ConfigurationItemType.EnableBackgroundSync,
             ConfigurationItemType.EnableAlternativeDurationSelection,
             ConfigurationItemType.ExperimentalFlags,
-            ConfigurationItemType.DefaultHomescreen
+            ConfigurationItemType.DefaultHomescreen,
+            ConfigurationItemType.HomescreenDelay
     )
 
     fun serialize(value: ConfigurationItemType) = when(value) {
@@ -153,6 +156,7 @@ object ConfigurationItemTypeUtil {
         ConfigurationItemType.EnableAlternativeDurationSelection -> ENABLE_ALTERNATIVE_DURATION_SELECTION
         ConfigurationItemType.ExperimentalFlags -> EXPERIMENTAL_FLAGS
         ConfigurationItemType.DefaultHomescreen -> DEFAULT_HOMESCREEN
+        ConfigurationItemType.HomescreenDelay -> HOMESCREEN_DELAY
     }
 
     fun parse(value: Int) = when(value) {
@@ -173,6 +177,7 @@ object ConfigurationItemTypeUtil {
         ENABLE_ALTERNATIVE_DURATION_SELECTION -> ConfigurationItemType.EnableAlternativeDurationSelection
         EXPERIMENTAL_FLAGS -> ConfigurationItemType.ExperimentalFlags
         DEFAULT_HOMESCREEN -> ConfigurationItemType.DefaultHomescreen
+        HOMESCREEN_DELAY -> ConfigurationItemType.HomescreenDelay
         else -> throw IllegalArgumentException()
     }
 }
