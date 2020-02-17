@@ -22,7 +22,6 @@ import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -35,6 +34,7 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.extensions.sorted
 import io.timelimit.android.data.model.*
 import io.timelimit.android.databinding.LockFragmentBinding
+import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
@@ -190,10 +190,10 @@ class LockFragment : Fragment() {
                 categoryEntries.sorted().forEach {
                     category ->
 
-                    val button = Button(context)
+                    val button = LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true)
 
-                    button.text = category.title
-                    button.setOnClickListener {
+                    button.title = category.title
+                    button.button.setOnClickListener {
                         _ ->
 
                         auth.tryDispatchParentAction(
@@ -203,23 +203,19 @@ class LockFragment : Fragment() {
                                 )
                         )
                     }
-
-                    binding.addToCategoryOptions.addView(button)
                 }
 
                 run {
-                    val button = Button(context)
+                    val button = LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true)
 
-                    button.text = getString(R.string.create_category_title)
-                    button.setOnClickListener {
+                    button.title = getString(R.string.create_category_title)
+                    button.button.setOnClickListener {
                         if (auth.requestAuthenticationOrReturnTrue()) {
                             CreateCategoryDialogFragment
                                     .newInstance(ManageChildFragmentArgs(childId = user.id))
                                     .show(fragmentManager!!)
                         }
                     }
-
-                    binding.addToCategoryOptions.addView(button)
                 }
             }
         })
