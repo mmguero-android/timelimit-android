@@ -1,1 +1,2 @@
-Möglichkeit hinzugefügt, die Kategorien zu sortieren
+- Designänderungen
+- Möglichkeit, eine Startbildschirmweiterleitungsverzögerung festzulegen

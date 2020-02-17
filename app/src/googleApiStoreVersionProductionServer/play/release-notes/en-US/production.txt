@@ -1,1 +1,2 @@
-Added option to sort the categories
+- design changes
+- option to specify a homescreen redirection delay
