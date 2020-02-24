@@ -98,6 +98,8 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
                 )
 
                 mailAddressToWhichCodeWasSentInternal.value = receiver
+            } catch (ex: TooManyRequestsHttpError) {
+                errorMessage.value = ErrorMessage.TooManyRequests
             } catch (ex: HttpError) {
                 if (BuildConfig.DEBUG) {
                     Log.w(LOG_TAG, "sendAuthMessage()", ex)
@@ -156,7 +158,7 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
 }
 
 enum class ErrorMessage {
-    NetworkProblem, ServerRejection, WrongCode, BlacklistedMailServer, NotWhitelistedMailAddress
+    NetworkProblem, ServerRejection, WrongCode, BlacklistedMailServer, NotWhitelistedMailAddress, TooManyRequests
 }
 
 enum class ScreenToShow {

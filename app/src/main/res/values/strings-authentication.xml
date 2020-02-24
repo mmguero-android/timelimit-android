@@ -40,4 +40,8 @@
         side whitelist of mail addresses and the specified mail address is not
         in this whitelist
     </string>
+    <string name="authenticate_too_many_requests_text">There were much login attempts.
+        Due to that, signing in is temporarily blocked.
+        This blocking is disabled automatically.
+    </string>
 </resources>

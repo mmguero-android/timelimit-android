@@ -130,6 +130,8 @@ class AuthenticateByMailFragment : Fragment() {
                     BlacklistedMailServerDialogFragment().show(fragmentManager!!)
                 } else if (it == ErrorMessage.NotWhitelistedMailAddress) {
                     NotWhitelistedMailAddressDialogFragment().show(fragmentManager!!)
+                } else if (it == ErrorMessage.TooManyRequests) {
+                    TooManyRequestsDialogFragment().show(parentFragmentManager)
                 } else {
                     Snackbar.make(
                             binding.root,
@@ -139,6 +141,7 @@ class AuthenticateByMailFragment : Fragment() {
                                 ErrorMessage.WrongCode -> R.string.authenticate_by_mail_snackbar_wrong_code
                                 ErrorMessage.BlacklistedMailServer -> throw IllegalStateException("should be handled above")
                                 ErrorMessage.NotWhitelistedMailAddress -> throw IllegalStateException("should be handled above")
+                                ErrorMessage.TooManyRequests -> throw IllegalStateException("should be handled above")
                             },
                             Snackbar.LENGTH_SHORT
                     ).show()

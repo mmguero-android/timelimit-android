@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ class ConflictHttpError: HttpError()
 class ForbiddenHttpError: HttpError()
 class GoneHttpError: HttpError()
 class NotFoundHttpError: HttpError()
+class TooManyRequestsHttpError(): HttpError()
 
 fun Response.assertSuccess() {
     if (!this.isSuccessful) {
@@ -37,6 +38,7 @@ fun Response.assertSuccess() {
             404 -> throw NotFoundHttpError()
             409 -> throw ConflictHttpError()
             410 -> throw GoneHttpError()
+            429 -> throw TooManyRequestsHttpError()
             else -> throw IOException("server returned $code")
         }
     }

@@ -43,4 +43,7 @@
         serverseitig eine Whitelist mit E-Mail-Adressen festgelegt und die angegebene E-Mail-Adresse war nicht
         in dieser Whitelist
     </string>
+    <string name="authenticate_too_many_requests_text">Es gab viele Anmeldeversuche, daher gibt es eine vorübergehende Anmeldesperre.
+        Diese Sperre wird automatisch deaktiviert.
+    </string>
 </resources>
