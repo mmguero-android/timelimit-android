@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ import android.os.Build
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.WindowManager
+import androidx.appcompat.view.ContextThemeWrapper
+import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.BlockingOverlayBinding
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
@@ -39,7 +41,9 @@ class OverlayUtil(private var application: Application) {
             return
         }
 
-        val view = BlockingOverlayBinding.inflate(LayoutInflater.from(application))
+        val view = BlockingOverlayBinding.inflate(
+                LayoutInflater.from(ContextThemeWrapper(application, R.style.AppTheme))
+        )
 
         val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,

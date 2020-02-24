@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -44,10 +44,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_view"
-        android:background="@color/white"
         app:menu="@menu/fragment_manage_child_bottom"
-        app:itemIconTint="@drawable/bottom_navigation_colors"
-        app:itemTextColor="@drawable/bottom_navigation_colors"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

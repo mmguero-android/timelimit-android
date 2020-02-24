@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,6 +58,8 @@ object AuthenticationFab {
                                     .tintTarget(true)
                                     .transparentTarget(false)
                                     .outerCircleColor(R.color.colorAccent)
+                                    .textColor(R.color.white)
+                                    .targetCircleColor(R.color.white)
                                     .icon(ContextCompat.getDrawable(fragment.context!!, R.drawable.ic_lock_open_white_24dp)),
                             object : TapTargetView.Listener() {
                                 override fun onTargetClick(view: TapTargetView) {

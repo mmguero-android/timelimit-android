@@ -39,6 +39,8 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        tools:ignore="UnusedAttribute"
+                        android:drawableTint="?colorOnSurface"
                         android:background="?selectableItemBackground"
                         android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                         android:id="@+id/extra_time_title"

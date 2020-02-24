@@ -14,7 +14,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <androidx.cardview.widget.CardView
         app:cardUseCompatPadding="true"
         android:layout_width="match_parent"
@@ -26,6 +27,8 @@
             android:layout_height="wrap_content">
 
             <TextView
+                tools:ignore="UnusedAttribute"
+                android:drawableTint="?colorOnSurface"
                 android:id="@+id/title_view"
                 android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                 android:background="?selectableItemBackground"

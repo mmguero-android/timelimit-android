@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -47,8 +47,8 @@
         android:textColor="@color/white"
         android:gravity="center"
         tools:text="10:15"
-        tools:background="@color/green"
-        android:background="@{safeUnbox(selected) ? @color/colorPrimary : mode == MinuteTileMode.Blocked ? @color/red : (mode == MinuteTileMode.Allowed ? @color/green : @color/yellow)}"
+        tools:background="@color/blockedtimes_green"
+        android:background="@{safeUnbox(selected) ? @color/colorPrimary : mode == MinuteTileMode.Blocked ? @color/blockedtimes_red : (mode == MinuteTileMode.Allowed ? @color/blockedtimes_green : @color/blockedtimes_yellow)}"
         android:text="@{text}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

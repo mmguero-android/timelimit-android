@@ -147,6 +147,8 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            tools:ignore="UnusedAttribute"
+                            android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
                             android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                             android:onClick="@{() -> handlers.helpUsageStatsAccess()}"
@@ -159,7 +161,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{usageStatsAccess == RuntimePermissionStatus.Granted ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/green"
+                            android:textColor="@color/text_green"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_granted"
                             android:layout_width="match_parent"
@@ -169,7 +171,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{usageStatsAccess == RuntimePermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/red"
+                            android:textColor="@color/text_red"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_granted"
                             android:layout_width="match_parent"
@@ -179,7 +181,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{usageStatsAccess == RuntimePermissionStatus.NotRequired ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/green"
+                            android:textColor="@color/text_green"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_required"
                             android:layout_width="match_parent"
@@ -217,6 +219,8 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            tools:ignore="UnusedAttribute"
+                            android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
                             android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                             android:onClick="@{() -> handlers.helpNotificationAccess()}"
@@ -229,7 +233,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{notificationAccessPermission == NewPermissionStatus.Granted ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/green"
+                            android:textColor="@color/text_green"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_granted"
                             android:layout_width="match_parent"
@@ -239,7 +243,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{notificationAccessPermission == NewPermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/red"
+                            android:textColor="@color/text_red"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_granted"
                             android:layout_width="match_parent"
@@ -249,7 +253,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{notificationAccessPermission == NewPermissionStatus.NotSupported ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/red"
+                            android:textColor="@color/text_red"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_supported"
                             android:layout_width="match_parent"
@@ -287,6 +291,8 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            tools:ignore="UnusedAttribute"
+                            android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
                             android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                             android:onClick="@{() -> handlers.helpDrawOverOtherApps()}"
@@ -299,7 +305,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{overlayPermission == RuntimePermissionStatus.Granted ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/green"
+                            android:textColor="@color/text_green"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_granted"
                             android:layout_width="match_parent"
@@ -309,7 +315,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{overlayPermission == RuntimePermissionStatus.NotGranted ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/red"
+                            android:textColor="@color/text_red"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_granted"
                             android:layout_width="match_parent"
@@ -319,7 +325,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{overlayPermission == RuntimePermissionStatus.NotRequired ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/green"
+                            android:textColor="@color/text_green"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_required"
                             android:layout_width="match_parent"
@@ -357,6 +363,8 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            tools:ignore="UnusedAttribute"
+                            android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
                             android:drawableEnd="@drawable/ic_info_outline_black_24dp"
                             android:onClick="@{() -> handlers.helpAccesibility()}"
@@ -369,7 +377,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{accessibilityServiceEnabled == true ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/green"
+                            android:textColor="@color/text_green"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_granted"
                             android:layout_width="match_parent"
@@ -379,7 +387,7 @@
                             android:paddingTop="8dp"
                             android:gravity="center_horizontal"
                             android:visibility="@{accessibilityServiceEnabled == false ? View.VISIBLE : View.GONE}"
-                            android:textColor="@color/red"
+                            android:textColor="@color/text_red"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/manage_device_permission_status_not_granted"
                             android:layout_width="match_parent"

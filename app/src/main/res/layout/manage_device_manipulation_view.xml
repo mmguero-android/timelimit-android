@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:background="@color/orange"
+            android:background="@color/orange_background"
             android:orientation="vertical"
             android:padding="8dp"
             android:layout_width="match_parent"
