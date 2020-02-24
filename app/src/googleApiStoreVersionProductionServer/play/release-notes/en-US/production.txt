@@ -1,2 +1,3 @@
-- design changes
-- option to specify a homescreen redirection delay
+- dark mode support
+- option to reduce the frequency of the restriction logic
+- theoretically fixed a crash cause

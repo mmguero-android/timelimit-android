@@ -1,2 +1,3 @@
-- Designänderungen
-- Möglichkeit, eine Startbildschirmweiterleitungsverzögerung festzulegen
+- Dark-Mode-Unterstützung
+- Option, die Begrenzungslogik seltener auszuführen
+- (theoretische) Behebung einer Absturzquelle
