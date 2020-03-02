@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,10 @@ class WebsocketClientLogic(
                 networkStatus == NetworkStatus.Online
             }.or(appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.IGNORE_SYSTEM_CONNECTION_STATUS))
 
-            okForCurrentUser.and(okFromNetworkStatus)
+            val okFromScreenStatus = appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.DISCONNECT_WHEN_SCREEN_OFF).invert()
+                    .or(liveDataFromFunction { appLogic.platformIntegration.isScreenOn() })
+
+            okForCurrentUser.and(okFromNetworkStatus).and(okFromScreenStatus)
         } else {
             liveDataFromValue(false)
         }

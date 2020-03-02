@@ -166,6 +166,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.HIGH_MAIN_LOOP_DELAY,
                         disableFlags = ExperimentalFlags.HIGH_MAIN_LOOP_DELAY,
                         enable = { true }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_dso,
+                        enableFlags = ExperimentalFlags.DISCONNECT_WHEN_SCREEN_OFF,
+                        disableFlags = ExperimentalFlags.DISCONNECT_WHEN_SCREEN_OFF,
+                        enable = { true }
                 )
         )
     }
