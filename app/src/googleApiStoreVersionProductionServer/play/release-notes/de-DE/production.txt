@@ -1,3 +1,1 @@
-- Dark-Mode-Unterstützung
-- Option, die Begrenzungslogik seltener auszuführen
-- (theoretische) Behebung einer Absturzquelle
+- spezifischere Fehlermeldung nach zu vielen Anmeldeversuchen
