@@ -344,7 +344,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                             nowDate.dayOfWeek,
                             buildUsedTimesSparseArray(usedTimes, categoryId),
                             rules,
-                            Math.max(0, category.extraTimeInMillis - (usedTimeUpdateHelper.extraTimeToSubtract.get(categoryId) ?: 0))
+                            Math.max(0, category.getExtraTime(dayOfEpoch = nowDate.dayOfEpoch) - (usedTimeUpdateHelper.extraTimeToSubtract.get(categoryId) ?: 0))
                     )
                 }
 

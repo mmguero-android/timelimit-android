@@ -42,6 +42,8 @@ data class Category(
         val blockedMinutesInWeek: ImmutableBitmask,    // 10080 bit -> ~10 KB
         @ColumnInfo(name = "extra_time")
         val extraTimeInMillis: Long,
+        @ColumnInfo(name = "extra_time_day")
+        val extraTimeDay: Int,
         @ColumnInfo(name = "temporarily_blocked")
         val temporarilyBlocked: Boolean,
         @ColumnInfo(name = "temporarily_blocked_end_time")
@@ -88,6 +90,7 @@ data class Category(
         private const val MIN_BATTERY_CHARGING = "minBatteryCharging"
         private const val MIN_BATTERY_MOBILE = "minBatteryMobile"
         private const val SORT = "sort"
+        private const val EXTRA_TIME_DAY = "extraTimeDay"
 
         fun parse(reader: JsonReader): Category {
             var id: String? = null
@@ -108,6 +111,7 @@ data class Category(
             var minBatteryCharging = 0
             var minBatteryMobile = 0
             var sort = 0
+            var extraTimeDay = -1
 
             reader.beginObject()
 
@@ -130,6 +134,7 @@ data class Category(
                     MIN_BATTERY_CHARGING -> minBatteryCharging = reader.nextInt()
                     MIN_BATTERY_MOBILE -> minBatteryMobile = reader.nextInt()
                     SORT -> sort = reader.nextInt()
+                    EXTRA_TIME_DAY -> extraTimeDay = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -153,7 +158,8 @@ data class Category(
                     timeWarnings = timeWarnings,
                     minBatteryLevelWhileCharging = minBatteryCharging,
                     minBatteryLevelMobile = minBatteryMobile,
-                    sort = sort
+                    sort = sort,
+                    extraTimeDay = extraTimeDay
             )
         }
     }
@@ -175,6 +181,10 @@ data class Category(
         }
 
         if (minBatteryLevelMobile > 100 || minBatteryLevelWhileCharging > 100) {
+            throw IllegalArgumentException()
+        }
+
+        if (extraTimeDay < -1) {
             throw IllegalArgumentException()
         }
     }
@@ -199,8 +209,15 @@ data class Category(
         writer.name(MIN_BATTERY_CHARGING).value(minBatteryLevelWhileCharging)
         writer.name(MIN_BATTERY_MOBILE).value(minBatteryLevelMobile)
         writer.name(SORT).value(sort)
+        writer.name(EXTRA_TIME_DAY).value(extraTimeDay)
 
         writer.endObject()
+    }
+
+    fun getExtraTime(dayOfEpoch: Int): Long = if (extraTimeDay == -1 || extraTimeDay == dayOfEpoch) {
+        extraTimeInMillis
+    } else {
+        0
     }
 }
 

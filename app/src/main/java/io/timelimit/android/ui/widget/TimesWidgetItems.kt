@@ -76,7 +76,7 @@ object TimesWidgetItems {
                                                 }
                                             },
                                             rules = rules,
-                                            extraTime = category.extraTimeInMillis
+                                            extraTime = category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch)
                                     )?.includingExtraTime
                             )
                         }

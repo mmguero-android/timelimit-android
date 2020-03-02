@@ -31,10 +31,12 @@ import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
+import io.timelimit.android.data.extensions.mapToTimezone
 import io.timelimit.android.data.extensions.sorted
 import io.timelimit.android.data.model.*
 import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
+import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
@@ -241,11 +243,14 @@ class LockFragment : Fragment() {
                                 binding.extraTimeBtnOk.isEnabled = false
 
                                 val categoryId = appCategory.waitForNullableValue()?.id
+                                val timezone = logic.deviceUserEntry.mapToTimezone().waitForNonNullValue()
+                                val date = DateInTimezone.newInstance(auth.logic.timeApi.getCurrentTimeInMillis(), timezone)
 
                                 if (categoryId != null) {
                                     auth.tryDispatchParentAction(IncrementCategoryExtraTimeAction(
                                             categoryId = categoryId,
-                                            addedExtraTime = extraTimeToAdd
+                                            addedExtraTime = extraTimeToAdd,
+                                            extraTimeDay = if (binding.switchLimitExtraTimeToToday.isChecked) date.dayOfEpoch else -1
                                     ))
                                 } else {
                                     Snackbar.make(binding.root, R.string.error_general, Snackbar.LENGTH_SHORT).show()

@@ -130,7 +130,8 @@ data class OfflineModeStatus(
                     apply(
                             SetCategoryExtraTimeAction(
                                     categoryId = category.id,
-                                    newExtraTime = category.extraTimeInMillis
+                                    newExtraTime = category.extraTimeInMillis,
+                                    extraTimeDay = category.extraTimeDay
                             )
                     )
                 }

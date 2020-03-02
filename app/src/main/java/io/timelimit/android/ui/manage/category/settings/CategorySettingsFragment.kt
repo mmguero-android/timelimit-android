@@ -24,7 +24,10 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
+import io.timelimit.android.data.extensions.mapToTimezone
 import io.timelimit.android.databinding.FragmentCategorySettingsBinding
+import io.timelimit.android.date.DateInTimezone
+import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.SetCategoryExtraTimeAction
@@ -52,6 +55,20 @@ class CategorySettingsFragment : Fragment() {
         val binding = FragmentCategorySettingsBinding.inflate(inflater, container, false)
 
         val categoryEntry = appLogic.database.category().getCategoryByChildIdAndId(params.childId, params.categoryId)
+
+        val childDate = appLogic.database.user().getChildUserByIdLive(params.childId).mapToTimezone().switchMap { timezone ->
+            liveDataFromFunction (1000 * 10L) { DateInTimezone.newInstance(appLogic.timeApi.getCurrentTimeInMillis(), timezone) }
+        }.ignoreUnchanged()
+
+        val currentExtraTime = categoryEntry.switchMap { category ->
+            childDate.map { date ->
+                category?.getExtraTime(date.dayOfEpoch)
+            }
+        }.ignoreUnchanged()
+
+        val currentExtraTimeBoundToDate = currentExtraTime.map { it != null && it != 0L }.and(
+                categoryEntry.map { it?.extraTimeDay != null && it.extraTimeDay != -1 }
+        ).ignoreUnchanged()
 
         ManageCategoryForUnassignedApps.bind(
                 binding = binding.categoryForUnassignedApps,
@@ -108,19 +125,41 @@ class CategorySettingsFragment : Fragment() {
             ).show(fragmentManager!!)
         }
 
-        categoryEntry.observe(this, Observer {
+        fun updateEditExtraTimeConfirmButtonVisibility() {
+            val roundedCurrentTimeInMillis = currentExtraTime.value?.let { (it / (1000 * 60)) * (1000 * 60) } ?: 0
+            val newLimitToToday = binding.switchLimitExtraTimeToToday.isChecked
+            val newTimeInMillis = binding.extraTimeSelection.timeInMillis
+
+            val timeDiffers = newTimeInMillis != roundedCurrentTimeInMillis
+            val dayDiffers = newLimitToToday != (currentExtraTimeBoundToDate.value ?: false)
+
+            binding.extraTimeBtnOk.visibility = if (timeDiffers || dayDiffers)
+                View.VISIBLE
+            else
+                View.GONE
+        }
+
+        currentExtraTime.observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                val roundedCurrentTimeInMillis = (it.extraTimeInMillis / (1000 * 60)) * (1000 * 60)
+                val roundedCurrentTimeInMillis = (it / (1000 * 60)) * (1000 * 60)
 
                 if (binding.extraTimeSelection.timeInMillis != roundedCurrentTimeInMillis) {
                     binding.extraTimeSelection.timeInMillis = roundedCurrentTimeInMillis
 
-                    binding.extraTimeBtnOk.visibility = View.GONE
+                    updateEditExtraTimeConfirmButtonVisibility()
                 }
             }
         })
 
-        appLogic.fullVersion.shouldProvideFullVersionFunctions.observe(this, Observer { hasFullVersion ->
+        currentExtraTimeBoundToDate.observe(viewLifecycleOwner, Observer {
+            if (binding.switchLimitExtraTimeToToday.isChecked != it) {
+                binding.switchLimitExtraTimeToToday.isChecked = it
+
+                updateEditExtraTimeConfirmButtonVisibility()
+            }
+        })
+
+        appLogic.fullVersion.shouldProvideFullVersionFunctions.observe(viewLifecycleOwner, Observer { hasFullVersion ->
             binding.extraTimeBtnOk.setOnClickListener {
                 binding.extraTimeSelection.clearNumberPickerFocus()
 
@@ -131,7 +170,8 @@ class CategorySettingsFragment : Fragment() {
                             auth.tryDispatchParentAction(
                                     SetCategoryExtraTimeAction(
                                             categoryId = params.categoryId,
-                                            newExtraTime = newExtraTime
+                                            newExtraTime = newExtraTime,
+                                            extraTimeDay = (if (binding.switchLimitExtraTimeToToday.isChecked) childDate.value?.dayOfEpoch else null) ?: -1
                                     )
                             )
                     ) {
@@ -145,15 +185,13 @@ class CategorySettingsFragment : Fragment() {
             }
         })
 
-        appLogic.database.config().getEnableAlternativeDurationSelectionAsync().observe(this, Observer {
+        appLogic.database.config().getEnableAlternativeDurationSelectionAsync().observe(viewLifecycleOwner, Observer {
             binding.extraTimeSelection.enablePickerMode(it)
         })
 
         binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
             override fun onTimeSpanChanged(newTimeInMillis: Long) {
-                val roundedCurrentTimeInMillis = categoryEntry.value?.let { (it.extraTimeInMillis / (1000 * 60)) * (1000 * 60) } ?: 0
-
-                binding.extraTimeBtnOk.visibility = if (newTimeInMillis != roundedCurrentTimeInMillis) View.VISIBLE else View.GONE
+                updateEditExtraTimeConfirmButtonVisibility()
             }
 
             override fun setEnablePickerMode(enable: Boolean) {
@@ -161,6 +199,10 @@ class CategorySettingsFragment : Fragment() {
                     appLogic.database.config().setEnableAlternativeDurationSelectionSync(enable)
                 }
             }
+        }
+
+        binding.switchLimitExtraTimeToToday.setOnCheckedChangeListener { _, _ ->
+            updateEditExtraTimeConfirmButtonVisibility()
         }
 
         return binding.root

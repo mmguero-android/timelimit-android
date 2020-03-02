@@ -371,6 +371,8 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             Log.d(LOG_TAG, "step 7")
         }
 
+        val extraTime = category.getExtraTime(dayOfEpoch = nowTrustedDate.dayOfEpoch)
+
         return appLogic.database.usedTimes().getUsedTimesOfWeek(category.id, nowTrustedDate.dayOfEpoch - nowTrustedDate.dayOfWeek).map {
             usedTimes ->
             val usedTimesSparseArray = SparseLongArray()
@@ -380,12 +382,12 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
                 usedTimesSparseArray.put(i, (if (usedTimesItem != null) usedTimesItem else 0))
             }
 
-            val remaining = RemainingTime.getRemainingTime(nowTrustedDate.dayOfWeek, usedTimesSparseArray, rules, category.extraTimeInMillis)
+            val remaining = RemainingTime.getRemainingTime(nowTrustedDate.dayOfWeek, usedTimesSparseArray, rules, extraTime)
 
             if (remaining == null || remaining.includingExtraTime > 0) {
                 BlockingReason.None
             } else {
-                if (category.extraTimeInMillis > 0) {
+                if (extraTime > 0) {
                     BlockingReason.TimeOverExtraTimeCanBeUsedLater
                 } else {
                     BlockingReason.TimeOver

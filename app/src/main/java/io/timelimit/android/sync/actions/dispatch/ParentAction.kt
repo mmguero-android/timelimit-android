@@ -75,6 +75,7 @@ object LocalDatabaseParentActionDispatcher {
                             // nothing blocked by default
                             blockedMinutesInWeek = ImmutableBitmask(BitSet()),
                             extraTimeInMillis = 0,
+                            extraTimeDay = -1,
                             temporarilyBlocked = false,
                             temporarilyBlockedEndTime = 0,
                             baseVersion = "",
@@ -114,7 +115,11 @@ object LocalDatabaseParentActionDispatcher {
                         throw IllegalArgumentException("invalid new extra time")
                     }
 
-                    database.category().updateCategoryExtraTime(action.categoryId, action.newExtraTime)
+                    if (action.extraTimeDay < -1) {
+                        throw IllegalArgumentException()
+                    }
+
+                    database.category().updateCategoryExtraTime(action.categoryId, action.newExtraTime, action.extraTimeDay)
                 }
                 is IncrementCategoryExtraTimeAction -> {
                     if (action.addedExtraTime < 0) {
@@ -124,13 +129,22 @@ object LocalDatabaseParentActionDispatcher {
                     val category = database.category().getCategoryByIdSync(action.categoryId)
                             ?: throw IllegalArgumentException("category ${action.categoryId} does not exist")
 
-                    database.category().incrementCategoryExtraTime(action.categoryId, action.addedExtraTime)
+                    fun handleExtratimeIncrement(category: Category) {
+                        database.category().updateCategorySync(
+                                category.copy(
+                                        extraTimeDay = action.extraTimeDay,
+                                        extraTimeInMillis = category.getExtraTime(action.extraTimeDay) + action.addedExtraTime
+                                )
+                        )
+                    }
+
+                    handleExtratimeIncrement(category)
 
                     if (category.parentCategoryId.isNotEmpty()) {
                         val parentCategory = database.category().getCategoryByIdSync(category.parentCategoryId)
 
                         if (parentCategory?.childId == category.childId) {
-                            database.category().incrementCategoryExtraTime(parentCategory.id, action.addedExtraTime)
+                            handleExtratimeIncrement(parentCategory)
                         }
                     }
 

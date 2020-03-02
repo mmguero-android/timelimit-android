@@ -335,6 +335,7 @@ data class ServerUpdatedCategoryBaseData(
         val title: String,
         val blockedMinutesInWeek: ImmutableBitmask,
         val extraTimeInMillis: Long,
+        val extraTimeDay: Int,
         val temporarilyBlocked: Boolean,
         val temporarilyBlockedEndTime: Long,
         val baseDataVersion: String,
@@ -351,6 +352,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val TITLE = "title"
         private const val BLOCKED_MINUTES_IN_WEEK = "blockedTimes"
         private const val EXTRA_TIME_IN_MILLIS = "extraTime"
+        private const val EXTRA_TIME_DAY = "extraTimeDay"
         private const val TEMPORARILY_BLOCKED = "tempBlocked"
         private const val TEMPORARILY_BLOCKED_END_TIME = "tempBlockTime"
         private const val BASE_DATA_VERSION = "version"
@@ -367,6 +369,7 @@ data class ServerUpdatedCategoryBaseData(
             var title: String? = null
             var blockedMinutesInWeek: ImmutableBitmask? = null
             var extraTimeInMillis: Long? = null
+            var extraTimeDay = -1
             var temporarilyBlocked: Boolean? = null
             var temporarilyBlockedEndTime: Long = 0
             var baseDataVersion: String? = null
@@ -386,6 +389,7 @@ data class ServerUpdatedCategoryBaseData(
                     TITLE -> title = reader.nextString()
                     BLOCKED_MINUTES_IN_WEEK -> blockedMinutesInWeek = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
                     EXTRA_TIME_IN_MILLIS -> extraTimeInMillis = reader.nextLong()
+                    EXTRA_TIME_DAY -> extraTimeDay = reader.nextInt()
                     TEMPORARILY_BLOCKED -> temporarilyBlocked = reader.nextBoolean()
                     TEMPORARILY_BLOCKED_END_TIME -> temporarilyBlockedEndTime = reader.nextLong()
                     BASE_DATA_VERSION -> baseDataVersion = reader.nextString()
@@ -406,6 +410,7 @@ data class ServerUpdatedCategoryBaseData(
                     title = title!!,
                     blockedMinutesInWeek = blockedMinutesInWeek!!,
                     extraTimeInMillis = extraTimeInMillis!!,
+                    extraTimeDay = extraTimeDay,
                     temporarilyBlocked = temporarilyBlocked!!,
                     temporarilyBlockedEndTime = temporarilyBlockedEndTime,
                     baseDataVersion = baseDataVersion!!,

@@ -54,6 +54,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
+                    <Switch
+                        android:id="@+id/switch_limit_extra_time_to_today"
+                        android:text="@string/category_settings_extra_time_switch_limit_to_day"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
                     <com.google.android.material.button.MaterialButton
                         app:icon="@drawable/ic_check_black_24dp"
                         android:visibility="gone"

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,11 +52,8 @@ abstract class CategoryDao {
     @Query("UPDATE category SET title = :newTitle WHERE id = :categoryId")
     abstract fun updateCategoryTitle(categoryId: String, newTitle: String)
 
-    @Query("UPDATE category SET extra_time = :newExtraTime WHERE id = :categoryId")
-    abstract fun updateCategoryExtraTime(categoryId: String, newExtraTime: Long)
-
-    @Query("UPDATE category SET extra_time = extra_time + :addedExtraTime WHERE id = :categoryId")
-    abstract fun incrementCategoryExtraTime(categoryId: String, addedExtraTime: Long)
+    @Query("UPDATE category SET extra_time = :newExtraTime, extra_time_day = :extraTimeDay WHERE id = :categoryId")
+    abstract fun updateCategoryExtraTime(categoryId: String, newExtraTime: Long, extraTimeDay: Int)
 
     @Query("UPDATE category SET extra_time = MAX(0, extra_time - :removedExtraTime) WHERE id = :categoryId")
     abstract fun subtractCategoryExtraTime(categoryId: String, removedExtraTime: Int)

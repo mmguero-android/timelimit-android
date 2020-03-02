@@ -584,15 +584,17 @@ data class UpdateCategoryTitleAction(val categoryId: String, val newTitle: Strin
         writer.endObject()
     }
 }
-data class SetCategoryExtraTimeAction(val categoryId: String, val newExtraTime: Long): ParentAction() {
+data class SetCategoryExtraTimeAction(val categoryId: String, val newExtraTime: Long, val extraTimeDay: Int = -1): ParentAction() {
     companion object {
         const val TYPE_VALUE = "SET_CATEGORY_EXTRA_TIME"
         private const val CATEGORY_ID = "categoryId"
         private const val NEW_EXTRA_TIME = "newExtraTime"
+        private const val DAY = "day"
 
         fun parse(action: JSONObject) = SetCategoryExtraTimeAction(
                 categoryId = action.getString(CATEGORY_ID),
-                newExtraTime = action.getLong(NEW_EXTRA_TIME)
+                newExtraTime = action.getLong(NEW_EXTRA_TIME),
+                extraTimeDay = if (action.has(DAY)) action.getInt(DAY) else -1
         )
     }
 
@@ -601,6 +603,10 @@ data class SetCategoryExtraTimeAction(val categoryId: String, val newExtraTime: 
 
         if (newExtraTime < 0) {
             throw IllegalArgumentException("newExtraTime must be >= 0")
+        }
+
+        if (extraTimeDay < -1) {
+            throw IllegalArgumentException()
         }
     }
 
@@ -611,18 +617,24 @@ data class SetCategoryExtraTimeAction(val categoryId: String, val newExtraTime: 
         writer.name(CATEGORY_ID).value(categoryId)
         writer.name(NEW_EXTRA_TIME).value(newExtraTime)
 
+        if (extraTimeDay != -1) {
+            writer.name(DAY).value(extraTimeDay)
+        }
+
         writer.endObject()
     }
 }
-data class IncrementCategoryExtraTimeAction(val categoryId: String, val addedExtraTime: Long): ParentAction() {
+data class IncrementCategoryExtraTimeAction(val categoryId: String, val addedExtraTime: Long, val extraTimeDay: Int = -1): ParentAction() {
     companion object {
         const val TYPE_VALUE = "INCREMENT_CATEGORY_EXTRATIME"
         private const val CATEGORY_ID = "categoryId"
         private const val ADDED_EXTRA_TIME = "addedExtraTime"
+        private const val DAY = "day"
 
         fun parse(action: JSONObject) = IncrementCategoryExtraTimeAction(
                 categoryId = action.getString(CATEGORY_ID),
-                addedExtraTime = action.getLong(ADDED_EXTRA_TIME)
+                addedExtraTime = action.getLong(ADDED_EXTRA_TIME),
+                extraTimeDay = if (action.has(DAY)) action.getInt(DAY) else -1
         )
     }
 
@@ -632,6 +644,10 @@ data class IncrementCategoryExtraTimeAction(val categoryId: String, val addedExt
         if (addedExtraTime <= 0) {
             throw IllegalArgumentException("addedExtraTime must be more than zero")
         }
+
+        if (extraTimeDay < -1) {
+            throw IllegalArgumentException()
+        }
     }
 
     override fun serialize(writer: JsonWriter) {
@@ -640,6 +656,10 @@ data class IncrementCategoryExtraTimeAction(val categoryId: String, val addedExt
         writer.name(TYPE).value(TYPE_VALUE)
         writer.name(CATEGORY_ID).value(categoryId)
         writer.name(ADDED_EXTRA_TIME).value(addedExtraTime)
+
+        if (extraTimeDay != -1) {
+            writer.name(DAY).value(extraTimeDay)
+        }
 
         writer.endObject()
     }

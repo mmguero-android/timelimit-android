@@ -24,6 +24,7 @@
     </string>
     <string name="category_settings_extra_time_change">Extrazeit ändern</string>
     <string name="category_settings_extra_time_change_toast">Die neue Extrazeit wurde gespeichert</string>
+    <string name="category_settings_extra_time_switch_limit_to_day">Extrazeit nach Ablauf des aktuellen Tages zurücksetzen</string>
 
     <string name="category_settings_delete_dialog">Möchten Sie die Kategorie %s löschen?</string>
 

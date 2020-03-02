@@ -109,7 +109,7 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
                                                     }
                                                 },
                                                 rules = rules,
-                                                extraTime = category.extraTimeInMillis
+                                                extraTime = category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch)
                                         )?.includingExtraTime,
                                         usedTimeToday = usedTimeItemsForCategory.find { item -> item.dayOfEpoch == childDate.dayOfEpoch }?.usedMillis
                                                 ?: 0,
