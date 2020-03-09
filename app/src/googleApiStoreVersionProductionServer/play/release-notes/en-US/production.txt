@@ -1,1 +1,1 @@
-- more specific error message after too many login attempts
+- added option to discard extra time at the end of the day

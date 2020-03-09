@@ -1,1 +1,1 @@
-- spezifischere Fehlermeldung nach zu vielen Anmeldeversuchen
+- Möglichkeit hinzugefügt, die Extrazeit nach Ablauf des Tages zu verwerfen
