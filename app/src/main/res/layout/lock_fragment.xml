@@ -166,6 +166,12 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_add_circle_outline_black_24dp"
                             android:visibility="@{reason == BlockingReason.NotPartOfAnCategory ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/lock_reason_no_category"
@@ -173,6 +179,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_block_black_24dp"
                             android:visibility="@{reason == BlockingReason.TemporarilyBlocked ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@{@string/lock_reason_temporarily_blocked(blockedKindLabel)}"
@@ -181,6 +193,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_time_white_24dp"
                             android:visibility="@{reason == BlockingReason.BlockedAtThisTime ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@{@string/lock_reason_blocked_time(blockedKindLabel)}"
@@ -189,6 +207,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_timer_black_24dp"
                             android:visibility="@{reason == BlockingReason.TimeOver ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@{@string/lock_reason_time_over(blockedKindLabel)}"
@@ -197,6 +221,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_timer_black_24dp"
                             android:visibility="@{reason == BlockingReason.TimeOverExtraTimeCanBeUsedLater ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/lock_reason_time_over_etra_time_can_be_used_later"
@@ -204,6 +234,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_signal_wifi_off_black_24dp"
                             android:visibility="@{reason == BlockingReason.MissingNetworkTime ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@string/lock_reason_missing_network_time"
@@ -212,6 +248,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_devices_other_black_24dp"
                             android:visibility="@{reason == BlockingReason.RequiresCurrentDevice ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@{@string/lock_reason_requires_current_device(blockedKindLabel)}"
@@ -220,6 +262,12 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_battery_alert_black_24dp"
                             android:visibility="@{reason == BlockingReason.BatteryLimit ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
                             android:text="@{@string/lock_reason_battery_limit(blockedKindLabel)}"
