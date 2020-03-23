@@ -61,7 +61,7 @@
     <string name="diagnose_exf_chd">Startbildschirmweiterleitung verzögern</string>
     <string name="diagnose_exf_nas">Netzwerkzeitnutzung auf Systemebene erzwingen</string>
     <string name="diagnose_exf_mld">Hauptschleifenintervall erhöhen</string>
-    <string name="diagnose_exf_dso">Verbindung trennen, wenn der Bildschirm aus ist</string>
+    <string name="diagnose_exf_kcs">Verbindung aufrecht halten, wenn der Bildschirm aus ist</string>
 
     <string name="diagnose_bg_task_loop_ex">Hintergrundaufgabenschleifenfehler</string>
 

@@ -168,9 +168,9 @@ data class DiagnoseExperimentalFlagItem(
                         enable = { true }
                 ),
                 DiagnoseExperimentalFlagItem(
-                        label = R.string.diagnose_exf_dso,
-                        enableFlags = ExperimentalFlags.DISCONNECT_WHEN_SCREEN_OFF,
-                        disableFlags = ExperimentalFlags.DISCONNECT_WHEN_SCREEN_OFF,
+                        label = R.string.diagnose_exf_kcs,
+                        enableFlags = ExperimentalFlags.KEEP_CONNECTED_WHEN_SCREEN_OFF,
+                        disableFlags = ExperimentalFlags.KEEP_CONNECTED_WHEN_SCREEN_OFF,
                         enable = { true }
                 )
         )

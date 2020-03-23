@@ -56,7 +56,7 @@ class WebsocketClientLogic(
                 networkStatus == NetworkStatus.Online
             }.or(appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.IGNORE_SYSTEM_CONNECTION_STATUS))
 
-            val okFromScreenStatus = appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.DISCONNECT_WHEN_SCREEN_OFF).invert()
+            val okFromScreenStatus = appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.KEEP_CONNECTED_WHEN_SCREEN_OFF)
                     .or(liveDataFromFunction { appLogic.platformIntegration.isScreenOn() })
 
             okForCurrentUser.and(okFromNetworkStatus).and(okFromScreenStatus)
