@@ -22,7 +22,7 @@ class PeriodicSyncInBackgroundWorker(private val context: Context, workerParamet
 
             WorkManager.getInstance().enqueueUniquePeriodicWork(
                     UNIQUE_WORK_NAME,
-                    ExistingPeriodicWorkPolicy.REPLACE,
+                    ExistingPeriodicWorkPolicy.KEEP,
                     PeriodicWorkRequestBuilder<PeriodicSyncInBackgroundWorker>(1, TimeUnit.HOURS)
                             .setConstraints(
                                     Constraints.Builder()
