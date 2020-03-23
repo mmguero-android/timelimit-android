@@ -1,2 +1,1 @@
-- Symbole auf dem Sperrbildschirm, die den Sperrgrund darstellen
-- Reduzierung des Energieverbrauchs in bestimmten Szenarien
+- Stabilitätsverbesserung, die für Android 4.4 und Android 5 relevant ist
