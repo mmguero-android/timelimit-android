@@ -1,1 +1,2 @@
-- added option to discard extra time at the end of the day
+- icons at the lock screen which tell the blocking reason
+- reduced power consumption in some cases

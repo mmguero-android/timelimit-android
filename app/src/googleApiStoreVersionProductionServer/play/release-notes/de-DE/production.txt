@@ -1,1 +1,2 @@
-- Möglichkeit hinzugefügt, die Extrazeit nach Ablauf des Tages zu verwerfen
+- Symbole auf dem Sperrbildschirm, die den Sperrgrund darstellen
+- Reduzierung des Energieverbrauchs in bestimmten Szenarien
