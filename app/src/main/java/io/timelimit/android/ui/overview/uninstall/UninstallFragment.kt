@@ -33,21 +33,36 @@ class UninstallFragment : Fragment() {
     }
 
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
-    private lateinit var binding: FragmentUninstallBinding
+    private var showBackdoorButton = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        showBackdoorButton = savedInstanceState?.getBoolean(STATUS_SHOW_BACKDOOR_BUTTON) ?: false
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentUninstallBinding.inflate(inflater, container, false)
+        val binding = FragmentUninstallBinding.inflate(inflater, container, false)
 
         binding.uninstall.isEnabled = binding.checkConfirm.isChecked
         binding.checkConfirm.setOnCheckedChangeListener { _, isChecked -> binding.uninstall.isEnabled = isChecked }
 
-        binding.uninstall.setOnClickListener { reset(revokePermissions = binding.checkPermissions.isChecked) }
+        binding.uninstall.setOnClickListener {
+            val revokePermissions = binding.checkPermissions.isChecked
+
+            if (BuildConfig.storeCompilant || auth.requestAuthenticationOrReturnTrue()) {
+                DefaultAppLogic.with(context!!).appSetupLogic.resetAppCompletely(revokePermissions)
+            } else {
+                showBackdoorButton = true
+                binding.showBackdoorButton = true
+            }
+        }
 
         binding.backdoorButton.setOnClickListener {
             BackdoorDialogFragment().show(parentFragmentManager)
         }
 
-        binding.showBackdoorButton = savedInstanceState?.getBoolean(STATUS_SHOW_BACKDOOR_BUTTON) ?: false
+        binding.showBackdoorButton = showBackdoorButton
 
         return binding.root
     }
@@ -55,14 +70,6 @@ class UninstallFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putBoolean(STATUS_SHOW_BACKDOOR_BUTTON, binding.showBackdoorButton)
-    }
-
-    private fun reset(revokePermissions: Boolean) {
-        if (BuildConfig.storeCompilant || auth.requestAuthenticationOrReturnTrue()) {
-            DefaultAppLogic.with(context!!).appSetupLogic.resetAppCompletely(revokePermissions)
-        } else {
-            binding.showBackdoorButton = true
-        }
+        outState.putBoolean(STATUS_SHOW_BACKDOOR_BUTTON, showBackdoorButton)
     }
 }
