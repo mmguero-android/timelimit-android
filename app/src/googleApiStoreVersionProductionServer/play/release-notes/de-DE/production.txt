@@ -1,1 +1,2 @@
-- Stabilitätsverbesserung, die für Android 4.4 und Android 5 relevant ist
+- Anzeige des gesperrten Elements auf dem Overlay
+- Aktualisierung einer enthaltenen Komponente

@@ -1,1 +1,2 @@
-- stability improvement at Android 4.4 and Android 5
+- showing of the blocked element at the overlay
+- update of a included component
