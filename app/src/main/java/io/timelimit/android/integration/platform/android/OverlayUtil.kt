@@ -73,6 +73,14 @@ class OverlayUtil(private var application: Application) {
         currentView = null
     }
 
+    fun setBlockedElement(blockedElement: String) {
+        currentView?.let { view ->
+            if (view.blockedElement != blockedElement) {
+                view.blockedElement = blockedElement
+            }
+        }
+    }
+
     fun isOverlayShown() = currentView?.root?.isShown ?: false
 
     fun getOverlayPermissionStatus() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)

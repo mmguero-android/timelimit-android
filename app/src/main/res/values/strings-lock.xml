@@ -98,4 +98,5 @@
         Failed to open the lock screen.
         You can try using the home or overview button to leave this screen.
     </string>
+    <string name="lock_overlay_text">Blocking %s</string>
 </resources>

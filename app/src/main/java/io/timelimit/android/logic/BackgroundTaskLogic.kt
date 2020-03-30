@@ -137,7 +137,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
     private val appTitleCache = QueryAppTitleCache(appLogic.platformIntegration)
 
     private suspend fun openLockscreen(blockedAppPackageName: String, blockedAppActivityName: String?) {
-        appLogic.platformIntegration.setShowBlockingOverlay(true)
+        appLogic.platformIntegration.setShowBlockingOverlay(true, "$blockedAppPackageName:${blockedAppActivityName?.removePrefix(blockedAppPackageName)}")
 
         if (appLogic.platformIntegration.isAccessibilityServiceEnabled()) {
             if (blockedAppPackageName != appLogic.platformIntegration.getLauncherAppPackageName()) {

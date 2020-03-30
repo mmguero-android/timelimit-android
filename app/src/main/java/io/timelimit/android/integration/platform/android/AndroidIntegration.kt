@@ -270,9 +270,10 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         }
     }
 
-    override fun setShowBlockingOverlay(show: Boolean) {
+    override fun setShowBlockingOverlay(show: Boolean, blockedElement: String?) {
         if (show) {
             overlay.show()
+            overlay.setBlockedElement(blockedElement ?: "")
         } else {
             overlay.hide()
         }

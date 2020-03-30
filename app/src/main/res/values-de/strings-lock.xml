@@ -94,4 +94,5 @@
         Öffnen des Sperrbildschirms fehlgeschlagen.
         Versuche es, den Home- oder Anwendungslisten-Button zu verwenden, um diesen Bildschirm zu verlassen.
     </string>
+    <string name="lock_overlay_text">Sperre %s</string>
 </resources>

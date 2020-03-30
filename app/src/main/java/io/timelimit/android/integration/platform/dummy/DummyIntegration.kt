@@ -100,7 +100,7 @@ class DummyIntegration(
         // ignore
     }
 
-    override fun setShowBlockingOverlay(show: Boolean) {
+    override fun setShowBlockingOverlay(show: Boolean, blockedElement: String?) {
         // ignore
     }
 
