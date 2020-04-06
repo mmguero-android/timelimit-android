@@ -44,6 +44,7 @@ import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.device.add.AddDeviceFragment
+import io.timelimit.android.ui.obsolete.ObsoleteDialogFragment
 import io.timelimit.android.ui.overview.about.AboutFragment
 import io.timelimit.android.ui.overview.about.AboutFragmentParentHandlers
 import io.timelimit.android.ui.overview.overview.CanNotAddDevicesInLocalModeDialogFragmentListener
@@ -85,39 +86,42 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
 
         fab.setOnClickListener { activity.showAuthenticationScreen() }
 
-        if (!wereViewsCreated) {
-            wereViewsCreated = true
-            logic.isInitialized.switchMap { isInitialized ->
-                if (isInitialized) {
-                    logic.database.config().getOwnDeviceId().map { it == null }
-                } else {
-                    liveDataFromValue(false)
+        logic.isInitialized.switchMap { isInitialized ->
+            if (isInitialized) {
+                logic.database.config().getOwnDeviceId().map { it == null }
+            } else {
+                liveDataFromValue(false)
+            }
+        }.observe(viewLifecycleOwner, Observer { shouldShowSetup ->
+            if (shouldShowSetup == true) {
+                fab.post {
+                    navigation.safeNavigate(
+                            MainFragmentDirections.actionOverviewFragmentToSetupTermsFragment(),
+                            R.id.overviewFragment
+                    )
                 }
-            }.observe(this, Observer { shouldShowSetup ->
-                if (shouldShowSetup == true) {
-                    fab.post {
-                        navigation.safeNavigate(
-                                MainFragmentDirections.actionOverviewFragmentToSetupTermsFragment(),
-                                R.id.overviewFragment
-                        )
-                    }
-                } else {
-                    if (savedInstanceState == null && !didRedirectToUserScreen) {
-                        didRedirectToUserScreen = true
+            } else {
+                if (savedInstanceState == null && !didRedirectToUserScreen) {
+                    didRedirectToUserScreen = true
 
-                        runAsync {
-                            val user = logic.deviceUserEntry.waitForNullableValue()
+                    runAsync {
+                        val user = logic.deviceUserEntry.waitForNullableValue()
 
-                            if (user?.type == UserType.Child) {
-                                if (fragmentManager?.isStateSaved == false) {
-                                    openManageChildScreen(user.id)
-                                }
+                        if (user?.type == UserType.Child) {
+                            if (parentFragmentManager.isStateSaved == false) {
+                                openManageChildScreen(user.id)
+                            }
+                        }
+
+                        if (user != null) {
+                            if (parentFragmentManager.isStateSaved == false) {
+                                ObsoleteDialogFragment.show(getActivity()!!, false)
                             }
                         }
                     }
                 }
-            })
-        }
+            }
+        })
 
         fun updateShowFab(selectedItemId: Int) {
             showAuthButtonLive.value = when (selectedItemId) {

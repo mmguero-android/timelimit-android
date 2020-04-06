@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,9 +28,18 @@ import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentSetupTermsBinding
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.obsolete.ObsoleteDialogFragment
 import io.timelimit.android.ui.setup.customserver.SelectCustomServerDialogFragment
 
 class SetupTermsFragment : Fragment() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            ObsoleteDialogFragment.show(activity!!, true)
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentSetupTermsBinding.inflate(inflater, container, false)
 
@@ -45,7 +54,7 @@ class SetupTermsFragment : Fragment() {
         binding.termsText1.movementMethod = LinkMovementMethod.getInstance()
         binding.termsText2.movementMethod = LinkMovementMethod.getInstance()
 
-        DefaultAppLogic.with(context!!).database.config().getCustomServerUrlAsync().observe(this, Observer {
+        DefaultAppLogic.with(context!!).database.config().getCustomServerUrlAsync().observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()) {
                 binding.customServerStatus.setText(R.string.custom_server_status_disabled)
             } else {
