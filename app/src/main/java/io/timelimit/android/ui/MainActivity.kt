@@ -19,6 +19,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.MutableLiveData
@@ -120,7 +121,9 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
             override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStarted(fm, f)
 
-                currentNavigatorFragment.value = f
+                if (!(f is DialogFragment)) {
+                    currentNavigatorFragment.value = f
+                }
             }
 
             override fun onFragmentStopped(fm: FragmentManager, f: Fragment) {
