@@ -39,7 +39,7 @@ class StayAwesomeFragment : Fragment(), FragmentWithCustomTitle {
         val binding = StayAwesomeFragmentBinding.inflate(inflater, container, false)
         val activityModel = (activity as MainActivity).purchaseModel
 
-        model.status.observe(this, Observer { status ->
+        model.status.observe(viewLifecycleOwner, Observer { status ->
             when (status!!) {
                 LoadingStayAwesomeStatus -> binding.flipper.displayedChild = 0
                 NotSupportedByDeviceStayAwesomeStatus -> binding.flipper.displayedChild = 1
@@ -72,6 +72,8 @@ class StayAwesomeFragment : Fragment(), FragmentWithCustomTitle {
                     binding.flipper.displayedChild = 3
                 }
             }.let {/* require handling all paths */}
+
+            binding.info.visibility = if (status is ReadyStayAwesomeStatus) View.VISIBLE else View.GONE
         })
 
         return binding.root

@@ -70,6 +70,7 @@
         </io.timelimit.android.ui.view.SafeViewFlipper>
 
         <TextView
+            android:id="@+id/info"
             android:padding="8dp"
             android:text="@string/purchase_sla_provision_info"
             android:layout_width="match_parent"

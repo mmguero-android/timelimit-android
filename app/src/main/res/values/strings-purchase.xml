@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -33,7 +33,9 @@
     <string name="purchase_one_year">Premium version for one year</string>
 
     <string name="purchase_error_not_supported_by_device">The payment via Google Play is not supported by your device</string>
-    <string name="purchase_error_not_supported_by_app_variant">The payment is only possible in the version from the Play Store</string>
+    <string name="purchase_error_not_supported_by_app_variant">This build does not support payments.
+        Get in touch with the support for purchases.
+    </string>
     <string name="purchase_error_existing_payment">
         You paid already.
         You can only extend the premium version if it expired or shortly before that.
