@@ -126,10 +126,14 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
                                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             )
                         } catch (ex: Exception) {
-                            startActivity(
-                                    Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            )
+                            try {
+                                startActivity(
+                                        Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                )
+                            } catch (ex: Exception) {
+                                AdbUsageStatsDialogFragment().show(parentFragmentManager)
+                            }
                         }
                     }
                 }
@@ -143,28 +147,32 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
                                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         )
                     } catch (ex: Exception) {
-                        Toast.makeText(
-                                context,
-                                R.string.error_general,
-                                Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
 
             override fun openDrawOverOtherAppsScreen() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    startActivity(
-                            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
-                    )
+                    try {
+                        startActivity(
+                                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
+                        )
+                    } catch (ex: Exception) {
+                        Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
             override fun openAccessibilitySettings() {
-                startActivity(
-                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
+                try {
+                    startActivity(
+                            Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                } catch (ex: Exception) {
+                    Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+                }
             }
 
             override fun manageDeviceAdmin() {
@@ -175,19 +183,27 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
                         if (InformAboutDeviceOwnerDialogFragment.shouldShow) {
                             InformAboutDeviceOwnerDialogFragment().show(fragmentManager!!)
                         } else {
-                            startActivity(
-                                    Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                                            .putExtra(
-                                                    DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                                                    ComponentName(context!!, AdminReceiver::class.java)
-                                            )
-                            )
+                            try {
+                                startActivity(
+                                        Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                                                .putExtra(
+                                                        DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                                                        ComponentName(context!!, AdminReceiver::class.java)
+                                                )
+                                )
+                            } catch (ex: Exception) {
+                                AdbDeviceAdminDialogFragment().show(parentFragmentManager)
+                            }
                         }
                     } else {
-                        startActivity(
-                                Intent(Settings.ACTION_SECURITY_SETTINGS)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
+                        try {
+                            startActivity(
+                                    Intent(Settings.ACTION_SECURITY_SETTINGS)
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        } catch (ex: Exception) {
+                            AdbDeviceAdminDialogFragment().show(parentFragmentManager)
+                        }
                     }
                 }
             }

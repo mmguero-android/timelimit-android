@@ -45,7 +45,9 @@
                     android:checked="@{safeUnbox(selectedDays.get(0))}"
                     android:text="@string/day_of_week_monday_short"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
+                    <requestFocus />
+                </com.google.android.material.button.MaterialButton>
 
                 <com.google.android.material.button.MaterialButton
                     style="?materialButtonOutlinedStyle"

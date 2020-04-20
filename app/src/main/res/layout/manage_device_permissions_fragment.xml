@@ -116,6 +116,8 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            android:id="@+id/device_admin_btn"
+                            android:nextFocusDown="@id/usage_stats_access_title"
                             style="?materialButtonOutlinedStyle"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"
@@ -124,7 +126,9 @@
                             android:enabled="@{safeUnbox(isThisDevice)}"
                             android:onClick="@{() -> handlers.manageDeviceAdmin()}"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content">
+                            <requestFocus />
+                        </Button>
 
                         <TextView
                             android:visibility="@{safeUnbox(isThisDevice) ? View.GONE : View.VISIBLE}"
@@ -147,6 +151,9 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:id="@+id/usage_stats_access_title"
+                            android:nextFocusUp="@id/device_admin_btn"
+                            android:nextFocusDown="@id/usage_stats_access_btn"
                             tools:ignore="UnusedAttribute"
                             android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
@@ -188,6 +195,9 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            android:id="@+id/usage_stats_access_btn"
+                            android:nextFocusUp="@id/usage_stats_access_title"
+                            android:nextFocusDown="@id/notification_access_title"
                             style="?materialButtonOutlinedStyle"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"
@@ -219,6 +229,9 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:id="@+id/notification_access_title"
+                            android:nextFocusUp="@id/usage_stats_access_btn"
+                            android:nextFocusDown="@id/notification_access_button"
                             tools:ignore="UnusedAttribute"
                             android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
@@ -260,6 +273,9 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            android:id="@+id/notification_access_button"
+                            android:nextFocusUp="@id/notification_access_title"
+                            android:nextFocusDown="@id/overlay_title"
                             style="?materialButtonOutlinedStyle"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"
@@ -291,6 +307,9 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:id="@+id/overlay_title"
+                            android:nextFocusUp="@id/notification_access_button"
+                            android:nextFocusDown="@id/overlay_btn"
                             tools:ignore="UnusedAttribute"
                             android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
@@ -332,6 +351,9 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            android:id="@+id/overlay_btn"
+                            android:nextFocusUp="@id/overlay_title"
+                            android:nextFocusDown="@id/accessibility_title"
                             style="?materialButtonOutlinedStyle"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"
@@ -363,6 +385,9 @@
                         android:layout_height="wrap_content">
 
                         <TextView
+                            android:id="@+id/accessibility_title"
+                            android:nextFocusUp="@id/overlay_btn"
+                            android:nextFocusDown="@id/accessibility_btn"
                             tools:ignore="UnusedAttribute"
                             android:drawableTint="?colorOnSurface"
                             android:background="?selectableItemBackground"
@@ -394,6 +419,9 @@
                             android:layout_height="wrap_content" />
 
                         <Button
+                            android:id="@+id/accessibility_btn"
+                            android:nextFocusUp="@id/accessibility_title"
+                            android:nextFocusDown="@id/fab"
                             style="?materialButtonOutlinedStyle"
                             android:layout_marginEnd="8dp"
                             android:layout_marginTop="8dp"
@@ -423,6 +451,7 @@
         </ScrollView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:nextFocusUp="@id/accessibility_btn"
             android:onClick="@{() -> handlers.showAuthenticationScreen()}"
             android:id="@+id/fab"
             app:fabSize="normal"

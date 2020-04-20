@@ -70,6 +70,7 @@
                 android:layout_height="wrap_content" />
 
             <SeekBar
+                android:nextFocusDown="@id/confirm_btn"
                 android:max="10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

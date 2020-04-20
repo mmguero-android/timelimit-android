@@ -107,6 +107,19 @@
 
     <string name="manage_device_permission_btn_modify">Modify</string>
 
+    <string name="manage_device_permission_no_ui_usage_stats_text">
+        This device does not allow changing this permission graphically. You can only
+        change it from a PC using ADB.
+        \n\nEnable:\n\n%s
+        \n\nDisable:\n\n%s
+    </string>
+    <string name="manage_device_permission_no_ui_device_admin">
+        This device does not allow changing this permission graphically. You can only
+        enable it from a PC using ADB.
+        \n\n%s
+        \n\nYou can disable it by using the uninstall feature of TimeLimit.
+    </string>
+
     <string name="manage_device_downgrade_title">Downgrade</string>
     <string name="manage_device_downgrade_text">On this device, a newer version of TimeLimit was replaced by an older one</string>
 

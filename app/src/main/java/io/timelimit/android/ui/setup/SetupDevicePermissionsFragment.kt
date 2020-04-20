@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.FragmentSetupDevicePermissionsBinding
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.integration.platform.ProtectionLevel
@@ -36,12 +37,24 @@ import io.timelimit.android.integration.platform.android.AdminReceiver
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.help.HelpDialogFragment
+import io.timelimit.android.ui.manage.device.manage.permission.AdbDeviceAdminDialogFragment
+import io.timelimit.android.ui.manage.device.manage.permission.AdbUsageStatsDialogFragment
 import io.timelimit.android.ui.manage.device.manage.permission.InformAboutDeviceOwnerDialogFragment
 
 
 class SetupDevicePermissionsFragment : Fragment() {
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private lateinit var binding: FragmentSetupDevicePermissionsBinding
+
+    lateinit var refreshStatusRunnable: Runnable
+
+    init {
+        refreshStatusRunnable = Runnable {
+            refreshStatus()
+
+            Threads.mainThreadHandler.postDelayed(refreshStatusRunnable, 2000L)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val navigation = Navigation.findNavController(container!!)
@@ -56,19 +69,27 @@ class SetupDevicePermissionsFragment : Fragment() {
                     if (InformAboutDeviceOwnerDialogFragment.shouldShow) {
                         InformAboutDeviceOwnerDialogFragment().show(fragmentManager!!)
                     } else {
-                        startActivity(
-                                Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                                        .putExtra(
-                                                DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                                                ComponentName(context!!, AdminReceiver::class.java)
-                                        )
-                        )
+                        try {
+                            startActivity(
+                                    Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                                            .putExtra(
+                                                    DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                                                    ComponentName(context!!, AdminReceiver::class.java)
+                                            )
+                            )
+                        } catch (ex: Exception) {
+                            AdbDeviceAdminDialogFragment().show(parentFragmentManager)
+                        }
                     }
                 } else {
-                    startActivity(
-                            Intent(Settings.ACTION_SECURITY_SETTINGS)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
+                    try {
+                        startActivity(
+                                Intent(Settings.ACTION_SECURITY_SETTINGS)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    } catch (ex: Exception) {
+                        AdbDeviceAdminDialogFragment().show(parentFragmentManager)
+                    }
                 }
             }
 
@@ -87,10 +108,14 @@ class SetupDevicePermissionsFragment : Fragment() {
                                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         )
                     } catch (ex: Exception) {
-                        startActivity(
-                                Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
+                        try {
+                            startActivity(
+                                    Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        } catch (ex: Exception) {
+                            AdbUsageStatsDialogFragment().show(parentFragmentManager)
+                        }
                     }
                 }
             }
@@ -112,18 +137,26 @@ class SetupDevicePermissionsFragment : Fragment() {
 
             override fun openDrawOverOtherAppsScreen() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    startActivity(
-                            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
+                    try {
+                        startActivity(
+                                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context!!.packageName))
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    } catch (ex: Exception) {
+                        Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
             override fun openAccessibilitySettings() {
-                startActivity(
-                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                )
+                try {
+                    startActivity(
+                            Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                } catch (ex: Exception) {
+                    Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+                }
             }
 
             override fun gotoNextStep() {
@@ -181,7 +214,14 @@ class SetupDevicePermissionsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        refreshStatus()
+        // this additionally schedules it
+        refreshStatusRunnable.run()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        Threads.mainThreadHandler.removeCallbacks(refreshStatusRunnable)
     }
 }
 

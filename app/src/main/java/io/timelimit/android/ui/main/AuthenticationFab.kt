@@ -52,7 +52,7 @@ object AuthenticationFab {
         val highlightObserver = Observer<Boolean> {
             if (it == true) {
                 if (tapTargetView == null && fab.isAttachedToWindow) {
-                    tapTargetView = TapTargetView.showFor(fragment.activity!!,
+                    tapTargetView = MyTapTargetView.showFor(fragment.activity!!,
                             TapTarget.forView(fab, fragment.getString(R.string.authentication_required_overlay_title), fragment.getString(R.string.authentication_required_overlay_text))
                                     .cancelable(true)
                                     .tintTarget(true)

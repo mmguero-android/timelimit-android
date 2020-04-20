@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,13 +41,17 @@ class InformAboutDeviceOwnerDialogFragment: DialogFragment() {
             .setTitle(R.string.inform_about_device_owner_title)
             .setMessage(R.string.inform_about_device_owner_text)
             .setPositiveButton(R.string.inform_about_device_owner_continue) { _, _ ->
-                startActivity(
-                        Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-                                .putExtra(
-                                        DevicePolicyManager.EXTRA_DEVICE_ADMIN,
-                                        ComponentName(context!!, AdminReceiver::class.java)
-                                )
-                )
+                try {
+                    startActivity(
+                            Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
+                                    .putExtra(
+                                            DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                                            ComponentName(context!!, AdminReceiver::class.java)
+                                    )
+                    )
+                } catch (ex: Exception) {
+                    AdbDeviceAdminDialogFragment().show(parentFragmentManager)
+                }
             }
             .setNegativeButton(R.string.generic_cancel, null)
             .create()

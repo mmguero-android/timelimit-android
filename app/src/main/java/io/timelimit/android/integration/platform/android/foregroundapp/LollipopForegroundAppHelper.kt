@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@ import android.app.AppOpsManager
 import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
+import io.timelimit.android.BuildConfig
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
@@ -35,6 +37,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
 
     private val usageStatsManager = context.getSystemService(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) Context.USAGE_STATS_SERVICE else "usagestats") as UsageStatsManager
     private val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+    private val packageManager = context.packageManager
 
     private var lastQueryTime: Long = 0
     private var lastPackage: String? = null
@@ -94,8 +97,13 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
     }
 
     override fun getPermissionStatus(): RuntimePermissionStatus {
-        if(appOpsManager.checkOpNoThrow("android:get_usage_stats",
-                android.os.Process.myUid(), context.packageName) == AppOpsManager.MODE_ALLOWED) {
+        val appOpsStatus = appOpsManager.checkOpNoThrow("android:get_usage_stats", android.os.Process.myUid(), context.packageName)
+        val packageManagerStatus = packageManager.checkPermission("android.permission.PACKAGE_USAGE_STATS", BuildConfig.APPLICATION_ID)
+
+        val allowedUsingSystemSettings = appOpsStatus == AppOpsManager.MODE_ALLOWED
+        val allowedUsingAdb = appOpsStatus == AppOpsManager.MODE_DEFAULT && packageManagerStatus == PackageManager.PERMISSION_GRANTED
+
+        if(allowedUsingSystemSettings || allowedUsingAdb) {
             return RuntimePermissionStatus.Granted
         } else {
             return RuntimePermissionStatus.NotGranted

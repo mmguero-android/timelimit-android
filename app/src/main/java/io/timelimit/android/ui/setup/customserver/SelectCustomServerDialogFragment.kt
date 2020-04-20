@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,12 @@ class SelectCustomServerDialogFragment : BottomSheetDialogFragment() {
         model.status.observe(this, Observer {
             when (it!!) {
                 SelectCustomServerStatus.Done -> dismiss()
-                SelectCustomServerStatus.Idle -> binding.isWorking = false
+                SelectCustomServerStatus.Idle -> {
+                    binding.isWorking = false
+                    binding.executePendingBindings()
+
+                    binding.url.requestFocus()
+                }
                 SelectCustomServerStatus.Working -> binding.isWorking = true
             }
         })

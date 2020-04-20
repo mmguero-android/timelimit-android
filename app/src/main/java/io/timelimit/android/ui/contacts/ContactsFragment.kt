@@ -126,11 +126,15 @@ class ContactsFragment : Fragment() {
     }
 
     private fun showContactSelection() {
-        startActivityForResult(
-                Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-                        .setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE),
-                REQ_SELECT_CONTACT
-        )
+        try {
+            startActivityForResult(
+                    Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+                            .setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE),
+                    REQ_SELECT_CONTACT
+            )
+        } catch (ex: Exception) {
+            Snackbar.make(view!!, R.string.error_general, Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     private fun removeItem(item: AllowedContact) {

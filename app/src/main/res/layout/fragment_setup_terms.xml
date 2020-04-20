@@ -71,6 +71,7 @@
 
                     <Button
                         style="?materialButtonOutlinedStyle"
+                        android:nextFocusDown="@id/btn_accept"
                         android:id="@+id/custom_server_button"
                         android:text="@string/select_custom_server_button"
                         android:layout_width="wrap_content"
@@ -94,12 +95,15 @@
             android:layout_height="wrap_content">
 
             <Button
+                android:nextFocusUp="@id/custom_server_button"
                 android:layout_marginEnd="4dp"
                 android:layout_gravity="end"
                 android:id="@+id/btn_accept"
                 android:text="@string/terms_btn_accept"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+                <requestFocus />
+            </Button>
 
         </LinearLayout>
     </LinearLayout>

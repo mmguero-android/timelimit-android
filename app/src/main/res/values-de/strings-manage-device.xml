@@ -108,6 +108,19 @@
 
     <string name="manage_device_permission_btn_modify">Ändern</string>
 
+    <string name="manage_device_permission_no_ui_usage_stats_text">
+        Dieses Gerät hat keine grafische Oberfläche zum Erteilen dieser Berechtigung - diese kann
+        nur von einem Computer mittels ADB geändert werden.
+        \n\nAktivieren mittels:\n\n%s
+        \n\nDeaktivieren mittels:\n\n%s
+    </string>
+    <string name="manage_device_permission_no_ui_device_admin">
+        Dieses Gerät hat keine grafische Oberfläche zum Erteilen dieser Berechtigung - diese kann
+        nur von einem Computer mittels ADB aktiviert werden:
+        \n\n%s
+        \n\nDie Berechtigung kann über die Deinstallations-Funktion von TimeLimit deaktiviert werden.
+    </string>
+
     <string name="manage_device_downgrade_title">Downgrade</string>
     <string name="manage_device_downgrade_text">Auf diesem Gerät wurde eine neuere Version von TimeLimit durch eine ältere ersetzt</string>
 
