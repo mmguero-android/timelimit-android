@@ -30,8 +30,8 @@ android {
         applicationId "io.timelimit.android"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 85
-        versionName "2.7.3"
+        versionCode 86
+        versionName "2.7.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         kapt {
             arguments {
