@@ -1,2 +1,3 @@
-- showing of the blocked element at the overlay
-- update of a included component
+- improved dpad navigation
+- added warning when using at old Android version
+- fix wrong titles after opening dialogs
