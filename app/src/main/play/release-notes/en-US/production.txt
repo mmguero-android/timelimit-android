@@ -1,3 +1,3 @@
-- improved dpad navigation
-- added warning when using at old Android version
-- fix wrong titles after opening dialogs
+- added unlocking by barcode to the local mode
+- added system permission request dialog of newer Android versions to the whitelist
+- added info that the temporarily blocking is indefinitely by default

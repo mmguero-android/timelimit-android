@@ -1,3 +1,3 @@
-- Steuerung bei DPAD-Nutzung verbessert
-- Warnung beim Einsatz auf älteren Android-Versionen hinzugefügt
-- falsche Texte in der Titelleiste nach dem Öffnen von Dialogen behoben
+- Entsperren per Barcode im lokalen Modus hinzugefügt
+- Systembereichtigungsanfragedialog bei neueren Android-Versionen zur Whitelist hinzugefügt
+- Hinweis hinzugefügt, dass das vorübergehende Sperren standardmäßig unbegrenzt ist
