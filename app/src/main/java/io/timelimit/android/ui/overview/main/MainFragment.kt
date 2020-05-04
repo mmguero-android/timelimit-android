@@ -99,7 +99,7 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                 runAsync {
                     val hasParentKey = Threads.database.executeAndWait { logic.database.config().getParentModeKeySync() != null }
 
-                    if (parentFragmentManager.isStateSaved == false) {
+                    if (isAdded && parentFragmentManager.isStateSaved == false) {
                         if (hasParentKey) {
                             navigation.safeNavigate(
                                     MainFragmentDirections.actionOverviewFragmentToParentModeFragment(),
@@ -121,13 +121,13 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                         val user = logic.deviceUserEntry.waitForNullableValue()
 
                         if (user?.type == UserType.Child) {
-                            if (parentFragmentManager.isStateSaved == false) {
+                            if (isAdded && parentFragmentManager.isStateSaved == false) {
                                 openManageChildScreen(user.id)
                             }
                         }
 
                         if (user != null) {
-                            if (parentFragmentManager.isStateSaved == false) {
+                            if (isAdded && parentFragmentManager.isStateSaved == false) {
                                 ObsoleteDialogFragment.show(getActivity()!!, false)
                             }
                         }
