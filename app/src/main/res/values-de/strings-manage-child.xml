@@ -22,6 +22,7 @@
         Sie können die Sperre automatisch aufheben lassen, indem Sie lange auf eine Kategorie tippen
         und dann eine Endzeit auswählen.
     </string>
+    <string name="manage_child_block_temporarily_no_end_time">%s (dauerhaft)</string>
     <string name="manage_child_block_temporarily_until">%1$s (bis %2$s)</string>
     <string name="manage_child_block_temporarily_dialog_until">bis %s</string>
 

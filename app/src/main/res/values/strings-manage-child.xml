@@ -22,6 +22,7 @@
         You can disable the blocking automatically by holding a category
         and selecting an end time.
     </string>
+    <string name="manage_child_block_temporarily_no_end_time">%s (indefinitely)</string>
     <string name="manage_child_block_temporarily_until">%1$s (until %2$s)</string>
     <string name="manage_child_block_temporarily_dialog_until">until %s</string>
 

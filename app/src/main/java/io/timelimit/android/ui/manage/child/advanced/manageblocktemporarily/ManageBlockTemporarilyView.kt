@@ -54,22 +54,25 @@ object ManageBlockTemporarilyView {
                 category ->
 
                 val checkbox = CheckBox(context)
-                val showEndTime = category.checked && category.endTime != 0L
 
                 checkbox.isChecked = category.checked
-                checkbox.text = if (showEndTime)
-                    context.getString(
-                            R.string.manage_child_block_temporarily_until,
-                            category.categoryTitle,
-                            DateUtils.formatDateTime(
-                                    context,
-                                    category.endTime,
-                                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or
-                                            DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_WEEKDAY
-                            )
-                    )
-                else
+                checkbox.text = if (category.checked) {
+                    if (category.endTime == 0L)
+                        context.getString(R.string.manage_child_block_temporarily_no_end_time, category.categoryTitle)
+                    else
+                        context.getString(
+                                R.string.manage_child_block_temporarily_until,
+                                category.categoryTitle,
+                                DateUtils.formatDateTime(
+                                        context,
+                                        category.endTime,
+                                        DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or
+                                                DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_WEEKDAY
+                                )
+                        )
+                } else {
                     category.categoryTitle
+                }
 
                 checkbox.setOnLongClickListener {
                     if (hasFullVersion != true) {
