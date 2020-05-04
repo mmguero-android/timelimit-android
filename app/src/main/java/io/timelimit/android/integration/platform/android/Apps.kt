@@ -62,6 +62,8 @@ object AndroidIntegrationApps {
             "com.android.settings:com.android.settings.enterprise.ActionDisabledByAdminDialog",
             "com.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionActivity",
             "com.google.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionsActivity",
+            "com.android.permissioncontroller:com.android.permissioncontroller.permission.ui.GrantPermissionActivity",
+            "com.google.android.permissioncontroller:com.android.permissioncontroller.permission.ui.GrantPermissionsActivity",
             "com.android.phone:com.android.phone.EmergencyDialer"
     )
 
