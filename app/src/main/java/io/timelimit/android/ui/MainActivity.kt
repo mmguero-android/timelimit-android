@@ -44,6 +44,7 @@ import io.timelimit.android.ui.manage.parent.link.LinkParentMailFragment
 import io.timelimit.android.ui.manage.parent.password.restore.RestoreParentPasswordFragment
 import io.timelimit.android.ui.migrate_to_connected.MigrateToConnectedModeFragment
 import io.timelimit.android.ui.overview.main.MainFragment
+import io.timelimit.android.ui.parentmode.ParentModeFragment
 import io.timelimit.android.ui.payment.ActivityPurchaseModel
 import io.timelimit.android.ui.setup.SetupTermsFragment
 import io.timelimit.android.ui.setup.parent.SetupParentModeFragment
@@ -104,7 +105,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
 
         // up button
         val shouldShowBackButtonForNavigatorFragment = currentNavigatorFragment.map { fragment ->
-            (!(fragment is MainFragment)) && (!(fragment is SetupTermsFragment))
+            (!(fragment is MainFragment)) && (!(fragment is SetupTermsFragment)) && (!(fragment is ParentModeFragment))
         }
 
         val shouldShowUpButton = shouldShowBackButtonForNavigatorFragment
@@ -224,7 +225,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
     }
 
     override fun onBackPressed() {
-        if (currentNavigatorFragment.value is SetupTermsFragment) {
+        if (currentNavigatorFragment.value is SetupTermsFragment || currentNavigatorFragment.value is ParentModeFragment) {
             // hack to prevent the user from going to the launch screen of the App if it is not set up
             finish()
         } else {

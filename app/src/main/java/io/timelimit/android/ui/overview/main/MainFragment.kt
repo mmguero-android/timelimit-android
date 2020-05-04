@@ -30,6 +30,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
+import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.extensions.safeNavigate
@@ -94,11 +96,22 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
             }
         }.observe(viewLifecycleOwner, Observer { shouldShowSetup ->
             if (shouldShowSetup == true) {
-                fab.post {
-                    navigation.safeNavigate(
-                            MainFragmentDirections.actionOverviewFragmentToSetupTermsFragment(),
-                            R.id.overviewFragment
-                    )
+                runAsync {
+                    val hasParentKey = Threads.database.executeAndWait { logic.database.config().getParentModeKeySync() != null }
+
+                    if (parentFragmentManager.isStateSaved == false) {
+                        if (hasParentKey) {
+                            navigation.safeNavigate(
+                                    MainFragmentDirections.actionOverviewFragmentToParentModeFragment(),
+                                    R.id.overviewFragment
+                            )
+                        } else {
+                            navigation.safeNavigate(
+                                    MainFragmentDirections.actionOverviewFragmentToSetupTermsFragment(),
+                                    R.id.overviewFragment
+                            )
+                        }
+                    }
                 }
             } else {
                 if (savedInstanceState == null && !didRedirectToUserScreen) {

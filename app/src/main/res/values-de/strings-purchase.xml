@@ -53,6 +53,7 @@
 
     <string name="purchase_required_info_only_networking">Diese Funktion ist nur in der Vollversion verfügbar.</string>
     <string name="purchase_required_info_local_mode_free">Diese Funktion ist nur in der Vollversion und im lokalen Modus verfügbar.</string>
+    <string name="purchase_required_info_only_local_mode">Diese Funktion ist nur im lokalen Modus verfügbar.</string>
 
     <string name="purchase_demo_temporarily_notice">
         Sie können die Funktionen der Vollversion vorübergehend nutzen.

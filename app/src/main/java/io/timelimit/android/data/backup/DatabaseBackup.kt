@@ -67,7 +67,11 @@ class DatabaseBackup(private val context: Context) {
 
                 val database = RoomDatabase.with(context)
 
-                if (database.config().getOwnDeviceIdSync().orEmpty().isNotEmpty()) {
+                if (
+                        database.config().getOwnDeviceIdSync().orEmpty().isNotEmpty() ||
+                        database.config().getParentModeKeySync() != null ||
+                        database.config().getCustomServerUrlSync().isNotEmpty()
+                ) {
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "database is not empty -> don't restore backup")
                     }

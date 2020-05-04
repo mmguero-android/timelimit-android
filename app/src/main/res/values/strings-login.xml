@@ -29,4 +29,7 @@
     <string name="login_child_done_toast">The user of this device was changed</string>
     <string name="login_missing_trusted_time">The current time is required to sign in with this user</string>
     <string name="login_blocked_time">Signing in as this user at this time was blocked</string>
+    <string name="login_scan_code">Scan code</string>
+    <string name="login_scan_code_err_expired">This code is old</string>
+    <string name="login_scan_code_err_not_linked">This key is not linked</string>
 </resources>

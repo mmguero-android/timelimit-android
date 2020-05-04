@@ -157,6 +157,9 @@
                 <include android:id="@+id/manage_notifications"
                     layout="@layout/manage_parent_notifications" />
 
+                <include android:id="@+id/user_key"
+                    layout="@layout/manage_user_key_view" />
+
                 <include android:id="@+id/timezone"
                     layout="@layout/user_timezone_view" />
 

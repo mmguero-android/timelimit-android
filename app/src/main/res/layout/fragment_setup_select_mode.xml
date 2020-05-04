@@ -129,6 +129,34 @@
 
             <androidx.cardview.widget.CardView
                 android:focusable="true"
+                android:id="@+id/btn_parent_key_mode"
+                android:foreground="?selectableItemBackground"
+                app:cardUseCompatPadding="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:padding="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:text="@string/setup_select_mode_parent_key_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/setup_select_mode_parent_key_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:focusable="true"
                 android:id="@+id/btn_uninstall"
                 android:foreground="?selectableItemBackground"
                 app:cardUseCompatPadding="true"

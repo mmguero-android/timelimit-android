@@ -94,7 +94,8 @@ enum class ConfigurationItemType {
     EnableAlternativeDurationSelection,
     ExperimentalFlags,
     DefaultHomescreen,
-    HomescreenDelay
+    HomescreenDelay,
+    ParentModeKey
 }
 
 object ConfigurationItemTypeUtil {
@@ -116,6 +117,7 @@ object ConfigurationItemTypeUtil {
     private const val EXPERIMENTAL_FLAGS = 17
     private const val DEFAULT_HOMESCREEN = 18
     private const val HOMESCREEN_DELAY = 19
+    private const val PARENT_MODE_KEY = 20
 
     val TYPES = listOf(
             ConfigurationItemType.OwnDeviceId,
@@ -135,7 +137,8 @@ object ConfigurationItemTypeUtil {
             ConfigurationItemType.EnableAlternativeDurationSelection,
             ConfigurationItemType.ExperimentalFlags,
             ConfigurationItemType.DefaultHomescreen,
-            ConfigurationItemType.HomescreenDelay
+            ConfigurationItemType.HomescreenDelay,
+            ConfigurationItemType.ParentModeKey
     )
 
     fun serialize(value: ConfigurationItemType) = when(value) {
@@ -157,6 +160,7 @@ object ConfigurationItemTypeUtil {
         ConfigurationItemType.ExperimentalFlags -> EXPERIMENTAL_FLAGS
         ConfigurationItemType.DefaultHomescreen -> DEFAULT_HOMESCREEN
         ConfigurationItemType.HomescreenDelay -> HOMESCREEN_DELAY
+        ConfigurationItemType.ParentModeKey -> PARENT_MODE_KEY
     }
 
     fun parse(value: Int) = when(value) {
@@ -178,6 +182,7 @@ object ConfigurationItemTypeUtil {
         EXPERIMENTAL_FLAGS -> ConfigurationItemType.ExperimentalFlags
         DEFAULT_HOMESCREEN -> ConfigurationItemType.DefaultHomescreen
         HOMESCREEN_DELAY -> ConfigurationItemType.HomescreenDelay
+        PARENT_MODE_KEY -> ConfigurationItemType.ParentModeKey
         else -> throw IllegalArgumentException()
     }
 }

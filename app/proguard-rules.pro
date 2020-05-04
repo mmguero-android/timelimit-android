@@ -1,4 +1,4 @@
-# TimeLimit Copyright <C> 2019 Jonas Lochmann
+# TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,3 +48,13 @@
 
 # readable stack traces
 -keepattributes SourceFile,LineNumberTable
+
+# Curve25519 support
+-keepnames class org.whispersystems.curve25519.NativeCurve25519Provider {}
+-keepnames class org.whispersystems.curve25519.JavaCurve25519Provider {}
+-keepnames class org.whispersystems.curve25519.J2meCurve25519Provider {}
+-keepnames class org.whispersystems.curve25519.OpportunisticCurve25519Provider {}
+-keep class org.whispersystems.curve25519.NativeCurve25519Provider {}
+-keep class org.whispersystems.curve25519.JavaCurve25519Provider {}
+-keep class org.whispersystems.curve25519.J2meCurve25519Provider {}
+-keep class org.whispersystems.curve25519.OpportunisticCurve25519Provider {}

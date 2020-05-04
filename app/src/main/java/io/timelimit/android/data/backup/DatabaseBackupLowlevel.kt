@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ object DatabaseBackupLowlevel {
     private const val APP_ACTIVITY = "appActivity"
     private const val NOTIFICATION = "notification"
     private const val ALLOWED_CONTACT = "allowedContact"
+    private const val USER_KEY = "userKey"
 
     fun outputAsBackupJson(database: Database, outputStream: OutputStream) {
         val writer = JsonWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
@@ -85,6 +86,7 @@ object DatabaseBackupLowlevel {
         handleCollection(APP_ACTIVITY) { offset, pageSize -> database.appActivity().getAppActivityPageSync(offset, pageSize) }
         handleCollection(NOTIFICATION) { offset, pageSize -> database.notification().getNotificationPageSync(offset, pageSize) }
         handleCollection(ALLOWED_CONTACT) { offset, pageSize -> database.allowedContact().getAllowedContactPageSync(offset, pageSize) }
+        handleCollection(USER_KEY) { offset, pageSize -> database.userKey().getUserKeyPageSync(offset, pageSize) }
 
         writer.endObject().flush()
     }
@@ -211,6 +213,15 @@ object DatabaseBackupLowlevel {
                                     // this will use an unused id
                                     AllowedContact.parse(reader).copy(id = 0)
                             )
+                        }
+
+                        reader.endArray()
+                    }
+                    USER_KEY -> {
+                        reader.beginArray()
+
+                        while (reader.hasNext()) {
+                            database.userKey().addUserKeySync(UserKey.parse(reader))
                         }
 
                         reader.endArray()

@@ -32,6 +32,7 @@ import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentSetupSelectModeBinding
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.setup.parentmode.SetupParentmodeDialogFragment
 import io.timelimit.android.ui.setup.privacy.PrivacyInfoDialogFragment
 import kotlinx.android.synthetic.main.fragment_setup_select_mode.*
 
@@ -39,6 +40,7 @@ class SetupSelectModeFragment : Fragment() {
     companion object {
         private const val REQ_SETUP_CONNECTED_PARENT = 1
         private const val REQ_SETUP_CONNECTED_CHILD = 2
+        private const val REQUEST_SETUP_PARENT_MODE = 3
     }
 
     private lateinit var navigation: NavController
@@ -73,6 +75,12 @@ class SetupSelectModeFragment : Fragment() {
             }.show(fragmentManager!!)
         }
 
+        btn_parent_key_mode.setOnClickListener {
+            SetupParentmodeDialogFragment().apply {
+                setTargetFragment(this@SetupSelectModeFragment, REQUEST_SETUP_PARENT_MODE)
+            }.show(parentFragmentManager)
+        }
+
         btn_uninstall.setOnClickListener {
             DefaultAppLogic.with(context!!).platformIntegration.disableDeviceAdmin()
 
@@ -104,6 +112,8 @@ class SetupSelectModeFragment : Fragment() {
                         SetupSelectModeFragmentDirections.actionSetupSelectModeFragmentToSetupParentModeFragment(),
                         R.id.setupSelectModeFragment
                 )
+            } else if (requestCode == REQUEST_SETUP_PARENT_MODE && resultCode == Activity.RESULT_OK) {
+                navigation.popBackStack(R.id.overviewFragment, false)
             }
         }
     }

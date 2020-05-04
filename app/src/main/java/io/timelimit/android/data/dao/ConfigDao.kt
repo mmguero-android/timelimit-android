@@ -16,6 +16,7 @@
 package io.timelimit.android.data.dao
 
 import android.content.ComponentName
+import android.util.Base64
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.room.*
@@ -271,4 +272,8 @@ abstract class ConfigDao {
 
     fun getHomescreenDelaySync(): Int = getValueOfKeySync(ConfigurationItemType.HomescreenDelay)?.toIntOrNull(radix = 10) ?: 5
     fun setHomescreenDelaySync(delay: Int) = updateValueSync(ConfigurationItemType.HomescreenDelay, delay.toString(radix = 10))
+
+    fun setParentModeKeySync(key: ByteArray) = updateValueSync(ConfigurationItemType.ParentModeKey, Base64.encodeToString(key, 0))
+    fun getParentModeKeySync() = getValueOfKeySync(ConfigurationItemType.ParentModeKey)?.let { value -> Base64.decode(value, 0) }
+    fun getParentModeKeyLive() = getValueOfKeyAsync(ConfigurationItemType.ParentModeKey).map { value -> value?.let { Base64.decode(it, 0) } }
 }

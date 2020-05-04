@@ -53,6 +53,7 @@
 
     <string name="purchase_required_info_only_networking">This feature is only available in the premium version.</string>
     <string name="purchase_required_info_local_mode_free">This feature is only available in the premium version and the local mode.</string>
+    <string name="purchase_required_info_only_local_mode">This feature is only available in the local mode.</string>
 
     <string name="purchase_demo_temporarily_notice">
         You can use the premium version temporarily.

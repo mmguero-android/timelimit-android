@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,22 @@ import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 
 class AboutFragment : Fragment() {
+    companion object {
+        private const val EXTRA_SHOWN_OUTSIDE_OF_OVERVIEW = "shownOutsideOfOverview"
+
+        fun newInstance(shownOutsideOfOverview: Boolean = false) = AboutFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(EXTRA_SHOWN_OUTSIDE_OF_OVERVIEW, shownOutsideOfOverview)
+            }
+        }
+    }
+
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val listener: AboutFragmentParentHandlers by lazy { parentFragment as AboutFragmentParentHandlers }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAboutBinding.inflate(inflater, container, false)
+        val shownOutsideOfOverview = arguments?.getBoolean(EXTRA_SHOWN_OUTSIDE_OF_OVERVIEW, false) ?: false
 
         mergeLiveData(
                 logic.database.config().getDeviceAuthTokenAsync(), logic.database.config().getFullVersionUntilAsync()
@@ -78,14 +89,19 @@ class AboutFragment : Fragment() {
         binding.containedSoftwareText.movementMethod = LinkMovementMethod.getInstance()
         binding.sourceCodeUrl.movementMethod = LinkMovementMethod.getInstance()
 
-        ResetShownHints.bind(
-                binding = binding.resetShownHintsView,
-                lifecycleOwner = this,
-                database = logic.database
-        )
+        if (shownOutsideOfOverview) {
+            binding.resetShownHintsView.root.visibility = View.GONE
+            binding.errorDiagnoseCard.visibility = View.GONE
+        } else {
+            ResetShownHints.bind(
+                    binding = binding.resetShownHintsView,
+                    lifecycleOwner = this,
+                    database = logic.database
+            )
 
-        binding.errorDiagnoseCard.setOnClickListener {
-            listener.onShowDiagnoseScreen()
+            binding.errorDiagnoseCard.setOnClickListener {
+                listener.onShowDiagnoseScreen()
+            }
         }
 
         return binding.root

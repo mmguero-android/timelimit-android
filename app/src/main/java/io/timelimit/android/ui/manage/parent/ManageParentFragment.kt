@@ -38,6 +38,7 @@ import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.child.advanced.timezone.UserTimezoneView
 import io.timelimit.android.ui.manage.parent.delete.DeleteParentView
+import io.timelimit.android.ui.manage.parent.key.ManageUserKeyView
 
 class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
@@ -113,6 +114,14 @@ class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
                 fragmentManager = fragmentManager!!,
                 auth = activity.getActivityViewModel(),
                 userEntry = parentUser
+        )
+
+        ManageUserKeyView.bind(
+                view = binding.userKey,
+                lifecycleOwner = viewLifecycleOwner,
+                userId = params.parentId,
+                auth = activity.getActivityViewModel(),
+                fragmentManager = parentFragmentManager
         )
 
         binding.handlers = object: ManageParentFragmentHandlers {
