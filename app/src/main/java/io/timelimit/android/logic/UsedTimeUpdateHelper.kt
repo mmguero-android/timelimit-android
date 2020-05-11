@@ -15,12 +15,19 @@
  */
 package io.timelimit.android.logic
 
+import android.util.Log
+import io.timelimit.android.BuildConfig
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.sync.actions.AddUsedTimeActionItem
 import io.timelimit.android.sync.actions.AddUsedTimeActionVersion2
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
+import io.timelimit.android.sync.actions.dispatch.CategoryNotFoundException
 
 class UsedTimeUpdateHelper (val date: DateInTimezone) {
+    companion object {
+        private const val LOG_TAG = "UsedTimeUpdateHelper"
+    }
+
     val timeToAdd = mutableMapOf<String, Int>()
     val extraTimeToSubtract = mutableMapOf<String, Int>()
     var shouldDoAutoCommit = false
@@ -62,20 +69,30 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
 
         val categoryIds = timeToAdd.keys + extraTimeToSubtract.keys
 
-        ApplyActionUtil.applyAppLogicAction(
-                action = AddUsedTimeActionVersion2(
-                        dayOfEpoch = date.dayOfEpoch,
-                        items = categoryIds.map { categoryId ->
-                            AddUsedTimeActionItem(
-                                    categoryId = categoryId,
-                                    timeToAdd = timeToAdd[categoryId] ?: 0,
-                                    extraTimeToSubtract = extraTimeToSubtract[categoryId] ?: 0
-                            )
-                        }
-                ),
-                appLogic = appLogic,
-                ignoreIfDeviceIsNotConfigured = true
-        )
+        try {
+            ApplyActionUtil.applyAppLogicAction(
+                    action = AddUsedTimeActionVersion2(
+                            dayOfEpoch = date.dayOfEpoch,
+                            items = categoryIds.map { categoryId ->
+                                AddUsedTimeActionItem(
+                                        categoryId = categoryId,
+                                        timeToAdd = timeToAdd[categoryId] ?: 0,
+                                        extraTimeToSubtract = extraTimeToSubtract[categoryId] ?: 0
+                                )
+                            }
+                    ),
+                    appLogic = appLogic,
+                    ignoreIfDeviceIsNotConfigured = true
+            )
+        } catch (ex: CategoryNotFoundException) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "could not commit used times", ex)
+            }
+
+            // this is a very rare case if a category is deltete while it is used;
+            // in this case there could be some lost time
+            // changes for other categories, but it's no big problem
+        }
 
         timeToAdd.clear()
         extraTimeToSubtract.clear()

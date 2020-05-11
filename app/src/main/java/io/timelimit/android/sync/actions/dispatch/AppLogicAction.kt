@@ -78,7 +78,8 @@ object LocalDatabaseAppLogicActionDispatcher {
                 }
                 is AddUsedTimeActionVersion2 -> {
                     action.items.forEach { item ->
-                        database.category().getCategoryByIdSync(item.categoryId)!!
+                        database.category().getCategoryByIdSync(item.categoryId)
+                                ?: throw CategoryNotFoundException()
 
                         val updatedRows = database.usedTimes().addUsedTime(
                                 categoryId = item.categoryId,
@@ -335,3 +336,5 @@ object LocalDatabaseAppLogicActionDispatcher {
         }
     }
 }
+
+class CategoryNotFoundException: NullPointerException()
