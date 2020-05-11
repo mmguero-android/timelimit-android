@@ -36,6 +36,8 @@ import io.timelimit.android.databinding.FragmentSetupLocalModeBinding
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.mustread.MustReadFragment
+import io.timelimit.android.ui.update.UpdateConsentCard
+import io.timelimit.android.update.UpdateUtil
 import kotlinx.android.synthetic.main.fragment_setup_local_mode.*
 
 class SetupLocalModeFragment : Fragment() {
@@ -70,11 +72,18 @@ class SetupLocalModeFragment : Fragment() {
         binding.nextBtn.setOnClickListener {
             model.trySetupWithPassword(
                     set_password_view.readPassword(),
-                    SetupNetworkTimeVerification.readSelection(binding.networkTimeVerification)
+                    SetupNetworkTimeVerification.readSelection(binding.networkTimeVerification),
+                    enableUpdateChecks = binding.update.enableSwitch.isChecked
             )
         }
 
         SetupNetworkTimeVerification.prepareHelpButton(binding.networkTimeVerification, fragmentManager!!)
+
+        UpdateConsentCard.bind(
+                view = binding.update,
+                lifecycleOwner = viewLifecycleOwner,
+                database = DefaultAppLogic.with(context!!).database
+        )
 
         return binding.root
     }
@@ -95,7 +104,7 @@ class SetupLocalModeModel(application: Application): AndroidViewModel(applicatio
         status.value = Status.Idle
     }
 
-    fun trySetupWithPassword(parentPassword: String, networkTimeVerification: NetworkTime) {
+    fun trySetupWithPassword(parentPassword: String, networkTimeVerification: NetworkTime, enableUpdateChecks: Boolean) {
         runAsync {
             if (status.value != Status.Idle) {
                 throw IllegalStateException()
@@ -105,6 +114,7 @@ class SetupLocalModeModel(application: Application): AndroidViewModel(applicatio
 
             try {
                 DefaultAppLogic.with(getApplication()).appSetupLogic.setupForLocalUse(parentPassword, networkTimeVerification, getApplication())
+                UpdateUtil.setEnableChecks(getApplication(), enableUpdateChecks)
                 status.value = Status.Done
             } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) {

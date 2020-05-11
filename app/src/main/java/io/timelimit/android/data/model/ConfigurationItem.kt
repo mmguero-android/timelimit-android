@@ -95,7 +95,9 @@ enum class ConfigurationItemType {
     ExperimentalFlags,
     DefaultHomescreen,
     HomescreenDelay,
-    ParentModeKey
+    ParentModeKey,
+    EnableUpdates,
+    UpdateStatus
 }
 
 object ConfigurationItemTypeUtil {
@@ -118,6 +120,8 @@ object ConfigurationItemTypeUtil {
     private const val DEFAULT_HOMESCREEN = 18
     private const val HOMESCREEN_DELAY = 19
     private const val PARENT_MODE_KEY = 20
+    private const val ENABLE_UPDATES = 21
+    private const val UPDATE_STATUS = 22
 
     val TYPES = listOf(
             ConfigurationItemType.OwnDeviceId,
@@ -138,7 +142,9 @@ object ConfigurationItemTypeUtil {
             ConfigurationItemType.ExperimentalFlags,
             ConfigurationItemType.DefaultHomescreen,
             ConfigurationItemType.HomescreenDelay,
-            ConfigurationItemType.ParentModeKey
+            ConfigurationItemType.ParentModeKey,
+            ConfigurationItemType.EnableUpdates,
+            ConfigurationItemType.UpdateStatus
     )
 
     fun serialize(value: ConfigurationItemType) = when(value) {
@@ -161,6 +167,8 @@ object ConfigurationItemTypeUtil {
         ConfigurationItemType.DefaultHomescreen -> DEFAULT_HOMESCREEN
         ConfigurationItemType.HomescreenDelay -> HOMESCREEN_DELAY
         ConfigurationItemType.ParentModeKey -> PARENT_MODE_KEY
+        ConfigurationItemType.EnableUpdates -> ENABLE_UPDATES
+        ConfigurationItemType.UpdateStatus -> UPDATE_STATUS
     }
 
     fun parse(value: Int) = when(value) {
@@ -183,6 +191,8 @@ object ConfigurationItemTypeUtil {
         DEFAULT_HOMESCREEN -> ConfigurationItemType.DefaultHomescreen
         HOMESCREEN_DELAY -> ConfigurationItemType.HomescreenDelay
         PARENT_MODE_KEY -> ConfigurationItemType.ParentModeKey
+        ENABLE_UPDATES -> ConfigurationItemType.EnableUpdates
+        UPDATE_STATUS -> ConfigurationItemType.UpdateStatus
         else -> throw IllegalArgumentException()
     }
 }

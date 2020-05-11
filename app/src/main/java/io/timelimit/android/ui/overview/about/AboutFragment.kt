@@ -28,6 +28,7 @@ import io.timelimit.android.databinding.FragmentAboutBinding
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.update.UpdateView
 
 class AboutFragment : Fragment() {
     companion object {
@@ -105,6 +106,13 @@ class AboutFragment : Fragment() {
         }
 
         binding.showPremiumCard = !shownOutsideOfOverview
+
+        UpdateView.bind(
+                view = binding.update,
+                lifecycleOwner = viewLifecycleOwner,
+                fragmentManager = parentFragmentManager,
+                appLogic = logic
+        )
 
         return binding.root
     }

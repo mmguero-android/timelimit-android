@@ -30,6 +30,7 @@ import io.timelimit.android.sync.actions.*
 import io.timelimit.android.sync.network.ParentPassword
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.user.create.DefaultCategories
+import io.timelimit.android.update.UpdateUtil
 
 class SetupDeviceModel(application: Application): AndroidViewModel(application) {
     private val logic = DefaultAppLogic.with(application)
@@ -44,7 +45,8 @@ class SetupDeviceModel(application: Application): AndroidViewModel(application) 
             allowedAppsCategory: String,
             appsToNotWhitelist: Set<String>,
             model: ActivityViewModel,
-            networkTime: NetworkTime
+            networkTime: NetworkTime,
+            enableUpdateChecks: Boolean
     ) {
         if (statusInternal.value != SetupDeviceModelStatus.Ready) {
             return
@@ -160,6 +162,9 @@ class SetupDeviceModel(application: Application): AndroidViewModel(application) 
                     deviceId = deviceId,
                     userId = realUserId
             ))
+
+            // configure update check
+            UpdateUtil.setEnableChecks(getApplication(), enableUpdateChecks)
 
             if (model.tryDispatchParentActions(actions)) {
                 statusInternal.value = SetupDeviceModelStatus.Done

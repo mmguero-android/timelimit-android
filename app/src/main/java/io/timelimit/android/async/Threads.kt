@@ -25,4 +25,5 @@ object Threads {
     val network = Executors.newSingleThreadExecutor()
     val crypto = Executors.newSingleThreadExecutor()
     val backgroundOSInteraction = Executors.newSingleThreadExecutor()
+    val update = Executors.newSingleThreadExecutor()
 }

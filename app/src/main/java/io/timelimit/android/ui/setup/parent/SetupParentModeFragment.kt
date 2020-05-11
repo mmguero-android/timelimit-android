@@ -29,9 +29,11 @@ import io.timelimit.android.databinding.FragmentSetupParentModeBinding
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
+import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.network.StatusOfMailAddress
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragment
 import io.timelimit.android.ui.authentication.AuthenticateByMailFragmentListener
+import io.timelimit.android.ui.update.UpdateConsentCard
 
 class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
     val model: SetupParentModeModel by lazy { ViewModelProviders.of(this).get(SetupParentModeModel::class.java) }
@@ -118,13 +120,15 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
                             parentPassword = binding.password.readPassword(),
                             parentName = binding.prename.text.toString(),
                             deviceName = binding.deviceName.text.toString(),
-                            enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked
+                            enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked,
+                            enableUpdateChecks = binding.update.enableSwitch.isChecked
                     )
                 }
                 StatusOfMailAddress.MailAddressWithFamily -> {
                     model.addDeviceToFamily(
                             deviceName = binding.deviceName.text.toString(),
-                            enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked
+                            enableBackgroundSync = binding.backgroundSyncCheckbox.isChecked,
+                            enableUpdateChecks = binding.update.enableSwitch.isChecked
                     )
                 }
             }
@@ -135,6 +139,12 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
                 Navigation.findNavController(binding.root).popBackStack(R.id.overviewFragment, false)
             }
         })
+
+        UpdateConsentCard.bind(
+                view = binding.update,
+                lifecycleOwner = viewLifecycleOwner,
+                database = DefaultAppLogic.with(context!!).database
+        )
 
         return binding.root
     }

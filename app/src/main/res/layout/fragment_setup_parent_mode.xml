@@ -42,7 +42,8 @@
             android:id="@+id/scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <FrameLayout
+            <LinearLayout
+                android:orientation="vertical"
                 android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -76,7 +77,9 @@
                             android:visibility="@{safeUnbox(isNewFamily) ? View.VISIBLE : View.GONE}"
                             android:hint="@string/setup_parent_mode_field_name_hint"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content">
+                            <requestFocus />
+                        </EditText>
 
                         <TextView
                             android:textAppearance="?android:textAppearanceMedium"
@@ -123,20 +126,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
-                        <Button
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="4dp"
-                            android:background="?selectableItemBackground"
-                            android:enabled="@{safeUnbox(enableOkButton)}"
-                            android:id="@+id/ok"
-                            android:layout_gravity="end"
-                            android:text="@string/generic_ok"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
-            </FrameLayout>
+
+                <include
+                    layout="@layout/update_consent_card"
+                    android:id="@+id/update" />
+
+                <Button
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="?selectableItemBackground"
+                    android:enabled="@{safeUnbox(enableOkButton)}"
+                    android:id="@+id/ok"
+                    android:layout_gravity="end"
+                    android:text="@string/generic_ok"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
         </ScrollView>
 
         <FrameLayout

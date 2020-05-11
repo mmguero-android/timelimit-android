@@ -45,6 +45,7 @@ import io.timelimit.android.ui.manage.device.manage.advanced.ManageDeviceBackgro
 import io.timelimit.android.ui.mustread.MustReadFragment
 import io.timelimit.android.ui.overview.main.MainFragmentDirections
 import io.timelimit.android.ui.setup.SetupNetworkTimeVerification
+import io.timelimit.android.ui.update.UpdateConsentCard
 
 class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
     companion object {
@@ -305,11 +306,18 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
                     allowedAppsCategory = allowedAppsCategory,
                     appsToNotWhitelist = selectedAppsToNotWhitelist,
                     model = activity.getActivityViewModel(),
-                    networkTime = SetupNetworkTimeVerification.readSelection(binding.networkTimeVerification)
+                    networkTime = SetupNetworkTimeVerification.readSelection(binding.networkTimeVerification),
+                    enableUpdateChecks = binding.update.enableSwitch.isChecked
             )
         }
 
         SetupNetworkTimeVerification.prepareHelpButton(binding.networkTimeVerification, fragmentManager!!)
+
+        UpdateConsentCard.bind(
+                view = binding.update,
+                lifecycleOwner = viewLifecycleOwner,
+                database = logic.database
+        )
 
         return binding.root
     }

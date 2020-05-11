@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="update">Update</string>
+    <string name="update_unsupported_text">This build does not have an integrated
+        updater. Check the place where you downloaded TimeLimit to get updates.
+    </string>
+    <string name="update_downloading">Downloading update</string>
+    <string name="update_unavailable">There is currently no update available</string>
+    <string name="update_available">TimeLimit %s is available. Changes:\n%s</string>
+    <string name="update_available_download">Download</string>
+    <string name="update_permission_required_text">TimeLimit needs your permission to update itself</string>
+    <string name="update_privacy">TimeLimit can automatically check for updates.
+        For this, it queries %s.
+    </string>
+    <string name="update_privacy_enable">Enable update checks</string>
+    <string name="update_toast_new_release">There seems to be a new version now</string>
+    <string name="update_disabled">The update checks are disabled</string>
+    <string name="update_enable">Enable</string>
+    <string name="update_enable_switch">Enable update checks</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_checking">Checking for updates</string>
+    <string name="update_checking_toast_unchanged">No new update</string>
+    <string name="update_toast_needs_permission">TimeLimit needs your permission to install updates</string>
+    <string name="update_installing">Installing update</string>
+    <string name="update_failure_toast">The update failed; The system reported the error %s</string>
+    <string name="update_notification_title">Update available</string>
+    <string name="update_notification_text">Tap for info</string>
+</resources>

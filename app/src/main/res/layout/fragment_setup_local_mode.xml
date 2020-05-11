@@ -37,6 +37,10 @@
                 android:id="@+id/network_time_verification"
                 layout="@layout/setup_network_time_verification" />
 
+            <include
+                layout="@layout/update_consent_card"
+                android:id="@+id/update" />
+
             <androidx.cardview.widget.CardView
                 app:cardUseCompatPadding="true"
                 android:layout_width="match_parent"

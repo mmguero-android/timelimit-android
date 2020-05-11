@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="update">Update</string>
+    <string name="update_unsupported_text">Dieser Build hat keinen integrierten Updater.
+        Sehen Sie an der Stelle, von der aus Sie TimeLimit installiert haben, nach Updates.
+    </string>
+    <string name="update_downloading">Update wird heruntergeladen</string>
+    <string name="update_unavailable">Momentan ist kein Update verfügbar</string>
+    <string name="update_available">TimeLimit %s ist verfügbar. Änderungen:\n%s</string>
+    <string name="update_available_download">Herunterladen</string>
+    <string name="update_permission_required_text">TimeLimit benötigt Ihre Berechtigung, um sich zu aktualisieren</string>
+    <string name="update_privacy">TimeLimit kann automatisch nach Updates suchen. Dafür
+        wird regelmäßig %s abgefragt.
+    </string>
+    <string name="update_privacy_enable">Updateprüfung aktivieren</string>
+    <string name="update_toast_new_release">Inzwischen gibt es eine andere Version</string>
+    <string name="update_disabled">Die Updateprüfung ist deaktiviert</string>
+    <string name="update_enable">Aktivieren</string>
+    <string name="update_enable_switch">Updateprüfung aktivieren</string>
+    <string name="update_check">Jetzt nach Updates suchen</string>
+    <string name="update_checking">Es wird nach Updates gesucht</string>
+    <string name="update_checking_toast_unchanged">Keine neuen Updates</string>
+    <string name="update_toast_needs_permission">TimeLimit benötigt Ihre Berechtigung, um Updates zu installieren</string>
+    <string name="update_installing">Update wird installiert</string>
+    <string name="update_failure_toast">Das Update ist fehlgeschlagen; Das System meldete das Problem %s</string>
+    <string name="update_notification_title">Update verfügbar</string>
+    <string name="update_notification_text">Für weitere Informationen tippen</string>
+</resources>

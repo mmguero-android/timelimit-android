@@ -104,6 +104,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.update.UpdateActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:taskAffinity=":update"
+            android:launchMode="singleTop" />
+
         <!-- system integration -->
 
         <receiver android:name=".integration.platform.android.receiver.BootReceiver">

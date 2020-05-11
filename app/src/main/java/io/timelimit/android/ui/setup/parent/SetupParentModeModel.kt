@@ -38,6 +38,7 @@ import io.timelimit.android.sync.network.ParentPassword
 import io.timelimit.android.sync.network.StatusOfMailAddressResponse
 import io.timelimit.android.sync.network.api.ConflictHttpError
 import io.timelimit.android.sync.network.api.UnauthorizedHttpError
+import io.timelimit.android.update.UpdateUtil
 import io.timelimit.android.work.PeriodicSyncInBackgroundWorker
 
 class SetupParentModeModel(application: Application): AndroidViewModel(application) {
@@ -76,7 +77,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
         }
     }
 
-    fun createFamily(parentPassword: String, parentName: String, deviceName: String, enableBackgroundSync: Boolean) {
+    fun createFamily(parentPassword: String, parentName: String, deviceName: String, enableBackgroundSync: Boolean, enableUpdateChecks: Boolean) {
         val database = logic.database
 
         if (isDoingSetup.value!!) {
@@ -125,6 +126,8 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                     PeriodicSyncInBackgroundWorker.enable()
                 }
 
+                UpdateUtil.setEnableChecks(getApplication(), enableUpdateChecks)
+
                 // the fragment detects the success and leaves this screen
             } catch (ex: ConflictHttpError) {
                 mailAuthTokenInternal.value = null
@@ -148,7 +151,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
         }
     }
 
-    fun addDeviceToFamily(deviceName: String, enableBackgroundSync: Boolean) {
+    fun addDeviceToFamily(deviceName: String, enableBackgroundSync: Boolean, enableUpdateChecks: Boolean) {
         val database = logic.database
 
         if (isDoingSetup.value!!) {
@@ -193,6 +196,8 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                 if (enableBackgroundSync) {
                     PeriodicSyncInBackgroundWorker.enable()
                 }
+
+                UpdateUtil.setEnableChecks(getApplication(), enableUpdateChecks)
 
                 // the fragment detects the success and leaves this screen
             } catch (ex: ConflictHttpError) {

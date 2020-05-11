@@ -17,6 +17,7 @@ package io.timelimit.android.data.dao
 
 import android.content.ComponentName
 import android.util.Base64
+import android.util.JsonWriter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.room.*
@@ -24,8 +25,11 @@ import io.timelimit.android.data.model.ConfigurationItem
 import io.timelimit.android.data.model.ConfigurationItemType
 import io.timelimit.android.data.model.ConfigurationItemTypeConverter
 import io.timelimit.android.data.model.ConfigurationItemTypeUtil
+import io.timelimit.android.extensions.toJsonReader
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.map
+import io.timelimit.android.update.UpdateStatus
+import java.io.StringWriter
 
 @Dao
 @TypeConverters(ConfigurationItemTypeConverter::class)
@@ -276,4 +280,32 @@ abstract class ConfigDao {
     fun setParentModeKeySync(key: ByteArray) = updateValueSync(ConfigurationItemType.ParentModeKey, Base64.encodeToString(key, 0))
     fun getParentModeKeySync() = getValueOfKeySync(ConfigurationItemType.ParentModeKey)?.let { value -> Base64.decode(value, 0) }
     fun getParentModeKeyLive() = getValueOfKeyAsync(ConfigurationItemType.ParentModeKey).map { value -> value?.let { Base64.decode(it, 0) } }
+
+    fun areUpdatesEnabledLive() = getValueOfKeyAsync(ConfigurationItemType.EnableUpdates).map { it == "1" }
+    fun getUpdateStatusLive() = getValueOfKeyAsync(ConfigurationItemType.UpdateStatus).map {
+        try {
+            it?.let { it.toJsonReader().use { UpdateStatus.parse(it) } }
+        } catch (ex: Exception) {
+            null
+        }
+    }
+    fun getUpdateStatusSync() = getValueOfKeySync(ConfigurationItemType.UpdateStatus).let {
+        try {
+            it?.let { it.toJsonReader().use { UpdateStatus.parse(it) } }
+        } catch (ex: Exception) {
+            null
+        }
+    }
+
+    fun setUpdatesEnabledSync(enable: Boolean) = updateValueSync(ConfigurationItemType.EnableUpdates, if (enable) "1" else "0")
+    fun setUpdateStatus(status: UpdateStatus) = updateValueSync(
+            ConfigurationItemType.UpdateStatus,
+            StringWriter().use {
+                JsonWriter(it).use {
+                    status.serialize(it)
+                }
+
+                it.buffer.toString()
+            }
+    )
 }

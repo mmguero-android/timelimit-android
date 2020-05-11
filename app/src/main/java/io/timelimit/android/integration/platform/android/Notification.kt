@@ -28,6 +28,7 @@ object NotificationIds {
     const val APP_RESET = 4
     const val USER_NOTIFICATION = 5
     const val TIME_WARNING = 6
+    const val LOCAL_UPDATE_NOTIFICATION = 7
 }
 
 object NotificationChannels {
@@ -128,5 +129,7 @@ object PendingIntentIds {
     const val REVOKE_TEMPORARILY_ALLOWED = 2
     const val SWITCH_TO_DEFAULT_USER = 3
     const val SYNC_NOTIFICATIONS = 4
+    const val UPDATE_STATUS = 5
+    const val OPEN_UPDATER = 6
     val DYNAMIC_NOTIFICATION_RANGE = 100..10000
 }
