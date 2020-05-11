@@ -89,7 +89,7 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
                 Log.d(LOG_TAG, "could not commit used times", ex)
             }
 
-            // this is a very rare case if a category is deltete while it is used;
+            // this is a very rare case if a category is deleted while it is used;
             // in this case there could be some lost time
             // changes for other categories, but it's no big problem
         }
