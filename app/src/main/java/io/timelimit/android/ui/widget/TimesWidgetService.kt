@@ -18,7 +18,6 @@ package io.timelimit.android.ui.widget
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
-import android.os.Handler
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.lifecycle.LiveData
@@ -29,14 +28,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.util.TimeTextUtil
 
 class TimesWidgetService: RemoteViewsService() {
-    private val handler = Handler()
     private val appWidgetManager: AppWidgetManager by lazy { AppWidgetManager.getInstance(this) }
-
-    private val refresh = Runnable {
-        val widgetIds = appWidgetManager.getAppWidgetIds(ComponentName(this, TimesWidgetProvider::class.java))
-
-        appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, android.R.id.list)
-    }
 
     private val categoriesLive: LiveData<List<TimesWidgetItem>> by lazy {
         TimesWidgetItems.with(DefaultAppLogic.with(this))
@@ -48,7 +40,9 @@ class TimesWidgetService: RemoteViewsService() {
     private val categoriesObserver = Observer<List<TimesWidgetItem>> {
         categoriesInput = it
 
-        handler.post(refresh)
+        val widgetIds = appWidgetManager.getAppWidgetIds(ComponentName(this, TimesWidgetProvider::class.java))
+
+        appWidgetManager.notifyAppWidgetViewDataChanged(widgetIds, android.R.id.list)
     }
 
     private val factory = object : RemoteViewsFactory {
