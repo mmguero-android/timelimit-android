@@ -49,7 +49,7 @@ class AboutFragment : Fragment() {
 
         mergeLiveData(
                 logic.database.config().getDeviceAuthTokenAsync(), logic.database.config().getFullVersionUntilAsync()
-        ).observe(this, Observer {
+        ).observe(viewLifecycleOwner, Observer {
             val (deviceAuthToken, fullVersionUntil) = it!!
 
             if (deviceAuthToken.isNullOrEmpty()) {
@@ -103,6 +103,8 @@ class AboutFragment : Fragment() {
                 listener.onShowDiagnoseScreen()
             }
         }
+
+        binding.showPremiumCard = !shownOutsideOfOverview
 
         return binding.root
     }

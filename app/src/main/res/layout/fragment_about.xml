@@ -34,6 +34,10 @@
             name="customServerUrl"
             type="String" />
 
+        <variable
+            name="showPremiumCard"
+            type="boolean" />
+
         <import type="io.timelimit.android.ui.overview.about.FullVersionStatus" />
         <import type="io.timelimit.android.BuildConfig" />
         <import type="android.text.TextUtils" />
@@ -90,6 +94,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:visibility="@{showPremiumCard ? View.VISIBLE : View.GONE}"
                 android:onClick="@{() -> handlers.startPurchase()}"
                 android:foreground="?selectableItemBackground"
                 app:cardUseCompatPadding="true"
