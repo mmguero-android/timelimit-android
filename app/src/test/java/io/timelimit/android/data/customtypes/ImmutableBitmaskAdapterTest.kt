@@ -22,6 +22,7 @@ class ImmutableBitmaskAdapterTest {
         assertEquals(parsed, emptySet)
     }
 
+    // @Test
     fun testRandomMap() {
         val inputSet = BitSet()
         val random = Random()

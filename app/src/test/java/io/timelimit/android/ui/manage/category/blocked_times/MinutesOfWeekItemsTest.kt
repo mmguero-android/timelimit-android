@@ -6,16 +6,16 @@ import org.junit.Test
 class MinutesOfWeekItemsTest {
     @Test
     fun canGetAllItems() {
-        for (i in 0..(ItemUtils.itemsPerWeek - 1)) {
-            ItemUtils.getItemAtPosition(i)
+        for (i in 0 until MinuteOfWeekItems.itemsPerWeek) {
+            MinuteOfWeekItems.getItemAtPosition(i)
         }
     }
 
     @Test
     fun reverseLookupReturnsSameItem() {
-        for (i in 0..(ItemUtils.itemsPerWeek - 1)) {
-            val item = ItemUtils.getItemAtPosition(i)
-            val index = ItemUtils.getPositionOfItem(item)
+        for (i in 0 until MinuteOfWeekItems.itemsPerWeek) {
+            val item = MinuteOfWeekItems.getItemAtPosition(i)
+            val index = MinuteOfWeekItems.getPositionOfItem(item)
 
             assertEquals(item.toString(), i, index)
         }
