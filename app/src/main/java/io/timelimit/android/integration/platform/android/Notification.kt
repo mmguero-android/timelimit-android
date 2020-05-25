@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.core.app.NotificationCompat
 import io.timelimit.android.R
 
 object NotificationIds {
@@ -51,6 +52,7 @@ object NotificationChannels {
                         setSound(null, null)
                         enableVibration(false)
                         setShowBadge(false)
+                        lockscreenVisibility = NotificationCompat.VISIBILITY_SECRET
                     }
             )
         }
