@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -18,6 +18,7 @@
     <string name="manage_device_activity_level_blocking_text">
         This allows (depending on the App) blocking some features within an App.
         If you don\'t understand what Android-Activities are, don\'t enable this.
+        You can add activities to a category by holding the App at the add category apps screen.
     </string>
     <string name="manage_device_activity_level_blocking_checkbox">Enable activity level blocking</string>
 </resources>
