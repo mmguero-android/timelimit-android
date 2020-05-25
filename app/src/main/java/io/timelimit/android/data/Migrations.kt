@@ -17,6 +17,8 @@ package io.timelimit.android.data
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import io.timelimit.android.data.model.TimeLimitRule
+import io.timelimit.android.extensions.MinuteOfDay
 
 object DatabaseMigrations {
     val MIGRATE_TO_V2 = object: Migration(1, 2) {
@@ -197,6 +199,23 @@ object DatabaseMigrations {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `user_key` (`user_id` TEXT NOT NULL, `key` BLOB NOT NULL, `last_use` INTEGER NOT NULL, PRIMARY KEY(`user_id`), FOREIGN KEY(`user_id`) REFERENCES `user`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_user_key_key` ON `user_key` (`key`)")
+        }
+    }
+
+    val MIGRATE_TO_V29 = object: Migration(28, 29) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `time_limit_rule` ADD COLUMN `start_minute_of_day` INTEGER NOT NULL DEFAULT ${TimeLimitRule.MIN_START_MINUTE}")
+            database.execSQL("ALTER TABLE `time_limit_rule` ADD COLUMN `end_minute_of_day` INTEGER NOT NULL DEFAULT ${TimeLimitRule.MAX_END_MINUTE}")
+            database.execSQL("ALTER TABLE `time_limit_rule` ADD COLUMN `session_duration_milliseconds` INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("ALTER TABLE `time_limit_rule` ADD COLUMN `session_pause_milliseconds` INTEGER NOT NULL DEFAULT 0")
+
+            database.execSQL("ALTER TABLE `used_time` RENAME TO `used_time_old`")
+            database.execSQL("CREATE TABLE IF NOT EXISTS `used_time` (`day_of_epoch` INTEGER NOT NULL, `used_time` INTEGER NOT NULL, `category_id` TEXT NOT NULL, `start_time_of_day` INTEGER NOT NULL, `end_time_of_day` INTEGER NOT NULL, PRIMARY KEY(`category_id`, `day_of_epoch`, `start_time_of_day`, `end_time_of_day`))")
+            database.execSQL("INSERT INTO `used_time` SELECT `day_of_epoch`, `used_time`, `category_id`, ${MinuteOfDay.MIN} AS `start_time_of_day`, ${MinuteOfDay.MAX} AS `end_time_of_day` FROM `used_time_old`")
+            database.execSQL("DROP TABLE `used_time_old`")
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS `session_duration` (`category_id` TEXT NOT NULL, `max_session_duration` INTEGER NOT NULL, `session_pause_duration` INTEGER NOT NULL, `start_minute_of_day` INTEGER NOT NULL, `end_minute_of_day` INTEGER NOT NULL, `last_usage` INTEGER NOT NULL, `last_session_duration` INTEGER NOT NULL, PRIMARY KEY(`category_id`, `max_session_duration`, `session_pause_duration`, `start_minute_of_day`, `end_minute_of_day`), FOREIGN KEY(`category_id`) REFERENCES `category`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `session_duration_index_category_id` ON `session_duration` (`category_id`)")
         }
     }
 }

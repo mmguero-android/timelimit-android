@@ -16,10 +16,8 @@
 package io.timelimit.android.sync.actions.dispatch
 
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.model.App
-import io.timelimit.android.data.model.AppActivity
-import io.timelimit.android.data.model.HadManipulationFlag
-import io.timelimit.android.data.model.UsedTimeItem
+import io.timelimit.android.data.model.*
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.integration.platform.NewPermissionStatusUtil
 import io.timelimit.android.integration.platform.ProtectionLevelUtil
 import io.timelimit.android.integration.platform.RuntimePermissionStatusUtil
@@ -46,7 +44,9 @@ object LocalDatabaseAppLogicActionDispatcher {
                         val updatedRows = database.usedTimes().addUsedTime(
                                 categoryId = categoryId,
                                 timeToAdd = action.timeToAdd,
-                                dayOfEpoch = action.dayOfEpoch
+                                dayOfEpoch = action.dayOfEpoch,
+                                start = MinuteOfDay.MIN,
+                                end = MinuteOfDay.MAX
                         )
 
                         if (updatedRows == 0) {
@@ -55,7 +55,9 @@ object LocalDatabaseAppLogicActionDispatcher {
                             database.usedTimes().insertUsedTime(UsedTimeItem(
                                     categoryId = categoryId,
                                     dayOfEpoch = action.dayOfEpoch,
-                                    usedMillis = action.timeToAdd.toLong()
+                                    usedMillis = action.timeToAdd.toLong(),
+                                    startTimeOfDay = MinuteOfDay.MIN,
+                                    endTimeOfDay = MinuteOfDay.MAX
                             ))
                         }
 
@@ -81,22 +83,67 @@ object LocalDatabaseAppLogicActionDispatcher {
                         database.category().getCategoryByIdSync(item.categoryId)
                                 ?: throw CategoryNotFoundException()
 
-                        val updatedRows = database.usedTimes().addUsedTime(
-                                categoryId = item.categoryId,
-                                timeToAdd = item.timeToAdd,
-                                dayOfEpoch = action.dayOfEpoch
-                        )
-
-                        if (updatedRows == 0) {
-                            // create new entry
-
-                            database.usedTimes().insertUsedTime(UsedTimeItem(
+                        fun handle(start: Int, end: Int) {
+                            val updatedRows = database.usedTimes().addUsedTime(
                                     categoryId = item.categoryId,
+                                    timeToAdd = item.timeToAdd,
                                     dayOfEpoch = action.dayOfEpoch,
-                                    usedMillis = item.timeToAdd.toLong()
-                            ))
+                                    start = start,
+                                    end = end
+                            )
+
+                            if (updatedRows == 0) {
+                                // create new entry
+
+                                database.usedTimes().insertUsedTime(UsedTimeItem(
+                                        categoryId = item.categoryId,
+                                        dayOfEpoch = action.dayOfEpoch,
+                                        usedMillis = item.timeToAdd.toLong(),
+                                        startTimeOfDay = start,
+                                        endTimeOfDay = end
+                                ))
+                            }
                         }
 
+                        handle(MinuteOfDay.MIN, MinuteOfDay.MAX)
+                        item.additionalCountingSlots.forEach { handle(it.start, it.end) }
+
+                        kotlin.run {
+                            val hasTrustedTimestamp = action.trustedTimestamp != 0L
+
+                            item.sessionDurationLimits.forEach { limit ->
+                                val oldItem = database.sessionDuration().getSessionDurationItemSync(
+                                        categoryId = item.categoryId,
+                                        maxSessionDuration = limit.maxSessionDuration,
+                                        sessionPauseDuration = limit.sessionPauseDuration,
+                                        startMinuteOfDay = limit.startMinuteOfDay,
+                                        endMinuteOfDay = limit.endMinuteOfDay
+                                )
+
+                                val newItem = oldItem?.copy(
+                                        lastUsage = if (hasTrustedTimestamp) action.trustedTimestamp else oldItem.lastUsage,
+                                        lastSessionDuration = if (hasTrustedTimestamp && action.trustedTimestamp - item.timeToAdd > oldItem.lastUsage + oldItem.sessionPauseDuration)
+                                            item.timeToAdd.toLong()
+                                        else
+                                            oldItem.lastSessionDuration + item.timeToAdd.toLong()
+                                ) ?: SessionDuration(
+                                        categoryId = item.categoryId,
+                                        maxSessionDuration = limit.maxSessionDuration,
+                                        sessionPauseDuration = limit.sessionPauseDuration,
+                                        startMinuteOfDay = limit.startMinuteOfDay,
+                                        endMinuteOfDay = limit.endMinuteOfDay,
+                                        lastSessionDuration = item.timeToAdd.toLong(),
+                                        // this will cause a small loss of session durations
+                                        lastUsage = if (hasTrustedTimestamp) action.trustedTimestamp else 0
+                                )
+
+                                if (oldItem == null) {
+                                    database.sessionDuration().insertSessionDurationItemSync(newItem)
+                                } else {
+                                    database.sessionDuration().updateSessionDurationItemSync(newItem)
+                                }
+                            }
+                        }
 
                         if (item.extraTimeToSubtract != 0) {
                             database.category().subtractCategoryExtraTime(

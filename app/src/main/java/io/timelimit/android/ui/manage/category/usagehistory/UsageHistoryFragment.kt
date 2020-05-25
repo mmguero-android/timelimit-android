@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,11 +42,11 @@ class UsageHistoryFragment : Fragment() {
         val adapter = UsageHistoryAdapter()
 
         LivePagedListBuilder(
-                database.usedTimes().getUsedTimesByCategoryId(params.categoryId),
+                database.usedTimes().getUsedTimeListItemsByCategoryId(params.categoryId),
                 10
         )
                 .build()
-                .observe(this, Observer {
+                .observe(viewLifecycleOwner, Observer {
                     binding.isEmpty = it.isEmpty()
                     adapter.submitList(it)
                 })

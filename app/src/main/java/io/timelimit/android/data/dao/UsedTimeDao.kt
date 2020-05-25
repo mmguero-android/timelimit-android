@@ -15,14 +15,13 @@
  */
 package io.timelimit.android.data.dao
 
-import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import io.timelimit.android.data.model.UsedTimeItem
+import io.timelimit.android.data.model.UsedTimeListItem
 import io.timelimit.android.livedata.ignoreUnchanged
 
 @Dao
@@ -30,16 +29,8 @@ abstract class UsedTimeDao {
     @Query("SELECT * FROM used_time WHERE category_id = :categoryId AND day_of_epoch >= :startingDayOfEpoch AND day_of_epoch <= :endDayOfEpoch")
     protected abstract fun getUsedTimesOfWeekInternal(categoryId: String, startingDayOfEpoch: Int, endDayOfEpoch: Int): LiveData<List<UsedTimeItem>>
 
-    fun getUsedTimesOfWeek(categoryId: String, firstDayOfWeekAsEpochDay: Int): LiveData<SparseArray<UsedTimeItem>> {
-        return Transformations.map(getUsedTimesOfWeekInternal(categoryId, firstDayOfWeekAsEpochDay, firstDayOfWeekAsEpochDay + 6).ignoreUnchanged()) {
-            val result = SparseArray<UsedTimeItem>()
-
-            it.forEach {
-                result.put(it.dayOfEpoch - firstDayOfWeekAsEpochDay, it)
-            }
-
-            result
-        }
+    fun getUsedTimesOfWeek(categoryId: String, firstDayOfWeekAsEpochDay: Int): LiveData<List<UsedTimeItem>> {
+        return getUsedTimesOfWeekInternal(categoryId, firstDayOfWeekAsEpochDay, firstDayOfWeekAsEpochDay + 6).ignoreUnchanged()
     }
 
     @Insert
@@ -48,14 +39,11 @@ abstract class UsedTimeDao {
     @Insert
     abstract fun insertUsedTimes(item: List<UsedTimeItem>)
 
-    @Query("UPDATE used_time SET used_time = :newUsedTime WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch")
-    abstract fun updateUsedTime(categoryId: String, dayOfEpoch: Int, newUsedTime: Long)
+    @Query("UPDATE used_time SET used_time = used_time + :timeToAdd WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch AND start_time_of_day = :start AND end_time_of_day = :end")
+    abstract fun addUsedTime(categoryId: String, dayOfEpoch: Int, timeToAdd: Int, start: Int, end: Int): Int
 
-    @Query("UPDATE used_time SET used_time = used_time + :timeToAdd WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch")
-    abstract fun addUsedTime(categoryId: String, dayOfEpoch: Int, timeToAdd: Int): Int
-
-    @Query("SELECT * FROM used_time WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch")
-    abstract fun getUsedTimeItem(categoryId: String, dayOfEpoch: Int): LiveData<UsedTimeItem?>
+    @Query("SELECT * FROM used_time WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch AND start_time_of_day = :start AND end_time_of_day = :end")
+    abstract fun getUsedTimeItemSync(categoryId: String, dayOfEpoch: Int, start: Int, end: Int): UsedTimeItem?
 
     @Query("DELETE FROM used_time WHERE category_id = :categoryId")
     abstract fun deleteUsedTimeItems(categoryId: String)
@@ -66,12 +54,13 @@ abstract class UsedTimeDao {
     @Query("SELECT * FROM used_time LIMIT :pageSize OFFSET :offset")
     abstract fun getUsedTimePageSync(offset: Int, pageSize: Int): List<UsedTimeItem>
 
-    @Query("SELECT * FROM used_time WHERE category_id = :categoryId ORDER BY day_of_epoch DESC")
-    abstract fun getUsedTimesByCategoryId(categoryId: String): DataSource.Factory<Int, UsedTimeItem>
-
     @Query("SELECT * FROM used_time WHERE category_id IN (:categoryIds) AND day_of_epoch >= :startingDayOfEpoch AND day_of_epoch <= :endDayOfEpoch")
     abstract fun getUsedTimesByDayAndCategoryIds(categoryIds: List<String>, startingDayOfEpoch: Int, endDayOfEpoch: Int): LiveData<List<UsedTimeItem>>
 
     @Query("SELECT * FROM used_time")
     abstract fun getAllUsedTimeItemsSync(): List<UsedTimeItem>
+
+    // breaking it into multiple lines causes issues during compilation ...
+    @Query("SELECT 2 AS type, start_time_of_day AS startMinuteOfDay, end_time_of_day AS endMinuteOfDay, used_time AS duration, day_of_epoch AS day, NULL AS lastUsage, NULL AS maxSessionDuration, NULL AS pauseDuration FROM used_time WHERE category_id = :categoryId UNION ALL SELECT 1 AS type, start_minute_of_day AS startMinuteOfDay, end_minute_of_day AS endMinuteOfDay, last_session_duration AS duration, NULL AS day, last_usage AS lastUsage, max_session_duration AS maxSessionDuration, session_pause_duration AS pauseDuration FROM session_duration WHERE category_id = :categoryId ORDER BY type, day DESC, lastUsage DESC, startMinuteOfDay, endMinuteOfDay")
+    abstract fun getUsedTimeListItemsByCategoryId(categoryId: String): DataSource.Factory<Int, UsedTimeListItem>
 }

@@ -26,7 +26,7 @@ import io.timelimit.android.databinding.ViewSelectTimeSpanBinding
 import io.timelimit.android.util.TimeTextUtil
 import kotlin.properties.Delegates
 
-class SelectTimeSpanView(context: Context, attributeSet: AttributeSet): FrameLayout(context, attributeSet) {
+class SelectTimeSpanView(context: Context, attributeSet: AttributeSet? = null): FrameLayout(context, attributeSet) {
     private val binding = ViewSelectTimeSpanBinding.inflate(LayoutInflater.from(context), this, false)
 
     init {

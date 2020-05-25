@@ -360,7 +360,24 @@ object ApplyServerDataStatus {
                                 UsedTimeItem(
                                         dayOfEpoch = it.dayOfEpoch,
                                         usedMillis = it.usedMillis,
-                                        categoryId = categoryId
+                                        categoryId = categoryId,
+                                        startTimeOfDay = it.startTimeOfDay,
+                                        endTimeOfDay = it.endTimeOfDay
+                                )
+                            }
+                    )
+
+                    database.sessionDuration().deleteByCategoryId(categoryId)
+                    database.sessionDuration().insertSessionDurationItemsSync(
+                            newUsedTime.sessionDurations.map {
+                                SessionDuration(
+                                        categoryId = categoryId,
+                                        maxSessionDuration = it.maxSessionDuration,
+                                        sessionPauseDuration = it.sessionPauseDuration,
+                                        startMinuteOfDay = it.startMinuteOfDay,
+                                        endMinuteOfDay = it.endMinuteOfDay,
+                                        lastUsage = it.lastUsage,
+                                        lastSessionDuration = it.lastSessionDuration
                                 )
                             }
                     )

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,28 @@
 package io.timelimit.android.ui.manage.category.usagehistory
 
 import android.text.format.DateFormat
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import io.timelimit.android.data.model.UsedTimeItem
+import io.timelimit.android.R
+import io.timelimit.android.data.model.UsedTimeListItem
 import io.timelimit.android.databinding.FragmentUsageHistoryItemBinding
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.util.TimeTextUtil
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneOffset
 import java.util.*
 
-class UsageHistoryAdapter: PagedListAdapter<UsedTimeItem, UsageHistoryViewHolder>(diffCallback) {
+class UsageHistoryAdapter: PagedListAdapter<UsedTimeListItem, UsageHistoryViewHolder>(diffCallback) {
     companion object {
-        private val diffCallback = object: DiffUtil.ItemCallback<UsedTimeItem>() {
-            override fun areContentsTheSame(oldItem: UsedTimeItem, newItem: UsedTimeItem) = oldItem == newItem
-            override fun areItemsTheSame(oldItem: UsedTimeItem, newItem: UsedTimeItem) =
-                    (oldItem.dayOfEpoch == newItem.dayOfEpoch) && (oldItem.categoryId == newItem.categoryId)
+        private val diffCallback = object: DiffUtil.ItemCallback<UsedTimeListItem>() {
+            override fun areContentsTheSame(oldItem: UsedTimeListItem, newItem: UsedTimeListItem) = oldItem == newItem
+            override fun areItemsTheSame(oldItem: UsedTimeListItem, newItem: UsedTimeListItem) =
+                    (oldItem.day == newItem.day) && (oldItem.startMinuteOfDay == newItem.startMinuteOfDay) &&
+                            (oldItem.endMinuteOfDay == newItem.endMinuteOfDay) && (oldItem.maxSessionDuration == newItem.maxSessionDuration)
         }
     }
 
@@ -50,17 +54,35 @@ class UsageHistoryAdapter: PagedListAdapter<UsedTimeItem, UsageHistoryViewHolder
         val binding = holder.binding
         val context = binding.root.context
 
-        if (item == null) {
+        val timeAreaString = if (item == null || item.startMinuteOfDay == MinuteOfDay.MIN && item.endMinuteOfDay == MinuteOfDay.MAX)
+            null
+        else
+            context.getString(R.string.usage_history_time_area, MinuteOfDay.format(item.startMinuteOfDay), MinuteOfDay.format(item.endMinuteOfDay))
+
+        if (item?.day != null) {
+            val dateObject = LocalDate.ofEpochDay(item.day)
+            val dateString = DateFormat.getDateFormat(context).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }.format(Date(dateObject.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000L))
+
+            binding.date = dateString
+            binding.timeArea = timeAreaString
+            binding.usedTime = TimeTextUtil.used(item.duration.toInt(), context)
+        } else if (item?.lastUsage != null && item.maxSessionDuration != null && item.pauseDuration != null) {
+            binding.date = context.getString(
+                    R.string.usage_history_item_session_duration_limit,
+                    TimeTextUtil.time(item.maxSessionDuration.toInt(), context),
+                    TimeTextUtil.time(item.pauseDuration.toInt(), context)
+            )
+            binding.timeArea = timeAreaString
+            binding.usedTime = TimeTextUtil.used(item.duration.toInt(), context) + "\n" +
+                    context.getString(
+                            R.string.usage_history_item_last_usage,
+                            DateUtils.formatDateTime(context, item.lastUsage, DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_SHOW_DATE)
+                    )
+        } else {
             binding.date = ""
             binding.usedTime = ""
-        } else {
-            val date = LocalDate.ofEpochDay(item.dayOfEpoch.toLong())
-
-            binding.date = DateFormat.getDateFormat(context).apply {
-                timeZone = TimeZone.getTimeZone("UTC")
-            }.format(Date(date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000L))
-
-            binding.usedTime = TimeTextUtil.used(item.usedMillis.toInt(), context)
         }
     }
 }

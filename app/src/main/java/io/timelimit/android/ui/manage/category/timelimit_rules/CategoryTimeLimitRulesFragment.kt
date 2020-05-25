@@ -74,14 +74,19 @@ class CategoryTimeLimitRulesFragment : Fragment(), EditTimeLimitRuleDialogFragme
 
         val userDate = database.user().getUserByIdLive(params.childId).getDateLive(logic.realTimeLogic)
 
-        val usedTimeItems = userDate.switchMap {
-            date ->
+        userDate.switchMap { date ->
+            val firstDayOfWeekAsEpochDay = date.dayOfEpoch - date.dayOfWeek
 
             database.usedTimes().getUsedTimesOfWeek(
                     categoryId = params.categoryId,
-                    firstDayOfWeekAsEpochDay = date.dayOfEpoch - date.dayOfWeek
-            )
-        }
+                    firstDayOfWeekAsEpochDay = firstDayOfWeekAsEpochDay
+            ).map { res ->
+                firstDayOfWeekAsEpochDay to res
+            }
+        }.observe(viewLifecycleOwner, Observer {
+            adapter.epochDayOfStartOfWeek = it.first
+            adapter.usedTimes = it.second
+        })
 
         val hasHiddenIntro = database.config().wereHintsShown(HintsToShow.TIME_LIMIT_RULE_INTRODUCTION)
 
@@ -97,15 +102,9 @@ class CategoryTimeLimitRulesFragment : Fragment(), EditTimeLimitRuleDialogFragme
                     listOf(TimeLimitRuleIntroductionItem) + baseList
                 }
             }
-        }.observe(this, Observer {
+        }.observe(viewLifecycleOwner, Observer {
             adapter.data = it
         })
-
-        usedTimeItems.observe(this, Observer {
-            usedTimes ->
-
-            adapter.usedTimes = (0..6).map { usedTimes[it]?.usedMillis ?: 0 } }
-        )
 
         adapter.handlers = object: Handlers {
             override fun onTimeLimitRuleClicked(rule: TimeLimitRule) {
@@ -171,7 +170,11 @@ class CategoryTimeLimitRulesFragment : Fragment(), EditTimeLimitRuleDialogFragme
                                     ruleId = oldRule.id,
                                     applyToExtraTimeUsage = oldRule.applyToExtraTimeUsage,
                                     maximumTimeInMillis = oldRule.maximumTimeInMillis,
-                                    dayMask = oldRule.dayMask
+                                    dayMask = oldRule.dayMask,
+                                    start = oldRule.startMinuteOfDay,
+                                    end = oldRule.endMinuteOfDay,
+                                    sessionDurationMilliseconds = oldRule.sessionDurationMilliseconds,
+                                    sessionPauseMilliseconds = oldRule.sessionPauseMilliseconds
                             )
                     )
                 }

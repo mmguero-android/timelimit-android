@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -39,6 +39,8 @@
     <string name="util_limit_hours_and_minutes"><xliff:g id="hours">%1$s</xliff:g> and <xliff:g>%2$s</xliff:g></string>
     <string name="util_time_remaining"><xliff:g example="3 minutes" id="time">%1$s</xliff:g> remaining</string>
     <string name="util_time_done">Time over</string>
+    <string name="util_time_pause_in">Break in %s</string>
+    <string name="util_time_pause_shortly">Break in a few moments</string>
 
     <string name="util_time_unused">Unused</string>
     <string name="util_time_used">Used <xliff:g example="4 minutes" id="used time">%1$s</xliff:g></string>

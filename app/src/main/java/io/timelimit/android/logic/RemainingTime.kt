@@ -15,8 +15,8 @@
  */
 package io.timelimit.android.logic
 
-import android.util.SparseLongArray
 import io.timelimit.android.data.model.TimeLimitRule
+import io.timelimit.android.data.model.UsedTimeItem
 
 data class RemainingTime(val includingExtraTime: Long, val default: Long) {
     val hasRemainingTime = includingExtraTime > 0
@@ -44,18 +44,21 @@ data class RemainingTime(val includingExtraTime: Long, val default: Long) {
             )
         }
 
-        private fun getRulesRelatedToDay(dayOfWeek: Int, rules: List<TimeLimitRule>): List<TimeLimitRule> {
-            return rules.filter { (it.dayMask.toInt() and (1 shl dayOfWeek)) != 0 }
+        private fun getRulesRelatedToDay(dayOfWeek: Int, minuteOfDay: Int, rules: List<TimeLimitRule>): List<TimeLimitRule> {
+            return rules.filter {
+                ((it.dayMask.toInt() and (1 shl dayOfWeek)) != 0) &&
+                        minuteOfDay >= it.startMinuteOfDay && minuteOfDay <= it.endMinuteOfDay
+            }
         }
 
-        fun getRemainingTime(dayOfWeek: Int, usedTimes: SparseLongArray, rules: List<TimeLimitRule>, extraTime: Long): RemainingTime? {
+        fun getRemainingTime(dayOfWeek: Int, minuteOfDay: Int, usedTimes: List<UsedTimeItem>, rules: List<TimeLimitRule>, extraTime: Long, firstDayOfWeekAsEpochDay: Int): RemainingTime? {
             if (extraTime < 0) {
                 throw IllegalStateException("extra time < 0")
             }
 
-            val relatedRules = getRulesRelatedToDay(dayOfWeek, rules)
-            val withoutExtraTime = getRemainingTime(usedTimes, relatedRules, false)
-            val withExtraTime = getRemainingTime(usedTimes, relatedRules, true)
+            val relatedRules = getRulesRelatedToDay(dayOfWeek, minuteOfDay, rules)
+            val withoutExtraTime = getRemainingTime(usedTimes, relatedRules, false, firstDayOfWeekAsEpochDay)
+            val withExtraTime = getRemainingTime(usedTimes, relatedRules, true, firstDayOfWeekAsEpochDay)
 
             if (withoutExtraTime == null && withExtraTime == null) {
                 // no rules
@@ -83,17 +86,23 @@ data class RemainingTime(val includingExtraTime: Long, val default: Long) {
             }
         }
 
-        private fun getRemainingTime(usedTimes: SparseLongArray, relatedRules: List<TimeLimitRule>, assumeMaximalExtraTime: Boolean): Long? {
-            return relatedRules.filter { (!assumeMaximalExtraTime) || it.applyToExtraTimeUsage }.map {
+        private fun getRemainingTime(usedTimes: List<UsedTimeItem>, relatedRules: List<TimeLimitRule>, assumeMaximalExtraTime: Boolean, firstDayOfWeekAsEpochDay: Int): Long? {
+            return relatedRules.filter { (!assumeMaximalExtraTime) || it.applyToExtraTimeUsage }.map { rule ->
                 var usedTime = 0L
 
-                for (day in 0..6) {
-                    if ((it.dayMask.toInt() and (1 shl day)) != 0) {
-                        usedTime += usedTimes[day]
+                usedTimes.forEach { usedTimeItem ->
+                    if (usedTimeItem.dayOfEpoch >= firstDayOfWeekAsEpochDay && usedTimeItem.dayOfEpoch <= firstDayOfWeekAsEpochDay + 6) {
+                        val usedTimeItemDayOfWeek = usedTimeItem.dayOfEpoch - firstDayOfWeekAsEpochDay
+
+                        if ((rule.dayMask.toInt() and (1 shl usedTimeItemDayOfWeek)) != 0) {
+                            if (rule.startMinuteOfDay == usedTimeItem.startTimeOfDay && rule.endMinuteOfDay == usedTimeItem.endTimeOfDay) {
+                                usedTime += usedTimeItem.usedMillis
+                            }
+                        }
                     }
                 }
 
-                val maxTime = it.maximumTimeInMillis
+                val maxTime = rule.maximumTimeInMillis
                 val remaining = Math.max(0, maxTime - usedTime)
 
                 remaining

@@ -205,7 +205,11 @@ object LocalDatabaseParentActionDispatcher {
                     database.timeLimitRules().updateTimeLimitRule(oldRule.copy(
                             maximumTimeInMillis = action.maximumTimeInMillis,
                             dayMask = action.dayMask,
-                            applyToExtraTimeUsage = action.applyToExtraTimeUsage
+                            applyToExtraTimeUsage = action.applyToExtraTimeUsage,
+                            startMinuteOfDay = action.start,
+                            endMinuteOfDay = action.end,
+                            sessionDurationMilliseconds = action.sessionDurationMilliseconds,
+                            sessionPauseMilliseconds = action.sessionPauseMilliseconds
                     ))
                 }
                 is SetDeviceUserAction -> {

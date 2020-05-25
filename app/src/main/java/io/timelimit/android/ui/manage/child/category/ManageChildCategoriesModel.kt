@@ -16,7 +16,6 @@
 package io.timelimit.android.ui.manage.child.category
 
 import android.app.Application
-import android.util.SparseLongArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.data.extensions.mapToTimezone
@@ -24,6 +23,7 @@ import io.timelimit.android.data.extensions.sorted
 import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.liveDataFromFunction
 import io.timelimit.android.livedata.map
@@ -100,19 +100,16 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
                                         isBlockedTimeNow = category.blockedMinutesInWeek.read(childMinuteOfWeek),
                                         remainingTimeToday = RemainingTime.getRemainingTime(
                                                 dayOfWeek = childDate.dayOfWeek,
-                                                usedTimes = SparseLongArray().apply {
-                                                    usedTimeItemsForCategory.forEach { usedTimeItem ->
-
-                                                        val dayOfWeek = usedTimeItem.dayOfEpoch - firstDayOfWeek
-
-                                                        put(dayOfWeek, usedTimeItem.usedMillis)
-                                                    }
-                                                },
+                                                usedTimes = usedTimeItemsForCategory,
                                                 rules = rules,
-                                                extraTime = category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch)
+                                                extraTime = category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
+                                                minuteOfDay = childMinuteOfWeek % MinuteOfDay.LENGTH,
+                                                firstDayOfWeekAsEpochDay = firstDayOfWeek
                                         )?.includingExtraTime,
-                                        usedTimeToday = usedTimeItemsForCategory.find { item -> item.dayOfEpoch == childDate.dayOfEpoch }?.usedMillis
-                                                ?: 0,
+                                        usedTimeToday = usedTimeItemsForCategory.find { item ->
+                                            item.dayOfEpoch == childDate.dayOfEpoch && item.startTimeOfDay == MinuteOfDay.MIN &&
+                                                    item.endTimeOfDay == MinuteOfDay.MAX
+                                        }?.usedMillis ?: 0,
                                         usedForNotAssignedApps = categoryForUnassignedApps == category.id,
                                         parentCategoryTitle = parentCategory?.title
                                 )

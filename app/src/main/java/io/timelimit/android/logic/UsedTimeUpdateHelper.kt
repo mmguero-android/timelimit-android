@@ -19,6 +19,8 @@ import android.util.Log
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.sync.actions.AddUsedTimeActionItem
+import io.timelimit.android.sync.actions.AddUsedTimeActionItemAdditionalCountingSlot
+import io.timelimit.android.sync.actions.AddUsedTimeActionItemSessionDurationLimitSlot
 import io.timelimit.android.sync.actions.AddUsedTimeActionVersion2
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.sync.actions.dispatch.CategoryNotFoundException
@@ -30,9 +32,16 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
 
     val timeToAdd = mutableMapOf<String, Int>()
     val extraTimeToSubtract = mutableMapOf<String, Int>()
+    val sessionDurationLimitSlots = mutableMapOf<String, Set<AddUsedTimeActionItemSessionDurationLimitSlot>>()
+    var trustedTimestamp: Long = 0
+    val additionalSlots = mutableMapOf<String, Set<AddUsedTimeActionItemAdditionalCountingSlot>>()
     var shouldDoAutoCommit = false
 
-    fun add(categoryId: String, time: Int, includingExtraTime: Boolean) {
+    fun add(
+            categoryId: String, time: Int, slots: Set<AddUsedTimeActionItemAdditionalCountingSlot>,
+            includingExtraTime: Boolean, sessionDurationLimits: Set<AddUsedTimeActionItemSessionDurationLimitSlot>,
+            trustedTimestamp: Long
+    ) {
         if (time < 0) {
             throw IllegalArgumentException()
         }
@@ -43,8 +52,22 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
 
         timeToAdd[categoryId] = (timeToAdd[categoryId] ?: 0) + time
 
+        if (sessionDurationLimits.isNotEmpty()) {
+            this.sessionDurationLimitSlots[categoryId] = sessionDurationLimits
+        }
+
+        if (sessionDurationLimits.isNotEmpty() && trustedTimestamp != 0L) {
+            this.trustedTimestamp = trustedTimestamp
+        }
+
         if (includingExtraTime) {
             extraTimeToSubtract[categoryId] = (extraTimeToSubtract[categoryId] ?: 0) + time
+        }
+
+        if (additionalSlots[categoryId] != null && slots != additionalSlots[categoryId]) {
+            shouldDoAutoCommit = true
+        } else if (slots.isNotEmpty()) {
+            additionalSlots[categoryId] = slots
         }
 
         if (timeToAdd[categoryId]!! >= 1000 * 10) {
@@ -77,9 +100,12 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
                                 AddUsedTimeActionItem(
                                         categoryId = categoryId,
                                         timeToAdd = timeToAdd[categoryId] ?: 0,
-                                        extraTimeToSubtract = extraTimeToSubtract[categoryId] ?: 0
+                                        extraTimeToSubtract = extraTimeToSubtract[categoryId] ?: 0,
+                                        additionalCountingSlots = additionalSlots[categoryId] ?: emptySet(),
+                                        sessionDurationLimits = sessionDurationLimitSlots[categoryId] ?: emptySet()
                                 )
-                            }
+                            },
+                            trustedTimestamp = trustedTimestamp
                     ),
                     appLogic = appLogic,
                     ignoreIfDeviceIsNotConfigured = true
@@ -96,6 +122,9 @@ class UsedTimeUpdateHelper (val date: DateInTimezone) {
 
         timeToAdd.clear()
         extraTimeToSubtract.clear()
+        sessionDurationLimitSlots.clear()
+        trustedTimestamp = 0
+        additionalSlots.clear()
         shouldDoAutoCommit = false
     }
 }

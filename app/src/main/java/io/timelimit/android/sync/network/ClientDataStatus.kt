@@ -33,6 +33,8 @@ data class ClientDataStatus(
         private const val APPS = "apps"
         private const val CATEGORIES = "categories"
         private const val USERS = "users"
+        private const val CLIENT_LEVEL = "clientLevel"
+        private const val CLIENT_LEVEL_VALUE = 2
 
         val empty = ClientDataStatus(
                 deviceListVersion = "",
@@ -75,6 +77,7 @@ data class ClientDataStatus(
     fun serialize(writer: JsonWriter) {
         writer.beginObject()
 
+        writer.name(CLIENT_LEVEL).value(CLIENT_LEVEL_VALUE)
         writer.name(DEVICES).value(deviceListVersion)
         writer.name(USERS).value(userListVersion)
 

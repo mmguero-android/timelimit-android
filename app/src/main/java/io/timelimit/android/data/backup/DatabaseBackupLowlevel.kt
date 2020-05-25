@@ -36,12 +36,13 @@ object DatabaseBackupLowlevel {
     private const val DEVICE = "device"
     private const val PENDING_SYNC_ACTION = "pendingSyncAction"
     private const val TIME_LIMIT_RULE = "timelimitRule"
-    private const val USED_TIME_ITEM = "usedTime"
+    private const val USED_TIME_ITEM = "usedTimeV2"
     private const val USER = "user"
     private const val APP_ACTIVITY = "appActivity"
     private const val NOTIFICATION = "notification"
     private const val ALLOWED_CONTACT = "allowedContact"
     private const val USER_KEY = "userKey"
+    private const val SESSION_DURATION = "sessionDuration"
 
     fun outputAsBackupJson(database: Database, outputStream: OutputStream) {
         val writer = JsonWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
@@ -87,6 +88,7 @@ object DatabaseBackupLowlevel {
         handleCollection(NOTIFICATION) { offset, pageSize -> database.notification().getNotificationPageSync(offset, pageSize) }
         handleCollection(ALLOWED_CONTACT) { offset, pageSize -> database.allowedContact().getAllowedContactPageSync(offset, pageSize) }
         handleCollection(USER_KEY) { offset, pageSize -> database.userKey().getUserKeyPageSync(offset, pageSize) }
+        handleCollection(SESSION_DURATION) { offset, pageSize -> database.sessionDuration().getSessionDurationPageSync(offset, pageSize) }
 
         writer.endObject().flush()
     }
@@ -222,6 +224,15 @@ object DatabaseBackupLowlevel {
 
                         while (reader.hasNext()) {
                             database.userKey().addUserKeySync(UserKey.parse(reader))
+                        }
+
+                        reader.endArray()
+                    }
+                    SESSION_DURATION -> {
+                        reader.beginArray()
+
+                        while (reader.hasNext()) {
+                            database.sessionDuration().addSessionDurationIgnoreErrorsSync(SessionDuration.parse(reader))
                         }
 
                         reader.endArray()

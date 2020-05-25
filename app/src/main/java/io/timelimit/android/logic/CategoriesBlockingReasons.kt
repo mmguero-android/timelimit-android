@@ -16,12 +16,12 @@
 package io.timelimit.android.logic
 
 import android.util.Log
-import android.util.SparseLongArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.data.model.*
 import io.timelimit.android.date.DateInTimezone
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.extension.isCategoryAllowed
 import java.util.*
@@ -146,7 +146,8 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
                             checkCategoryTimeLimitRules(
                                     temporarilyTrustedDate = temporarilyTrustedDate,
                                     category = category,
-                                    rules = appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id)
+                                    rules = appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(category.id),
+                                    temporarilyTrustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek
                             )
                         }
                     }
@@ -211,6 +212,7 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
 
     private fun checkCategoryTimeLimitRules(
             temporarilyTrustedDate: LiveData<DateInTimezone?>,
+            temporarilyTrustedMinuteOfWeek: LiveData<Int?>,
             rules: LiveData<List<TimeLimitRule>>,
             category: Category
     ): LiveData<BlockingReason> = rules.switchMap { rules ->
@@ -218,43 +220,60 @@ class CategoriesBlockingReasonUtil(private val appLogic: AppLogic) {
             liveDataFromValue(BlockingReason.None)
         } else {
             temporarilyTrustedDate.switchMap { temporarilyTrustedDate ->
-                if (temporarilyTrustedDate == null) {
-                    liveDataFromValue(BlockingReason.MissingNetworkTime)
-                } else {
-                    getBlockingReasonStep7(
-                            category = category,
-                            nowTrustedDate = temporarilyTrustedDate,
-                            rules = rules
-                    )
+                temporarilyTrustedMinuteOfWeek.switchMap { temporarilyTrustedMinuteOfWeek ->
+                    if (temporarilyTrustedDate == null || temporarilyTrustedMinuteOfWeek == null) {
+                        liveDataFromValue(BlockingReason.MissingNetworkTime)
+                    } else {
+                        getBlockingReasonStep7(
+                                category = category,
+                                nowTrustedDate = temporarilyTrustedDate,
+                                rules = rules,
+                                trustedMinuteOfWeek = temporarilyTrustedMinuteOfWeek
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun getBlockingReasonStep7(category: Category, nowTrustedDate: DateInTimezone, rules: List<TimeLimitRule>): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep7(category: Category, nowTrustedDate: DateInTimezone, trustedMinuteOfWeek: Int, rules: List<TimeLimitRule>): LiveData<BlockingReason> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 7")
         }
 
         val extraTime = category.getExtraTime(dayOfEpoch = nowTrustedDate.dayOfEpoch)
+        val firstDayOfWeekAsEpochDay = nowTrustedDate.dayOfEpoch - nowTrustedDate.dayOfWeek
 
-        return appLogic.database.usedTimes().getUsedTimesOfWeek(category.id, nowTrustedDate.dayOfEpoch - nowTrustedDate.dayOfWeek).map { usedTimes ->
-            val usedTimesSparseArray = SparseLongArray()
-
-            for (i in 0..6) {
-                val usedTimesItem = usedTimes[i]?.usedMillis
-                usedTimesSparseArray.put(i, (if (usedTimesItem != null) usedTimesItem else 0))
-            }
-
-            val remaining = RemainingTime.getRemainingTime(nowTrustedDate.dayOfWeek, usedTimesSparseArray, rules, extraTime)
+        return appLogic.database.usedTimes().getUsedTimesOfWeek(category.id, firstDayOfWeekAsEpochDay).switchMap { usedTimes ->
+            val remaining = RemainingTime.getRemainingTime(nowTrustedDate.dayOfWeek, trustedMinuteOfWeek % MinuteOfDay.LENGTH, usedTimes, rules, extraTime, firstDayOfWeekAsEpochDay)
 
             if (remaining == null || remaining.includingExtraTime > 0) {
-                BlockingReason.None
+                appLogic.database.sessionDuration().getSessionDurationItemsByCategoryId(category.id).switchMap { durations ->
+                    blockingReason.getTemporarilyTrustedTimeInMillis().map { timeInMillis ->
+                        if (timeInMillis == null) {
+                            BlockingReason.MissingNetworkTime
+                        } else {
+                            val remainingDuration = RemainingSessionDuration.getRemainingSessionDuration(
+                                    rules = rules,
+                                    dayOfWeek = nowTrustedDate.dayOfWeek,
+                                    durationsOfCategory = durations,
+                                    minuteOfDay = trustedMinuteOfWeek % MinuteOfDay.LENGTH,
+                                    timestamp = timeInMillis
+                            )
+
+                            if (remainingDuration == null || remainingDuration > 0) {
+                                BlockingReason.None
+                            } else {
+                                BlockingReason.SessionDurationLimit
+                            }
+                        }
+                    }
+                }
             } else {
                 if (extraTime > 0) {
-                    BlockingReason.TimeOverExtraTimeCanBeUsedLater
+                    liveDataFromValue(BlockingReason.TimeOverExtraTimeCanBeUsedLater)
                 } else {
-                    BlockingReason.TimeOver
+                    liveDataFromValue(BlockingReason.TimeOver)
                 }
             }
         }.ignoreUnchanged()

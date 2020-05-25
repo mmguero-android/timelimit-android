@@ -13,18 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.sync.actions
 
-import android.util.JsonWriter
-import java.io.StringWriter
+package io.timelimit.android.extensions
 
-object SerializationUtil {
-    fun serializeAction(action: Action): String {
-        val stringWriter = StringWriter()
-        val jsonWriter = JsonWriter(stringWriter)
+object MinuteOfDay {
+    const val MIN = 0
+    const val MAX = 24 * 60 - 1
+    const val LENGTH = 24 *  60
 
-        action.serialize(jsonWriter)
+    fun isValid(value: Int) = value >= MIN && value <= MAX
 
-        return stringWriter.buffer.toString()
+    fun format(minuteOfDay: Int): String {
+        if (minuteOfDay < MIN || minuteOfDay > MAX) {
+            return "???"
+        } else {
+            val hour = minuteOfDay / 60
+            val minute = minuteOfDay % 60
+
+            val hourString = hour.toString()
+            val minuteString = minute.toString().padStart(2, '0')
+
+            return "$hourString:$minuteString"
+        }
     }
 }

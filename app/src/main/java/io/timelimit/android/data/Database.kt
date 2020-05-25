@@ -33,6 +33,7 @@ interface Database {
     fun notification(): NotificationDao
     fun allowedContact(): AllowedContactDao
     fun userKey(): UserKeyDao
+    fun sessionDuration(): SessionDurationDao
 
     fun beginTransaction()
     fun setTransactionSuccessful()

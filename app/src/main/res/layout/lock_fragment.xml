@@ -275,6 +275,20 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
+                        <TextView
+                            android:paddingStart="8dp"
+                            android:paddingEnd="0dp"
+                            tools:ignore="UnusedAttribute"
+                            android:drawablePadding="16dp"
+                            android:drawableTint="?colorOnSurface"
+                            android:drawableStart="@drawable/ic_pause_circle_outline_black_24dp"
+                            android:visibility="@{reason == BlockingReason.SessionDurationLimit ? View.VISIBLE : View.GONE}"
+                            android:textAppearance="?android:textAppearanceMedium"
+                            android:text="@{@string/lock_reason_session_duration(blockedKindLabel)}"
+                            tools:text="@string/lock_reason_session_duration"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
                         <ProgressBar
                             android:visibility="@{reason == null ? View.VISIBLE : View.GONE}"
                             android:padding="8dp"
@@ -513,7 +527,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <io.timelimit.android.ui.view.ManageDisableTimelimitsView
-                    android:visibility="@{reason == BlockingReason.BlockedAtThisTime || reason == BlockingReason.TimeOver || reason == BlockingReason.TimeOverExtraTimeCanBeUsedLater ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{reason == BlockingReason.BlockedAtThisTime || reason == BlockingReason.TimeOver || reason == BlockingReason.TimeOverExtraTimeCanBeUsedLater || reason == BlockingReason.SessionDurationLimit ? View.VISIBLE : View.GONE}"
                     android:id="@+id/manage_disable_time_limits"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

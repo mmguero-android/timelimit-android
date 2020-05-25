@@ -13,18 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.sync.actions
 
-import android.util.JsonWriter
-import java.io.StringWriter
+package io.timelimit.android.data.model
 
-object SerializationUtil {
-    fun serializeAction(action: Action): String {
-        val stringWriter = StringWriter()
-        val jsonWriter = JsonWriter(stringWriter)
-
-        action.serialize(jsonWriter)
-
-        return stringWriter.buffer.toString()
-    }
-}
+data class UsedTimeListItem(
+        val startMinuteOfDay: Int,
+        val endMinuteOfDay: Int,
+        val duration: Long,
+        // used time item
+        val day: Long?,
+        // session duration
+        val lastUsage: Long?,
+        val maxSessionDuration: Long?,
+        val pauseDuration: Long?
+)

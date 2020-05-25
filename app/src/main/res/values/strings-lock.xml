@@ -84,6 +84,11 @@
         battery limit was reached.
         To unlock it, charge the battery.
     </string>
+    <string name="lock_reason_session_duration">
+        This %s is part of a category which has got a session duration limit
+        and this limit was reached.
+        It will be unlocked after the break duration.
+    </string>
 
     <string name="lock_reason_short_no_category">no category</string>
     <string name="lock_reason_short_temporarily_blocked">temporarily blocked</string>
@@ -93,6 +98,7 @@
     <string name="lock_reason_short_requires_current_device">device must be the current device</string>
     <string name="lock_reason_short_notification_blocking">all notifications are blocked</string>
     <string name="lock_reason_short_battery_limit">battery limit reached</string>
+    <string name="lock_reason_short_session_duration">session duration limit reached</string>
 
     <string name="lock_overlay_warning">
         Failed to open the lock screen.

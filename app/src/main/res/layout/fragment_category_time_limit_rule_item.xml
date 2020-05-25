@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -32,6 +32,14 @@
 
         <variable
             name="daysString"
+            type="String" />
+
+        <variable
+            name="timeAreaString"
+            type="String" />
+
+        <variable
+            name="sessionLimitString"
             type="String" />
 
         <variable
@@ -69,6 +77,22 @@
                 android:textAppearance="?android:textAppearanceMedium"
                 android:text="@{daysString}"
                 tools:text="Montag und Dienstag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:text="@{timeAreaString}"
+                tools:text="von 12:00 bis 18:00"
+                android:visibility="@{TextUtils.isEmpty(timeAreaString) ? View.GONE : View.VISIBLE}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:text="@{sessionLimitString}"
+                tools:text="10 Minuten Pause nach 5 Minuten Nutzung"
+                android:visibility="@{TextUtils.isEmpty(sessionLimitString) ? View.GONE : View.VISIBLE}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

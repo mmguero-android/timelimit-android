@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,11 @@ class DefaultCategories private constructor(private val context: Context) {
                             categoryId = categoryId,
                             applyToExtraTimeUsage = false,
                             dayMask = (1 shl day).toByte(),
-                            maximumTimeInMillis = 1000 * 60 * 30    // 30 minutes
+                            maximumTimeInMillis = 1000 * 60 * 30,    // 30 minutes
+                            startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
+                            endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
+                            sessionPauseMilliseconds = 0,
+                            sessionDurationMilliseconds = 0
                     )
             )
         }
@@ -77,7 +81,11 @@ class DefaultCategories private constructor(private val context: Context) {
                             categoryId = categoryId,
                             applyToExtraTimeUsage = false,
                             dayMask = (1 shl day).toByte(),
-                            maximumTimeInMillis = 1000 * 60 * 60 * 3    // 3 hours
+                            maximumTimeInMillis = 1000 * 60 * 60 * 3,    // 3 hours
+                            startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
+                            endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
+                            sessionPauseMilliseconds = 0,
+                            sessionDurationMilliseconds = 0
                     )
             )
         }
@@ -93,7 +101,11 @@ class DefaultCategories private constructor(private val context: Context) {
                         categoryId = categoryId,
                         applyToExtraTimeUsage = false,
                         dayMask = 1 + 2 + 4 + 8 + 16 + 32 + 64,
-                        maximumTimeInMillis = 1000 * 60 * 60 * 6    // 6 hours
+                        maximumTimeInMillis = 1000 * 60 * 60 * 6,    // 6 hours
+                        startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
+                        endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
+                        sessionPauseMilliseconds = 0,
+                        sessionDurationMilliseconds = 0
                 )
         )
 

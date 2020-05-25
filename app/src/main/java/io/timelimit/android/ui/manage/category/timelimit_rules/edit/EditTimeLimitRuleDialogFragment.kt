@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
-import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.IdGenerator
@@ -33,6 +34,7 @@ import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.data.model.TimeLimitRule
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.FragmentEditTimeLimitRuleDialogBinding
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.DefaultAppLogic
@@ -44,11 +46,12 @@ import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.mustread.MustReadFragment
 import io.timelimit.android.ui.view.SelectDayViewHandlers
 import io.timelimit.android.ui.view.SelectTimeSpanViewListener
+import io.timelimit.android.util.TimeTextUtil
 import java.nio.ByteBuffer
 import java.util.*
 
 
-class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
+class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPickerDialogFragmentListener {
     companion object {
         private const val PARAM_EXISTING_RULE = "a"
         private const val PARAM_CATEGORY_ID = "b"
@@ -76,6 +79,8 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
 
     var existingRule: TimeLimitRule? = null
     var savedNewRule: TimeLimitRule? = null
+    lateinit var newRule: TimeLimitRule
+    lateinit var view: FragmentEditTimeLimitRuleDialogBinding
 
     private val categoryId: String by lazy {
         if (existingRule != null) {
@@ -109,13 +114,37 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
                 ?: arguments?.getParcelable<TimeLimitRule?>(PARAM_EXISTING_RULE)
     }
 
+    fun bindRule() {
+        savedNewRule = newRule
+
+        view.daySelection.selectedDays = BitSet.valueOf(
+                ByteBuffer.allocate(1).put(newRule.dayMask).apply {
+                    position(0)
+                }
+        )
+        view.applyToExtraTime = newRule.applyToExtraTimeUsage
+        view.timeSpan.timeInMillis = newRule.maximumTimeInMillis.toLong()
+
+        val affectedDays = Math.max(0, (0..6).map { (newRule.dayMask.toInt() shr it) and 1 }.sum())
+        view.timeSpan.maxDays = Math.max(0, affectedDays - 1)   // max prevents crash
+        view.affectsMultipleDays = affectedDays >= 2
+
+        view.applyToWholeDay = newRule.appliesToWholeDay
+        view.startTime = MinuteOfDay.format(newRule.startMinuteOfDay)
+        view.endTime = MinuteOfDay.format(newRule.endMinuteOfDay)
+
+        view.enableSessionDurationLimit = newRule.sessionDurationLimitEnabled
+        view.sessionBreakText = TimeTextUtil.minutes(newRule.sessionPauseMilliseconds / (1000 * 60), context!!)
+        view.sessionLengthText = TimeTextUtil.minutes(newRule.sessionDurationMilliseconds / (1000 * 60), context!!)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = FragmentEditTimeLimitRuleDialogBinding.inflate(layoutInflater, container, false)
         val listener = targetFragment as EditTimeLimitRuleDialogFragmentListener
-        var newRule: TimeLimitRule
         val database = DefaultAppLogic.with(context!!).database
 
-        auth.authenticatedUser.observe(this, Observer {
+        view = FragmentEditTimeLimitRuleDialogBinding.inflate(layoutInflater, container, false)
+
+        auth.authenticatedUser.observe(viewLifecycleOwner, Observer {
             if (it == null || it.second.type != UserType.Parent) {
                 dismissAllowingStateLoss()
             }
@@ -129,7 +158,11 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
                     categoryId = categoryId,
                     applyToExtraTimeUsage = false,
                     dayMask = 0,
-                    maximumTimeInMillis = 1000 * 60 * 60 * 5 / 2    // 2,5 (5/2) hours
+                    maximumTimeInMillis = 1000 * 60 * 60 * 5 / 2,   // 2,5 (5/2) hours
+                    startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
+                    endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
+                    sessionPauseMilliseconds = 0,
+                    sessionDurationMilliseconds = 0
             )
         } else {
             view.isNewRule = false
@@ -143,22 +176,6 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
             if (restoredRule != null) {
                 newRule = restoredRule
             }
-        }
-
-        fun bindRule() {
-            savedNewRule = newRule
-
-            view.daySelection.selectedDays = BitSet.valueOf(
-                    ByteBuffer.allocate(1).put(newRule.dayMask).apply {
-                        position(0)
-                    }
-            )
-            view.applyToExtraTime = newRule.applyToExtraTimeUsage
-            view.timeSpan.timeInMillis = newRule.maximumTimeInMillis.toLong()
-
-            val affectedDays = Math.max(0, (0..6).map { (newRule.dayMask.toInt() shr it) and 1 }.sum())
-            view.timeSpan.maxDays = Math.max(0, affectedDays - 1)   // max prevents crash
-            view.affectsMultipleDays = affectedDays >= 2
         }
 
         bindRule()
@@ -181,6 +198,72 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
                 bindRule()
             }
 
+            override fun updateApplyToWholeDay(apply: Boolean) {
+                if (apply) {
+                    newRule = newRule.copy(
+                            startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
+                            endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE
+                    )
+                } else {
+                    newRule = newRule.copy(
+                            startMinuteOfDay = 10 * 60,
+                            endMinuteOfDay = 16 * 60
+                    )
+                }
+
+                bindRule()
+            }
+
+            override fun updateStartTime() {
+                TimePickerDialogFragment.newInstance(
+                        editTimeLimitRuleDialogFragment = this@EditTimeLimitRuleDialogFragment,
+                        index = 0,
+                        startMinuteOfDay = newRule.startMinuteOfDay
+                ).show(parentFragmentManager)
+            }
+
+            override fun updateEndTime() {
+                TimePickerDialogFragment.newInstance(
+                        editTimeLimitRuleDialogFragment = this@EditTimeLimitRuleDialogFragment,
+                        index = 1,
+                        startMinuteOfDay = newRule.endMinuteOfDay
+                ).show(parentFragmentManager)
+            }
+
+            override fun updateSessionDurationLimit(enable: Boolean) {
+                if (enable) {
+                    newRule = newRule.copy(
+                            sessionDurationMilliseconds = 1000 * 60 * 30,
+                            sessionPauseMilliseconds = 1000 * 60 * 10
+                    )
+                } else {
+                    newRule = newRule.copy(
+                            sessionDurationMilliseconds = 0,
+                            sessionPauseMilliseconds = 0
+                    )
+                }
+
+                bindRule()
+            }
+
+            override fun updateSessionLength() {
+                DurationPickerDialogFragment.newInstance(
+                        titleRes = R.string.category_time_limit_rules_session_limit_duration,
+                        index = 0,
+                        target = this@EditTimeLimitRuleDialogFragment,
+                        startTimeInMillis = newRule.sessionDurationMilliseconds
+                ).show(parentFragmentManager)
+            }
+
+            override fun updateSessionBreak() {
+                DurationPickerDialogFragment.newInstance(
+                        titleRes = R.string.category_time_limit_rules_session_limit_pause,
+                        index = 1,
+                        target = this@EditTimeLimitRuleDialogFragment,
+                        startTimeInMillis = newRule.sessionPauseMilliseconds
+                ).show(parentFragmentManager)
+            }
+
             override fun onSaveRule() {
                 view.timeSpan.clearNumberPickerFocus()
 
@@ -191,7 +274,11 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
                                                 ruleId = newRule.id,
                                                 maximumTimeInMillis = newRule.maximumTimeInMillis,
                                                 dayMask = newRule.dayMask,
-                                                applyToExtraTimeUsage = newRule.applyToExtraTimeUsage
+                                                applyToExtraTimeUsage = newRule.applyToExtraTimeUsage,
+                                                start = newRule.startMinuteOfDay,
+                                                end = newRule.endMinuteOfDay,
+                                                sessionDurationMilliseconds = newRule.sessionDurationMilliseconds,
+                                                sessionPauseMilliseconds = newRule.sessionPauseMilliseconds
                                         )
                                 )) {
                             return
@@ -245,13 +332,13 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
             }
         }
 
-        database.config().getEnableAlternativeDurationSelectionAsync().observe(this, Observer {
+        database.config().getEnableAlternativeDurationSelectionAsync().observe(viewLifecycleOwner, Observer {
             view.timeSpan.enablePickerMode(it)
         })
 
         if (existingRule != null) {
             database.timeLimitRules()
-                    .getTimeLimitRuleByIdLive(existingRule!!.id).observe(this, Observer {
+                    .getTimeLimitRuleByIdLive(existingRule!!.id).observe(viewLifecycleOwner, Observer {
                         if (it == null) {
                             // rule was deleted
                             dismissAllowingStateLoss()
@@ -301,10 +388,64 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
             }
         }
     }
+
+    fun handleTimePickerResult(index: Int, minuteOfDay: Int) {
+        if (!MinuteOfDay.isValid(minuteOfDay)) {
+            Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+
+            return
+        }
+
+        if (index == 0) {
+            // start minute
+
+            if (minuteOfDay > newRule.endMinuteOfDay) {
+                Toast.makeText(context, R.string.category_time_limit_rules_invalid_range, Toast.LENGTH_SHORT).show()
+            } else {
+                newRule = newRule.copy(startMinuteOfDay = minuteOfDay)
+                bindRule()
+            }
+        } else if (index == 1) {
+            // end minute
+
+            if (minuteOfDay < newRule.startMinuteOfDay) {
+                Toast.makeText(context, R.string.category_time_limit_rules_invalid_range, Toast.LENGTH_SHORT).show()
+            } else {
+                newRule = newRule.copy(endMinuteOfDay = minuteOfDay)
+                bindRule()
+            }
+        } else {
+            Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onDurationSelected(durationInMillis: Int, index: Int) {
+        if (index == 0) {
+            newRule = newRule.copy(
+                    sessionDurationMilliseconds = durationInMillis
+            )
+
+            bindRule()
+        } else if (index == 1) {
+            newRule = newRule.copy(
+                    sessionPauseMilliseconds = durationInMillis
+            )
+
+            bindRule()
+        } else {
+            throw IllegalArgumentException()
+        }
+    }
 }
 
 interface Handlers {
     fun updateApplyToExtraTime(apply: Boolean)
+    fun updateApplyToWholeDay(apply: Boolean)
+    fun updateStartTime()
+    fun updateEndTime()
+    fun updateSessionDurationLimit(enable: Boolean)
+    fun updateSessionLength()
+    fun updateSessionBreak()
     fun onSaveRule()
     fun onDeleteRule()
 }

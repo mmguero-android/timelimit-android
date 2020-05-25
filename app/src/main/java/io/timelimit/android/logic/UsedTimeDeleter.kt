@@ -21,7 +21,7 @@ import io.timelimit.android.data.transaction
 import io.timelimit.android.date.DateInTimezone
 
 object UsedTimeDeleter {
-    fun deleteOldUsedTimeItems(database: Database, date: DateInTimezone) {
+    fun deleteOldUsedTimeItems(database: Database, date: DateInTimezone, timestamp: Long) {
         Threads.database.execute {
             database.transaction().use {
                 if (database.config().getDeviceAuthTokenSync().isNotEmpty()) {
@@ -37,6 +37,8 @@ object UsedTimeDeleter {
                 }
 
                 database.usedTimes().deleteOldUsedTimeItems(lastDayToKeep = date.dayOfEpoch - date.dayOfWeek)
+
+                database.sessionDuration().deleteOldSessionDurationItemsSync(trustedTimestamp = timestamp)
 
                 it.setSuccess()
             }

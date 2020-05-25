@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,14 @@ object TimeTextUtil {
             context.resources.getString(R.string.util_time_remaining, time(time, context))
         } else {
             context.resources.getString(R.string.util_time_done)
+        }
+    }
+
+    fun pauseIn(time: Int, context: Context): String {
+        return if (time <= 1000 * 60) {
+            context.getString(R.string.util_time_pause_shortly)
+        } else {
+            context.getString(R.string.util_time_pause_in, time(time, context))
         }
     }
 

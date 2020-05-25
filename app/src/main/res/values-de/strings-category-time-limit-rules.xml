@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -23,9 +23,19 @@
         Regeln, bei denen nur ein Tag gewählt wurde, begrenzen nur diesen Tag.
     </string>
     <string name="category_time_limit_rules_applied_to_extra_time">gilt auch für ggf. vorhandene Extra-Zeit</string>
+    <string name="category_time_limit_rules_time_area">nur von %s bis %s gültig</string>
+    <string name="category_time_limit_rules_session_limit">%s Pause nach %s Nutzung</string>
     <string name="category_time_limit_rule_dialog_new">Regel erstellen</string>
     <string name="category_time_limit_rule_dialog_edit">Regel bearbeiten</string>
     <string name="category_time_limit_rules_apply_to_extra_time">Auch auf die Extra-Zeit anwenden</string>
+    <string name="category_time_limit_rules_apply_to_whole_day">Für den ganzen Tag anwenden</string>
+    <string name="category_time_limit_rules_apply_to_part_day_1">Von</string>
+    <string name="category_time_limit_rules_apply_to_part_day_2">bis</string>
+    <string name="category_time_limit_rules_apply_to_part_day_3">anwenden</string>
+    <string name="category_time_limit_rules_invalid_range">Die Anfangszeit muss vor der Endzeit liegen</string>
+    <string name="category_time_limit_rules_enable_session_limit">Sitzungsdauer beschränken</string>
+    <string name="category_time_limit_rules_session_limit_duration">maximale Nutzungsdauer</string>
+    <string name="category_time_limit_rules_session_limit_pause">Pausendauer</string>
 
     <string name="category_time_limit_rules_snackbar_created">Regel wurde erstellt</string>
     <string name="category_time_limit_rules_snackbar_updated">Regel wurde geändert</string>
@@ -34,5 +44,10 @@
     <string name="category_time_limit_rules_warning_multiple_days">Diese Regel
         wird die Gesamtnutzungsdauer in einer Woche an den gewählten Tagen einschränken.
         Wenn Sei die Begrenzung je Tag wollen, dann erstellen Sie eine Regel je Tag.
+    </string>
+    <string name="category_time_limit_rules_warning_day_part">Diese Regel begrenzt nur
+        die Nutzung im angegebenen Intervall. Ohne Regeln für andere Intervalle
+        oder Sperrzeiten wird es keine Begrenzung außerhalb dieses Intervalls
+        geben.
     </string>
 </resources>

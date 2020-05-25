@@ -19,6 +19,7 @@ import android.util.JsonReader
 import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
 import io.timelimit.android.data.model.*
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.extensions.parseList
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.sync.actions.AppActivityItem
@@ -476,16 +477,19 @@ data class ServerUpdatedCategoryAssignedApps(
 data class ServerUpdatedCategoryUsedTimes(
         val categoryId: String,
         val usedTimeItems: List<ServerUsedTimeItem>,
+        val sessionDurations: List<ServerSessionDuration>,
         val version: String
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
         private const val USED_TIMES_ITEMS = "times"
+        private const val SESSION_DURATIONS = "sessionDurations"
         private const val VERSION = "version"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryUsedTimes {
             var categoryId: String? = null
             var usedTimeItems: List<ServerUsedTimeItem>? = null
+            var sessionDurations = emptyList<ServerSessionDuration>()
             var version: String? = null
 
             reader.beginObject()
@@ -493,6 +497,7 @@ data class ServerUpdatedCategoryUsedTimes(
                 when (reader.nextName()) {
                     CATEGORY_ID -> categoryId = reader.nextString()
                     USED_TIMES_ITEMS -> usedTimeItems = ServerUsedTimeItem.parseList(reader)
+                    SESSION_DURATIONS -> sessionDurations = ServerSessionDuration.parseList(reader)
                     VERSION -> version = reader.nextString()
                     else -> reader.skipValue()
                 }
@@ -502,6 +507,7 @@ data class ServerUpdatedCategoryUsedTimes(
             return ServerUpdatedCategoryUsedTimes(
                     categoryId = categoryId!!,
                     usedTimeItems = usedTimeItems!!,
+                    sessionDurations = sessionDurations,
                     version = version!!
             )
         }
@@ -512,21 +518,29 @@ data class ServerUpdatedCategoryUsedTimes(
 
 data class ServerUsedTimeItem(
         val dayOfEpoch: Int,
-        val usedMillis: Long
+        val usedMillis: Long,
+        val startTimeOfDay: Int,
+        val endTimeOfDay: Int
 ) {
     companion object {
         private const val DAY_OF_EPOCH = "day"
         private const val USED_MILLIS = "time"
+        private const val START_TIME_OF_DAY = "start"
+        private const val END_TIME_OF_DAY = "end"
 
         fun parse(reader: JsonReader): ServerUsedTimeItem {
             var dayOfEpoch: Int? = null
             var usedMillis: Long? = null
+            var startTimeOfDay: Int = MinuteOfDay.MIN
+            var endTimeOfDay: Int = MinuteOfDay.MAX
 
             reader.beginObject()
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     DAY_OF_EPOCH -> dayOfEpoch = reader.nextInt()
                     USED_MILLIS -> usedMillis = reader.nextLong()
+                    START_TIME_OF_DAY -> startTimeOfDay = reader.nextInt()
+                    END_TIME_OF_DAY -> endTimeOfDay = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -534,12 +548,76 @@ data class ServerUsedTimeItem(
 
             return ServerUsedTimeItem(
                     dayOfEpoch = dayOfEpoch!!,
-                    usedMillis = usedMillis!!
+                    usedMillis = usedMillis!!,
+                    startTimeOfDay = startTimeOfDay,
+                    endTimeOfDay = endTimeOfDay
             )
         }
 
         fun parseList(reader: JsonReader): List<ServerUsedTimeItem> {
             val result = ArrayList<ServerUsedTimeItem>()
+
+            reader.beginArray()
+            while (reader.hasNext()) {
+                result.add(parse(reader))
+            }
+            reader.endArray()
+
+            return Collections.unmodifiableList(result)
+        }
+    }
+}
+
+data class ServerSessionDuration(
+        val maxSessionDuration: Int,
+        val sessionPauseDuration: Int,
+        val startMinuteOfDay: Int,
+        val endMinuteOfDay: Int,
+        val lastUsage: Long,
+        val lastSessionDuration: Long
+) {
+    companion object {
+        private const val MAX_SESSION_DURATION = "md"
+        private const val SESSION_PAUSE_DURATION = "spd"
+        private const val START_MINUTE_OF_DAY = "sm"
+        private const val END_MINUTE_OF_DAY = "em"
+        private const val LAST_USAGE = "l"
+        private const val LAST_SESSION_DURATION = "d"
+
+        fun parse(reader: JsonReader): ServerSessionDuration {
+            var maxSessionDuration: Int? = null
+            var sessionPauseDuration: Int? = null
+            var startMinuteOfDay: Int? = null
+            var endMinuteOfDay: Int? = null
+            var lastUsage: Long? = null
+            var lastSessionDuration: Long? = null
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    MAX_SESSION_DURATION -> maxSessionDuration = reader.nextInt()
+                    SESSION_PAUSE_DURATION -> sessionPauseDuration = reader.nextInt()
+                    START_MINUTE_OF_DAY -> startMinuteOfDay = reader.nextInt()
+                    END_MINUTE_OF_DAY -> endMinuteOfDay = reader.nextInt()
+                    LAST_USAGE -> lastUsage = reader.nextLong()
+                    LAST_SESSION_DURATION -> lastSessionDuration = reader.nextLong()
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+
+            return ServerSessionDuration(
+                    maxSessionDuration = maxSessionDuration!!,
+                    sessionPauseDuration = sessionPauseDuration!!,
+                    startMinuteOfDay = startMinuteOfDay!!,
+                    endMinuteOfDay = endMinuteOfDay!!,
+                    lastUsage = lastUsage!!,
+                    lastSessionDuration = lastSessionDuration!!
+            )
+        }
+
+        fun parseList(reader: JsonReader): List<ServerSessionDuration> {
+            val result = ArrayList<ServerSessionDuration>()
 
             reader.beginArray()
             while (reader.hasNext()) {
@@ -593,19 +671,31 @@ data class ServerTimeLimitRule(
         val id: String,
         val applyToExtraTimeUsage: Boolean,
         val dayMask: Byte,
-        val maximumTimeInMillis: Int
+        val maximumTimeInMillis: Int,
+        val startMinuteOfDay: Int,
+        val endMinuteOfDay: Int,
+        val sessionDurationMilliseconds: Int,
+        val sessionPauseMilliseconds: Int
 ) {
     companion object {
         private const val ID = "id"
         private const val APPLY_TO_EXTRA_TIME_USAGE = "extraTime"
         private const val DAY_MASK = "dayMask"
         private const val MAXIMUM_TIME_IN_MILLIS = "maxTime"
+        private const val START_MINUTE_OF_DAY = "start"
+        private const val END_MINUTE_OF_DAY = "end"
+        private const val SESSION_DURATION_MILLISECONDS = "session"
+        private const val SESSION_PAUSE_MILLISECONDS = "pause"
 
         fun parse(reader: JsonReader): ServerTimeLimitRule {
             var id: String? = null
             var applyToExtraTimeUsage: Boolean? = null
             var dayMask: Byte? = null
             var maximumTimeInMillis: Int? = null
+            var startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE
+            var endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE
+            var sessionDurationMilliseconds: Int = 0
+            var sessionPauseMilliseconds: Int = 0
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -614,6 +704,10 @@ data class ServerTimeLimitRule(
                     APPLY_TO_EXTRA_TIME_USAGE -> applyToExtraTimeUsage = reader.nextBoolean()
                     DAY_MASK -> dayMask = reader.nextInt().toByte()
                     MAXIMUM_TIME_IN_MILLIS -> maximumTimeInMillis = reader.nextInt()
+                    START_MINUTE_OF_DAY -> startMinuteOfDay = reader.nextInt()
+                    END_MINUTE_OF_DAY -> endMinuteOfDay = reader.nextInt()
+                    SESSION_DURATION_MILLISECONDS -> sessionDurationMilliseconds = reader.nextInt()
+                    SESSION_PAUSE_MILLISECONDS -> sessionPauseMilliseconds = reader.nextInt()
                     else -> reader.skipValue()
                 }
             }
@@ -623,7 +717,11 @@ data class ServerTimeLimitRule(
                     id = id!!,
                     applyToExtraTimeUsage = applyToExtraTimeUsage!!,
                     dayMask = dayMask!!,
-                    maximumTimeInMillis = maximumTimeInMillis!!
+                    maximumTimeInMillis = maximumTimeInMillis!!,
+                    startMinuteOfDay = startMinuteOfDay,
+                    endMinuteOfDay = endMinuteOfDay,
+                    sessionDurationMilliseconds = sessionDurationMilliseconds,
+                    sessionPauseMilliseconds = sessionPauseMilliseconds
             )
         }
 
@@ -645,7 +743,11 @@ data class ServerTimeLimitRule(
             applyToExtraTimeUsage = applyToExtraTimeUsage,
             dayMask = dayMask,
             maximumTimeInMillis = maximumTimeInMillis,
-            categoryId = categoryId
+            categoryId = categoryId,
+            startMinuteOfDay = startMinuteOfDay,
+            endMinuteOfDay = endMinuteOfDay,
+            sessionDurationMilliseconds = sessionDurationMilliseconds,
+            sessionPauseMilliseconds = sessionPauseMilliseconds
     )
 }
 

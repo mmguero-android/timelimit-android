@@ -113,6 +113,7 @@ class NotificationListener: NotificationListenerService() {
                                                     BlockingReason.RequiresCurrentDevice -> getString(R.string.lock_reason_short_requires_current_device)
                                                     BlockingReason.NotificationsAreBlocked -> getString(R.string.lock_reason_short_notification_blocking)
                                                     BlockingReason.BatteryLimit -> getString(R.string.lock_reason_short_battery_limit)
+                                                    BlockingReason.SessionDurationLimit -> getString(R.string.lock_reason_short_session_duration)
                                                     BlockingReason.None -> throw IllegalStateException()
                                                 }
                                 )

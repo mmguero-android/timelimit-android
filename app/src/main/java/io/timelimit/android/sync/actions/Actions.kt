@@ -22,9 +22,11 @@ import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
 import io.timelimit.android.data.model.*
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.sync.network.ParentPassword
 import io.timelimit.android.sync.validation.ListValidation
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
@@ -142,20 +144,26 @@ data class AddUsedTimeAction(val categoryId: String, val dayOfEpoch: Int, val ti
     }
 }
 
-data class AddUsedTimeActionVersion2(val dayOfEpoch: Int, val items: List<AddUsedTimeActionItem>): AppLogicAction() {
+data class AddUsedTimeActionVersion2(
+        val dayOfEpoch: Int,
+        val items: List<AddUsedTimeActionItem>,
+        val trustedTimestamp: Long
+): AppLogicAction() {
     companion object {
         const val TYPE_VALUE = "ADD_USED_TIME_V2"
         private const val DAY_OF_EPOCH = "d"
         private const val ITEMS = "i"
+        private const val TRUSTED_TIMESTAMP = "t"
 
         fun parse(action: JSONObject): AddUsedTimeActionVersion2 = AddUsedTimeActionVersion2(
                 dayOfEpoch = action.getInt(DAY_OF_EPOCH),
-                items = ParseUtils.readObjectArray(action.getJSONArray(ITEMS)).map { AddUsedTimeActionItem.parse(it) }
+                items = ParseUtils.readObjectArray(action.getJSONArray(ITEMS)).map { AddUsedTimeActionItem.parse(it) },
+                trustedTimestamp = if (action.has(TRUSTED_TIMESTAMP)) action.getLong(TRUSTED_TIMESTAMP) else 0L
         )
     }
 
     init {
-        if (dayOfEpoch < 0) {
+        if (dayOfEpoch < 0 || trustedTimestamp < 0) {
             throw IllegalArgumentException()
         }
 
@@ -178,20 +186,42 @@ data class AddUsedTimeActionVersion2(val dayOfEpoch: Int, val items: List<AddUse
         items.forEach { it.serialize(writer) }
         writer.endArray()
 
+        if (trustedTimestamp != 0L) {
+            writer.name(TRUSTED_TIMESTAMP).value(trustedTimestamp)
+        }
+
         writer.endObject()
     }
 }
 
-data class AddUsedTimeActionItem(val categoryId: String, val timeToAdd: Int, val extraTimeToSubtract: Int) {
+data class AddUsedTimeActionItem(
+        val categoryId: String, val timeToAdd: Int, val extraTimeToSubtract: Int,
+        val additionalCountingSlots: Set<AddUsedTimeActionItemAdditionalCountingSlot>,
+        val sessionDurationLimits: Set<AddUsedTimeActionItemSessionDurationLimitSlot>
+) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
         private const val TIME_TO_ADD = "tta"
         private const val EXTRA_TIME_TO_SUBTRACT = "etts"
+        private const val ADDITIONAL_COUNTING_SLOTS = "as"
+        private const val SESSION_DURATION_LIMITS = "sdl"
 
         fun parse(item: JSONObject): AddUsedTimeActionItem = AddUsedTimeActionItem(
                 categoryId = item.getString(CATEGORY_ID),
                 timeToAdd = item.getInt(TIME_TO_ADD),
-                extraTimeToSubtract = item.getInt(EXTRA_TIME_TO_SUBTRACT)
+                extraTimeToSubtract = item.getInt(EXTRA_TIME_TO_SUBTRACT),
+                additionalCountingSlots = if (item.has(ADDITIONAL_COUNTING_SLOTS))
+                    item.getJSONArray(ADDITIONAL_COUNTING_SLOTS).let { array ->
+                        (0 until array.length()).map { AddUsedTimeActionItemAdditionalCountingSlot.parse(array.getJSONArray(it)) }
+                    }.toSet()
+                else
+                    emptySet(),
+                sessionDurationLimits = if (item.has(SESSION_DURATION_LIMITS))
+                    item.getJSONArray(SESSION_DURATION_LIMITS).let { array ->
+                        (0 until array.length()).map { AddUsedTimeActionItemSessionDurationLimitSlot.parse(array.getJSONArray(it)) }
+                    }.toSet()
+                else
+                    emptySet()
         )
     }
 
@@ -214,7 +244,88 @@ data class AddUsedTimeActionItem(val categoryId: String, val timeToAdd: Int, val
         writer.name(TIME_TO_ADD).value(timeToAdd)
         writer.name(EXTRA_TIME_TO_SUBTRACT).value(extraTimeToSubtract)
 
+        if (additionalCountingSlots.isNotEmpty()) {
+            writer.name(ADDITIONAL_COUNTING_SLOTS).beginArray()
+            additionalCountingSlots.forEach { it.serialize(writer) }
+            writer.endArray()
+        }
+
+        if (sessionDurationLimits.isNotEmpty()) {
+            writer.name(SESSION_DURATION_LIMITS).beginArray()
+            sessionDurationLimits.forEach { it.serialize(writer) }
+            writer.endArray()
+        }
+
         writer.endObject()
+    }
+}
+
+data class AddUsedTimeActionItemAdditionalCountingSlot(val start: Int, val end: Int) {
+    companion object {
+        fun parse(array: JSONArray): AddUsedTimeActionItemAdditionalCountingSlot {
+            val length = array.length()
+
+            if (length != 2) {
+                throw IllegalArgumentException()
+            }
+
+            return AddUsedTimeActionItemAdditionalCountingSlot(
+                    start = array.getInt(0),
+                    end = array.getInt(1)
+            )
+        }
+    }
+
+    init {
+        if (start < MinuteOfDay.MIN || end > MinuteOfDay.MAX || start > end) {
+            throw IllegalArgumentException()
+        }
+
+        if (start == MinuteOfDay.MIN && end == MinuteOfDay.MAX) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    fun serialize(writer: JsonWriter) {
+        writer.beginArray()
+                .value(start).value(end)
+                .endArray()
+    }
+}
+
+data class AddUsedTimeActionItemSessionDurationLimitSlot(
+        val startMinuteOfDay: Int, val endMinuteOfDay: Int,
+        val maxSessionDuration: Int, val sessionPauseDuration: Int
+) {
+    companion object {
+        fun parse(array: JSONArray): AddUsedTimeActionItemSessionDurationLimitSlot {
+            if (array.length() != 4) {
+                throw IllegalArgumentException()
+            }
+
+            return AddUsedTimeActionItemSessionDurationLimitSlot(
+                    array.getInt(0), array.getInt(1), array.getInt(2), array.getInt(3)
+            )
+        }
+    }
+
+    init {
+        if (startMinuteOfDay < MinuteOfDay.MIN || endMinuteOfDay > MinuteOfDay.MAX || startMinuteOfDay > endMinuteOfDay) {
+            throw IllegalArgumentException()
+        }
+
+        if (maxSessionDuration <= 0 || sessionPauseDuration <= 0) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    fun serialize(writer: JsonWriter) {
+        writer.beginArray()
+                .value(startMinuteOfDay)
+                .value(endMinuteOfDay)
+                .value(maxSessionDuration)
+                .value(sessionPauseDuration)
+                .endArray()
     }
 }
 
@@ -1299,13 +1410,20 @@ data class CreateTimeLimitRuleAction(val rule: TimeLimitRule): ParentAction() {
     }
 }
 
-data class UpdateTimeLimitRuleAction(val ruleId: String, val dayMask: Byte, val maximumTimeInMillis: Int, val applyToExtraTimeUsage: Boolean): ParentAction() {
+data class UpdateTimeLimitRuleAction(
+        val ruleId: String, val dayMask: Byte, val maximumTimeInMillis: Int, val applyToExtraTimeUsage: Boolean,
+        val start: Int, val end: Int, val sessionDurationMilliseconds: Int, val sessionPauseMilliseconds: Int
+): ParentAction() {
     companion object {
         const val TYPE_VALUE = "UPDATE_TIMELIMIT_RULE"
         private const val RULE_ID = "ruleId"
         private const val MAX_TIME_IN_MILLIS = "time"
         private const val DAY_MASK = "days"
         private const val APPLY_TO_EXTRA_TIME_USAGE = "extraTime"
+        private const val START = "start"
+        private const val END = "end"
+        private const val SESSION_DURATION_MILLISECONDS = "dur"
+        private const val SESSION_PAUSE_MILLISECONDS = "pause"
     }
 
     init {
@@ -1318,6 +1436,14 @@ data class UpdateTimeLimitRuleAction(val ruleId: String, val dayMask: Byte, val 
         if (dayMask < 0 || dayMask > (1 or 2 or 4 or 8 or 16 or 32 or 64)) {
             throw IllegalArgumentException()
         }
+
+        if (start < MinuteOfDay.MIN || end > MinuteOfDay.MAX || start > end) {
+            throw IllegalArgumentException()
+        }
+
+        if (sessionDurationMilliseconds < 0 || sessionPauseMilliseconds < 0) {
+            throw IllegalArgumentException()
+        }
     }
 
     override fun serialize(writer: JsonWriter) {
@@ -1328,6 +1454,13 @@ data class UpdateTimeLimitRuleAction(val ruleId: String, val dayMask: Byte, val 
         writer.name(MAX_TIME_IN_MILLIS).value(maximumTimeInMillis)
         writer.name(DAY_MASK).value(dayMask)
         writer.name(APPLY_TO_EXTRA_TIME_USAGE).value(applyToExtraTimeUsage)
+        writer.name(START).value(start)
+        writer.name(END).value(end)
+
+        if (sessionPauseMilliseconds > 0 || sessionDurationMilliseconds > 0) {
+            writer.name(SESSION_DURATION_MILLISECONDS).value(sessionDurationMilliseconds)
+            writer.name(SESSION_PAUSE_MILLISECONDS).value(sessionPauseMilliseconds)
+        }
 
         writer.endObject()
     }
@@ -1369,7 +1502,7 @@ data class AddUserAction(val name: String, val userType: UserType, val password:
 
         fun parse(action: JSONObject): AddUserAction {
             var password: ParentPassword? = null
-            val passwordObject = action.getJSONObject(PASSWORD)
+            val passwordObject = action.optJSONObject(PASSWORD)
 
             if (passwordObject != null) {
                 password = ParentPassword.parse(passwordObject)

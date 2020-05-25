@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.timelimit.android.R
 import io.timelimit.android.data.model.TimeLimitRule
+import io.timelimit.android.data.model.UsedTimeItem
 import io.timelimit.android.databinding.AddItemViewBinding
 import io.timelimit.android.databinding.FragmentCategoryTimeLimitRuleItemBinding
 import io.timelimit.android.databinding.TimeLimitRuleIntroductionBinding
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.util.JoinUtil
 import io.timelimit.android.util.TimeTextUtil
 import kotlin.properties.Delegates
@@ -36,7 +38,8 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
     }
 
     var data: List<TimeLimitRuleItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
-    var usedTimes: List<Long>? by Delegates.observable(null as List<Long>?) { _, _, _ -> notifyDataSetChanged() }
+    var usedTimes: List<UsedTimeItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
+    var epochDayOfStartOfWeek: Int by Delegates.observable(0) { _, _, _ -> notifyDataSetChanged() }
     var handlers: Handlers? = null
 
     init {
@@ -110,26 +113,42 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
             is TimeLimitRuleRuleItem -> {
                 val rule = item.rule
                 val binding = (holder as ItemViewHolder).view
+                val context = binding.root.context
                 val dayNames = binding.root.resources.getStringArray(R.array.days_of_week_array)
-                val usedTime = usedTimes?.mapIndexed { index, value ->
-                    if (rule.dayMask.toInt() and (1 shl index) != 0) {
-                        value
-                    } else {
-                        0
-                    }
-                }?.sum()?.toInt() ?: 0
+                val usedTime = usedTimes.filter { usedTime ->
+                    val dayOfWeek = usedTime.dayOfEpoch - epochDayOfStartOfWeek
+                    usedTime.startTimeOfDay == rule.startMinuteOfDay && usedTime.endTimeOfDay == rule.endMinuteOfDay &&
+                            (rule.dayMask.toInt() and (1 shl dayOfWeek) != 0)
+                }.map { it.usedMillis }.sum().toInt()
 
-                binding.maxTimeString = TimeTextUtil.time(rule.maximumTimeInMillis, binding.root.context)
-                binding.usageAsText = TimeTextUtil.used(usedTime, binding.root.context)
+                binding.maxTimeString = TimeTextUtil.time(rule.maximumTimeInMillis, context)
+                binding.usageAsText = TimeTextUtil.used(usedTime, context)
                 binding.usageProgressInPercent = if (rule.maximumTimeInMillis > 0)
                     (usedTime * 100 / rule.maximumTimeInMillis)
                 else
                     100
                 binding.daysString = JoinUtil.join(
                         dayNames.filterIndexed { index, _ -> (rule.dayMask.toInt() and (1 shl index)) != 0 },
-                        binding.root.context
+                        context
                 )
+                binding.timeAreaString = if (rule.appliesToWholeDay)
+                    null
+                else
+                    context.getString(
+                            R.string.category_time_limit_rules_time_area,
+                            MinuteOfDay.format(rule.startMinuteOfDay),
+                            MinuteOfDay.format(rule.endMinuteOfDay)
+                    )
                 binding.appliesToExtraTime = rule.applyToExtraTimeUsage
+                binding.sessionLimitString = if (rule.sessionDurationLimitEnabled)
+                    context.getString(
+                            R.string.category_time_limit_rules_session_limit,
+                            TimeTextUtil.time(rule.sessionPauseMilliseconds, context),
+                            TimeTextUtil.time(rule.sessionDurationMilliseconds, context)
+                    )
+                else
+                    null
+
                 binding.card.setOnClickListener { handlers?.onTimeLimitRuleClicked(rule) }
 
                 binding.executePendingBindings()

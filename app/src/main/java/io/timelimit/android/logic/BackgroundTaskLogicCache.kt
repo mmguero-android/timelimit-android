@@ -15,12 +15,8 @@
  */
 package io.timelimit.android.logic
 
-import android.util.SparseArray
 import androidx.lifecycle.LiveData
-import io.timelimit.android.data.model.Category
-import io.timelimit.android.data.model.CategoryApp
-import io.timelimit.android.data.model.TimeLimitRule
-import io.timelimit.android.data.model.UsedTimeItem
+import io.timelimit.android.data.model.*
 import io.timelimit.android.livedata.*
 import java.util.*
 
@@ -49,9 +45,14 @@ class BackgroundTaskLogicCache (private val appLogic: AppLogic) {
             return appLogic.database.timeLimitRules().getTimeLimitRulesByCategory(key)
         }
     }
-    val usedTimesOfCategoryAndWeekByFirstDayOfWeek = object: MultiKeyLiveDataCache<SparseArray<UsedTimeItem>, Pair<String, Int>>() {
-        override fun createValue(key: Pair<String, Int>): LiveData<SparseArray<UsedTimeItem>> {
+    val usedTimesOfCategoryAndWeekByFirstDayOfWeek = object: MultiKeyLiveDataCache<List<UsedTimeItem>, Pair<String, Int>>() {
+        override fun createValue(key: Pair<String, Int>): LiveData<List<UsedTimeItem>> {
             return appLogic.database.usedTimes().getUsedTimesOfWeek(key.first, key.second)
+        }
+    }
+    val usedSessionDurationsByCategoryId = object: MultiKeyLiveDataCache<List<SessionDuration>, String>() {
+        override fun createValue(key: String): LiveData<List<SessionDuration>> {
+            return appLogic.database.sessionDuration().getSessionDurationItemsByCategoryId(key)
         }
     }
     val shouldDoAutomaticSignOut = SingleItemLiveDataCacheWithRequery { -> appLogic.defaultUserLogic.hasAutomaticSignOut()}

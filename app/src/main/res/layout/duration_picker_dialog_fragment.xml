@@ -13,14 +13,10 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
-    <string name="usage_history_title">Nutzungsverlauf</string>
-    <string name="usage_history_empty_title">Kein Nutzungsverlauf vorhanden</string>
-    <string name="usage_history_empty_text">
-        Die Nutzungszeiten werden nur erfasst,
-        wenn Zeitbegrenzungsregeln existieren und die zeitbegrenzten Apps genutzt werden
-    </string>
-    <string name="usage_history_time_area">von %s bis %s</string>
-    <string name="usage_history_item_session_duration_limit">Sitzungsdauerbegrenzung von %s mit %s Pause</string>
-    <string name="usage_history_item_last_usage">Letzte Verwendung: %s</string>
-</resources>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <io.timelimit.android.ui.view.SelectTimeSpanView
+        android:padding="16dp"
+        android:id="@+id/duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</layout>

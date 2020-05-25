@@ -16,15 +16,14 @@
 package io.timelimit.android.logic
 
 import android.util.Log
-import android.util.SparseLongArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.data.model.*
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
-import io.timelimit.android.integration.time.TimeApi
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.extension.isCategoryAllowed
 import java.util.*
@@ -39,7 +38,8 @@ enum class BlockingReason {
     MissingNetworkTime,
     RequiresCurrentDevice,
     NotificationsAreBlocked,
-    BatteryLimit
+    BatteryLimit,
+    SessionDurationLimit
 }
 
 enum class BlockingLevel {
@@ -319,18 +319,18 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
             trustedMinuteOfWeek ->
 
             if (category.blockedMinutesInWeek.dataNotToModify.isEmpty) {
-                getBlockingReasonStep6(category, timeZone)
+                getBlockingReasonStep6(category, timeZone, trustedMinuteOfWeek)
             } else if (trustedMinuteOfWeek == null) {
                 liveDataFromValue(BlockingReason.MissingNetworkTime)
             } else if (category.blockedMinutesInWeek.read(trustedMinuteOfWeek)) {
                 liveDataFromValue(BlockingReason.BlockedAtThisTime)
             } else {
-                getBlockingReasonStep6(category, timeZone)
+                getBlockingReasonStep6(category, timeZone, trustedMinuteOfWeek)
             }
         }
     }
 
-    private fun getBlockingReasonStep6(category: Category, timeZone: TimeZone): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep6(category: Category, timeZone: TimeZone, trustedMinuteOfWeek: Int?): LiveData<BlockingReason> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 6")
         }
@@ -343,54 +343,67 @@ class BlockingReasonUtil(private val appLogic: AppLogic) {
 
                 if (rules.isEmpty()) {
                     liveDataFromValue(BlockingReason.None)
-                } else if (nowTrustedDate == null) {
+                } else if (nowTrustedDate == null || trustedMinuteOfWeek == null) {
                     liveDataFromValue(BlockingReason.MissingNetworkTime)
                 } else {
-                    getBlockingReasonStep6(category, nowTrustedDate, rules)
+                    getBlockingReasonStep6(category, nowTrustedDate, trustedMinuteOfWeek, rules)
                 }
             }
         }
     }
 
-    private fun getBlockingReasonStep6(category: Category, nowTrustedDate: DateInTimezone, rules: List<TimeLimitRule>): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep6(category: Category, nowTrustedDate: DateInTimezone, trustedMinuteOfWeek: Int, rules: List<TimeLimitRule>): LiveData<BlockingReason> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 6 - 2")
         }
 
         return appLogic.currentDeviceLogic.isThisDeviceTheCurrentDevice.switchMap { isCurrentDevice ->
             if (isCurrentDevice) {
-                getBlockingReasonStep7(category, nowTrustedDate, rules)
+                getBlockingReasonStep7(category, nowTrustedDate, trustedMinuteOfWeek, rules)
             } else {
                 liveDataFromValue(BlockingReason.RequiresCurrentDevice)
             }
         }
     }
 
-    private fun getBlockingReasonStep7(category: Category, nowTrustedDate: DateInTimezone, rules: List<TimeLimitRule>): LiveData<BlockingReason> {
+    private fun getBlockingReasonStep7(category: Category, nowTrustedDate: DateInTimezone, trustedMinuteOfWeek: Int, rules: List<TimeLimitRule>): LiveData<BlockingReason> {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "step 7")
         }
 
         val extraTime = category.getExtraTime(dayOfEpoch = nowTrustedDate.dayOfEpoch)
+        val firstDayOfWeekAsEpochDay = nowTrustedDate.dayOfEpoch - nowTrustedDate.dayOfWeek
 
-        return appLogic.database.usedTimes().getUsedTimesOfWeek(category.id, nowTrustedDate.dayOfEpoch - nowTrustedDate.dayOfWeek).map {
-            usedTimes ->
-            val usedTimesSparseArray = SparseLongArray()
-
-            for (i in 0..6) {
-                val usedTimesItem = usedTimes[i]?.usedMillis
-                usedTimesSparseArray.put(i, (if (usedTimesItem != null) usedTimesItem else 0))
-            }
-
-            val remaining = RemainingTime.getRemainingTime(nowTrustedDate.dayOfWeek, usedTimesSparseArray, rules, extraTime)
+        return appLogic.database.usedTimes().getUsedTimesOfWeek(category.id, firstDayOfWeekAsEpochDay = firstDayOfWeekAsEpochDay).switchMap { usedTimes ->
+            val remaining = RemainingTime.getRemainingTime(nowTrustedDate.dayOfWeek, trustedMinuteOfWeek % MinuteOfDay.LENGTH, usedTimes, rules, extraTime, firstDayOfWeekAsEpochDay)
 
             if (remaining == null || remaining.includingExtraTime > 0) {
-                BlockingReason.None
+                appLogic.database.sessionDuration().getSessionDurationItemsByCategoryId(category.id).switchMap { durations ->
+                    getTemporarilyTrustedTimeInMillis().map { timeInMillis ->
+                        if (timeInMillis == null) {
+                            BlockingReason.MissingNetworkTime
+                        } else {
+                            val remainingDuration = RemainingSessionDuration.getRemainingSessionDuration(
+                                    rules = rules,
+                                    dayOfWeek = nowTrustedDate.dayOfWeek,
+                                    durationsOfCategory = durations,
+                                    minuteOfDay = trustedMinuteOfWeek % MinuteOfDay.LENGTH,
+                                    timestamp = timeInMillis
+                            )
+
+                            if (remainingDuration == null || remainingDuration > 0) {
+                                BlockingReason.None
+                            } else {
+                                BlockingReason.SessionDurationLimit
+                            }
+                        }
+                    }
+                }
             } else {
                 if (extraTime > 0) {
-                    BlockingReason.TimeOverExtraTimeCanBeUsedLater
+                    liveDataFromValue(BlockingReason.TimeOverExtraTimeCanBeUsedLater)
                 } else {
-                    BlockingReason.TimeOver
+                    liveDataFromValue(BlockingReason.TimeOver)
                 }
             }
         }
