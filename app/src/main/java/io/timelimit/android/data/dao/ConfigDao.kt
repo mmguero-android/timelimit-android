@@ -158,6 +158,14 @@ abstract class ConfigDao {
         }
     }
 
+    fun getFullVersionUntilSync() = getValueOfKeySync(ConfigurationItemType.FullVersionUntil).let {
+        if (it == null || it.isEmpty()) {
+            0L
+        } else {
+            it.toLong()
+        }
+    }
+
     fun setFullVersionUntilSync(fullVersionUntil: Long) {
         updateValueSync(ConfigurationItemType.FullVersionUntil, fullVersionUntil.toString())
     }

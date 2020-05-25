@@ -15,10 +15,7 @@
  */
 package io.timelimit.android.data.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import io.timelimit.android.data.model.Notification
 
 @Dao
@@ -29,7 +26,7 @@ interface NotificationDao {
     @Insert
     fun addNotificationSync(notification: Notification)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addNotificationsSync(notifications: List<Notification>)
 
     @Delete

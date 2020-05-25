@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,6 +117,23 @@ object NotificationAreaSync {
                             .setShowWhen(false)
                             .setAutoCancel(false)
                             .setPriority(NotificationCompat.PRIORITY_LOW)
+                            .setOnlyAlertOnce(true)
+                            .build()
+            )
+        } else if (notification.type == NotificationTypes.PREMIUM_EXPIRES) {
+            notificationManager.notify(
+                    notificationTag,
+                    NotificationIds.USER_NOTIFICATION,
+                    NotificationCompat.Builder(context, NotificationChannels.PREMIUM_EXPIRES_NOTIFICATION)
+                            .setSmallIcon(R.drawable.ic_stat_timelapse)
+                            .setContentTitle(context.getString(R.string.notification_premium_expires_title))
+                            .setContentText(context.getString(R.string.notification_generic_text))
+                            .setContentIntent(openAppIntent)
+                            .setDeleteIntent(markReadIntent)
+                            .setWhen(0)
+                            .setShowWhen(false)
+                            .setAutoCancel(false)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                             .setOnlyAlertOnce(true)
                             .build()
             )

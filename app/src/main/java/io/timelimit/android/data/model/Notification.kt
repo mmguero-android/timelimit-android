@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,4 +81,5 @@ data class Notification(
 object NotificationTypes {
     const val UPDATE_MISSING = 1 shl 1
     const val MANIPULATION = 1 shl 2
+    const val PREMIUM_EXPIRES = 1 shl 3
 }

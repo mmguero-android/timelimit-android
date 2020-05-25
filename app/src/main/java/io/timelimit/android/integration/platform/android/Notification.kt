@@ -38,6 +38,7 @@ object NotificationChannels {
     const val MANIPULATION_WARNING = "manipulation warning"
     const val UPDATE_NOTIFICATION = "update notification"
     const val TIME_WARNING = "time warning"
+    const val PREMIUM_EXPIRES_NOTIFICATION = "premium expires"
 
     private fun createAppStatusChannel(notificationManager: NotificationManager, context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -117,12 +118,30 @@ object NotificationChannels {
         }
     }
 
+    fun createPremiumExpiresChannel(notificationManager: NotificationManager, context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                    NotificationChannel(
+                            NotificationChannels.PREMIUM_EXPIRES_NOTIFICATION,
+                            context.getString(R.string.notification_channel_premium_expires_title),
+                            NotificationManager.IMPORTANCE_DEFAULT
+                    ).apply {
+                        description = context.getString(R.string.notification_channel_premium_expires_text)
+                        enableLights(false)
+                        setSound(null, null)
+                        enableVibration(false)
+                    }
+            )
+        }
+    }
+
     fun createNotificationChannels(notificationManager: NotificationManager, context: Context) {
         createAppStatusChannel(notificationManager, context)
         createBlockedNotificationChannel(notificationManager, context)
         createManipulationNotificationChannel(notificationManager, context)
         createUpdateNotificationChannel(notificationManager, context)
         createTimeWarningsNotificationChannel(notificationManager, context)
+        createPremiumExpiresChannel(notificationManager, context)
     }
 }
 

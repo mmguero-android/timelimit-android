@@ -7,6 +7,7 @@ import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.Notification
 import io.timelimit.android.data.model.NotificationTypes
+import io.timelimit.android.data.model.UserType
 import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.ui.notification.NotificationAreaSync
 
@@ -40,10 +41,28 @@ class SyncNotificationLogic (private val appLogic: AppLogic) {
 
         // get current warnings
         val now = System.currentTimeMillis()
-        val devices = Threads.database.executeAndWait {
+        val ( devices, fullVersionEndTime, isChildDevice ) = Threads.database.executeAndWait {
             val ownId = appLogic.database.config().getOwnDeviceIdSync()
 
-            appLogic.database.device().getAllDevicesSync().filter { it.id != ownId }
+            val otherDevices = appLogic.database.device().getAllDevicesSync().filter { it.id != ownId }
+            val fullVersionEndTime = if (ownId != null && appLogic.database.config().getDeviceAuthTokenSync().isNotEmpty())
+                appLogic.database.config().getFullVersionUntilSync()
+            else
+                null
+
+            val deviceEntry = if (ownId != null)
+                appLogic.database.device().getDeviceByIdSync(ownId)
+            else
+                null
+
+            val userEntry = if (deviceEntry != null)
+                appLogic.database.user().getUserByIdSync(deviceEntry.currentUserId)
+            else
+                null
+
+            val isChildDevice = userEntry?.type == UserType.Child
+
+            Triple(otherDevices, fullVersionEndTime, isChildDevice)
         }
 
         val manipulatedDevices = devices.filter { it.hasAnyManipulation || it.didReportUninstall }.map { it.id }
@@ -52,6 +71,10 @@ class SyncNotificationLogic (private val appLogic: AppLogic) {
         val currentWarnings = mutableSetOf<Pair<Int, String>>() // type + id
         currentWarnings.addAll(manipulatedDevices.map { NotificationTypes.MANIPULATION to it })
         currentWarnings.addAll(outdatedDevices.map { NotificationTypes.UPDATE_MISSING to it })
+
+        if (fullVersionEndTime != null && fullVersionEndTime > now && !isChildDevice) {
+            currentWarnings.add(NotificationTypes.PREMIUM_EXPIRES to "")
+        }
 
         val savedWarnings = Threads.database.executeAndWait {
             appLogic.database.notification().getAllNotifications()
@@ -68,7 +91,22 @@ class SyncNotificationLogic (private val appLogic: AppLogic) {
         currentWarnings.forEach { warning ->
             val oldEntry = notificationsToRemove.find { it.type == warning.first && it.id == warning.second }
 
-            if (oldEntry != null) {
+            if (warning.first == NotificationTypes.PREMIUM_EXPIRES) {
+                val notifyTime = fullVersionEndTime!! - 1000 * 60 * 60 * 24 * 3   // wait until 3 days before its end time
+
+                if (oldEntry != null) {
+                    notificationsToRemove.remove(oldEntry)
+                }
+
+                if (oldEntry == null || oldEntry.firstNotifyTime != notifyTime) {
+                    newNotifications.add(Notification(
+                            type = NotificationTypes.PREMIUM_EXPIRES,
+                            id = "",
+                            isDismissed = false,
+                            firstNotifyTime = notifyTime
+                    ))
+                }
+            } else if (oldEntry != null) {
                 // nothing to do
                 notificationsToRemove.remove(oldEntry)
             } else {
@@ -88,12 +126,12 @@ class SyncNotificationLogic (private val appLogic: AppLogic) {
             Threads.database.executeAndWait {
                 appLogic.database.beginTransaction()
                 try {
-                    if (newNotifications.isNotEmpty()) {
-                        appLogic.database.notification().addNotificationsSync(newNotifications)
-                    }
-
                     if (notificationsToRemove.isNotEmpty()) {
                         appLogic.database.notification().removeNotificationSync(notificationsToRemove)
+                    }
+
+                    if (newNotifications.isNotEmpty()) {
+                        appLogic.database.notification().addNotificationsSync(newNotifications)
                     }
 
                     appLogic.database.setTransactionSuccessful()
