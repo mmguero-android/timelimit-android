@@ -1,3 +1,9 @@
-- added unlocking by barcode to the local mode
-- added system permission request dialog of newer Android versions to the whitelist
-- added info that the temporarily blocking is indefinitely by default
+New features:
+
+- session duration limits (e.g. 10 minutes break after 30 minutes usage)
+- time limits depending on the time of the day
+- notification when the premium version will expire shortly (at the device of the parent if the background sync is enabled)
+
+Changes:
+
+- the status notification is not showed at the lockscreen anymore if a screen lock is configured
