@@ -64,6 +64,7 @@ class BackgroundTaskLogicCache (private val appLogic: AppLogic) {
             appCategories,
             timeLimitRules,
             usedTimesOfCategoryAndWeekByFirstDayOfWeek,
+            usedSessionDurationsByCategoryId,
             shouldDoAutomaticSignOut
     ))
 }
