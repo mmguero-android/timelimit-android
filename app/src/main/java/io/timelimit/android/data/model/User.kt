@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +62,9 @@ data class User(
         @ColumnInfo(name = "mail_notification_flags")
         val mailNotificationFlags: Int,
         @ColumnInfo(name = "blocked_times")
-        val blockedTimes: ImmutableBitmask
+        val blockedTimes: ImmutableBitmask,
+        @ColumnInfo(name = "flags")
+        val flags: Long
 ): JsonSerializable {
     companion object {
         private const val ID = "id"
@@ -78,6 +80,7 @@ data class User(
         private const val RELAX_PRIMARY_DEVICE = "relaxPrimaryDevice"
         private const val MAIL_NOTIFICATION_FLAGS = "mailNotificationFlags"
         private const val BLOCKED_TIMES = "blockedTimes"
+        private const val FLAGS = "flags"
 
         fun parse(reader: JsonReader): User {
             var id: String? = null
@@ -93,6 +96,7 @@ data class User(
             var relaxPrimaryDevice = false
             var mailNotificationFlags = 0
             var blockedTimes = ImmutableBitmask(BitSet())
+            var flags = 0L
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -110,6 +114,7 @@ data class User(
                     RELAX_PRIMARY_DEVICE -> relaxPrimaryDevice = reader.nextBoolean()
                     MAIL_NOTIFICATION_FLAGS -> mailNotificationFlags = reader.nextInt()
                     BLOCKED_TIMES -> blockedTimes = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
+                    FLAGS -> flags = reader.nextLong()
                     else -> reader.skipValue()
                 }
             }
@@ -128,7 +133,8 @@ data class User(
                     categoryForNotAssignedApps = categoryForNotAssignedApps,
                     relaxPrimaryDevice = relaxPrimaryDevice,
                     mailNotificationFlags = mailNotificationFlags,
-                    blockedTimes = blockedTimes
+                    blockedTimes = blockedTimes,
+                    flags = flags
             )
         }
 
@@ -159,6 +165,9 @@ data class User(
         }
     }
 
+    val restrictViewingToParents: Boolean
+        get() = flags and UserFlags.RESTRICT_VIEWING_TO_PARENTS == UserFlags.RESTRICT_VIEWING_TO_PARENTS
+
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 
@@ -175,6 +184,7 @@ data class User(
         writer.name(RELAX_PRIMARY_DEVICE).value(relaxPrimaryDevice)
         writer.name(MAIL_NOTIFICATION_FLAGS).value(mailNotificationFlags)
         writer.name(BLOCKED_TIMES).value(ImmutableBitmaskJson.serialize(blockedTimes))
+        writer.name(FLAGS).value(flags)
 
         writer.endObject()
     }
@@ -206,4 +216,9 @@ class UserTypeConverter {
 
     @TypeConverter
     fun toString(value: UserType) = UserTypeJson.serialize(value)
+}
+
+object UserFlags {
+    const val RESTRICT_VIEWING_TO_PARENTS = 1L
+    const val ALL_FLAGS = RESTRICT_VIEWING_TO_PARENTS
 }

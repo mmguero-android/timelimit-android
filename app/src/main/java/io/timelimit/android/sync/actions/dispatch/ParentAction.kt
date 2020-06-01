@@ -176,7 +176,8 @@ object LocalDatabaseParentActionDispatcher {
                             categoryForNotAssignedApps = "",
                             relaxPrimaryDevice = false,
                             mailNotificationFlags = 0,
-                            blockedTimes = ImmutableBitmask(BitSet())
+                            blockedTimes = ImmutableBitmask(BitSet()),
+                            flags = 0
                     ))
                 }
                 is UpdateCategoryBlockedTimesAction -> {
@@ -585,6 +586,15 @@ object LocalDatabaseParentActionDispatcher {
                     action.categoryIds.forEachIndexed { index, categoryId ->
                         database.category().updateCategorySorting(categoryId, index)
                     }
+                }
+                is UpdateUserFlagsAction -> {
+                    val user = database.user().getUserByIdSync(action.userId)!!
+
+                    val updatedUser = user.copy(
+                            flags = (user.flags and action.modifiedBits.inv()) or action.newValues
+                    )
+
+                    database.user().updateUserSync(updatedUser)
                 }
             }.let { }
         }

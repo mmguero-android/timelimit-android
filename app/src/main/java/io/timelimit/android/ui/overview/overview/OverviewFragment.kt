@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,10 +69,18 @@ class OverviewFragment : CoroutineFragment(), CanNotAddDevicesInLocalModeDialogF
             }
 
             override fun onUserClicked(user: User) {
-                when (user.type) {
-                    UserType.Child -> handlers.openManageChildScreen(childId = user.id)
-                    UserType.Parent -> handlers.openManageParentScreen(parentId = user.id)
-                }.let {  }
+                if (
+                        user.restrictViewingToParents &&
+                        logic.deviceUserId.value != user.id &&
+                        !auth.requestAuthenticationOrReturnTrue()
+                ) {
+                    // do "nothing"/ request authentication
+                } else {
+                    when (user.type) {
+                        UserType.Child -> handlers.openManageChildScreen(childId = user.id)
+                        UserType.Parent -> handlers.openManageParentScreen(parentId = user.id)
+                    }.let { }
+                }
             }
 
             override fun onAddDeviceClicked() {

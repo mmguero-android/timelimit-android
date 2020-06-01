@@ -98,6 +98,9 @@
             <include android:id="@+id/password"
                 layout="@layout/manage_child_password" />
 
+            <include android:id="@+id/limit_viewing"
+                layout="@layout/limit_user_viewing_view" />
+
             <androidx.cardview.widget.CardView
                 app:cardUseCompatPadding="true"
                 android:layout_width="match_parent"

@@ -1826,6 +1826,34 @@ data class ResetParentBlockedTimesAction(val parentId: String): ParentAction() {
     }
 }
 
+data class UpdateUserFlagsAction(val userId: String, val modifiedBits: Long, val newValues: Long): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_USER_FLAGS"
+        private const val USER_ID = "userId"
+        private const val MODIFIED_BITS = "modified"
+        private const val NEW_VALUES = "values"
+    }
+
+    init {
+        IdGenerator.assertIdValid(userId)
+
+        if (modifiedBits or UserFlags.ALL_FLAGS != UserFlags.ALL_FLAGS || modifiedBits or newValues != modifiedBits) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(USER_ID).value(userId)
+        writer.name(MODIFIED_BITS).value(modifiedBits)
+        writer.name(NEW_VALUES).value(newValues)
+
+        writer.endObject()
+    }
+}
+
 // child actions
 object ChildSignInAction: ChildAction() {
     private const val TYPE_VALUE = "CHILD_SIGN_IN"
