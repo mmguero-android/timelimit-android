@@ -23,7 +23,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.transaction
 import io.timelimit.android.crypto.Curve25519
 
 class SetupParentmodeDialogModel: ViewModel() {
@@ -37,15 +36,13 @@ class SetupParentmodeDialogModel: ViewModel() {
             runAsync {
                 val keys = Threads.crypto.executeAndWait { Curve25519.generateKeyPair() }
                 val ok = Threads.database.executeAndWait {
-                    database.transaction().use {
+                    database.runInTransaction {
                         if (database.config().getOwnDeviceIdSync() != null) {
                             false
                         } else if (database.config().getParentModeKeySync() != null) {
                             true
                         } else {
                             database.config().setParentModeKeySync(keys)
-
-                            it.setSuccess()
 
                             true
                         }

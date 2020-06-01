@@ -26,7 +26,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.backup.DatabaseBackup
-import io.timelimit.android.data.transaction
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.ApplyServerDataStatus
@@ -112,7 +111,7 @@ class MigrateToConnectedModeModel(application: Application): AndroidViewModel(ap
                     val auth = model.getAuthenticatedUser()!!
 
                     val currentConfig = Threads.database.executeAndWait {
-                        database.transaction().use {
+                        database.runInTransaction {
                             // check if not yet linked
                             if (database.config().getDeviceAuthTokenSync() != "") {
                                 throw IllegalStateException("already linked")
@@ -142,7 +141,7 @@ class MigrateToConnectedModeModel(application: Application): AndroidViewModel(ap
                     val clientStatusResponse = server.api.pullChanges(addDeviceResponse.deviceAuthToken, ClientDataStatus.empty)
 
                     val authentication = Threads.database.executeAndWait {
-                        logic.database.transaction().use { transaction ->
+                        logic.database.runInTransaction {
                             val customServerUrl = logic.database.config().getCustomServerUrlSync()
                             val database = logic.database
 
@@ -159,8 +158,6 @@ class MigrateToConnectedModeModel(application: Application): AndroidViewModel(ap
                                     parentUserId = newParentUser.id,
                                     secondPasswordHash = auth.secondPasswordHash
                             )
-
-                            transaction.setSuccess()
 
                             newParentUserAuth
                         }

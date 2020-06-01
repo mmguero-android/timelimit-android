@@ -107,16 +107,8 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
     }
 
     // the room compiler needs this
-    override fun setTransactionSuccessful() {
-        super.setTransactionSuccessful()
-    }
-
-    override fun beginTransaction() {
-        super.beginTransaction()
-    }
-
-    override fun endTransaction() {
-        super.endTransaction()
+    override fun <T> runInTransaction(block: () -> T): T {
+        return super.runInTransaction(block)
     }
 
     override fun deleteAllData() {

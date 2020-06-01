@@ -27,7 +27,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.backup.DatabaseBackup
-import io.timelimit.android.data.transaction
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.DefaultAppLogic
@@ -104,7 +103,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                 val clientStatusResponse = api.pullChanges(registerResponse.deviceAuthToken, ClientDataStatus.empty)
 
                 Threads.database.executeAndWait {
-                    logic.database.transaction().use { transaction ->
+                    logic.database.runInTransaction {
                         val customServerUrl = logic.database.config().getCustomServerUrlSync()
 
                         database.deleteAllData()
@@ -115,8 +114,6 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                         database.config().setEnableBackgroundSync(enableBackgroundSync)
 
                         ApplyServerDataStatus.applyServerDataStatusSync(clientStatusResponse, logic.database, logic.platformIntegration)
-
-                        transaction.setSuccess()
                     }
                 }
 
@@ -175,7 +172,7 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                 val clientStatusResponse = api.pullChanges(registerResponse.deviceAuthToken, ClientDataStatus.empty)
 
                 Threads.database.executeAndWait {
-                    logic.database.transaction().use { transaction ->
+                    logic.database.runInTransaction {
                         val customServerUrl = logic.database.config().getCustomServerUrlSync()
 
                         database.deleteAllData()
@@ -186,8 +183,6 @@ class SetupParentModeModel(application: Application): AndroidViewModel(applicati
                         database.config().setEnableBackgroundSync(enableBackgroundSync)
 
                         ApplyServerDataStatus.applyServerDataStatusSync(clientStatusResponse, logic.database, logic.platformIntegration)
-
-                        transaction.setSuccess()
                     }
                 }
 

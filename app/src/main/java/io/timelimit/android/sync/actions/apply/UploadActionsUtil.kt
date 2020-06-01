@@ -18,7 +18,6 @@ package io.timelimit.android.sync.actions.apply
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.transaction
 import io.timelimit.android.logic.ServerLogic
 import io.timelimit.android.sync.network.ActionUploadItem
 import io.timelimit.android.sync.network.ActionUploadRequest
@@ -28,15 +27,11 @@ class UploadActionsUtil(private val database: Database, private val syncConflict
         private const val BATCH_SIZE = 25
 
         fun deleteAllVersionNumbersSync(database: Database) {
-            database.transaction().use {
-                transaction ->
-
+            database.runInTransaction {
                 database.config().setUserListVersionSync("")
                 database.config().setDeviceListVersionSync("")
                 database.device().deleteAllInstalledAppsVersions()
                 database.category().deleteAllCategoriesVersionNumbers()
-
-                transaction.setSuccess()
             }
         }
     }
@@ -60,9 +55,7 @@ class UploadActionsUtil(private val database: Database, private val syncConflict
 
     private suspend fun markItemsForUploadingIfNeeded(highestSequenceNumber: Long): Boolean {
         return Threads.database.executeAndWait {
-            database.transaction().use {
-                transaction ->
-
+            database.runInTransaction {
                 val preparedItems = database.pendingSyncAction().countScheduledActionsSync(highestSequenceNumber)
                 val unpreparedItems = database.pendingSyncAction().countUnscheduledActionsSync(highestSequenceNumber)
                 val missingItems = BATCH_SIZE - preparedItems
@@ -71,7 +64,6 @@ class UploadActionsUtil(private val database: Database, private val syncConflict
                     val items = database.pendingSyncAction().getNextUnscheduledActionsSync(missingItems.toInt())
                     database.pendingSyncAction().markSyncActionsAsScheduledForUpload(items.last().sequenceNumber)
 
-                    transaction.setSuccess()
                     true
                 } else {
                     false
@@ -115,9 +107,7 @@ class UploadActionsUtil(private val database: Database, private val syncConflict
         )
 
         Threads.database.executeAndWait {
-            database.transaction().use {
-                transaction ->
-
+            database.runInTransaction {
                 if (response.shouldDoFullSync) {
                     deleteAllVersionNumbersSync(database)
 
@@ -126,8 +116,6 @@ class UploadActionsUtil(private val database: Database, private val syncConflict
 
                 // delete now processed items
                 database.pendingSyncAction().removeSyncActionsBySequenceNumbersSync(pendingItems.map { it.sequenceNumber })
-
-                transaction.setSuccess()
             }
         }
 

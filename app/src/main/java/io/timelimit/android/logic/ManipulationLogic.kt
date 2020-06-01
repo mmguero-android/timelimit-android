@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.ExperimentalFlags
-import io.timelimit.android.data.transaction
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.manipulation.UnlockAfterManipulationActivity
 
@@ -86,15 +85,13 @@ class ManipulationLogic(val appLogic: AppLogic) {
 
     fun reportManualUnlock() {
         Threads.database.execute {
-            appLogic.database.transaction().use { transaction ->
+            appLogic.database.runInTransaction {
                 if (appLogic.database.config().getOwnDeviceIdSync() != null) {
                     if (appLogic.database.config().wasDeviceLockedSync()) {
                         appLogic.database.config().setWasDeviceLockedSync(false)
 
                         showManipulationUnlockedScreen()
                     }
-
-                    transaction.setSuccess()
                 }
             }
         }

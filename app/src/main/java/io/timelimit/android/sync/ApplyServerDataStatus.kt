@@ -35,9 +35,7 @@ object ApplyServerDataStatus {
     }
 
     fun applyServerDataStatusSync(status: ServerDataStatus, database: Database, platformIntegration: PlatformIntegration) {
-        database.beginTransaction()
-
-        try {
+        database.runInTransaction {
             run {
                 // apply ful version until and message
 
@@ -462,10 +460,6 @@ object ApplyServerDataStatus {
                     )
                 }
             }
-
-            database.setTransactionSuccessful()
-        } finally {
-            database.endTransaction()
         }
     }
 }

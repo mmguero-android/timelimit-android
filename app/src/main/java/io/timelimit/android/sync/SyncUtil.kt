@@ -24,7 +24,6 @@ import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.data.transaction
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.ServerLogic
@@ -225,7 +224,7 @@ class SyncUtil (private val logic: AppLogic) {
 
     private suspend fun wipeCacheIfUpdated() {
         Threads.database.executeAndWait {
-            logic.database.transaction().use {
+            logic.database.runInTransaction {
                 if (logic.database.config().getLastAppVersionWhichSynced() != appVersion) {
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "app update -> wipe cache")
@@ -239,8 +238,6 @@ class SyncUtil (private val logic: AppLogic) {
                         Log.d(LOG_TAG, "no app update -> keep cache")
                     }
                 }
-
-                it.setSuccess()
             }
         }
     }

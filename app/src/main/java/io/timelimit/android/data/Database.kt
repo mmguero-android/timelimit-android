@@ -35,30 +35,8 @@ interface Database {
     fun userKey(): UserKeyDao
     fun sessionDuration(): SessionDurationDao
 
-    fun beginTransaction()
-    fun setTransactionSuccessful()
-    fun endTransaction()
+    fun <T> runInTransaction(block: () -> T): T
 
     fun deleteAllData()
     fun close()
-}
-
-fun Database.transaction(): Transaction {
-    val db = this
-
-    db.beginTransaction()
-
-    return object: Transaction {
-        override fun setSuccess() {
-            db.setTransactionSuccessful()
-        }
-
-        override fun close() {
-            db.endTransaction()
-        }
-    }
-}
-
-interface Transaction: Closeable {
-    fun setSuccess()
 }

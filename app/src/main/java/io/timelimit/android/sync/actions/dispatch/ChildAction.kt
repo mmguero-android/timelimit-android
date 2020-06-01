@@ -23,9 +23,7 @@ object LocalDatabaseChildActionDispatcher {
     fun dispatchChildActionSync(action: ChildAction, childId: String, database: Database) {
         DatabaseValidation.assertChildExists(database, childId)
 
-        database.beginTransaction()
-
-        try {
+        database.runInTransaction {
             when (action) {
                 is ChildSignInAction -> {
                     val deviceId = database.config().getOwnDeviceIdSync()!!
@@ -64,10 +62,6 @@ object LocalDatabaseChildActionDispatcher {
                     )
                 }
             }.let { /* require handling all paths */ }
-
-            database.setTransactionSuccessful()
-        } finally {
-            database.endTransaction()
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +35,7 @@ class ServerLogic(private val appLogic: AppLogic) {
 
     suspend fun getServerConfigCoroutine(): ServerConfig {
         return Threads.database.executeAndWait {
-            appLogic.database.beginTransaction()
-
-            try {
+            appLogic.database.runInTransaction {
                 val customServerUrl = appLogic.database.config().getCustomServerUrlSync()
                 val deviceAuthToken = appLogic.database.config().getDeviceAuthTokenSync()
                 val isAppEnabled = appLogic.database.config().getOwnDeviceIdSync() != null
@@ -48,8 +46,6 @@ class ServerLogic(private val appLogic: AppLogic) {
                         isAppEnabled = isAppEnabled,
                         serverLogic = this
                 )
-            } finally {
-                appLogic.database.endTransaction()
             }
         }
     }

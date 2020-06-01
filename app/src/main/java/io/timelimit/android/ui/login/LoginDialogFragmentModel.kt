@@ -27,7 +27,6 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.crypto.PasswordHashing
 import io.timelimit.android.data.model.User
 import io.timelimit.android.data.model.UserType
-import io.timelimit.android.data.transaction
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.BlockingReasonUtil
 import io.timelimit.android.logic.DefaultAppLogic
@@ -203,7 +202,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                 }
 
                 val user: User? = Threads.database.executeAndWait {
-                    logic.database.transaction().use {
+                    logic.database.runInTransaction {
                         val keyEntry = logic.database.userKey().findUserKeyByPublicKeySync(code.publicKey)
 
                         if (keyEntry == null) {
@@ -211,7 +210,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                 Toast.makeText(getApplication(), R.string.login_scan_code_err_not_linked, Toast.LENGTH_SHORT).show()
                             }
 
-                            return@executeAndWait null
+                            return@runInTransaction null
                         }
 
                         if (keyEntry.lastUse >= code.timestamp) {
@@ -219,11 +218,10 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                 Toast.makeText(getApplication(), R.string.login_scan_code_err_expired, Toast.LENGTH_SHORT).show()
                             }
 
-                            return@executeAndWait null
+                            return@runInTransaction null
                         }
 
                         logic.database.userKey().updateKeyTimestamp(code.publicKey, code.timestamp)
-                        it.setSuccess()
 
                         logic.database.user().getUserByIdSync(keyEntry.userId)
                     }

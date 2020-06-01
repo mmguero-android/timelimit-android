@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.backup.DatabaseBackup
-import io.timelimit.android.data.transaction
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.AppLogic
@@ -60,7 +59,7 @@ class SetupRemoteChildViewModel(application: Application): AndroidViewModel(appl
                 val clientStatusResponse = api.pullChanges(registerResponse.deviceAuthToken, ClientDataStatus.empty)
 
                 Threads.database.executeAndWait {
-                    logic.database.transaction().use { transaction ->
+                    logic.database.runInTransaction {
                         val customServerUrl = logic.database.config().getCustomServerUrlSync()
 
                         logic.database.deleteAllData()
@@ -69,8 +68,6 @@ class SetupRemoteChildViewModel(application: Application): AndroidViewModel(appl
                         logic.database.config().setDeviceAuthTokenSync(registerResponse.deviceAuthToken)
 
                         ApplyServerDataStatus.applyServerDataStatusSync(clientStatusResponse, logic.database, logic.platformIntegration)
-
-                        transaction.setSuccess()
                     }
                 }
 

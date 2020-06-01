@@ -25,7 +25,6 @@ import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.PendingSyncAction
 import io.timelimit.android.data.model.PendingSyncActionType
 import io.timelimit.android.data.model.UserType
-import io.timelimit.android.data.transaction
 import io.timelimit.android.integration.platform.PlatformIntegration
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.ManipulationLogic
@@ -73,11 +72,11 @@ object ApplyActionUtil {
         */
 
         Threads.database.executeAndWait {
-            database.transaction().use {
+            database.runInTransaction {
                 val ownDeviceId = database.config().getOwnDeviceIdSync()
 
                 if (ownDeviceId == null && ignoreIfDeviceIsNotConfigured) {
-                    return@executeAndWait
+                    return@runInTransaction
                 }
 
                 LocalDatabaseAppLogicActionDispatcher.dispatchAppLogicActionSync(action, ownDeviceId!!, database, manipulationLogic)
@@ -103,10 +102,9 @@ object ApplyActionUtil {
                                         }.toString()
                                 )
 
-                                database.setTransactionSuccessful()
                                 syncUtil.requestVeryUnimportantSync()
 
-                                return@executeAndWait
+                                return@runInTransaction
                             }
                         }
                     } else if (action is AddUsedTimeActionVersion2) {
@@ -181,10 +179,9 @@ object ApplyActionUtil {
                                             }.toString()
                                     )
 
-                                    database.setTransactionSuccessful()
                                     syncUtil.requestVeryUnimportantSync()
 
-                                    return@executeAndWait
+                                    return@runInTransaction
                                 }
                             }
                         }
@@ -215,15 +212,13 @@ object ApplyActionUtil {
                         syncUtil.requestImportantSync()
                     }
                 }
-
-                database.setTransactionSuccessful()
             }
         }
     }
 
     suspend fun applyParentAction(action: ParentAction, database: Database, authentication: ApplyActionParentAuthentication, syncUtil: SyncUtil, platformIntegration: PlatformIntegration) {
         Threads.database.executeAndWait {
-            database.transaction().use {
+            database.runInTransaction {
                 val deviceUserIdBeforeDispatchingForDeviceAuth = if (authentication is ApplyActionParentDeviceAuthentication) {
                     val deviceId = database.config().getOwnDeviceIdSync()!!
                     val device = database.device().getDeviceByIdSync(deviceId)!!
@@ -302,15 +297,13 @@ object ApplyActionUtil {
 
                     syncUtil.requestImportantSync(enqueueIfOffline = true)
                 }
-
-                database.setTransactionSuccessful()
             }
         }
     }
 
     suspend fun applyChildAction(action: ChildAction, database: Database, authentication: ApplyActionChildAuthentication, syncUtil: SyncUtil) {
         Threads.database.executeAndWait {
-            database.transaction().use {
+            database.runInTransaction {
                 LocalDatabaseChildActionDispatcher.dispatchChildActionSync(action, authentication.childUserId, database)
 
                 if (isSyncEnabled(database)) {
@@ -351,8 +344,6 @@ object ApplyActionUtil {
 
                     syncUtil.requestImportantSync(enqueueIfOffline = true)
                 }
-
-                database.setTransactionSuccessful()
             }
         }
     }

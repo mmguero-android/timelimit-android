@@ -54,8 +54,7 @@ class AppSetupLogic(private val appLogic: AppLogic) {
             val allowedAppsCategoryId = IdGenerator.generateId()
             val allowedGamesCategoryId = IdGenerator.generateId()
 
-            appLogic.database.beginTransaction()
-            try {
+            appLogic.database.runInTransaction {
                 run {
                     val customServerUrl = appLogic.database.config().getCustomServerUrlSync()
 
@@ -226,10 +225,6 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                         appLogic.database.timeLimitRules().addTimeLimitRule(rule)
                     }
                 }
-
-                appLogic.database.setTransactionSuccessful()
-            } finally {
-                appLogic.database.endTransaction()
             }
         })
 

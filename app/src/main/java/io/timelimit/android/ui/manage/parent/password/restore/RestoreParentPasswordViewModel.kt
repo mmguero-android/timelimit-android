@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.UserType
-import io.timelimit.android.data.transaction
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.network.ParentPassword
@@ -81,9 +80,7 @@ class RestoreParentPasswordViewModel(application: Application): AndroidViewModel
 
                 // update the local database to make the new password work directly
                 Threads.database.executeAndWait {
-                    logic.database.transaction().use {
-                        transaction ->
-
+                    logic.database.runInTransaction {
                         val user = logic.database.user().getUserByIdSync(parentUserId!!)
 
                         if (user!!.type != UserType.Parent) {
@@ -96,8 +93,6 @@ class RestoreParentPasswordViewModel(application: Application): AndroidViewModel
                                         secondPasswordSalt = parentPassword.parentPasswordSecondSalt
                                 )
                         )
-
-                        transaction.setSuccess()
                     }
                 }
 
