@@ -502,10 +502,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 if (categoriesToCount.isNotEmpty()) {
                     categoriesToCount.forEach { categoryId ->
-                        // only handle rules which are related to today
-                        val rules = timeLimitRules.get(categoryId).waitForNonNullValue().filter {
-                            (it.dayMask.toInt() and (1 shl nowDate.dayOfWeek)) != 0
-                        }
+                        // only handle rules which are related at today and the current time
+                        val rules = RemainingTime.getRulesRelatedToDay(
+                                dayOfWeek = nowDate.dayOfWeek,
+                                minuteOfDay = minuteOfWeek % MinuteOfDay.LENGTH,
+                                rules = timeLimitRules.get(categoryId).waitForNonNullValue()
+                        )
 
                         usedTimeUpdateHelper.add(
                                 categoryId = categoryId,
