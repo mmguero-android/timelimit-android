@@ -21,7 +21,7 @@
     <string name="update_downloading">Update wird heruntergeladen</string>
     <string name="update_unavailable">Momentan ist kein Update verfügbar</string>
     <string name="update_available">TimeLimit %s ist verfügbar. Änderungen:\n%s</string>
-    <string name="update_available_download">Herunterladen</string>
+    <string name="update_available_download">Aktualisieren</string>
     <string name="update_permission_required_text">TimeLimit benötigt Ihre Berechtigung, um sich zu aktualisieren</string>
     <string name="update_privacy">TimeLimit kann automatisch nach Updates suchen. Dafür
         wird regelmäßig %s abgefragt.
