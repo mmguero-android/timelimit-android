@@ -67,7 +67,7 @@ class PurchaseModel(application: Application): AndroidViewModel(application) {
                             CanDoPurchaseStatus.NoForUnknownReason
 
                         if (canDoPurchase is CanDoPurchaseStatus.Yes) {
-                            if (canDoPurchase.publicKey?.equals(Base64.decode(BuildConfig.googlePlayKey, 0)) == false) {
+                            if (canDoPurchase.publicKey?.contentEquals(Base64.decode(BuildConfig.googlePlayKey, 0)) == false) {
                                 statusInternal.value = PurchaseFragmentServerHasDifferentPublicKey
                             } else {
                                 val checkout = Checkout.forApplication(application.billing)
