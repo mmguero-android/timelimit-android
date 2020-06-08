@@ -1,9 +1,12 @@
-New features:
+New feature:
 
-- session duration limits (e.g. 10 minutes break after 30 minutes usage)
-- time limits depending on the time of the day
-- notification when the premium version will expire shortly (at the device of the parent if the background sync is enabled)
+- option to prevent child users to view the settings and usage durations of other child users within the same family
 
 Changes:
 
-- the status notification is not showed at the lockscreen anymore if a screen lock is configured
+- modified detection of the currently running App
+
+Fixed issues:
+
+- layout issues at the time limit rule editor at small screens
+- counting time for not active slots of the current day

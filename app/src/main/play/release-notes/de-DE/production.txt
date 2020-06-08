@@ -1,9 +1,12 @@
 Neue Funktionen:
 
-- Sitzungsdauerbegrenzung (z.B. 10 Minuten Pause nach 30 Minuten Benutzung)
-- Uhrzeitabhängige Zeitbegrenzungen
-- Benachrichtigung vor dem Ablauf der Vollversion (am Gerät des Elternteils, sofern die Hintergrundsynchronisation aktiviert ist)
+- Möglichkeit, Kinder daran zu hindern die Nutzungsdauern und Zeiten der anderen Kinder der Familie zu sehen
 
 Änderungen:
 
-- die Statusbenachrichtigung wird nicht mehr auf dem Sperrbildschirm angezeigt (sofern eine Bildschirmsperre konfiguriert ist)
+- Anpassung der Erkennung der aktiven App
+
+behobene Fehler:
+
+- Layoutfehler beim Zeitbegrenzungseditor auf kleinen Bildschirmen
+- Zählen der Zeit für nicht aktive Zeitfenster am aktuellen Tag
