@@ -80,7 +80,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
                     usageEvents.getNextEvent(event)
 
                     if (event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-                        if (event.timeStamp > lastPackageTime) {
+                        if (event.timeStamp >= lastPackageTime) {
                             lastPackageTime = event.timeStamp
                             lastPackage = event.packageName
                             lastPackageActivity = event.className
