@@ -476,18 +476,8 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
 
             return Threads.network.executeAndWait {
                 val reader = JsonReader(response.body()!!.charStream())
-                var status: CanDoPurchaseStatus? = null
 
-                reader.beginObject()
-                while (reader.hasNext()) {
-                    when (reader.nextName()) {
-                        "canDoPurchase" -> status = CanDoPurchaseParser.parse(reader.nextString())
-                        else -> reader.skipValue()
-                    }
-                }
-                reader.endObject()
-
-                status!!
+                CanDoPurchaseParser.parse(reader)
             }
         }
     }

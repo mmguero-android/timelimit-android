@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.payment
 
 import android.app.Application
+import android.util.Base64
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
@@ -65,22 +66,26 @@ class PurchaseModel(application: Application): AndroidViewModel(application) {
                         else
                             CanDoPurchaseStatus.NoForUnknownReason
 
-                        if (canDoPurchase == CanDoPurchaseStatus.Yes) {
-                            val checkout = Checkout.forApplication(application.billing)
+                        if (canDoPurchase is CanDoPurchaseStatus.Yes) {
+                            if (canDoPurchase.publicKey?.equals(Base64.decode(BuildConfig.googlePlayKey, 0)) == false) {
+                                statusInternal.value = PurchaseFragmentServerHasDifferentPublicKey
+                            } else {
+                                val checkout = Checkout.forApplication(application.billing)
 
-                            checkout.startAsync().use {
-                                if (!it.billingSupported) {
-                                    statusInternal.value = PurchaseFragmentErrorBillingNotSupportedByDevice
-                                } else {
-                                    val skus = it.requests.getSkusAsync(
-                                            ProductTypes.IN_APP,
-                                            PurchaseIds.BUY_SKUS
-                                    )
+                                checkout.startAsync().use {
+                                    if (!it.billingSupported) {
+                                        statusInternal.value = PurchaseFragmentErrorBillingNotSupportedByDevice
+                                    } else {
+                                        val skus = it.requests.getSkusAsync(
+                                                ProductTypes.IN_APP,
+                                                PurchaseIds.BUY_SKUS
+                                        )
 
-                                    statusInternal.value = PurchaseFragmentReady(
-                                            monthPrice = skus.getSku(PurchaseIds.SKU_MONTH)?.price.toString(),
-                                            yearPrice = skus.getSku(PurchaseIds.SKU_YEAR)?.price.toString()
-                                    )
+                                        statusInternal.value = PurchaseFragmentReady(
+                                                monthPrice = skus.getSku(PurchaseIds.SKU_MONTH)?.price.toString(),
+                                                yearPrice = skus.getSku(PurchaseIds.SKU_YEAR)?.price.toString()
+                                        )
+                                    }
                                 }
                             }
                         } else if (canDoPurchase == CanDoPurchaseStatus.NotDueToOldPurchase) {
@@ -110,3 +115,4 @@ object PurchaseFragmentErrorBillingNotSupportedByAppVariant: PurchaseFragmentUnr
 object PurchaseFragmentNetworkError: PurchaseFragmentRecoverableError()
 object PurchaseFragmentExistingPaymentError: PurchaseFragmentUnrecoverableError()
 object PurchaseFragmentServerRejectedError: PurchaseFragmentUnrecoverableError()
+object PurchaseFragmentServerHasDifferentPublicKey: PurchaseFragmentUnrecoverableError()

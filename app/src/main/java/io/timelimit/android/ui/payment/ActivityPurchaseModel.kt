@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ class ActivityPurchaseModel(application: Application): AndroidViewModel(applicat
                                 return@runAsync
                             }
 
-                            if (server.api.canDoPurchase(server.deviceAuthToken) != CanDoPurchaseStatus.Yes) {
+                            if (!(server.api.canDoPurchase(server.deviceAuthToken) is CanDoPurchaseStatus.Yes)) {
                                 throw IOException("can not do purchase right now")
                             }
                         }

@@ -41,6 +41,7 @@
         Sie haben bereits bezahlt. Sie können die Vollversion erst kurz vor dem Ablaufen (oder danach) verlängern
     </string>
     <string name="purchase_error_server_rejected">Der Server akzeptiert momentan keine Bezahlungen</string>
+    <string name="purchase_error_server_different_key">Der Server unterstützt Bezahlungen, aber nicht über diesen App-Build</string>
 
     <string name="purchase_done_title">Bezahlung abgeschlossen</string>
     <string name="purchase_done_text">Betätigen Sie die Zurück-Taste, um zur App zurückzukehren</string>

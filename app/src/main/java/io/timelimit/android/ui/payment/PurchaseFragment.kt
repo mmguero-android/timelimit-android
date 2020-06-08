@@ -90,6 +90,7 @@ class PurchaseFragment : Fragment(), FragmentWithCustomTitle {
                             PurchaseFragmentNetworkError -> getString(R.string.error_network)
                             PurchaseFragmentExistingPaymentError -> getString(R.string.purchase_error_existing_payment)
                             PurchaseFragmentServerRejectedError -> getString(R.string.purchase_error_server_rejected)
+                            PurchaseFragmentServerHasDifferentPublicKey -> getString(R.string.purchase_error_server_different_key)
                         }
 
                         binding.showRetryButton = when (fragmentStatus) {

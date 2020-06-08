@@ -41,6 +41,7 @@
         You can only extend the premium version if it expired or shortly before that.
     </string>
     <string name="purchase_error_server_rejected">The server does not accept payments currently</string>
+    <string name="purchase_error_server_different_key">The server does support payments, but not using this app build</string>
 
     <string name="purchase_done_title">Purchase succeeded</string>
     <string name="purchase_done_text">Press back to go back to the App</string>
