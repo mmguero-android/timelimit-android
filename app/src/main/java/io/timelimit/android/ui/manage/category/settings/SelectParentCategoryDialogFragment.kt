@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,10 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.timelimit.android.R
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.model.Category
+import io.timelimit.android.data.extensions.getChildCategories
+import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.UserType
+import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.databinding.BottomSheetSelectionListBinding
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.logic.AppLogic
@@ -57,21 +59,10 @@ class SelectParentCategoryDialogFragment: BottomSheetDialogFragment() {
     val database: Database by lazy { logic.database }
     val auth: ActivityViewModel by lazy { (activity as ActivityViewModelHolder).getActivityViewModel() }
 
-    val childCategoryEntries: LiveData<List<Category>> by lazy {
-        database.category().getCategoriesByChildId(childId)
-    }
+    val userRelatedData: LiveData<UserRelatedData?> by lazy { database.derivedDataDao().getUserRelatedDataLive(childId) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        childCategoryEntries.observe(this, Observer { categories ->
-            val ownCategory = categories.find { it.id == categoryId }
-            val hasSubCategories = categories.find { it.parentCategoryId == categoryId } != null
-
-            if (ownCategory == null || hasSubCategories) {
-                dismissAllowingStateLoss()
-            }
-        })
 
         auth.authenticatedUser.observe(this, Observer {
             if (it?.second?.type != UserType.Parent) {
@@ -87,11 +78,15 @@ class SelectParentCategoryDialogFragment: BottomSheetDialogFragment() {
 
         val list = binding.list
 
-        childCategoryEntries.observe(this, Observer { categories ->
-            list.removeAllViews()
+        userRelatedData.observe(viewLifecycleOwner, Observer { userRelatedData ->
+            val ownCategory = userRelatedData?.categoryById?.get(categoryId) ?: kotlin.run {
+                dismissAllowingStateLoss()
+                return@Observer
+            }
+            val ownParentCategory = userRelatedData.categoryById[ownCategory.category.parentCategoryId]
+            val currentChildCategories = userRelatedData.getChildCategories(ownCategory.category.id)
 
-            val ownCategory = categories.find { it.id == categoryId }
-            val ownParentCategory = categories.find { it.id == ownCategory?.parentCategoryId }
+            list.removeAllViews()
 
             fun buildRow(): CheckedTextView = LayoutInflater.from(context!!).inflate(
                     android.R.layout.simple_list_item_single_choice,
@@ -99,19 +94,19 @@ class SelectParentCategoryDialogFragment: BottomSheetDialogFragment() {
                     false
             ) as CheckedTextView
 
-            categories.forEach { category ->
-                if (category.id != categoryId) {
+            userRelatedData.sortedCategories().forEach { (_, category) ->
+                if (category.category.id != categoryId) {
                     val row = buildRow()
 
-                    row.text = category.title
-                    row.isChecked = category.id == ownCategory?.parentCategoryId
-                    row.isEnabled = categories.find { it.id == category.parentCategoryId } == null
+                    row.text = category.category.title
+                    row.isChecked = category.category.id == ownCategory.category.parentCategoryId
+                    row.isEnabled = !currentChildCategories.contains(category.category.id)
                     row.setOnClickListener {
                         if (!row.isChecked) {
                             auth.tryDispatchParentAction(
                                     SetParentCategory(
                                             categoryId = categoryId,
-                                            parentCategory = category.id
+                                            parentCategory = category.category.id
                                     )
                             )
                         }

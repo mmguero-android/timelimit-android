@@ -18,8 +18,7 @@ package io.timelimit.android.ui.manage.child.category
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import io.timelimit.android.data.extensions.mapToTimezone
-import io.timelimit.android.data.extensions.sorted
+import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
@@ -30,6 +29,7 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.RemainingTime
+import java.util.*
 
 class ManageChildCategoriesModel(application: Application): AndroidViewModel(application) {
     private val logic = DefaultAppLogic.with(application)
@@ -45,11 +45,9 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
 
     private val hasChildDevicesWithManipulation = childDevices.map { devices -> devices.find { device -> device.hasAnyManipulation } != null }.ignoreUnchanged()
 
-    private val childEntry = childId.switchMap { logic.database.user().getChildUserByIdLive(it) }
+    private val childRelatedData = childId.switchMap { logic.database.derivedDataDao().getUserRelatedDataLive(it) }
 
-    private val categoryForUnassignedAppsLive = childEntry.map { it?.categoryForNotAssignedApps }.ignoreUnchanged()
-
-    private val childTimezone = childEntry.mapToTimezone()
+    private val childTimezone = childRelatedData.map { it?.timeZone ?: TimeZone.getDefault() }
 
     private val childMinuteOfWeek = childTimezone.switchMap { timeZone ->
         liveDataFromFunction { getMinuteOfWeek(logic.realTimeLogic.getCurrentTimeInMillis(), timeZone) }
@@ -59,63 +57,38 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
         liveDataFromFunction { DateInTimezone.newInstance(logic.realTimeLogic.getCurrentTimeInMillis(), timeZone) }
     }.ignoreUnchanged()
 
-    private val categories = childId.switchMap { logic.database.category().getCategoriesByChildId(it) }
+    private val categoryItems = childRelatedData.switchMap { userRelatedData ->
+        childDate.switchMap { childDate ->
+            childMinuteOfWeek.map { childMinuteOfWeek ->
+                if (userRelatedData != null) {
+                    val firstDayOfWeek = childDate.dayOfEpoch - childDate.dayOfWeek
 
-    private val usedTimeItemsForWeek = childDate.switchMap { date ->
-        categories.switchMap { categories ->
-            logic.database.usedTimes().getUsedTimesByDayAndCategoryIds(
-                    categoryIds = categories.map { it.id },
-                    startingDayOfEpoch = date.dayOfEpoch - date.dayOfWeek,
-                    endDayOfEpoch = date.dayOfEpoch - date.dayOfWeek + 6
-            )
-        }
-    }
+                    userRelatedData.sortedCategories().map { (level, category) ->
+                        val rules = category.rules
+                        val usedTimeItemsForCategory = category.usedTimes
 
-    private val timeLimitRules = categories.switchMap { categories ->
-        logic.database.timeLimitRules().getTimeLimitRulesByCategories(
-                categories.map { category -> category.id }
-        )
-    }
-
-    private val sortedCategories = categories.map { it.sorted() }
-
-    private val categoryItems = categoryForUnassignedAppsLive.switchMap { categoryForUnassignedApps ->
-        sortedCategories.switchMap { categories ->
-            timeLimitRules.switchMap { timeLimitRules ->
-                childDate.switchMap { childDate ->
-                    usedTimeItemsForWeek.switchMap { usedTimeItemsForWeek ->
-                        childMinuteOfWeek.map { childMinuteOfWeek ->
-                            val rulesByCategoryId = timeLimitRules.groupBy { rule -> rule.categoryId }
-                            val usedTimesByCategory = usedTimeItemsForWeek.groupBy { item -> item.categoryId }
-                            val firstDayOfWeek = childDate.dayOfEpoch - childDate.dayOfWeek
-
-                            categories.map { category ->
-                                val rules = rulesByCategoryId[category.id] ?: emptyList()
-                                val usedTimeItemsForCategory = usedTimesByCategory[category.id]
-                                        ?: emptyList()
-                                val parentCategory = categories.find { it.id == category.parentCategoryId }
-
-                                CategoryItem(
-                                        category = category,
-                                        isBlockedTimeNow = category.blockedMinutesInWeek.read(childMinuteOfWeek),
-                                        remainingTimeToday = RemainingTime.getRemainingTime(
-                                                dayOfWeek = childDate.dayOfWeek,
-                                                usedTimes = usedTimeItemsForCategory,
-                                                rules = rules,
-                                                extraTime = category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
-                                                minuteOfDay = childMinuteOfWeek % MinuteOfDay.LENGTH,
-                                                firstDayOfWeekAsEpochDay = firstDayOfWeek
-                                        )?.includingExtraTime,
-                                        usedTimeToday = usedTimeItemsForCategory.find { item ->
-                                            item.dayOfEpoch == childDate.dayOfEpoch && item.startTimeOfDay == MinuteOfDay.MIN &&
-                                                    item.endTimeOfDay == MinuteOfDay.MAX
-                                        }?.usedMillis ?: 0,
-                                        usedForNotAssignedApps = categoryForUnassignedApps == category.id,
-                                        parentCategoryTitle = parentCategory?.title
-                                )
-                            }
-                        }
+                        CategoryItem(
+                                category = category.category,
+                                isBlockedTimeNow = category.category.blockedMinutesInWeek.read(childMinuteOfWeek),
+                                remainingTimeToday = RemainingTime.getRemainingTime(
+                                        dayOfWeek = childDate.dayOfWeek,
+                                        usedTimes = usedTimeItemsForCategory,
+                                        rules = rules,
+                                        extraTime = category.category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
+                                        minuteOfDay = childMinuteOfWeek % MinuteOfDay.LENGTH,
+                                        firstDayOfWeekAsEpochDay = firstDayOfWeek
+                                )?.includingExtraTime,
+                                usedTimeToday = usedTimeItemsForCategory.find { item ->
+                                    item.dayOfEpoch == childDate.dayOfEpoch && item.startTimeOfDay == MinuteOfDay.MIN &&
+                                            item.endTimeOfDay == MinuteOfDay.MAX
+                                }?.usedMillis ?: 0,
+                                usedForNotAssignedApps = category.category.id == userRelatedData.user.categoryForNotAssignedApps,
+                                parentCategoryId = if (level == 0) null else category.category.parentCategoryId,
+                                categoryNestingLevel = level
+                        )
                     }
+                } else {
+                    emptyList()
                 }
             }
         }

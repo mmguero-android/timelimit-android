@@ -30,7 +30,6 @@
 
     <string name="category_settings_parent_category_title">Ober-Kategorie</string>
     <string name="category_settings_parent_category_intro">Wenn die Oberkategorie einer Kategorie blockiert ist (z.B. weil die Zeit verbraucht wurde), dann wird auch die Unterkategorie blockiert.  Wenn die Unterkategorie verwendet wird, dann wird die Nutzungsdauer auch zur Ober-Kategorie hinzugefügt.</string>
-    <string name="category_settings_parent_category_already_used_as_parent">Sie können keine Oberkategorie wählen, weil diese Kategorie bereits die Oberkategorie für eine andere Kategorie ist.</string>
     <string name="category_settings_parent_category_assigned_to">Diese Kategorie ist eine Unterkategorie von %s.</string>
     <string name="category_settings_parent_category_button">Oberkategorie wählen</string>
     <string name="category_settings_parent_category_none">keine Oberkategorie</string>

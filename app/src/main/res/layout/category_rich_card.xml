@@ -38,14 +38,6 @@
             name="usedForAppsWithoutCategory"
             type="boolean" />
 
-        <variable
-            name="parentCategoryTitle"
-            type="String" />
-
-        <variable
-            name="isChildCategory"
-            type="boolean" />
-
         <import type="android.text.TextUtils" />
         <import type="android.view.View" />
     </data>
@@ -56,8 +48,8 @@
         android:orientation="horizontal">
 
         <View
-            android:visibility="@{isChildCategory ? View.VISIBLE : View.GONE}"
-            android:layout_width="32dp"
+            android:id="@+id/left_space"
+            android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <androidx.cardview.widget.CardView
@@ -85,14 +77,6 @@
                     android:textAppearance="?android:textAppearanceMedium"
                     android:visibility="@{usedForAppsWithoutCategory ? View.VISIBLE : View.GONE}"
                     android:text="@string/manage_child_category_for_unassigned_apps"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:visibility="@{TextUtils.isEmpty(parentCategoryTitle) ? View.GONE : View.VISIBLE}"
-                    tools:text="@string/manage_child_category_is_child"
-                    android:text="@{@string/manage_child_category_is_child(parentCategoryTitle)}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

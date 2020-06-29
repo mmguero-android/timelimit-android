@@ -88,7 +88,7 @@ class ManageChildCategoriesFragment : Fragment() {
         recycler.layoutManager = LinearLayoutManager(context)
 
         model.init(params.childId)
-        model.listContent.observe(this, Observer { adapter.categories = it })
+        model.listContent.observe(viewLifecycleOwner, Observer { adapter.categories = it })
 
         ItemTouchHelper(object: ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -122,49 +122,24 @@ class ManageChildCategoriesFragment : Fragment() {
                     throw IllegalStateException()
                 }
 
-                if (!(toItem is CategoryItem)) {
+                val relatedCategories = categories
+                        .filter { it is CategoryItem && it.categoryNestingLevel == fromItem.categoryNestingLevel && it.parentCategoryId == fromItem.parentCategoryId }
+
+                val sourceIndex = relatedCategories.indexOf(fromItem)
+                val targetIndex = relatedCategories.indexOf(toItem)
+
+                if (targetIndex == -1) {
                     return false
                 }
 
-                if (fromItem.parentCategoryTitle == null) {
-                    if (toItem.parentCategoryTitle != null) {
-                        return false
-                    }
+                val updatedRelatedCategories = relatedCategories.map { it as CategoryItem; it.category.id }.toMutableList()
+                updatedRelatedCategories.add(targetIndex, updatedRelatedCategories.removeAt(sourceIndex))
 
-                    val parentCategories = mutableListOf<CategoryItem>()
-
-                    categories.forEach { if (it is CategoryItem && it.parentCategoryTitle == null) { parentCategories.add(it) } }
-
-                    val targetIndex = parentCategories.indexOf(toItem)
-                    val sourceIndex = parentCategories.indexOf(fromItem)
-
-                    parentCategories.add(targetIndex, parentCategories.removeAt(sourceIndex))
-
-                    return auth.tryDispatchParentAction(
-                            UpdateCategorySortingAction(
-                                    categoryIds = parentCategories.map { it.category.id }
-                            )
-                    )
-                } else {
-                    if (toItem.category.parentCategoryId != fromItem.category.parentCategoryId) {
-                        return false
-                    }
-
-                    val childCategories = mutableListOf<CategoryItem>()
-
-                    categories.forEach { if (it is CategoryItem && it.category.parentCategoryId == fromItem.category.parentCategoryId) { childCategories.add(it) } }
-
-                    val targetIndex = childCategories.indexOf(toItem)
-                    val sourceIndex = childCategories.indexOf(fromItem)
-
-                    childCategories.add(targetIndex, childCategories.removeAt(sourceIndex))
-
-                    return auth.tryDispatchParentAction(
-                            UpdateCategorySortingAction(
-                                    categoryIds = childCategories.map { it.category.id }
-                            )
-                    )
-                }
+                return auth.tryDispatchParentAction(
+                        UpdateCategorySortingAction(
+                                categoryIds = updatedRelatedCategories
+                        )
+                )
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

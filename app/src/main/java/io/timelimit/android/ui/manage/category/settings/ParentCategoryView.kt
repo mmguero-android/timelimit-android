@@ -44,10 +44,8 @@ object ParentCategoryView {
         database.category().getCategoriesByChildId(childId).observe(lifecycleOwner, Observer { categories ->
             val ownCategory = categories.find { it.id == categoryId }
             val parentCategory = categories.find { it.id == ownCategory?.parentCategoryId }
-            val hasSubCategories = categories.find { it.parentCategoryId == categoryId } != null
 
             binding.parentCategoryTitle = parentCategory?.title
-            binding.isParentCategory = hasSubCategories
         })
 
         binding.selectParentButton.setOnClickListener {

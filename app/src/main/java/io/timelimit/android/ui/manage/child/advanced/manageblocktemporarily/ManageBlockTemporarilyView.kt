@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Category
+import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
 import io.timelimit.android.ui.main.ActivityViewModel
@@ -31,7 +32,7 @@ import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 
 object ManageBlockTemporarilyView {
     fun bind(
-            categories: LiveData<List<Category>>,
+            userRelatedData: LiveData<UserRelatedData?>,
             shouldProvideFullVersionFunctions: LiveData<Boolean>,
             lifecycleOwner: LifecycleOwner,
             container: LinearLayout,
@@ -41,7 +42,7 @@ object ManageBlockTemporarilyView {
     ) {
         val context = container.context
         val items = ManageBlockTemporarilyItems.build(
-                categories = categories,
+                userRelatedData = userRelatedData,
                 realTimeLogic = auth.logic.realTimeLogic
         )
 

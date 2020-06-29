@@ -19,10 +19,6 @@
 
     <data>
         <variable
-            name="isParentCategory"
-            type="boolean" />
-
-        <variable
             name="parentCategoryTitle"
             type="String" />
 
@@ -52,13 +48,6 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:visibility="@{isParentCategory ? View.VISIBLE : View.GONE}"
-                android:text="@string/category_settings_parent_category_already_used_as_parent"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
                 android:visibility="@{TextUtils.isEmpty(parentCategoryTitle) ? View.GONE : View.VISIBLE}"
                 tools:text="@string/category_settings_parent_category_assigned_to"
                 android:text="@{@string/category_settings_parent_category_assigned_to(parentCategoryTitle)}"
@@ -69,7 +58,6 @@
             <Button
                 style="?materialButtonOutlinedStyle"
                 android:id="@+id/select_parent_button"
-                android:enabled="@{!isParentCategory}"
                 android:text="@string/category_settings_parent_category_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

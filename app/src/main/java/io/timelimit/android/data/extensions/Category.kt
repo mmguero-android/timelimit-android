@@ -17,38 +17,73 @@ package io.timelimit.android.data.extensions
 
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.derived.CategoryRelatedData
+import io.timelimit.android.data.model.derived.UserRelatedData
 
-// TODO: remove this
-fun List<Category>.sorted(): List<Category> {
-    val categoryIds = this.map { it.id }.toSet()
+fun UserRelatedData.sortedCategories(): List<Pair<Int, CategoryRelatedData>> {
+    val result = mutableListOf<Pair<Int, CategoryRelatedData>>()
+    val presorted = this.categories.sortedBy { it.category.sort }
 
-    val sortedCategories = mutableListOf<Category>()
-    val childCategories = this.filter { categoryIds.contains(it.parentCategoryId) }.groupBy { it.parentCategoryId }
+    fun appendSortedInternal(categoryId: String, level: Int) {
+        val category = this.categoryById[categoryId]!!
 
-    this.filterNot { categoryIds.contains(it.parentCategoryId) }.sortedBy { it.sort }.forEach { category ->
-        sortedCategories.add(category)
+        result.add(level to category)
 
-        childCategories[category.id]?.sortedBy { it.sort }?.let { items ->
-            sortedCategories.addAll(items)
+        val childCategories = presorted.filter { it.category.parentCategoryId == categoryId }
+
+        childCategories.forEach { appendSortedInternal(it.category.id, level + 1) }
+    }
+
+    presorted.forEach { category ->
+        val hasParentCategory = this.categoryById.containsKey(category.category.parentCategoryId)
+
+        if (!hasParentCategory) {
+            appendSortedInternal(category.category.id, 0)
         }
     }
 
-    return sortedCategories.toList()
+    return result.toList()
 }
 
-fun List<CategoryRelatedData>.sortedCategories(): List<CategoryRelatedData> {
-    val categoryIds = this.map { it.category.id }.toSet()
-
-    val sortedCategories = mutableListOf<CategoryRelatedData>()
-    val childCategories = this.filter { categoryIds.contains(it.category.parentCategoryId) }.groupBy { it.category.parentCategoryId }
-
-    this.filterNot { categoryIds.contains(it.category.parentCategoryId) }.sortedBy { it.category.sort }.forEach { category ->
-        sortedCategories.add(category)
-
-        childCategories[category.category.id]?.sortedBy { it.category.sort }?.let { items ->
-            sortedCategories.addAll(items)
-        }
+fun UserRelatedData.getChildCategories(categoryId: String): Set<String> {
+    if (!this.categoryById.containsKey(categoryId)) {
+        return emptySet()
     }
 
-    return sortedCategories.toList()
+    val result = mutableSetOf<String>()
+    val processedCategoryIds = mutableSetOf<String>()
+
+    fun handle(currentCategoryId: String) {
+        if (!processedCategoryIds.add(currentCategoryId)) return
+
+        val childCategories = this.categories.filter { it.category.parentCategoryId == currentCategoryId }
+
+        childCategories.forEach { childCategory ->
+            result.add(childCategory.category.id)
+            handle(childCategory.category.id)
+        }
+    }; handle(categoryId)
+
+    return result
+}
+
+fun List<Category>.getChildCategories(categoryId: String): Set<String> {
+    if (this.find { it.id == categoryId } != null) {
+        return emptySet()
+    }
+
+    val result = mutableSetOf<String>()
+    val processedCategoryIds = mutableSetOf<String>()
+
+    fun handle(currentCategoryId: String) {
+        if (!processedCategoryIds.add(currentCategoryId)) return
+
+        val childCategories = this.filter { it.parentCategoryId == currentCategoryId }
+
+        childCategories.forEach { childCategory ->
+            result.add(childCategory.id)
+            handle(childCategory.id)
+        }
+    }; handle(categoryId)
+
+    return result
 }

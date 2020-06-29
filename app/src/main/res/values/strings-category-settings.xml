@@ -31,7 +31,6 @@
 
     <string name="category_settings_parent_category_title">Parent category</string>
     <string name="category_settings_parent_category_intro">When the parent category of a category is blocked (e.g. because the time is over), then the child category is blocked too. When using the child category, the used time is also added to the parent category.</string>
-    <string name="category_settings_parent_category_already_used_as_parent">You can not select a parent category because this category is the parent of an other one.</string>
     <string name="category_settings_parent_category_assigned_to">This category is a child category of %s now.</string>
     <string name="category_settings_parent_category_button">Select parent category</string>
     <string name="category_settings_parent_category_none">no parent category</string>

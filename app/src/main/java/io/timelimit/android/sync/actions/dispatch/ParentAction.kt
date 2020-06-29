@@ -17,6 +17,7 @@ package io.timelimit.android.sync.actions.dispatch
 
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.customtypes.ImmutableBitmask
+import io.timelimit.android.data.extensions.getChildCategories
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.CategoryApp
 import io.timelimit.android.data.model.User
@@ -375,15 +376,13 @@ object LocalDatabaseParentActionDispatcher {
                     if (action.parentCategory.isNotEmpty()) {
                         val categories = database.category().getCategoriesByChildIdSync(category.childId)
 
-                        val parentCategoryItem = categories.find { it.id == action.parentCategory }
+                        categories.find { it.id == action.parentCategory }
                                 ?: throw IllegalArgumentException("selected parent category does not exist")
 
-                        if (parentCategoryItem.parentCategoryId.isNotEmpty()) {
-                            throw IllegalArgumentException("can not set a category as parent which itself has got a parent")
-                        }
+                        val childCategoryIds = categories.getChildCategories(action.categoryId)
 
-                        if (categories.find { it.parentCategoryId == action.categoryId } != null) {
-                            throw IllegalArgumentException("can not make category a child category if it is already a parent category")
+                        if (childCategoryIds.contains(action.parentCategory) || action.parentCategory == action.categoryId) {
+                            throw IllegalArgumentException("can not set a category as parent which is a child of the category")
                         }
                     }
 

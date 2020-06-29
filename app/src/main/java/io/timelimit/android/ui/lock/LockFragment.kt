@@ -292,7 +292,7 @@ class LockFragment : Fragment() {
     private fun bindAddToCategoryOptions(userRelatedData: UserRelatedData) {
         binding.addToCategoryOptions.removeAllViews()
 
-        userRelatedData.categories.sortedCategories().forEach { category ->
+        userRelatedData.sortedCategories().forEach { (_, category) ->
             LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true).let { button ->
                 button.title = category.category.title
                 button.button.setOnClickListener { _ ->

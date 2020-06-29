@@ -16,8 +16,8 @@
 package io.timelimit.android.ui.manage.child.advanced.manageblocktemporarily
 
 import androidx.lifecycle.LiveData
-import io.timelimit.android.data.extensions.sorted
-import io.timelimit.android.data.model.Category
+import io.timelimit.android.data.extensions.sortedCategories
+import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.RealTimeLogic
 
@@ -30,20 +30,20 @@ data class ManageBlockTemporarilyItem(
 
 object ManageBlockTemporarilyItems {
     fun build(
-            categories: LiveData<List<Category>>,
+            userRelatedData: LiveData<UserRelatedData?>,
             realTimeLogic: RealTimeLogic
     ): LiveData<List<ManageBlockTemporarilyItem>> {
         val time = liveDataFromFunction { realTimeLogic.getCurrentTimeInMillis() }
 
-        return categories.map { categories ->
-            categories.sorted().map { category ->
+        return userRelatedData.map { userRelatedData ->
+            userRelatedData?.sortedCategories()?.map { (_, category) ->
                 ManageBlockTemporarilyItem(
-                        categoryId = category.id,
-                        categoryTitle = category.title,
-                        endTime = category.temporarilyBlockedEndTime,
-                        checked = category.temporarilyBlocked
+                        categoryId = category.category.id,
+                        categoryTitle = category.category.title,
+                        endTime = category.category.temporarilyBlockedEndTime,
+                        checked = category.category.temporarilyBlocked
                 )
-            }
+            } ?: emptyList()
         }.switchMap { items ->
             val hasEndtimes = items.find { it.endTime != 0L } != null
 

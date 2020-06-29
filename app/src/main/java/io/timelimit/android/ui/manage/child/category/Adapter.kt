@@ -18,12 +18,15 @@ package io.timelimit.android.ui.manage.child.category
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.databinding.AddItemViewBinding
 import io.timelimit.android.databinding.CategoryRichCardBinding
 import io.timelimit.android.util.TimeTextUtil
+import kotlin.math.log2
+import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
 class Adapter: RecyclerView.Adapter<ViewHolder>() {
@@ -125,8 +128,10 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
                     null
                 }
                 binding.usedForAppsWithoutCategory = item.usedForNotAssignedApps
-                binding.parentCategoryTitle = item.parentCategoryTitle
-                binding.isChildCategory = item.parentCategoryTitle != null
+                binding.leftSpace.layoutParams = LinearLayout.LayoutParams(
+                        (context.resources.displayMetrics.density * 32.0 * log2((item.categoryNestingLevel + 1).toDouble())).roundToInt(),
+                        0
+                )
 
                 binding.card.setOnClickListener { handlers?.onCategoryClicked(item.category) }
 
