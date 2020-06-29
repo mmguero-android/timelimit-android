@@ -22,7 +22,7 @@
         während diese wirken.
     </string>
     <string name="parent_limit_login_status_disabled">Sie können sich jederzeit anmelden</string>
-    <string name="parent_limit_login_status_enabled">Sie können sich nicht anmelden, wenn %s$1 für %s$2 gesperrt ist</string>
+    <string name="parent_limit_login_status_enabled">Sie können sich nicht anmelden, wenn %1$s für %2$s gesperrt ist</string>
     <string name="parent_limit_login_status_needs_other_user">Sie müssen einen Elternteil-Benutzer als Backup (damit Sie
         sich nicht aussperren) erstellen, bevor Sie diese Funktion verwenden können.</string>
     <string name="parent_limit_login_select_button">Kategorie wählen</string>
