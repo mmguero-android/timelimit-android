@@ -55,7 +55,7 @@ object RealTimeApi: TimeApi() {
             handler.removeCallbacks(queueProcessor)
 
             queue.peek()?.let { head ->
-                val delay = head.targetUptime - getCurrentTimeInMillis()
+                val delay = head.targetUptime - getCurrentUptimeInMillis()
 
                 // at most 5 seconds so that sleeps don't cause trouble
                 handler.postDelayed(queueProcessor, delay.coerceAtLeast(0).coerceAtMost(5 * 1000))
