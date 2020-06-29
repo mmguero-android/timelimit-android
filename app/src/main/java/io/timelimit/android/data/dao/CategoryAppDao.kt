@@ -32,7 +32,7 @@ abstract class CategoryAppDao {
     @Query("SELECT * FROM category_app WHERE category_id IN (:categoryIds)")
     abstract fun getCategoryApps(categoryIds: List<String>): LiveData<List<CategoryApp>>
 
-    @Query("SELECT * FROM category_app WHERE category_id IN (SELECT category_id FROM category WHERE child_id = :userId)")
+    @Query("SELECT * FROM category_app WHERE category_id IN (SELECT id FROM category WHERE child_id = :userId)")
     abstract fun getCategoryAppsByUserIdSync(userId: String): List<CategoryApp>
 
     @Insert
