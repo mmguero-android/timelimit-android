@@ -85,7 +85,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                             if (status is AllowUserLoginStatus.Allow) {
                                 loginScreen
                             } else if (
-                                    status is AllowUserLoginStatus.ForbidByCurrentTime ||
+                                    (status is AllowUserLoginStatus.ForbidByCurrentTime && status.missingNetworkTime) ||
                                     (status is AllowUserLoginStatus.ForbidByCategory && status.blockingReason == BlockingReason.MissingNetworkTime)
                             ) {
                                 liveDataFromValue(ParentUserLoginMissingTrustedTime as LoginDialogStatus)
