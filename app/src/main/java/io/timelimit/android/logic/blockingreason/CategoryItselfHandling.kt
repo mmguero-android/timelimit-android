@@ -90,6 +90,19 @@ data class CategoryItselfHandling (
 
             val missingNetworkTimeForBlockedTimeAreas = !categoryRelatedData.category.blockedMinutesInWeek.dataNotToModify.isEmpty
             val okByBlockedTimeAreas = areLimitsTemporarilyDisabled || !categoryRelatedData.category.blockedMinutesInWeek.read(minuteInWeek)
+            val dependsOnMaxMinuteOfWeekByBlockedTimeAreas = categoryRelatedData.category.blockedMinutesInWeek.let { blockedTimeAreas ->
+                if (blockedTimeAreas.dataNotToModify[minuteInWeek]) {
+                    blockedTimeAreas.dataNotToModify.nextClearBit(minuteInWeek)
+                } else {
+                    val next = blockedTimeAreas.dataNotToModify.nextSetBit(minuteInWeek)
+
+                    if (next == -1) Int.MAX_VALUE else next
+                }
+            }
+            val dependsOnMaxMinuteOfDayByBlockedTimeAreas = if (dependsOnMaxMinuteOfWeekByBlockedTimeAreas / MinuteOfDay.LENGTH != minuteInWeek / MinuteOfDay.LENGTH)
+                Int.MAX_VALUE
+            else
+                dependsOnMaxMinuteOfWeekByBlockedTimeAreas % MinuteOfDay.LENGTH
 
             val relatedRules = if (areLimitsTemporarilyDisabled)
                 emptyList()
@@ -128,8 +141,8 @@ data class CategoryItselfHandling (
                                         it.startMinuteOfDay > minuteInWeek % MinuteOfDay.LENGTH
                             }
                             .minBy { it.startMinuteOfDay }?.startMinuteOfDay ?: Int.MAX_VALUE
-            )
-            val dependsOnMaxTimeByRules = if (dependsOnMaxTimeByMinuteOfDay != Int.MAX_VALUE) {
+            ).coerceAtMost(dependsOnMaxMinuteOfDayByBlockedTimeAreas)
+            val dependsOnMaxTimeByRules = if (dependsOnMaxTimeByMinuteOfDay <= MinuteOfDay.LENGTH) {
                 localDate.atStartOfDay(ZoneId.of(user.user.timeZone)).plusMinutes(dependsOnMaxTimeByMinuteOfDay.toLong()).toEpochSecond() * 1000
             } else {
                 localDate.plusDays(1).atStartOfDay(ZoneId.of(user.user.timeZone)).toEpochSecond() * 1000
