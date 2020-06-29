@@ -163,6 +163,9 @@
                 <include android:id="@+id/timezone"
                     layout="@layout/user_timezone_view" />
 
+                <include android:id="@+id/parent_limit_login"
+                    layout="@layout/parent_limit_login_view" />
+
                 <androidx.cardview.widget.CardView
                     app:cardUseCompatPadding="true"
                     android:onClick="@{() -> handlers.onManageBlockedTimesClicked()}"

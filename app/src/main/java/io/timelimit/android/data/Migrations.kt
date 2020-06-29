@@ -224,4 +224,11 @@ object DatabaseMigrations {
             database.execSQL("ALTER TABLE `user` ADD COLUMN `flags` INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    val MIGRATE_TO_V31 = object: Migration(30, 31) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `user_limit_login_category` (`user_id` TEXT NOT NULL, `category_id` TEXT NOT NULL, PRIMARY KEY(`user_id`), FOREIGN KEY(`user_id`) REFERENCES `user`(`id`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`category_id`) REFERENCES `category`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `user_limit_login_category_index_category_id` ON `user_limit_login_category` (`category_id`)")
+        }
+    }
 }

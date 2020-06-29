@@ -42,6 +42,7 @@ object DatabaseBackupLowlevel {
     private const val ALLOWED_CONTACT = "allowedContact"
     private const val USER_KEY = "userKey"
     private const val SESSION_DURATION = "sessionDuration"
+    private const val USER_LIMIT_LOGIN_CATEGORY = "userLimitLoginCategory"
 
     fun outputAsBackupJson(database: Database, outputStream: OutputStream) {
         val writer = JsonWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
@@ -88,12 +89,15 @@ object DatabaseBackupLowlevel {
         handleCollection(ALLOWED_CONTACT) { offset, pageSize -> database.allowedContact().getAllowedContactPageSync(offset, pageSize) }
         handleCollection(USER_KEY) { offset, pageSize -> database.userKey().getUserKeyPageSync(offset, pageSize) }
         handleCollection(SESSION_DURATION) { offset, pageSize -> database.sessionDuration().getSessionDurationPageSync(offset, pageSize) }
+        handleCollection(USER_LIMIT_LOGIN_CATEGORY) { offset, pageSize -> database.userLimitLoginCategoryDao().getAllowedContactPageSync(offset, pageSize) }
 
         writer.endObject().flush()
     }
 
     fun restoreFromBackupJson(database: Database, inputStream: InputStream) {
         val reader = JsonReader(InputStreamReader(inputStream, Charsets.UTF_8))
+
+        var userLoginLimitCategories = emptyList<UserLimitLoginCategory>()
 
         database.runInTransaction {
             database.deleteAllData()
@@ -234,10 +238,25 @@ object DatabaseBackupLowlevel {
 
                         reader.endArray()
                     }
+                    USER_LIMIT_LOGIN_CATEGORY -> {
+                        reader.beginArray()
+
+                        mutableListOf<UserLimitLoginCategory>().let { list ->
+                            while (reader.hasNext()) {
+                                list.add(UserLimitLoginCategory.parse(reader))
+                            }
+
+                            userLoginLimitCategories = list
+                        }
+
+                        reader.endArray()
+                    }
                     else -> reader.skipValue()
                 }
             }
             reader.endObject()
+
+            database.userLimitLoginCategoryDao().addItemsSync(userLoginLimitCategories)
         }
     }
 }

@@ -17,6 +17,7 @@
 package io.timelimit.android.logic.blockingreason
 
 import io.timelimit.android.BuildConfig
+import io.timelimit.android.data.extensions.getCategoryWithParentCategories
 import io.timelimit.android.data.model.derived.CategoryRelatedData
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
@@ -85,20 +86,8 @@ sealed class AppBaseHandling {
                 if (startCategory == null) {
                     return BlockDueToNoCategory
                 } else {
-                    val categoryIds = mutableSetOf(startCategory.category.id)
-
-                    run {
-                        // get parent category ids
-
-                        var currentCategory: CategoryRelatedData? = userRelatedData.categoryById[startCategory.category.parentCategoryId]
-
-                        while (currentCategory != null && categoryIds.add(currentCategory.category.id)) {
-                            currentCategory = userRelatedData.categoryById[currentCategory.category.parentCategoryId]
-                        }
-                    }
-
                     return UseCategories(
-                            categoryIds = categoryIds,
+                            categoryIds = userRelatedData.getCategoryWithParentCategories(startCategoryId = startCategory.category.id),
                             shouldCount = !pauseCounting,
                             level = when (appCategory?.specifiesActivity) {
                                 null -> BlockingLevel.Activity // occurs when using a default category

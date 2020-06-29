@@ -20,9 +20,7 @@ import androidx.lifecycle.LiveData
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.cache.multi.*
 import io.timelimit.android.data.cache.single.*
-import io.timelimit.android.data.model.derived.DeviceAndUserRelatedData
-import io.timelimit.android.data.model.derived.DeviceRelatedData
-import io.timelimit.android.data.model.derived.UserRelatedData
+import io.timelimit.android.data.model.derived.*
 
 class DerivedDataDao (private val database: Database) {
     private val userRelatedDataCache = object : DataCacheHelperInterface<String, UserRelatedData?, UserRelatedData?> {
@@ -32,16 +30,8 @@ class DerivedDataDao (private val database: Database) {
             return UserRelatedData.load(user, database)
         }
 
-        override fun updateItemSync(key: String, item: UserRelatedData?): UserRelatedData? {
-            return if (item != null) {
-                item.update(database)
-            } else {
-                openItemSync(key)
-            }
-        }
-
+        override fun updateItemSync(key: String, item: UserRelatedData?): UserRelatedData? = if (item != null) item.update(database) else openItemSync(key)
         override fun <R> wrapOpenOrUpdate(block: () -> R): R = database.runInUnobservedTransaction { block() }
-
         override fun disposeItemFast(key: String, item: UserRelatedData?) = Unit
         override fun prepareForUser(item: UserRelatedData?): UserRelatedData? = item
         override fun close() = Unit
@@ -49,27 +39,30 @@ class DerivedDataDao (private val database: Database) {
 
     private val deviceRelatedDataCache = object: SingleItemDataCacheHelperInterface<DeviceRelatedData?, DeviceRelatedData?> {
         override fun openItemSync(): DeviceRelatedData? = DeviceRelatedData.load(database)
-
-        override fun updateItemSync(item: DeviceRelatedData?): DeviceRelatedData? = if (item != null) {
-            item.update(database)
-        } else {
-            openItemSync()
-        }
-
+        override fun updateItemSync(item: DeviceRelatedData?): DeviceRelatedData? = if (item != null) item.update(database) else openItemSync()
         override fun <R> wrapOpenOrUpdate(block: () -> R): R = database.runInUnobservedTransaction { block() }
-
         override fun prepareForUser(item: DeviceRelatedData?): DeviceRelatedData? = item
         override fun disposeItemFast(item: DeviceRelatedData?): Unit = Unit
     }.createCache()
 
+    private val userLoginRelatedDataCache = object: DataCacheHelperInterface<String, UserLoginRelatedData?, UserLoginRelatedData?> {
+        override fun openItemSync(key: String): UserLoginRelatedData? = UserLoginRelatedData.load(key, database)
+        override fun updateItemSync(key: String, item: UserLoginRelatedData?): UserLoginRelatedData? = if (item != null) item.update(database) else openItemSync(key)
+        override fun <R> wrapOpenOrUpdate(block: () -> R): R = database.runInUnobservedTransaction { block() }
+        override fun disposeItemFast(key: String, item: UserLoginRelatedData?) = Unit
+        override fun prepareForUser(item: UserLoginRelatedData?): UserLoginRelatedData? = item
+        override fun close() = Unit
+    }.createCache()
+
     private val usableUserRelatedData = userRelatedDataCache.userInterface.delayClosingItems(15 * 1000 /* 15 seconds */)
     private val usableDeviceRelatedData = deviceRelatedDataCache.userInterface.delayClosingItem(60 * 1000 /* 1 minute */)
+    private val usableUserLoginRelatedDataCache = userLoginRelatedDataCache.userInterface.delayClosingItems(15 * 1000 /* 15 seconds */)
 
     private val deviceAndUserRelatedDataCache = object: SingleItemDataCacheHelperInterface<DeviceAndUserRelatedData?, DeviceAndUserRelatedData?> {
         override fun openItemSync(): DeviceAndUserRelatedData?  {
             val deviceRelatedData = usableDeviceRelatedData.openSync(null) ?: return null
             val userRelatedData = if (deviceRelatedData.deviceEntry.currentUserId.isNotEmpty())
-                    usableUserRelatedData.openSync(deviceRelatedData.deviceEntry.currentUserId, null)
+                usableUserRelatedData.openSync(deviceRelatedData.deviceEntry.currentUserId, null)
             else
                 null
 
@@ -80,27 +73,12 @@ class DerivedDataDao (private val database: Database) {
         }
 
         override fun updateItemSync(item: DeviceAndUserRelatedData?): DeviceAndUserRelatedData? {
-            val deviceRelatedData = usableDeviceRelatedData.openSync(null) ?: run {
-                // close old listener instances
+            try {
+                val newItem = openItemSync()
+
+                return if (newItem != item) newItem else item
+            } finally {
                 disposeItemFast(item)
-
-                return null
-            }
-            val userRelatedData = if (deviceRelatedData.deviceEntry.currentUserId.isNotEmpty())
-                usableUserRelatedData.openSync(deviceRelatedData.deviceEntry.currentUserId, null)
-            else
-                null
-
-            // close old listener instances
-            disposeItemFast(item)
-
-            return if (deviceRelatedData == item?.deviceRelatedData && userRelatedData == item.userRelatedData) {
-                item
-            } else {
-                DeviceAndUserRelatedData(
-                        deviceRelatedData = deviceRelatedData,
-                        userRelatedData = userRelatedData
-                )
             }
         }
 
@@ -109,21 +87,72 @@ class DerivedDataDao (private val database: Database) {
         override fun prepareForUser(item: DeviceAndUserRelatedData?): DeviceAndUserRelatedData? = item
 
         override fun disposeItemFast(item: DeviceAndUserRelatedData?) {
-            if (item != null) {
-                usableDeviceRelatedData.close(null)
-                item.userRelatedData?.user?.let { usableUserRelatedData.close(it.id, null) }
+            usableDeviceRelatedData.close(null)
+            item?.deviceRelatedData?.deviceEntry?.currentUserId?.let {
+                if (it.isNotEmpty()) {
+                    usableUserRelatedData.close(it, null)
+                }
             }
         }
     }.createCache()
 
+    private val completeUserLoginRelatedData = object: DataCacheHelperInterface<String, CompleteUserLoginRelatedData?, CompleteUserLoginRelatedData?> {
+        override fun openItemSync(key: String): CompleteUserLoginRelatedData? = database.runInUnobservedTransaction {
+            val userLoginRelatedData = usableUserLoginRelatedDataCache.openSync(key, null)
+            val deviceRelatedData = usableDeviceRelatedData.openSync(null)
+
+            val limitLoginCategoryUserRelatedData = if (userLoginRelatedData?.limitLoginCategory == null)
+                null
+            else {
+                usableUserRelatedData.openSync(userLoginRelatedData.limitLoginCategory.childId, null)
+            }
+
+            if (userLoginRelatedData == null || deviceRelatedData == null) {
+                null
+            } else {
+                CompleteUserLoginRelatedData(
+                        loginRelatedData = userLoginRelatedData,
+                        deviceRelatedData = deviceRelatedData,
+                        limitLoginCategoryUserRelatedData = limitLoginCategoryUserRelatedData
+                )
+            }
+        }
+
+        override fun updateItemSync(key: String, item: CompleteUserLoginRelatedData?): CompleteUserLoginRelatedData? {
+            try {
+                val newItem = openItemSync(key)
+
+                return if (newItem != item) newItem else item
+            } finally {
+                disposeItemFast(key, item)
+            }
+        }
+
+        override fun disposeItemFast(key: String, item: CompleteUserLoginRelatedData?) {
+            usableUserLoginRelatedDataCache.close(key, null)
+            usableDeviceRelatedData.close(null)
+            item?.loginRelatedData?.limitLoginCategory?.let { category ->
+                usableUserRelatedData.close(category.childId, null)
+            }
+        }
+
+        override fun <R> wrapOpenOrUpdate(block: () -> R): R = database.runInUnobservedTransaction { block() }
+        override fun prepareForUser(item: CompleteUserLoginRelatedData?): CompleteUserLoginRelatedData? = item
+        override fun close() = Unit
+    }.createCache()
+
     private val usableDeviceAndUserRelatedDataCache = deviceAndUserRelatedDataCache.userInterface.delayClosingItem(5000)
+    private val usableCompleteUserLoginRelatedData = completeUserLoginRelatedData.userInterface.delayClosingItems(5000)
+
     private val deviceAndUserRelatedDataLive = usableDeviceAndUserRelatedDataCache.openLiveAtDatabaseThread()
 
     init {
         database.registerTransactionCommitListener {
             userRelatedDataCache.ownerInterface.updateSync()
             deviceRelatedDataCache.ownerInterface.updateSync()
+            userLoginRelatedDataCache.ownerInterface.updateSync()
             deviceAndUserRelatedDataCache.ownerInterface.updateSync()
+            completeUserLoginRelatedData.ownerInterface.updateSync()
         }
     }
 
@@ -135,7 +164,17 @@ class DerivedDataDao (private val database: Database) {
         return result
     }
 
+    fun getUserLoginRelatedDataSync(userId: String): CompleteUserLoginRelatedData? {
+        val result = usableCompleteUserLoginRelatedData.openSync(userId, null)
+
+        usableCompleteUserLoginRelatedData.close(userId, null)
+
+        return result
+    }
+
     fun getUserAndDeviceRelatedDataLive(): LiveData<DeviceAndUserRelatedData?> = deviceAndUserRelatedDataLive
 
     fun getUserRelatedDataLive(userId: String): LiveData<UserRelatedData?> = usableUserRelatedData.openLiveAtDatabaseThread(userId)
+
+    fun getUserLoginRelatedDataLive(userId: String) = usableCompleteUserLoginRelatedData.openLiveAtDatabaseThread(userId)
 }

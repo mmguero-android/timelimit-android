@@ -1854,6 +1854,32 @@ data class UpdateUserFlagsAction(val userId: String, val modifiedBits: Long, val
     }
 }
 
+data class UpdateUserLimitLoginCategory(val userId: String, val categoryId: String?): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_USER_LIMIT_LOGIN_CATEGORY"
+        private const val USER_ID = "userId"
+        private const val CATEGORY_ID = "categoryId"
+    }
+
+    init {
+        IdGenerator.assertIdValid(userId)
+        categoryId?.let { IdGenerator.assertIdValid(categoryId) }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(USER_ID).value(userId)
+
+        if (categoryId != null) {
+            writer.name(CATEGORY_ID).value(categoryId)
+        }
+
+        writer.endObject()
+    }
+}
+
 // child actions
 object ChildSignInAction: ChildAction() {
     private const val TYPE_VALUE = "CHILD_SIGN_IN"

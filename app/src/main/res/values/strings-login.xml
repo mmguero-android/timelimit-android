@@ -32,4 +32,5 @@
     <string name="login_scan_code">Scan code</string>
     <string name="login_scan_code_err_expired">This code is old</string>
     <string name="login_scan_code_err_not_linked">This key is not linked</string>
+    <string name="login_category_blocked">The category %1$s is blocked now (%2$s) so you can not sign in with this user now</string>
 </resources>

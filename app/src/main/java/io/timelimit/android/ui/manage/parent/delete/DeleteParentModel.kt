@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,14 +48,19 @@ class DeleteParentModel(application: Application): AndroidViewModel(application)
             } != null
         }
     }
+    private val isLastWithoutLoginLimit = parentUserIdLive.switchMap { userId ->
+        database.userLimitLoginCategoryDao().countOtherUsersWithoutLimitLoginCategoryLive(userId).map { it == 0L }
+    }
 
     private val statusIgnoringLinkingLive = parentUserIdLive.switchMap { parentUserId ->
-        authenticatedUserLive.map { authenticatedUser ->
-            if (authenticatedUser?.second?.type != UserType.Parent) {
-                Status.NotAuthenticated
-            } else {
-                if (authenticatedUser.second.id == parentUserId) {
+        authenticatedUserLive.switchMap { authenticatedUser ->
+            isLastWithoutLoginLimit.map { lastWithoutLoginLimit ->
+                if (authenticatedUser?.second?.type != UserType.Parent) {
+                    Status.NotAuthenticated
+                } else if (authenticatedUser.second.id == parentUserId) {
                     Status.WrongAccount
+                } else if (lastWithoutLoginLimit) {
+                    Status.LastWihtoutLoginLimit
                 } else {
                     Status.Ready
                 }
@@ -142,5 +147,6 @@ enum class Status {
     LastLinked,
     NotAuthenticated,
     WrongAccount,
+    LastWihtoutLoginLimit,
     Ready
 }

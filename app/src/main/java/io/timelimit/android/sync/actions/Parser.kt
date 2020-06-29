@@ -69,6 +69,7 @@ object ActionParser {
         // UpdateCategoryBatteryLimit
         // UpdateCategorySorting
         // UpdateUserFlagsAction
+        // UpdateUserLimitLoginCategory
         else -> throw IllegalStateException()
     }
 }

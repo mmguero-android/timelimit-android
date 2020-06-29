@@ -16,6 +16,7 @@
 package io.timelimit.android.sync.network
 
 import android.util.JsonReader
+import android.util.JsonToken
 import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
 import io.timelimit.android.data.model.*
@@ -130,7 +131,7 @@ data class ServerDeviceList(
 
 data class ServerUserList(
         val version: String,
-        val data: List<User>
+        val data: List<ServerUserData>
 ) {
     companion object {
         private const val VERSION = "version"
@@ -138,13 +139,13 @@ data class ServerUserList(
 
         fun parse(reader: JsonReader): ServerUserList {
             var version: String? = null
-            var data: List<User>? = null
+            var data: List<ServerUserData>? = null
 
             reader.beginObject()
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     VERSION -> version = reader.nextString()
-                    DATA -> data = User.parseList(reader)
+                    DATA -> data = ServerUserData.parseList(reader)
                     else -> reader.skipValue()
                 }
             }
@@ -155,6 +156,103 @@ data class ServerUserList(
                     data = data!!
             )
         }
+    }
+}
+
+data class ServerUserData(
+        val id: String,
+        val name: String,
+        val password: String,
+        val secondPasswordSalt: String,
+        val type: UserType,
+        val timeZone: String,
+        val disableLimitsUntil: Long,
+        val mail: String,
+        val currentDevice: String,
+        val categoryForNotAssignedApps: String,
+        val relaxPrimaryDevice: Boolean,
+        val mailNotificationFlags: Int,
+        val blockedTimes: ImmutableBitmask,
+        val flags: Long,
+        val limitLoginCategory: String?
+) {
+    companion object {
+        private const val ID = "id"
+        private const val NAME = "name"
+        private const val PASSWORD = "password"
+        private const val SECOND_PASSWORD_SALT = "secondPasswordSalt"
+        private const val TYPE = "type"
+        private const val TIMEZONE = "timeZone"
+        private const val DISABLE_LIMITS_UNTIL = "disableLimitsUntil"
+        private const val MAIL = "mail"
+        private const val CURRENT_DEVICE = "currentDevice"
+        private const val CATEGORY_FOR_NOT_ASSIGNED_APPS = "categoryForNotAssignedApps"
+        private const val RELAX_PRIMARY_DEVICE = "relaxPrimaryDevice"
+        private const val MAIL_NOTIFICATION_FLAGS = "mailNotificationFlags"
+        private const val BLOCKED_TIMES = "blockedTimes"
+        private const val FLAGS = "flags"
+        private const val USER_LIMIT_LOGIN_CATEGORY = "llc"
+
+        fun parse(reader: JsonReader): ServerUserData {
+            var id: String? = null
+            var name: String? = null
+            var password: String? = null
+            var secondPasswordSalt: String? = null
+            var type: UserType? = null
+            var timeZone: String? = null
+            var disableLimitsUntil: Long? = null
+            var mail: String? = null
+            var currentDevice: String? = null
+            var categoryForNotAssignedApps = ""
+            var relaxPrimaryDevice = false
+            var mailNotificationFlags = 0
+            var blockedTimes = ImmutableBitmask(BitSet())
+            var flags = 0L
+            var limitLoginCategory: String? = null
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when(reader.nextName()) {
+                    ID -> id = reader.nextString()
+                    NAME -> name = reader.nextString()
+                    PASSWORD -> password = reader.nextString()
+                    SECOND_PASSWORD_SALT -> secondPasswordSalt = reader.nextString()
+                    TYPE -> type = UserTypeJson.parse(reader.nextString())
+                    TIMEZONE -> timeZone = reader.nextString()
+                    DISABLE_LIMITS_UNTIL -> disableLimitsUntil = reader.nextLong()
+                    MAIL -> mail = reader.nextString()
+                    CURRENT_DEVICE -> currentDevice = reader.nextString()
+                    CATEGORY_FOR_NOT_ASSIGNED_APPS -> categoryForNotAssignedApps = reader.nextString()
+                    RELAX_PRIMARY_DEVICE -> relaxPrimaryDevice = reader.nextBoolean()
+                    MAIL_NOTIFICATION_FLAGS -> mailNotificationFlags = reader.nextInt()
+                    BLOCKED_TIMES -> blockedTimes = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
+                    FLAGS -> flags = reader.nextLong()
+                    USER_LIMIT_LOGIN_CATEGORY -> if (reader.peek() == JsonToken.NULL) reader.nextNull() else limitLoginCategory = reader.nextString()
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+
+            return ServerUserData(
+                    id = id!!,
+                    name = name!!,
+                    password = password!!,
+                    secondPasswordSalt = secondPasswordSalt!!,
+                    type = type!!,
+                    timeZone = timeZone!!,
+                    disableLimitsUntil = disableLimitsUntil!!,
+                    mail = mail!!,
+                    currentDevice = currentDevice!!,
+                    categoryForNotAssignedApps = categoryForNotAssignedApps,
+                    relaxPrimaryDevice = relaxPrimaryDevice,
+                    mailNotificationFlags = mailNotificationFlags,
+                    blockedTimes = blockedTimes,
+                    flags = flags,
+                    limitLoginCategory = limitLoginCategory
+            )
+        }
+
+        fun parseList(reader: JsonReader) = parseJsonArray(reader) { parse(reader) }
     }
 }
 

@@ -44,8 +44,9 @@ import java.util.concurrent.CountDownLatch
     Notification::class,
     AllowedContact::class,
     UserKey::class,
-    SessionDuration::class
-], version = 30)
+    SessionDuration::class,
+    UserLimitLoginCategory::class
+], version = 31)
 abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database {
     companion object {
         private val lock = Object()
@@ -109,7 +110,8 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
                             DatabaseMigrations.MIGRATE_TO_V27,
                             DatabaseMigrations.MIGRATE_TO_V28,
                             DatabaseMigrations.MIGRATE_TO_V29,
-                            DatabaseMigrations.MIGRATE_TO_V30
+                            DatabaseMigrations.MIGRATE_TO_V30,
+                            DatabaseMigrations.MIGRATE_TO_V31
                     )
                     .build()
         }

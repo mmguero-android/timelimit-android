@@ -241,6 +241,23 @@ data class CategoryItselfHandling (
     // blockAllNotifications is only relevant if premium or local mode
     // val shouldBlockNotifications = !okAll || blockAllNotifications
     val shouldBlockAtSystemLevel = !okBasic
+    val systemLevelBlockingReason: BlockingReason = if (!okByBattery)
+        BlockingReason.BatteryLimit
+    else if (!okByTempBlocking)
+        BlockingReason.TemporarilyBlocked
+    else if (!okByBlockedTimeAreas)
+        BlockingReason.BlockedAtThisTime
+    else if (!okByTimeLimitRules)
+        if (remainingTime?.hasRemainingTime == true)
+            BlockingReason.TimeOverExtraTimeCanBeUsedLater
+        else
+            BlockingReason.TimeOver
+    else if (!okBySessionDurationLimits)
+        BlockingReason.SessionDurationLimit
+    else if (missingNetworkTime)
+        BlockingReason.MissingNetworkTime
+    else
+        BlockingReason.None
 
     fun isValid(
             categoryRelatedData: CategoryRelatedData,

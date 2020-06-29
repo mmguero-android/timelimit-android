@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="parent_limit_login_title">Limit login category</string>
+    <string name="parent_limit_login_help">Here you can select a category. As soon as Apps of this
+        category are blocked, you can not sign in with your parent user. This
+        can be used to prevent you from disabling limits which you set for yourself while they are active.
+    </string>
+    <string name="parent_limit_login_status_disabled">You can sign in at any time</string>
+    <string name="parent_limit_login_status_enabled">You can not sign in when %1$s is blocked for %2$s</string>
+    <string name="parent_limit_login_status_needs_other_user">You must create another parent user as backup (in case you lock out yourself) before you can use this feature</string>
+    <string name="parent_limit_login_select_button">Select category</string>
+    <string name="parent_limit_login_dialog_no_selection">no category</string>
+    <string name="parent_limit_login_dialog_item">%1$s/%2$s</string>
+    <string name="parent_limit_login_error_user_itself">You must be signed in as the user
+        to select a category. Other users can only disable this feature.
+    </string>
+</resources>

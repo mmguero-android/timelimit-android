@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -14,8 +14,9 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="manage_parent_blocked_times_title">Time lock</string>
+    <string name="manage_parent_blocked_times_title">Time lock (deprecated)</string>
     <string name="manage_parent_blocked_times_description">
+        You can use a limit login category instead.
         This allows to set times at which the parent can not sign in.
         This is relevant for limiting ones own usage.
     </string>
@@ -28,4 +29,9 @@
     <string name="manage_parent_blocked_action_reset">Reset limits</string>
 
     <string name="manage_parent_lockout_hour_rule">To prevent losing access, you can only block 18 hours per day</string>
+
+    <string name="manage_parent_blocked_times_toast">
+        You are using the deprecated time lock for your parent user.
+        You should use a limit login category instead.
+    </string>
 </resources>

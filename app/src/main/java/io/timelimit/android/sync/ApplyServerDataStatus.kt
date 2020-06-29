@@ -52,8 +52,24 @@ object ApplyServerDataStatus {
                     run {
                         // update/ create entries (first because there must be always one parent user)
 
-                        newUserList.data.forEach {
-                            newData ->
+                        newUserList.data.forEach { newEntry ->
+                            val newData = User(
+                                    id = newEntry.id,
+                                    name = newEntry.name,
+                                    password = newEntry.password,
+                                    secondPasswordSalt = newEntry.secondPasswordSalt,
+                                    type = newEntry.type,
+                                    timeZone = newEntry.timeZone,
+                                    disableLimitsUntil = newEntry.disableLimitsUntil,
+                                    mail = newEntry.mail,
+                                    currentDevice = newEntry.currentDevice,
+                                    categoryForNotAssignedApps = newEntry.categoryForNotAssignedApps,
+                                    relaxPrimaryDevice = newEntry.relaxPrimaryDevice,
+                                    mailNotificationFlags = newEntry.mailNotificationFlags,
+                                    blockedTimes = newEntry.blockedTimes,
+                                    flags = newEntry.flags
+                            )
+
                             val oldEntry = oldUserList.find { it.id == newData.id }
 
                             if (oldEntry == null) {
@@ -458,6 +474,24 @@ object ApplyServerDataStatus {
                             categoryId = categoryId,
                             rulesVersion = newTimeLimitRulesItem.version
                     )
+                }
+            }
+
+            status.newUserList?.data?.forEach { user ->
+                if (user.limitLoginCategory == null) {
+                    database.userLimitLoginCategoryDao().removeItemSync(user.id)
+                } else {
+                    val oldItem = database.userLimitLoginCategoryDao().getByParentUserIdSync(user.id)
+
+                    if (oldItem == null || oldItem.categoryId != user.limitLoginCategory) {
+                        database.userLimitLoginCategoryDao().removeItemSync(user.id)
+                        database.userLimitLoginCategoryDao().insertOrIgnoreItemSync(
+                                UserLimitLoginCategory(
+                                        userId = user.id,
+                                        categoryId = user.limitLoginCategory
+                                )
+                        )
+                    }
                 }
             }
         }
