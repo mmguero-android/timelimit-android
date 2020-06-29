@@ -57,6 +57,9 @@ abstract class UsedTimeDao {
     @Query("SELECT * FROM used_time WHERE category_id IN (:categoryIds) AND day_of_epoch >= :startingDayOfEpoch AND day_of_epoch <= :endDayOfEpoch")
     abstract fun getUsedTimesByDayAndCategoryIds(categoryIds: List<String>, startingDayOfEpoch: Int, endDayOfEpoch: Int): LiveData<List<UsedTimeItem>>
 
+    @Query("SELECT * FROM used_time WHERE category_id = :categoryId")
+    abstract fun getUsedTimeItemsByCategoryId(categoryId: String): List<UsedTimeItem>
+
     @Query("SELECT * FROM used_time")
     abstract fun getAllUsedTimeItemsSync(): List<UsedTimeItem>
 

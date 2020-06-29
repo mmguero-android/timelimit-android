@@ -26,6 +26,7 @@ abstract class TimeApi {
     abstract fun getCurrentUptimeInMillis(): Long
     // function to run something delayed at the UI Thread
     abstract fun runDelayed(runnable: Runnable, delayInMillis: Long)
+    abstract fun runDelayedByUptime(runnable: Runnable, delayInMillis: Long)
     abstract fun cancelScheduledAction(runnable: Runnable)
     suspend fun sleep(timeInMillis: Long) = suspendCoroutine<Void?> {
         runDelayed(Runnable {

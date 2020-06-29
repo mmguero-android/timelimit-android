@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,14 +16,26 @@
 package io.timelimit.android.logic
 
 import io.timelimit.android.data.model.Device
+import io.timelimit.android.data.model.derived.DeviceRelatedData
+import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.livedata.*
 
 class CurrentDeviceLogic(private val appLogic: AppLogic) {
-    private val disabledPrimaryDeviceCheck = appLogic.deviceUserEntry.switchMap { userEntry ->
-        if (userEntry?.relaxPrimaryDevice == true) {
-            appLogic.fullVersion.shouldProvideFullVersionFunctions
-        } else {
-            liveDataFromValue(false)
+    companion object {
+        fun handleDeviceAsCurrentDevice(device: DeviceRelatedData, user: UserRelatedData): Boolean {
+            if (device.isLocalMode) {
+                return true
+            }
+
+            if (user.user.currentDevice == device.deviceEntry.id) {
+                return true
+            }
+
+            if (user.user.relaxPrimaryDevice && device.isConnectedAndHasPremium) {
+                return true
+            }
+
+            return false
         }
     }
 
@@ -40,19 +52,6 @@ class CurrentDeviceLogic(private val appLogic: AppLogic) {
             devices.filterNot { device -> device.id == ownDeviceEntry?.id }
         }
     }
-
-    private val isThisDeviceMarkedAsCurrentDevice = appLogic.deviceEntry
-            .map { it?.id }
-            .switchMap { ownDeviceId ->
-                appLogic.deviceUserEntry.map { userEntry ->
-                    userEntry?.currentDevice == ownDeviceId
-                }
-            }
-
-    val isThisDeviceTheCurrentDevice = appLogic.fullVersion.isLocalMode
-            .or(isThisDeviceMarkedAsCurrentDevice)
-            .or(disabledPrimaryDeviceCheck)
-            .ignoreUnchanged()
 
     val otherAssignedDevice = appLogic.deviceUserEntry.switchMap { userEntry ->
         if (userEntry?.currentDevice == null) {

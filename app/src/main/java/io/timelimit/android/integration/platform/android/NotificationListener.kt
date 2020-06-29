@@ -27,9 +27,13 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
+import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.livedata.waitForNonNullValue
+import io.timelimit.android.data.model.UserType
 import io.timelimit.android.logic.*
+import io.timelimit.android.logic.blockingreason.AppBaseHandling
+import io.timelimit.android.logic.blockingreason.CategoryItselfHandling
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 class NotificationListener: NotificationListenerService() {
@@ -39,7 +43,6 @@ class NotificationListener: NotificationListenerService() {
     }
 
     private val appLogic: AppLogic by lazy { DefaultAppLogic.with(this) }
-    private val blockingReasonUtil: BlockingReasonUtil by lazy { BlockingReasonUtil(appLogic) }
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private val queryAppTitleCache: QueryAppTitleCache by lazy { QueryAppTitleCache(appLogic.platformIntegration) }
     private val lastOngoingNotificationHidden = mutableSetOf<String>()
@@ -140,31 +143,53 @@ class NotificationListener: NotificationListenerService() {
             return BlockingReason.None
         }
 
-        val blockingReason = blockingReasonUtil.getBlockingReason(
-                packageName = sbn.packageName,
-                activityName = null
-        ).waitForNonNullValue()
-
-        if (blockingReason.areNotificationsBlocked) {
-            if (BuildConfig.DEBUG) {
-                Log.d(LOG_TAG, "blocking notification of ${sbn.packageName} because notifications are blocked")
-            }
-
-            return BlockingReason.NotificationsAreBlocked
+        val deviceAndUserRelatedData = Threads.database.executeAndWait {
+            appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
         }
 
-        return when (blockingReason) {
-            is NoBlockingReason -> BlockingReason.None
-            is BlockedReasonDetails -> {
-                if (isSystemApp(sbn.packageName) && blockingReason.reason == BlockingReason.NotPartOfAnCategory) {
-                    return BlockingReason.None
+        return if (deviceAndUserRelatedData?.userRelatedData?.user?.type != UserType.Child) {
+            BlockingReason.None
+        } else {
+            val appHandling = AppBaseHandling.calculate(
+                    foregroundAppPackageName = sbn.packageName,
+                    foregroundAppActivityName = null,
+                    pauseCounting = false,
+                    pauseForegroundAppBackgroundLoop = false,
+                    userRelatedData = deviceAndUserRelatedData.userRelatedData,
+                    deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData
+            )
+
+            if (appHandling is AppBaseHandling.BlockDueToNoCategory && !isSystemApp(sbn.packageName)) {
+                BlockingReason.NotPartOfAnCategory
+            } else if (appHandling is AppBaseHandling.UseCategories) {
+                val time = RealTime.newInstance()
+                val battery = appLogic.platformIntegration.getBatteryStatus()
+                val allowNotificationFilter = deviceAndUserRelatedData.deviceRelatedData.isConnectedAndHasPremium || deviceAndUserRelatedData.deviceRelatedData.isLocalMode
+
+                appLogic.realTimeLogic.getRealTime(time)
+
+                val categoryHandlings = appHandling.categoryIds.map { categoryId ->
+                    CategoryItselfHandling.calculate(
+                            categoryRelatedData = deviceAndUserRelatedData.userRelatedData.categoryById[categoryId]!!,
+                            user = deviceAndUserRelatedData.userRelatedData,
+                            assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(
+                                    device = deviceAndUserRelatedData.deviceRelatedData,
+                                    user = deviceAndUserRelatedData.userRelatedData
+                            ),
+                            batteryStatus = battery,
+                            shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily,
+                            timeInMillis = time.timeInMillis
+                    )
                 }
 
-                if (BuildConfig.DEBUG) {
-                    Log.d(LOG_TAG, "blocking notification of ${sbn.packageName} because ${blockingReason.reason}")
+                if (allowNotificationFilter && categoryHandlings.find { it.blockAllNotifications } != null) {
+                    BlockingReason.NotificationsAreBlocked
+                } else {
+                    categoryHandlings.find { it.shouldBlockActivities }?.activityBlockingReason
+                            ?: BlockingReason.None
                 }
-
-                return blockingReason.reason
+            } else {
+                BlockingReason.None
             }
         }
     }

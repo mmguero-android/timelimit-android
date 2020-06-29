@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,28 @@
  */
 package io.timelimit.android.logic
 
+import io.timelimit.android.async.Threads
+import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.livedata.waitForNullableValue
+import io.timelimit.android.logic.blockingreason.AppBaseHandling
 
 object AppAffectedByPrimaryDeviceUtil {
     suspend fun isCurrentAppAffectedByPrimaryDevice(
             logic: AppLogic
     ): Boolean {
-        val user = logic.deviceUserEntry.waitForNullableValue()
-                ?: throw NullPointerException("no user is signed in")
-
-        if (user.type != UserType.Child) {
-            throw IllegalStateException("no child is signed in")
+        val deviceAndUserRelatedData = Threads.database.executeAndWait {
+            logic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
         }
 
-        if (user.relaxPrimaryDevice) {
-            if (logic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue() == true) {
+        if (deviceAndUserRelatedData?.userRelatedData?.user?.type != UserType.Child) {
+            return false
+        }
+
+        if (deviceAndUserRelatedData.userRelatedData.user.relaxPrimaryDevice) {
+            if (deviceAndUserRelatedData.deviceRelatedData.isConnectedAndHasPremium) {
                 return false
             }
         }
@@ -49,50 +53,26 @@ object AppAffectedByPrimaryDeviceUtil {
             return false
         }
 
-        val categories = logic.database.category().getCategoriesByChildId(user.id).waitForNonNullValue()
-        val categoryId = run {
-            val categoryIdAtAppLevel = logic.database.categoryApp().getCategoryApp(
-                    categoryIds = categories.map { it.id },
-                    packageName = currentApp.packageName!!
-            ).waitForNullableValue()?.categoryId
+        val handling = AppBaseHandling.calculate(
+                foregroundAppPackageName = currentApp.packageName,
+                foregroundAppActivityName = currentApp.activityName,
+                deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
+                userRelatedData = deviceAndUserRelatedData.userRelatedData,
+                pauseCounting = false,
+                pauseForegroundAppBackgroundLoop = false
+        )
 
-            if (logic.deviceEntry.waitForNullableValue()?.enableActivityLevelBlocking == true) {
-                val categoryIdAtActivityLevel = logic.database.categoryApp().getCategoryApp(
-                        categoryIds = categories.map { it.id },
-                        packageName = "${currentApp.packageName}:${currentApp.activityName}"
-                ).waitForNullableValue()?.categoryId
-
-                categoryIdAtActivityLevel ?: categoryIdAtAppLevel
-            } else {
-                categoryIdAtAppLevel
-            }
-        } ?: user.categoryForNotAssignedApps
-
-        val category = categories.find { it.id == categoryId }
-        val parentCategory = categories.find { it.id == category?.parentCategoryId }
-
-        if (category == null) {
+        if (!(handling is AppBaseHandling.UseCategories)) {
             return false
         }
 
-        // check blocked time areas
-        if (
-                (category.blockedMinutesInWeek.dataNotToModify.isEmpty == false) ||
-                (parentCategory?.blockedMinutesInWeek?.dataNotToModify?.isEmpty == false)
-        ) {
-            return true
-        }
+        return handling.categoryIds.find { categoryId ->
+            val category = deviceAndUserRelatedData.userRelatedData.categoryById[categoryId]!!
 
-        // check time limit rules
-        val rules = logic.database.timeLimitRules().getTimeLimitRulesByCategories(
-                categoryIds = listOf(categoryId) +
-                        (if (parentCategory != null) listOf(parentCategory.id) else emptyList())
-        ).waitForNonNullValue()
+            val hasBlockedTimeAreas = !category.category.blockedMinutesInWeek.dataNotToModify.isEmpty
+            val hasRules = category.rules.isNotEmpty()
 
-        if (rules.isNotEmpty()) {
-            return true
-        }
-
-        return false
+            hasBlockedTimeAreas || hasRules
+        } != null
     }
 }

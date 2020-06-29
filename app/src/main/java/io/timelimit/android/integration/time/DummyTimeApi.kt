@@ -42,6 +42,8 @@ class DummyTimeApi(var timeStepSizeInMillis: Long): TimeApi() {
         scheduledActions.add(ScheduledAction(currentUptime + delayInMillis, runnable))
     }
 
+    override fun runDelayedByUptime(runnable: Runnable, delayInMillis: Long) = runDelayed(runnable, delayInMillis)
+
     override fun cancelScheduledAction(runnable: Runnable) {
         scheduledActions.removeAll { it.action === runnable }
     }

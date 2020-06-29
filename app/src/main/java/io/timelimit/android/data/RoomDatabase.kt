@@ -15,11 +15,19 @@
  */
 package io.timelimit.android.data
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.room.Database
+import androidx.room.InvalidationTracker
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import io.timelimit.android.data.dao.DerivedDataDao
+import io.timelimit.android.data.invalidation.Observer
+import io.timelimit.android.data.invalidation.Table
+import io.timelimit.android.data.invalidation.TableUtil
 import io.timelimit.android.data.model.*
+import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch
 
 @Database(entities = [
     User::class,
@@ -107,9 +115,82 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
         }
     }
 
+    private val derivedDataDao: DerivedDataDao by lazy { DerivedDataDao(this) }
+    override fun derivedDataDao(): DerivedDataDao = derivedDataDao
+
+    private val transactionCommitListeners = mutableSetOf<() -> Unit>()
+
+    override fun registerTransactionCommitListener(listener: () -> Unit): Unit = synchronized(transactionCommitListeners) {
+        transactionCommitListeners.add(listener)
+    }
+
+    override fun unregisterTransactionCommitListener(listener: () -> Unit): Unit = synchronized(transactionCommitListeners) {
+        transactionCommitListeners.remove(listener)
+    }
+
     // the room compiler needs this
     override fun <T> runInTransaction(block: () -> T): T {
         return super.runInTransaction(block)
+    }
+
+    override fun <T> runInUnobservedTransaction(block: () -> T): T {
+        openHelper.readableDatabase.beginTransaction()
+        try {
+            val result = block()
+
+            openHelper.readableDatabase.setTransactionSuccessful()
+
+            return result
+        } finally {
+            openHelper.readableDatabase.endTransaction()
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun endTransaction() {
+        openHelper.writableDatabase.endTransaction()
+
+        if (!inTransaction()) {
+            // block the query thread of room until this is done
+            val latch = CountDownLatch(1)
+
+            try {
+                queryExecutor.execute { latch.await() }
+
+                // without requesting a async refresh, no sync refresh will happen
+                invalidationTracker.refreshVersionsAsync()
+                invalidationTracker.refreshVersionsSync()
+
+                openHelper.readableDatabase.beginTransaction()
+                try {
+                    synchronized(transactionCommitListeners) { transactionCommitListeners.toList() }.forEach { it() }
+                } finally {
+                    openHelper.readableDatabase.endTransaction()
+                }
+            } finally {
+                latch.countDown()
+            }
+        }
+    }
+
+    override fun registerWeakObserver(tables: Array<Table>, observer: WeakReference<Observer>) {
+        val tableNames = arrayOfNulls<String>(tables.size)
+
+        tables.forEachIndexed { index, table ->
+            tableNames[index] = TableUtil.toName(table)
+        }
+
+        invalidationTracker.addObserver(object: InvalidationTracker.Observer(tableNames) {
+            override fun onInvalidated(tables: MutableSet<String>) {
+                val item = observer.get()
+
+                if (item != null) {
+                    item.onInvalidated(tables.map { TableUtil.toEnum(it) }.toSet())
+                } else {
+                    invalidationTracker.removeObserver(this)
+                }
+            }
+        })
     }
 
     override fun deleteAllData() {

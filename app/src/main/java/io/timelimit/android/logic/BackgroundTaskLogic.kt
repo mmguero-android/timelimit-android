@@ -26,16 +26,15 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.coroutines.runAsyncExpectForever
 import io.timelimit.android.data.backup.DatabaseBackup
 import io.timelimit.android.data.model.*
+import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.date.DateInTimezone
-import io.timelimit.android.date.getMinuteOfWeek
-import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.integration.platform.AppStatusMessage
 import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AccessibilityService
 import io.timelimit.android.livedata.*
-import io.timelimit.android.sync.actions.AddUsedTimeActionItemAdditionalCountingSlot
-import io.timelimit.android.sync.actions.AddUsedTimeActionItemSessionDurationLimitSlot
+import io.timelimit.android.logic.blockingreason.AppBaseHandling
+import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
 import io.timelimit.android.sync.actions.UpdateDeviceStatusAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.ui.IsAppInForeground
@@ -64,14 +63,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         private const val MAX_USED_TIME_PER_ROUND_LONG = 2000           // 1 second
     }
 
-    private val temporarilyAllowedApps = appLogic.deviceId.switchMap {
-        if (it != null) {
-            appLogic.database.temporarilyAllowedApp().getTemporarilyAllowedApps(it)
-        } else {
-            liveDataFromValue(Collections.emptyList<String>())
-        }
-    }
-
     init {
         runAsyncExpectForever { backgroundServiceLoop() }
         runAsyncExpectForever { syncDeviceStatusLoop() }
@@ -96,10 +87,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
                 }
 
-        temporarilyAllowedApps.map { it.isNotEmpty() }.ignoreUnchanged().observeForever {
-            appLogic.platformIntegration.setShowNotificationToRevokeTemporarilyAllowedApps(it!!)
-        }
-
         appLogic.database.config().getEnableBackgroundSyncAsync().ignoreUnchanged().observeForever {
             if (it) {
                 PeriodicSyncInBackgroundWorker.enable()
@@ -121,15 +108,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         }
     }
 
-    private val cache = BackgroundTaskLogicCache(appLogic)
-    private val deviceUserEntryLive = cache.deviceUserEntryLive
-    private val childCategories = cache.childCategories
-    private val timeLimitRules = cache.timeLimitRules
-    private val usedTimesOfCategoryAndWeekByFirstDayOfWeek = cache.usedTimesOfCategoryAndWeekByFirstDayOfWeek
-    private val shouldDoAutomaticSignOut = cache.shouldDoAutomaticSignOut
-    private val liveDataCaches = cache.liveDataCaches
-
-    private var usedTimeUpdateHelper: UsedTimeUpdateHelper? = null
+    private val usedTimeUpdateHelper = UsedTimeUpdateHelper(appLogic)
     private var previousMainLogicExecutionTime = 0
     private var previousMainLoopEndTime = 0L
     private val dayChangeTracker = DayChangeTracker(
@@ -138,6 +117,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
     )
 
     private val appTitleCache = QueryAppTitleCache(appLogic.platformIntegration)
+    private val categoryHandlingCache = CategoryHandlingCache()
 
     private val isChromeOs = appLogic.context.packageManager.hasSystemFeature(PackageManager.FEATURE_PC)
 
@@ -167,12 +147,19 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         appLogic.platformIntegration.showAppLockScreen(blockedAppPackageName, blockedAppActivityName)
     }
 
+    private var showNotificationToRevokeTemporarilyAllowedApps: Boolean? = null
+
+    private fun setShowNotificationToRevokeTemporarilyAllowedApps(show: Boolean) {
+        if (showNotificationToRevokeTemporarilyAllowedApps != show) {
+            showNotificationToRevokeTemporarilyAllowedApps = show
+            appLogic.platformIntegration.setShowNotificationToRevokeTemporarilyAllowedApps(show)
+        }
+    }
+
     private val foregroundAppSpec = ForegroundAppSpec.newInstance()
-    val foregroundAppHandling = BackgroundTaskRestrictionLogicResult()
-    val audioPlaybackHandling = BackgroundTaskRestrictionLogicResult()
 
     private suspend fun commitUsedTimeUpdaters() {
-        usedTimeUpdateHelper?.forceCommit(appLogic)
+        usedTimeUpdateHelper.flush()
     }
 
     private suspend fun backgroundServiceLoop() {
@@ -192,22 +179,30 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
             // app must be enabled
             if (!appLogic.enable.waitForNonNullValue()) {
                 commitUsedTimeUpdaters()
-                liveDataCaches.removeAllItems()
                 appLogic.platformIntegration.setAppStatusMessage(null)
                 appLogic.platformIntegration.setShowBlockingOverlay(false)
+                setShowNotificationToRevokeTemporarilyAllowedApps(false)
                 appLogic.enable.waitUntilValueMatches { it == true }
 
                 continue
             }
 
+            val deviceAndUSerRelatedData = Threads.database.executeAndWait {
+                appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
+            }
+
+            val deviceRelatedData = deviceAndUSerRelatedData?.deviceRelatedData
+            val userRelatedData = deviceAndUSerRelatedData?.userRelatedData
+
+            setShowNotificationToRevokeTemporarilyAllowedApps(deviceRelatedData?.temporarilyAllowedApps?.isNotEmpty() ?: false)
+
             // device must be used by a child
-            val deviceUserEntry = deviceUserEntryLive.read().waitForNullableValue()
-
-            if (deviceUserEntry == null || deviceUserEntry.type != UserType.Child) {
+            if (deviceRelatedData == null || userRelatedData == null || userRelatedData.user.type != UserType.Child) {
                 commitUsedTimeUpdaters()
-                val shouldDoAutomaticSignOut = shouldDoAutomaticSignOut.read()
 
-                if (shouldDoAutomaticSignOut.waitForNonNullValue()) {
+                val shouldDoAutomaticSignOut = deviceRelatedData != null && DefaultUserLogic.hasAutomaticSignOut(deviceRelatedData)
+
+                if (shouldDoAutomaticSignOut) {
                     appLogic.defaultUserLogic.reportScreenOn(appLogic.platformIntegration.isScreenOn())
 
                     appLogic.platformIntegration.setAppStatusMessage(
@@ -219,16 +214,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     )
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
 
-                    liveDataCaches.reportLoopDone()
                     appLogic.timeApi.sleep(backgroundServiceInterval)
                 } else {
-                    liveDataCaches.removeAllItems()
                     appLogic.platformIntegration.setAppStatusMessage(null)
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
 
-                    val isChildSignedIn = deviceUserEntryLive.read().map { it != null && it.type == UserType.Child }
-
-                    isChildSignedIn.or(shouldDoAutomaticSignOut).waitUntilValueMatches { it == true }
+                    appLogic.timeApi.sleep(backgroundServiceInterval)
                 }
 
                 continue
@@ -240,18 +231,18 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 appLogic.realTimeLogic.getRealTime(realTime)
 
                 val nowTimestamp = realTime.timeInMillis
-                val nowTimezone = TimeZone.getTimeZone(deviceUserEntry.timeZone)
+                val nowTimezone = TimeZone.getTimeZone(userRelatedData.user.timeZone)
 
-                val nowDate = DateInTimezone.newInstance(nowTimestamp, nowTimezone)
-                val minuteOfWeek = getMinuteOfWeek(nowTimestamp, nowTimezone)
+                val nowDate = DateInTimezone.getLocalDate(nowTimestamp, nowTimezone)
+                val dayOfEpoch = nowDate.toEpochDay().toInt()
 
                 // eventually remove old used time data
                 if (realTime.shouldTrustTimePermanently) {
-                    val dayChange = dayChangeTracker.reportDayChange(nowDate.dayOfEpoch)
+                    val dayChange = dayChangeTracker.reportDayChange(dayOfEpoch)
 
                     fun deleteOldUsedTimes() = UsedTimeDeleter.deleteOldUsedTimeItems(
                             database = appLogic.database,
-                            date = nowDate,
+                            date = DateInTimezone.newInstance(nowDate),
                             timestamp = nowTimestamp
                     )
 
@@ -266,10 +257,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
                 }
 
-                // get the categories
-                val categories = childCategories.get(deviceUserEntry.id).waitForNonNullValue()
-                val temporarilyAllowedApps = temporarilyAllowedApps.waitForNonNullValue()
-
                 // get the current status
                 val isScreenOn = appLogic.platformIntegration.isScreenOn()
                 val batteryStatus = appLogic.platformIntegration.getBatteryStatus()
@@ -277,10 +264,20 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 appLogic.defaultUserLogic.reportScreenOn(isScreenOn)
 
                 if (!isScreenOn) {
-                    if (temporarilyAllowedApps.isNotEmpty()) {
+                    if (deviceRelatedData.temporarilyAllowedApps.isNotEmpty()) {
                         resetTemporarilyAllowedApps()
                     }
                 }
+
+                fun reportStatusToCategoryHandlingCache(userRelatedData: UserRelatedData) {
+                    categoryHandlingCache.reportStatus(
+                            user = userRelatedData,
+                            timeInMillis = nowTimestamp,
+                            shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
+                            assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceRelatedData, userRelatedData),
+                            batteryStatus = batteryStatus
+                    )
+                }; reportStatusToCategoryHandlingCache(userRelatedData)
 
                 appLogic.platformIntegration.getForegroundApp(foregroundAppSpec, appLogic.getForegroundAppQueryInterval())
                 val foregroundAppPackageName = foregroundAppSpec.packageName
@@ -288,282 +285,83 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 val audioPlaybackPackageName = appLogic.platformIntegration.getMusicPlaybackPackage()
                 val activityLevelBlocking = appLogic.deviceEntry.value?.enableActivityLevelBlocking ?: false
 
-                foregroundAppHandling.reset()
-                audioPlaybackHandling.reset()
-
-                BackgroundTaskRestrictionLogic.getHandling(
+                val foregroundAppBaseHandling = AppBaseHandling.calculate(
                         foregroundAppPackageName = foregroundAppPackageName,
                         foregroundAppActivityName = foregroundAppActivityName,
                         pauseForegroundAppBackgroundLoop = pauseForegroundAppBackgroundLoop,
-                        temporarilyAllowedApps = temporarilyAllowedApps,
-                        categories = categories,
-                        activityLevelBlocking = activityLevelBlocking,
-                        deviceUserEntry = deviceUserEntry,
-                        batteryStatus = batteryStatus,
-                        shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
-                        nowTimestamp = nowTimestamp,
-                        minuteOfWeek = minuteOfWeek,
-                        cache = cache,
-                        result = foregroundAppHandling
+                        userRelatedData = userRelatedData,
+                        deviceRelatedData = deviceRelatedData,
+                        pauseCounting = !isScreenOn
                 )
 
-                BackgroundTaskRestrictionLogic.getHandling(
+                val backgroundAppBaseHandling = AppBaseHandling.calculate(
                         foregroundAppPackageName = audioPlaybackPackageName,
                         foregroundAppActivityName = null,
                         pauseForegroundAppBackgroundLoop = false,
-                        temporarilyAllowedApps = temporarilyAllowedApps,
-                        categories = categories,
-                        activityLevelBlocking = activityLevelBlocking,
-                        deviceUserEntry = deviceUserEntry,
-                        batteryStatus = batteryStatus,
-                        shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
-                        nowTimestamp = nowTimestamp,
-                        minuteOfWeek = minuteOfWeek,
-                        cache = cache,
-                        result = audioPlaybackHandling
+                        userRelatedData = userRelatedData,
+                        deviceRelatedData = deviceRelatedData,
+                        pauseCounting = false
                 )
 
-                // update used time helper if date does not match
-                if (usedTimeUpdateHelper?.date != nowDate) {
-                    usedTimeUpdateHelper?.forceCommit(appLogic)
-                    usedTimeUpdateHelper = UsedTimeUpdateHelper(nowDate)
-                }
+                // check if should be blocked
+                val blockForegroundApp = foregroundAppBaseHandling is AppBaseHandling.BlockDueToNoCategory ||
+                        (foregroundAppBaseHandling is AppBaseHandling.UseCategories && foregroundAppBaseHandling.categoryIds.find {
+                            categoryHandlingCache.get(it).shouldBlockActivities
+                        } != null)
 
-                val usedTimeUpdateHelper = usedTimeUpdateHelper!!
+                val blockAudioPlayback = backgroundAppBaseHandling is AppBaseHandling.BlockDueToNoCategory ||
+                        (backgroundAppBaseHandling is AppBaseHandling.UseCategories && backgroundAppBaseHandling.categoryIds.find {
+                            val handling = categoryHandlingCache.get(it)
+                            val hasPremium = deviceRelatedData.isLocalMode || deviceRelatedData.isConnectedAndHasPremium
+                            val blockAllNotifications = handling.blockAllNotifications && hasPremium
 
-                // check times
-                fun buildDummyUsedTimeItems(categoryId: String): List<UsedTimeItem> {
-                    if (!usedTimeUpdateHelper.timeToAdd.containsKey(categoryId)) {
-                        return emptyList()
-                    }
-
-                    return (usedTimeUpdateHelper.additionalSlots[categoryId] ?: emptySet()).map {
-                        UsedTimeItem(
-                                categoryId = categoryId,
-                                startTimeOfDay = it.start,
-                                endTimeOfDay = it.end,
-                                dayOfEpoch = usedTimeUpdateHelper.date.dayOfEpoch,
-                                usedMillis = (usedTimeUpdateHelper.timeToAdd[categoryId] ?: 0).toLong()
-                        )
-                    } + listOf(
-                            UsedTimeItem(
-                                    categoryId = categoryId,
-                                    startTimeOfDay = MinuteOfDay.MIN,
-                                    endTimeOfDay = MinuteOfDay.MAX,
-                                    dayOfEpoch = usedTimeUpdateHelper.date.dayOfEpoch,
-                                    usedMillis = (usedTimeUpdateHelper.timeToAdd[categoryId] ?: 0).toLong()
-                            )
-                    )
-                }
-
-                suspend fun getRemainingTime(categoryId: String?): RemainingTime? {
-                    categoryId ?: return null
-
-                    val category = categories.find { it.id == categoryId } ?: return null
-                    val rules = timeLimitRules.get(category.id).waitForNonNullValue()
-
-                    if (rules.isEmpty()) {
-                        return null
-                    }
-
-                    val firstDayOfWeekAsEpochDay = nowDate.dayOfEpoch - nowDate.dayOfWeek
-                    val usedTimes = usedTimesOfCategoryAndWeekByFirstDayOfWeek.get(Pair(category.id, firstDayOfWeekAsEpochDay)).waitForNonNullValue()
-
-                    return RemainingTime.getRemainingTime(
-                            nowDate.dayOfWeek,
-                            minuteOfWeek % MinuteOfDay.LENGTH,
-                            usedTimes + buildDummyUsedTimeItems(categoryId),
-                            rules,
-                            Math.max(0, category.getExtraTime(dayOfEpoch = nowDate.dayOfEpoch) - (usedTimeUpdateHelper.extraTimeToSubtract.get(categoryId) ?: 0)),
-                            firstDayOfWeekAsEpochDay
-                    )
-                }
-
-                suspend fun getRemainingSessionDuration(categoryId: String?): Long? {
-                    categoryId ?: return null
-
-                    val category = categories.find { it.id == categoryId } ?: return null
-                    val rules = timeLimitRules.get(category.id).waitForNonNullValue()
-                    val durations = cache.usedSessionDurationsByCategoryId.get(categoryId).waitForNonNullValue()
-                    val timeToAdd = usedTimeUpdateHelper.timeToAdd[categoryId] ?: 0
-
-                    val result = RemainingSessionDuration.getRemainingSessionDuration(
-                            rules = rules,
-                            durationsOfCategory = durations,
-                            timestamp = nowTimestamp,
-                            dayOfWeek = nowDate.dayOfWeek,
-                            minuteOfDay = minuteOfWeek % MinuteOfDay.LENGTH
-                    )
-
-                    if (result == null) {
-                        return null
-                    } else {
-                        return (result - timeToAdd).coerceAtLeast(0)
-                    }
-                }
-
-                // note: remainingTime != null implicates that there are limits and they are currently not ignored
-                val remainingTimeForegroundAppChild = if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(foregroundAppHandling.categoryId) else null
-                val remainingTimeForegroundAppParent = if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(foregroundAppHandling.parentCategoryId) else null
-                val remainingTimeForegroundApp = RemainingTime.min(remainingTimeForegroundAppChild, remainingTimeForegroundAppParent)
-                val remainingSessionDurationForegroundAppChild = if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingSessionDuration(foregroundAppHandling.categoryId) else null
-                val remainingSessionDurationForegroundAppParent = if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingSessionDuration(foregroundAppHandling.parentCategoryId) else null
-                val remainingSessionDurationForegroundApp = RemainingSessionDuration.min(remainingSessionDurationForegroundAppChild, remainingSessionDurationForegroundAppParent)
-
-                val remainingTimeBackgroundAppChild = if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(audioPlaybackHandling.categoryId) else null
-                val remainingTimeBackgroundAppParent = if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingTime(audioPlaybackHandling.parentCategoryId) else null
-                val remainingTimeBackgroundApp = RemainingTime.min(remainingTimeBackgroundAppChild, remainingTimeBackgroundAppParent)
-                val remainingSessionDurationBackgroundAppChild = if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingSessionDuration(audioPlaybackHandling.categoryId) else null
-                val remainingSessionDurationBackgroundAppParent = if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime) getRemainingSessionDuration(audioPlaybackHandling.parentCategoryId) else null
-                val remainingSessionDurationBackgroundApp = RemainingSessionDuration.min(remainingSessionDurationBackgroundAppChild, remainingSessionDurationBackgroundAppParent)
-
-                val sessionDurationLimitReachedForegroundApp = (remainingSessionDurationForegroundApp != null && remainingSessionDurationForegroundApp == 0L)
-                val sessionDurationLimitReachedBackgroundApp = (remainingSessionDurationBackgroundApp != null && remainingSessionDurationBackgroundApp == 0L)
-
-                // eventually block
-                if (remainingTimeForegroundApp?.hasRemainingTime == false || sessionDurationLimitReachedForegroundApp) {
-                    foregroundAppHandling.status = BackgroundTaskLogicAppStatus.ShouldBlock
-                }
-
-                if (remainingTimeBackgroundApp?.hasRemainingTime == false || sessionDurationLimitReachedBackgroundApp) {
-                    audioPlaybackHandling.status = BackgroundTaskLogicAppStatus.ShouldBlock
-                }
+                            handling.shouldBlockActivities || blockAllNotifications
+                        } != null)
 
                 // update times
                 val timeToSubtract = Math.min(previousMainLogicExecutionTime, maxUsedTimeToAdd)
 
-                // see note above declaration of remainingTimeForegroundAppChild
-                val shouldCountForegroundApp = remainingTimeForegroundApp != null && isScreenOn && remainingTimeForegroundApp.hasRemainingTime
-                val shouldCountBackgroundApp = remainingTimeBackgroundApp != null && remainingTimeBackgroundApp.hasRemainingTime
+                val categoryHandlingsToCount = AppBaseHandling.getCategoriesForCounting(foregroundAppBaseHandling, backgroundAppBaseHandling)
+                        .map { categoryHandlingCache.get(it) }
+                        .filter { it.shouldCountTime }
 
-                val categoriesToCount = mutableSetOf<String>()
-                val categoriesToCountExtraTime = mutableSetOf<String>()
-                val categoriesToCountSessionDurations = mutableSetOf<String>()
-
-                if (shouldCountForegroundApp) {
-                    remainingTimeForegroundAppChild?.let { remainingTime ->
-                        foregroundAppHandling.categoryId?.let { categoryId ->
-                            categoriesToCount.add(categoryId)
-
-                            if (remainingTime.usingExtraTime) {
-                                categoriesToCountExtraTime.add(categoryId)
-                            }
-
-                            if (!sessionDurationLimitReachedForegroundApp) {
-                                categoriesToCountSessionDurations.add(categoryId)
-                            }
-                        }
-                    }
-
-                    remainingTimeForegroundAppParent?.let { remainingTime ->
-                        foregroundAppHandling.parentCategoryId?.let {
-                            categoriesToCount.add(it)
-
-                            if (remainingTime.usingExtraTime) {
-                                categoriesToCountExtraTime.add(it)
-                            }
-
-                            if (!sessionDurationLimitReachedForegroundApp) {
-                                categoriesToCountSessionDurations.add(it)
-                            }
-                        }
-                    }
-                }
-
-                if (shouldCountBackgroundApp) {
-                    remainingTimeBackgroundAppChild?.let { remainingTime ->
-                        audioPlaybackHandling.categoryId?.let {
-                            categoriesToCount.add(it)
-
-                            if (remainingTime.usingExtraTime) {
-                                categoriesToCountExtraTime.add(it)
-                            }
-
-                            if (!sessionDurationLimitReachedBackgroundApp) {
-                                categoriesToCountSessionDurations.add(it)
-                            }
-                        }
-                    }
-
-                    remainingTimeBackgroundAppParent?.let { remainingTime ->
-                        audioPlaybackHandling.parentCategoryId?.let {
-                            categoriesToCount.add(it)
-
-                            if (remainingTime.usingExtraTime) {
-                                categoriesToCountExtraTime.add(it)
-                            }
-
-                            if (!sessionDurationLimitReachedBackgroundApp) {
-                                categoriesToCountSessionDurations.add(it)
-                            }
-                        }
-                    }
-                }
-
-                if (categoriesToCount.isNotEmpty()) {
-                    categoriesToCount.forEach { categoryId ->
-                        // only handle rules which are related at today and the current time
-                        val rules = RemainingTime.getRulesRelatedToDay(
-                                dayOfWeek = nowDate.dayOfWeek,
-                                minuteOfDay = minuteOfWeek % MinuteOfDay.LENGTH,
-                                rules = timeLimitRules.get(categoryId).waitForNonNullValue()
-                        )
-
-                        usedTimeUpdateHelper.add(
-                                categoryId = categoryId,
-                                time = timeToSubtract,
-                                includingExtraTime = categoriesToCountExtraTime.contains(categoryId),
-                                slots = run {
-                                    val slots = mutableSetOf<AddUsedTimeActionItemAdditionalCountingSlot>()
-
-                                    rules.forEach { rule ->
-                                        if (!rule.appliesToWholeDay) {
-                                            slots.add(
-                                                    AddUsedTimeActionItemAdditionalCountingSlot(
-                                                            rule.startMinuteOfDay, rule.endMinuteOfDay
-                                                    )
-                                            )
-                                        }
-                                    }
-
-                                    slots
-                                },
+                if (
+                        usedTimeUpdateHelper.report(
+                                duration = timeToSubtract,
+                                dayOfEpoch = dayOfEpoch,
                                 trustedTimestamp = if (realTime.shouldTrustTimePermanently) realTime.timeInMillis else 0,
-                                sessionDurationLimits = run {
-                                    val slots = mutableSetOf<AddUsedTimeActionItemSessionDurationLimitSlot>()
-
-                                    if (categoriesToCountSessionDurations.contains(categoryId)) {
-                                        rules.forEach { rule ->
-                                            if (rule.sessionDurationLimitEnabled) {
-                                                slots.add(
-                                                        AddUsedTimeActionItemSessionDurationLimitSlot(
-                                                                startMinuteOfDay = rule.startMinuteOfDay,
-                                                                endMinuteOfDay = rule.endMinuteOfDay,
-                                                                sessionPauseDuration = rule.sessionPauseMilliseconds,
-                                                                maxSessionDuration = rule.sessionDurationMilliseconds
-                                                        )
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    slots
-                                }
+                                handlings = categoryHandlingsToCount
                         )
+                ) {
+                    val newDeviceAndUserRelatedData = Threads.database.executeAndWait {
+                        appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
                     }
+
+                    if (
+                            newDeviceAndUserRelatedData?.userRelatedData?.user?.id != deviceAndUSerRelatedData.userRelatedData.user.id ||
+                            newDeviceAndUserRelatedData.userRelatedData.categoryById.keys != deviceAndUSerRelatedData.userRelatedData.categoryById.keys
+                    ) {
+                        // start the loop directly again
+                        continue
+                    }
+
+                    reportStatusToCategoryHandlingCache(userRelatedData = newDeviceAndUserRelatedData.userRelatedData)
                 }
 
-                usedTimeUpdateHelper.reportCurrentCategories(categoriesToCount)
+                val categoriesToCount = categoryHandlingsToCount.map { it.createdWithCategoryRelatedData.category.id }
 
-                if (usedTimeUpdateHelper.shouldDoAutoCommit) {
-                    usedTimeUpdateHelper.forceCommit(appLogic)
+                fun timeToSubtractForCategory(categoryId: String): Int {
+                    return if (usedTimeUpdateHelper.getCountedCategoryIds().contains(categoryId)) usedTimeUpdateHelper.getCountedTime() else 0
                 }
 
                 // trigger time warnings
-                fun eventuallyTriggerTimeWarning(remaining: RemainingTime, categoryId: String?) {
-                    val category = categories.find { it.id == categoryId } ?: return
-                    val oldRemainingTime = remaining.includingExtraTime
-                    val newRemainingTime = oldRemainingTime - timeToSubtract
+                categoriesToCount.forEach { categoryId ->
+                    val category = userRelatedData.categoryById[categoryId]!!.category
+                    val handling = categoryHandlingCache.get(categoryId)
+                    val nowRemaining = handling.remainingTime ?: return@forEach // category is not limited anymore
+
+                    val newRemainingTime = nowRemaining.includingExtraTime - timeToSubtractForCategory(categoryId)
+                    val oldRemainingTime = newRemainingTime + timeToSubtract
 
                     if (oldRemainingTime / (1000 * 60) != newRemainingTime / (1000 * 60)) {
                         // eventually show remaining time warning
@@ -579,11 +377,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
                 }
 
-                remainingTimeForegroundAppChild?.let { eventuallyTriggerTimeWarning(it, foregroundAppHandling.categoryId) }
-                remainingTimeForegroundAppParent?.let { eventuallyTriggerTimeWarning(it, foregroundAppHandling.parentCategoryId) }
-                remainingTimeBackgroundAppChild?.let { eventuallyTriggerTimeWarning(it, audioPlaybackHandling.categoryId) }
-                remainingTimeBackgroundAppParent?.let { eventuallyTriggerTimeWarning(it, audioPlaybackHandling.parentCategoryId) }
-
                 // show notification
                 fun buildStatusMessageWithCurrentAppTitle(
                         text: String,
@@ -597,107 +390,156 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         if (appActivityToShow != null && appPackageName != null) appActivityToShow.removePrefix(appPackageName) else null
                 )
 
-                fun getCategoryTitle(categoryId: String?): String = categories.find { it.id == categoryId }?.title ?: categoryId.toString()
+                fun getCategoryTitle(categoryId: String?): String = categoryId.let { userRelatedData.categoryById[it]?.category?.title } ?: categoryId.toString()
 
-                fun buildStatusMessage(
-                        handling: BackgroundTaskRestrictionLogicResult,
-                        remainingTime: RemainingTime?,
-                        remainingSessionDuration: Long?,
+                fun buildNotificationForAppWithCategoryUsage(
+                        suffix: String,
+                        appPackageName: String?,
+                        appActivityToShow: String?,
+                        categoryId: String
+                ): AppStatusMessage {
+                    val handling = categoryHandlingCache.get(categoryId)
+
+                    return if (handling.areLimitsTemporarilyDisabled) {
+                        buildStatusMessageWithCurrentAppTitle(
+                                text = appLogic.context.getString(R.string.background_logic_limits_disabled),
+                                titleSuffix = suffix,
+                                appPackageName = appPackageName,
+                                appActivityToShow = appActivityToShow
+                        )
+                    } else if (handling.remainingTime == null) {
+                        buildStatusMessageWithCurrentAppTitle(
+                                text = appLogic.context.getString(R.string.background_logic_no_timelimit),
+                                titlePrefix = getCategoryTitle(categoryId) + " - ",
+                                titleSuffix = suffix,
+                                appPackageName = appPackageName,
+                                appActivityToShow = appActivityToShow
+                        )
+                    } else {
+                        val remainingTimeFromCache = handling.remainingTime
+                        val timeSubtractedFromThisCategory = timeToSubtractForCategory(categoryId)
+                        val realRemainingTimeDefault = (remainingTimeFromCache.default - timeSubtractedFromThisCategory).coerceAtLeast(0)
+                        val realRemainingTimeWithExtraTime = (remainingTimeFromCache.includingExtraTime - timeSubtractedFromThisCategory).coerceAtLeast(0)
+                        val realRemainingTimeUsingExtraTime = realRemainingTimeDefault == 0L && realRemainingTimeWithExtraTime > 0
+
+                        val remainingSessionDuration = handling.remainingSessionDuration?.let { (it - timeToSubtractForCategory(categoryId)).coerceAtLeast(0) }
+
+                        buildStatusMessageWithCurrentAppTitle(
+                                text = if (realRemainingTimeUsingExtraTime)
+                                    appLogic.context.getString(R.string.background_logic_using_extra_time, TimeTextUtil.remaining(realRemainingTimeWithExtraTime.toInt(), appLogic.context))
+                                else if (remainingSessionDuration != null && remainingSessionDuration < realRemainingTimeDefault)
+                                    TimeTextUtil.pauseIn(remainingSessionDuration.toInt(), appLogic.context)
+                                else
+                                    TimeTextUtil.remaining(realRemainingTimeDefault.toInt() ?: 0, appLogic.context),
+                                titlePrefix = getCategoryTitle(categoryId) + " - ",
+                                titleSuffix = suffix,
+                                appPackageName = appPackageName,
+                                appActivityToShow = appActivityToShow
+                        )
+                    }
+                }
+
+                fun buildNotificationForAppWithoutCategoryUsage(
+                        handling: AppBaseHandling,
                         suffix: String,
                         appPackageName: String?,
                         appActivityToShow: String?
-                ): AppStatusMessage = when (handling.status) {
-                    BackgroundTaskLogicAppStatus.ShouldBlock -> buildStatusMessageWithCurrentAppTitle(
-                            text = appLogic.context.getString(R.string.background_logic_opening_lockscreen),
-                            titleSuffix = suffix,
-                            appPackageName = appPackageName,
-                            appActivityToShow = appActivityToShow
-                    )
-                    BackgroundTaskLogicAppStatus.BackgroundLogicPaused -> AppStatusMessage(
+                ): AppStatusMessage = when (handling) {
+                    is AppBaseHandling.UseCategories -> throw IllegalArgumentException()
+                    AppBaseHandling.BlockDueToNoCategory -> throw IllegalArgumentException()
+                    AppBaseHandling.PauseLogic -> AppStatusMessage(
                             title = appLogic.context.getString(R.string.background_logic_paused_title) + suffix,
                             text = appLogic.context.getString(R.string.background_logic_paused_text)
                     )
-                    BackgroundTaskLogicAppStatus.InternalWhitelist -> buildStatusMessageWithCurrentAppTitle(
+                    AppBaseHandling.Whitelist -> buildStatusMessageWithCurrentAppTitle(
                             text = appLogic.context.getString(R.string.background_logic_whitelisted),
                             titleSuffix = suffix,
                             appPackageName = appPackageName,
                             appActivityToShow = appActivityToShow
                     )
-                    BackgroundTaskLogicAppStatus.TemporarilyAllowed -> buildStatusMessageWithCurrentAppTitle(
+                    AppBaseHandling.TemporarilyAllowed -> buildStatusMessageWithCurrentAppTitle(
                             text = appLogic.context.getString(R.string.background_logic_temporarily_allowed),
                             titleSuffix = suffix,
                             appPackageName = appPackageName,
                             appActivityToShow = appActivityToShow
                     )
-                    BackgroundTaskLogicAppStatus.LimitsDisabled -> buildStatusMessageWithCurrentAppTitle(
-                            text = appLogic.context.getString(R.string.background_logic_limits_disabled),
-                            titleSuffix = suffix,
-                            appPackageName = appPackageName,
-                            appActivityToShow = appActivityToShow
-                    )
-                    BackgroundTaskLogicAppStatus.AllowedNoTimelimit -> buildStatusMessageWithCurrentAppTitle(
-                            text = appLogic.context.getString(R.string.background_logic_no_timelimit),
-                            titlePrefix = getCategoryTitle(handling.categoryId) + " - ",
-                            titleSuffix = suffix,
-                            appPackageName = appPackageName,
-                            appActivityToShow = appActivityToShow
-                    )
-                    BackgroundTaskLogicAppStatus.AllowedCountAndCheckTime -> buildStatusMessageWithCurrentAppTitle(
-                            text = if (remainingTime?.usingExtraTime == true)
-                                appLogic.context.getString(R.string.background_logic_using_extra_time, TimeTextUtil.remaining(remainingTime.includingExtraTime.toInt(), appLogic.context))
-                            else if (remainingTime != null && remainingSessionDuration != null && remainingSessionDuration < remainingTime.default)
-                                TimeTextUtil.pauseIn(remainingSessionDuration.toInt(), appLogic.context)
-                            else
-                                TimeTextUtil.remaining(remainingTime?.default?.toInt() ?: 0, appLogic.context),
-                            titlePrefix = getCategoryTitle(handling.categoryId) + " - ",
-                            titleSuffix = suffix,
-                            appPackageName = appPackageName,
-                            appActivityToShow = appActivityToShow
-                    )
-                    BackgroundTaskLogicAppStatus.Idle -> AppStatusMessage(
+                    AppBaseHandling.Idle -> AppStatusMessage(
                             appLogic.context.getString(R.string.background_logic_idle_title) + suffix,
                             appLogic.context.getString(R.string.background_logic_idle_text)
                     )
                 }
 
-                val showBackgroundStatus = audioPlaybackHandling.status != BackgroundTaskLogicAppStatus.Idle &&
-                        audioPlaybackHandling.status != BackgroundTaskLogicAppStatus.ShouldBlock &&
+                val showBackgroundStatus = !(backgroundAppBaseHandling is AppBaseHandling.Idle) &&
+                        !blockAudioPlayback &&
                         audioPlaybackPackageName != foregroundAppPackageName
 
-                if (showBackgroundStatus && nowTimestamp % 6000 >= 3000) {
-                    // show notification for music
-                    appLogic.platformIntegration.setAppStatusMessage(
-                            buildStatusMessage(
-                                    handling = audioPlaybackHandling,
-                                    remainingTime = remainingTimeBackgroundApp,
-                                    suffix = " (2/2)",
-                                    appPackageName = audioPlaybackPackageName,
-                                    appActivityToShow = null,
-                                    remainingSessionDuration = remainingSessionDurationBackgroundApp
-                            )
+                val statusMessage = if (blockForegroundApp) {
+                    buildStatusMessageWithCurrentAppTitle(
+                            text = appLogic.context.getString(R.string.background_logic_opening_lockscreen),
+                            appPackageName = foregroundAppPackageName,
+                            appActivityToShow = if (activityLevelBlocking) foregroundAppActivityName else null
                     )
                 } else {
-                    // show regular notification
-                    appLogic.platformIntegration.setAppStatusMessage(
-                            buildStatusMessage(
-                                    handling = foregroundAppHandling,
-                                    remainingTime = remainingTimeForegroundApp,
-                                    suffix = if (showBackgroundStatus) " (1/2)" else "",
+                    val pagesForTheForegroundApp = if (foregroundAppBaseHandling is AppBaseHandling.UseCategories) foregroundAppBaseHandling.categoryIds.size else 1
+                    val pagesForTheBackgroundApp = if (!showBackgroundStatus) 0 else if (backgroundAppBaseHandling is AppBaseHandling.UseCategories) backgroundAppBaseHandling.categoryIds.size else 1
+                    val totalPages = pagesForTheForegroundApp + pagesForTheBackgroundApp
+                    val currentPage = (nowTimestamp / 3000 % totalPages).toInt()
+
+                    val suffix = if (totalPages == 1) "" else " (${currentPage + 1} / $totalPages)"
+
+                    if (currentPage < pagesForTheForegroundApp) {
+                        val pageWithin = currentPage
+
+                        if (foregroundAppBaseHandling is AppBaseHandling.UseCategories) {
+                            val categoryId = foregroundAppBaseHandling.categoryIds.toList()[pageWithin]
+
+                            buildNotificationForAppWithCategoryUsage(
                                     appPackageName = foregroundAppPackageName,
                                     appActivityToShow = if (activityLevelBlocking) foregroundAppActivityName else null,
-                                    remainingSessionDuration = remainingSessionDurationForegroundApp
+                                    suffix = suffix,
+                                    categoryId = categoryId
                             )
-                    )
+                        } else {
+                            buildNotificationForAppWithoutCategoryUsage(
+                                    appPackageName = foregroundAppPackageName,
+                                    appActivityToShow = if (activityLevelBlocking) foregroundAppActivityName else null,
+                                    suffix = suffix,
+                                    handling = foregroundAppBaseHandling
+                            )
+                        }
+                    } else {
+                        val pageWithin = currentPage - pagesForTheForegroundApp
+
+                        if (backgroundAppBaseHandling is AppBaseHandling.UseCategories) {
+                            val categoryId = backgroundAppBaseHandling.categoryIds.toList()[pageWithin]
+
+                            buildNotificationForAppWithCategoryUsage(
+                                    appPackageName = audioPlaybackPackageName,
+                                    appActivityToShow = null,
+                                    suffix = suffix,
+                                    categoryId = categoryId
+                            )
+                        } else {
+                            buildNotificationForAppWithoutCategoryUsage(
+                                    appPackageName = audioPlaybackPackageName,
+                                    appActivityToShow = null,
+                                    suffix = suffix,
+                                    handling = backgroundAppBaseHandling
+                            )
+                        }
+                    }
                 }
 
+                appLogic.platformIntegration.setAppStatusMessage(statusMessage)
+
                 // handle blocking
-                if (foregroundAppHandling.status == BackgroundTaskLogicAppStatus.ShouldBlock) {
+                if (blockForegroundApp) {
                     openLockscreen(foregroundAppPackageName!!, foregroundAppActivityName)
                 } else {
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
                 }
 
-                if (audioPlaybackHandling.status == BackgroundTaskLogicAppStatus.ShouldBlock && audioPlaybackPackageName != null) {
+                if (blockAudioPlayback && audioPlaybackPackageName != null) {
                     appLogic.platformIntegration.muteAudioIfPossible(audioPlaybackPackageName)
                 }
             } catch (ex: SecurityException) {
@@ -722,8 +564,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 ))
                 appLogic.platformIntegration.setShowBlockingOverlay(false)
             }
-
-            liveDataCaches.reportLoopDone()
 
             // delay before running next time
             val endTime = appLogic.timeApi.getCurrentUptimeInMillis()

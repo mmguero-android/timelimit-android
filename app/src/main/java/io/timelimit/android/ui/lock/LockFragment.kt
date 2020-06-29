@@ -25,20 +25,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
-import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
-import io.timelimit.android.coroutines.executeAndWait
-import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.data.extensions.mapToTimezone
-import io.timelimit.android.data.extensions.sorted
+import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.*
+import io.timelimit.android.data.model.derived.DeviceAndUserRelatedData
+import io.timelimit.android.data.model.derived.DeviceRelatedData
+import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
 import io.timelimit.android.date.DateInTimezone
+import io.timelimit.android.integration.platform.BatteryStatus
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
+import io.timelimit.android.logic.blockingreason.AppBaseHandling
+import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.sync.actions.IncrementCategoryExtraTimeAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
@@ -55,11 +56,13 @@ import io.timelimit.android.ui.manage.child.category.create.CreateCategoryDialog
 import io.timelimit.android.ui.manage.child.primarydevice.UpdatePrimaryDeviceDialogFragment
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 import io.timelimit.android.ui.view.SelectTimeSpanViewListener
+import java.util.*
 
 class LockFragment : Fragment() {
     companion object {
         private const val EXTRA_PACKAGE_NAME = "pkg"
         private const val EXTRA_ACTIVITY = "activitiy"
+        private const val STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN = "didOpenSetCurrentDeviceScreen"
 
         fun newInstance(packageName: String, activity: String?): LockFragment {
             val result = LockFragment()
@@ -76,6 +79,7 @@ class LockFragment : Fragment() {
         }
     }
 
+    private var didOpenSetCurrentDeviceScreen = false
     private val packageName: String by lazy { arguments!!.getString(EXTRA_PACKAGE_NAME)!! }
     private val activityName: String? by lazy {
         if (arguments!!.containsKey(EXTRA_ACTIVITY))
@@ -86,189 +90,273 @@ class LockFragment : Fragment() {
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val title: String? by lazy { logic.platformIntegration.getLocalAppTitle(packageName) }
-    private val blockingReason: LiveData<BlockingReasonDetail> by lazy { BlockingReasonUtil(logic).getBlockingReason(packageName, activityName) }
+    private val deviceAndUserRelatedData: LiveData<DeviceAndUserRelatedData?> by lazy {
+        logic.database.derivedDataDao().getUserAndDeviceRelatedDataLive()
+    }
+    private val batteryStatus: LiveData<BatteryStatus> by lazy {
+        logic.platformIntegration.getBatteryStatusLive()
+    }
+    private lateinit var binding: LockFragmentBinding
+    private val handlingCache = CategoryHandlingCache()
+    private val realTime = RealTime.newInstance()
+    private val timeModificationListener: () -> Unit = { update() }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding = LockFragmentBinding.inflate(layoutInflater, container, false)
+    private val updateRunnable = Runnable { update() }
 
-        AuthenticationFab.manageAuthenticationFab(
-                fab = binding.fab,
-                shouldHighlight = auth.shouldHighlightAuthenticationButton,
-                authenticatedUser = auth.authenticatedUser,
-                fragment = this,
-                doesSupportAuth = liveDataFromValue(true)
+    fun scheduleUpdate(delay: Long) {
+        logic.timeApi.cancelScheduledAction(updateRunnable)
+        logic.timeApi.runDelayedByUptime(updateRunnable, delay)
+    }
+
+    fun unscheduleUpdate() {
+        logic.timeApi.cancelScheduledAction(updateRunnable)
+    }
+
+    private fun update() {
+        val deviceAndUserRelatedData = deviceAndUserRelatedData.value ?: return
+        val batteryStatus = batteryStatus.value ?: return
+
+        logic.realTimeLogic.getRealTime(realTime)
+
+        if (deviceAndUserRelatedData.userRelatedData?.user?.type != UserType.Child) {
+            binding.reason = BlockingReason.None
+            binding.handlers = null
+            activity?.finish()
+            return
+        }
+
+        handlingCache.reportStatus(
+                user = deviceAndUserRelatedData.userRelatedData,
+                assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceAndUserRelatedData.deviceRelatedData, deviceAndUserRelatedData.userRelatedData),
+                batteryStatus = batteryStatus,
+                timeInMillis = realTime.timeInMillis,
+                shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily
         )
 
-        liveDataFromFunction { logic.timeApi.getCurrentTimeInMillis() }.observe(this, Observer {
-            systemTime ->
+        val appBaseHandling = AppBaseHandling.calculate(
+                foregroundAppPackageName = packageName,
+                foregroundAppActivityName = activityName,
+                deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
+                userRelatedData = deviceAndUserRelatedData.userRelatedData,
+                pauseForegroundAppBackgroundLoop = false,
+                pauseCounting = false
+        )
 
-            binding.currentTime = DateUtils.formatDateTime(
-                    context,
-                    systemTime!!,
-                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or
-                            DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_WEEKDAY
+        binding.activityName = if (deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking)
+            activityName?.removePrefix(packageName)
+        else
+            null
+
+        if (appBaseHandling is AppBaseHandling.UseCategories) {
+            val categoryHandlings = appBaseHandling.categoryIds.map { handlingCache.get(it) }
+            val blockingHandling = categoryHandlings.find { it.shouldBlockActivities }
+
+            if (blockingHandling == null) {
+                binding.reason = BlockingReason.None
+                binding.handlers = null
+                activity?.finish()
+                return
+            }
+
+            binding.appCategoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title
+            binding.reason = blockingHandling.activityBlockingReason
+            binding.blockedKindLabel = when (appBaseHandling.level) {
+                BlockingLevel.Activity -> "Activity"
+                BlockingLevel.App -> "App"
+            }
+            setupHandlers(
+                    deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id,
+                    blockedCategoryId = blockingHandling.createdWithCategoryRelatedData.category.id,
+                    userRelatedData = deviceAndUserRelatedData.userRelatedData
             )
-        })
+            bindExtraTimeView(
+                    deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
+                    categoryId = blockingHandling.createdWithCategoryRelatedData.category.id,
+                    timeZone = deviceAndUserRelatedData.userRelatedData.timeZone
+            )
+            binding.manageDisableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
+                    childId = deviceAndUserRelatedData.userRelatedData.user.id,
+                    childTimezone = deviceAndUserRelatedData.userRelatedData.user.timeZone,
+                    activity = activity!!,
+                    hasFullVersion = deviceAndUserRelatedData.deviceRelatedData.isConnectedAndHasPremium || deviceAndUserRelatedData.deviceRelatedData.isLocalMode
+            )
 
-        val enableActivityLevelBlocking = logic.deviceEntry.map { it?.enableActivityLevelBlocking ?: false }
+            if (blockingHandling.activityBlockingReason == BlockingReason.RequiresCurrentDevice && !didOpenSetCurrentDeviceScreen && isResumed) {
+                setThisDeviceAsCurrentDevice()
+            }
 
-        binding.packageName = packageName
+            scheduleUpdate((blockingHandling.dependsOnMaxTime - realTime.timeInMillis))
+        } else if (appBaseHandling is AppBaseHandling.BlockDueToNoCategory) {
+            binding.appCategoryTitle = null
+            binding.reason = BlockingReason.NotPartOfAnCategory
+            binding.blockedKindLabel = "App"
+            setupHandlers(
+                    deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id,
+                    blockedCategoryId = null,
+                    userRelatedData = deviceAndUserRelatedData.userRelatedData
+            )
 
-        enableActivityLevelBlocking.observe(this, Observer {
-            binding.activityName = if (it) activityName?.removePrefix(packageName) else null
-        })
-
-        if (title != null) {
-            binding.appTitle = title
+            bindAddToCategoryOptions(deviceAndUserRelatedData.userRelatedData)
         } else {
-            binding.appTitle = "???"
+            binding.reason = BlockingReason.None
+            binding.handlers = null
+            activity?.finish()
+            return
         }
+    }
 
-        binding.appIcon.setImageDrawable(logic.platformIntegration.getAppIcon(packageName))
-
-        blockingReason.observe(this, Observer {
-            when (it) {
-                is NoBlockingReason -> activity!!.finish()
-                is BlockedReasonDetails -> {
-                    binding.reason = it.reason
-                    binding.blockedKindLabel = when (it.level) {
-                        BlockingLevel.Activity -> "Activity"
-                        BlockingLevel.App -> "App"
-                    }
-                }
-            }.let { /* require handling all cases */ }
-        })
-
-        val categories = logic.deviceUserEntry.switchMap {
-            user ->
-
-            if (user != null && user.type == UserType.Child) {
-                Transformations.map(logic.database.category().getCategoriesByChildId(user.id)) {
-                    categories ->
-
-                    user to categories
-                }
-            } else {
-                liveDataFromValue(null as Pair<User, List<Category>>?)
+    private fun setupHandlers(deviceId: String, userRelatedData: UserRelatedData, blockedCategoryId: String?) {
+        binding.handlers = object: Handlers {
+            override fun openMainApp() {
+                startActivity(Intent(context, MainActivity::class.java))
             }
-        }.ignoreUnchanged()
 
-        // bind category name of the app
-        val appCategory = categories.switchMap {
-            status ->
+            override fun allowTemporarily() {
+                if (auth.requestAuthenticationOrReturnTrue()) {
+                    val database = logic.database
 
-            if (status == null) {
-                liveDataFromValue(null as Category?)
-            } else {
-                val (_, categoryItems) = status
-
-                blockingReason.map { reason ->
-                    if (reason is BlockedReasonDetails) {
-                        reason.categoryId
-                    } else {
-                        null
-                    }
-                }.map { categoryId ->
-                    categoryItems.find { it.id == categoryId }
-                }
-            }
-        }
-
-        appCategory.observe(this, Observer {
-            binding.appCategoryTitle = it?.title
-        })
-
-        // bind add to category list
-        categories.observe(this, Observer {
-            status ->
-
-            binding.addToCategoryOptions.removeAllViews()
-
-            if (status == null) {
-                // nothing to do
-            } else {
-                val (user, categoryEntries) = status
-
-                categoryEntries.sorted().forEach {
-                    category ->
-
-                    val button = LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true)
-
-                    button.title = category.title
-                    button.button.setOnClickListener {
-                        _ ->
-
-                        auth.tryDispatchParentAction(
-                                AddCategoryAppsAction(
-                                        categoryId = category.id,
-                                        packageNames = listOf(packageName)
-                                )
-                        )
-                    }
-                }
-
-                run {
-                    val button = LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true)
-
-                    button.title = getString(R.string.create_category_title)
-                    button.button.setOnClickListener {
-                        if (auth.requestAuthenticationOrReturnTrue()) {
-                            CreateCategoryDialogFragment
-                                    .newInstance(ManageChildFragmentArgs(childId = user.id))
-                                    .show(fragmentManager!!)
+                    // this accesses the database directly because it is not synced
+                    Threads.database.submit {
+                        try {
+                            database.temporarilyAllowedApp().addTemporarilyAllowedAppSync(TemporarilyAllowedApp(
+                                    deviceId = deviceId,
+                                    packageName = packageName
+                            ))
+                        } catch (ex: SQLiteConstraintException) {
+                            // ignore this
+                            //
+                            // this happens when touching that option more than once very fast
+                            // or if the device is under load
                         }
                     }
                 }
             }
-        })
 
-        // bind adding extra time controls
+            override fun confirmLocalTime() {
+                if (auth.requestAuthenticationOrReturnTrue()) {
+                    logic.realTimeLogic.confirmLocalTime()
+                }
+            }
+
+            override fun disableTimeVerification() {
+                auth.tryDispatchParentAction(
+                        UpdateNetworkTimeVerificationAction(
+                                deviceId = deviceId,
+                                mode = NetworkTime.IfPossible
+                        )
+                )
+            }
+
+            override fun disableTemporarilyLockForAllCategories() {
+                auth.tryDispatchParentActions(
+                        userRelatedData.categories
+                                .filter { it.category.temporarilyBlocked }
+                                .map {
+                                    UpdateCategoryTemporarilyBlockedAction(
+                                            categoryId = it.category.id,
+                                            blocked = false,
+                                            endTime = null
+                                    )
+                                }
+                )
+            }
+
+            override fun disableTemporarilyLockForCurrentCategory() {
+                blockedCategoryId ?: return
+
+                auth.tryDispatchParentAction(
+                        UpdateCategoryTemporarilyBlockedAction(
+                                categoryId = blockedCategoryId,
+                                blocked = false,
+                                endTime = null
+                        )
+                )
+            }
+
+            override fun showAuthenticationScreen() {
+                (activity as LockActivity).showAuthenticationScreen()
+            }
+
+            override fun setThisDeviceAsCurrentDevice() = this@LockFragment.setThisDeviceAsCurrentDevice()
+        }
+    }
+
+    private fun setThisDeviceAsCurrentDevice() {
+        didOpenSetCurrentDeviceScreen = true
+
+        UpdatePrimaryDeviceDialogFragment
+                .newInstance(UpdatePrimaryDeviceRequestType.SetThisDevice)
+                .show(parentFragmentManager)
+    }
+
+    private fun bindAddToCategoryOptions(userRelatedData: UserRelatedData) {
+        binding.addToCategoryOptions.removeAllViews()
+
+        userRelatedData.categories.sortedCategories().forEach { category ->
+            LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true).let { button ->
+                button.title = category.category.title
+                button.button.setOnClickListener { _ ->
+                    auth.tryDispatchParentAction(
+                            AddCategoryAppsAction(
+                                    categoryId = category.category.id,
+                                    packageNames = listOf(packageName)
+                            )
+                    )
+                }
+            }
+        }
+
+        LockFragmentCategoryButtonBinding.inflate(LayoutInflater.from(context), binding.addToCategoryOptions, true).let { button ->
+            button.title = getString(R.string.create_category_title)
+            button.button.setOnClickListener {
+                if (auth.requestAuthenticationOrReturnTrue()) {
+                    CreateCategoryDialogFragment
+                            .newInstance(ManageChildFragmentArgs(childId = userRelatedData.user.id))
+                            .show(fragmentManager!!)
+                }
+            }
+        }
+    }
+
+    private fun bindExtraTimeView(deviceRelatedData: DeviceRelatedData, categoryId: String, timeZone: TimeZone) {
+        val hasFullVersion = deviceRelatedData.isConnectedAndHasPremium || deviceRelatedData.isLocalMode
+
+        binding.extraTimeBtnOk.setOnClickListener {
+            binding.extraTimeSelection.clearNumberPickerFocus()
+
+            if (hasFullVersion) {
+                if (auth.requestAuthenticationOrReturnTrue()) {
+                    val extraTimeToAdd = binding.extraTimeSelection.timeInMillis
+
+                    if (extraTimeToAdd > 0) {
+                        binding.extraTimeBtnOk.isEnabled = false
+
+                        val date = DateInTimezone.newInstance(auth.logic.timeApi.getCurrentTimeInMillis(), timeZone)
+
+                        auth.tryDispatchParentAction(IncrementCategoryExtraTimeAction(
+                                categoryId = categoryId,
+                                addedExtraTime = extraTimeToAdd,
+                                extraTimeDay = if (binding.switchLimitExtraTimeToToday.isChecked) date.dayOfEpoch else -1
+                        ))
+
+                        binding.extraTimeBtnOk.isEnabled = true
+                    }
+                }
+            } else {
+                RequiresPurchaseDialogFragment().show(parentFragmentManager)
+            }
+        }
+    }
+
+    private fun initExtraTimeView() {
         binding.extraTimeTitle.setOnClickListener {
             HelpDialogFragment.newInstance(
                     title = R.string.lock_extratime_title,
                     text = R.string.lock_extratime_text
-            ).show(fragmentManager!!)
+            ).show(parentFragmentManager)
         }
 
-        logic.fullVersion.shouldProvideFullVersionFunctions.observe(this, Observer { hasFullVersion ->
-            binding.extraTimeBtnOk.setOnClickListener {
-                binding.extraTimeSelection.clearNumberPickerFocus()
-
-                if (hasFullVersion) {
-                    if (auth.isParentAuthenticated()) {
-                        runAsync {
-                            val extraTimeToAdd = binding.extraTimeSelection.timeInMillis
-
-                            if (extraTimeToAdd > 0) {
-                                binding.extraTimeBtnOk.isEnabled = false
-
-                                val categoryId = appCategory.waitForNullableValue()?.id
-                                val timezone = logic.deviceUserEntry.mapToTimezone().waitForNonNullValue()
-                                val date = DateInTimezone.newInstance(auth.logic.timeApi.getCurrentTimeInMillis(), timezone)
-
-                                if (categoryId != null) {
-                                    auth.tryDispatchParentAction(IncrementCategoryExtraTimeAction(
-                                            categoryId = categoryId,
-                                            addedExtraTime = extraTimeToAdd,
-                                            extraTimeDay = if (binding.switchLimitExtraTimeToToday.isChecked) date.dayOfEpoch else -1
-                                    ))
-                                } else {
-                                    Snackbar.make(binding.root, R.string.error_general, Snackbar.LENGTH_SHORT).show()
-                                }
-
-                                binding.extraTimeBtnOk.isEnabled = true
-                            }
-                        }
-                    } else {
-                        auth.requestAuthentication()
-                    }
-                } else {
-                    RequiresPurchaseDialogFragment().show(fragmentManager!!)
-                }
-            }
-        })
-
-        logic.database.config().getEnableAlternativeDurationSelectionAsync().observe(this, Observer {
+        logic.database.config().getEnableAlternativeDurationSelectionAsync().observe(viewLifecycleOwner, Observer {
             binding.extraTimeSelection.enablePickerMode(it)
         })
 
@@ -283,149 +371,75 @@ class LockFragment : Fragment() {
                 }
             }
         }
+    }
 
-        // bind disable time limits
-        mergeLiveData(logic.deviceUserEntry, logic.fullVersion.shouldProvideFullVersionFunctions).observe(this, Observer {
-            (child, hasFullVersion) ->
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-            if (child != null) {
-                binding.manageDisableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
-                        childId = child.id,
-                        childTimezone = child.timeZone,
-                        activity = activity!!,
-                        hasFullVersion = hasFullVersion == true
-                )
-            }
+        if (savedInstanceState != null) {
+            didOpenSetCurrentDeviceScreen = savedInstanceState.getBoolean(STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean(STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN, didOpenSetCurrentDeviceScreen)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = LockFragmentBinding.inflate(layoutInflater, container, false)
+
+        AuthenticationFab.manageAuthenticationFab(
+                fab = binding.fab,
+                shouldHighlight = auth.shouldHighlightAuthenticationButton,
+                authenticatedUser = auth.authenticatedUser,
+                fragment = this,
+                doesSupportAuth = liveDataFromValue(true)
+        )
+
+        liveDataFromFunction { logic.timeApi.getCurrentTimeInMillis() }.observe(viewLifecycleOwner, Observer {
+            systemTime ->
+
+            binding.currentTime = DateUtils.formatDateTime(
+                    context,
+                    systemTime!!,
+                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or
+                            DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_WEEKDAY
+            )
         })
 
-        mergeLiveData(logic.deviceUserEntry, liveDataFromFunction { logic.realTimeLogic.getCurrentTimeInMillis() }).map {
-            (child, time) ->
+        deviceAndUserRelatedData.observe(viewLifecycleOwner, Observer { update() })
+        batteryStatus.observe(viewLifecycleOwner, Observer { update() })
 
-            if (time == null || child == null) {
-                null
-            } else {
-                ManageDisableTimelimitsViewHelper.getDisabledUntilString(child, time, context!!)
-            }
-        }.observe(this, Observer {
-            binding.manageDisableTimeLimits.disableTimeLimitsUntilString = it
-        })
+        binding.packageName = packageName
 
-        binding.handlers = object: Handlers {
-            override fun openMainApp() {
-                startActivity(Intent(context, MainActivity::class.java))
-            }
+        binding.appTitle = title ?: "???"
+        binding.appIcon.setImageDrawable(logic.platformIntegration.getAppIcon(packageName))
 
-            override fun allowTemporarily() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    val database = logic.database
-                    val deviceIdLive = logic.deviceId
-
-                    // this accesses the database directly because it is not synced
-                    runAsync {
-                        val deviceId = deviceIdLive.waitForNullableValue()
-
-                        if (deviceId != null) {
-                            Threads.database.executeAndWait(Runnable {
-                                try {
-                                    database.temporarilyAllowedApp().addTemporarilyAllowedAppSync(TemporarilyAllowedApp(
-                                            deviceId = deviceId,
-                                            packageName = packageName
-                                    ))
-                                } catch (ex: SQLiteConstraintException) {
-                                    // ignore this
-                                    //
-                                    // this happens when touching that option more than once very fast
-                                    // or if the device is under load
-                                }
-                            })
-                        }
-                    }
-                }
-            }
-
-            override fun confirmLocalTime() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    logic.realTimeLogic.confirmLocalTime()
-                }
-            }
-
-            override fun disableTimeVerification() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    runAsync {
-                        val deviceId = logic.deviceId.waitForNullableValue()
-
-                        if (deviceId != null) {
-                            auth.tryDispatchParentAction(
-                                    UpdateNetworkTimeVerificationAction(
-                                            deviceId = deviceId,
-                                            mode = NetworkTime.IfPossible
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-
-            override fun disableTemporarilyLockForAllCategories() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    runAsync {
-                        categories.waitForNullableValue()?.second?.filter { it.temporarilyBlocked }?.map { it.id }?.forEach {
-                            categoryId ->
-
-                            auth.tryDispatchParentAction(
-                                    UpdateCategoryTemporarilyBlockedAction(
-                                            categoryId = categoryId,
-                                            blocked = false,
-                                            endTime = null
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-
-            override fun disableTemporarilyLockForCurrentCategory() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    runAsync {
-                        val category = appCategory.waitForNullableValue()
-
-                        if (category != null) {
-                            auth.tryDispatchParentAction(
-                                    UpdateCategoryTemporarilyBlockedAction(
-                                            categoryId = category.id,
-                                            blocked = false,
-                                            endTime = null
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-
-            override fun showAuthenticationScreen() {
-                (activity as LockActivity).showAuthenticationScreen()
-            }
-
-            override fun setThisDeviceAsCurrentDevice() {
-                UpdatePrimaryDeviceDialogFragment
-                        .newInstance(UpdatePrimaryDeviceRequestType.SetThisDevice)
-                        .show(fragmentManager!!)
-            }
-        }
-
-        if (savedInstanceState == null) {
-            runAsync {
-                val reason = blockingReason.waitForNonNullValue()
-
-                if (reason is BlockedReasonDetails && reason.reason == BlockingReason.RequiresCurrentDevice) {
-                    if (isResumed) {
-                        binding.handlers!!.setThisDeviceAsCurrentDevice()
-                    }
-                }
-            }
-        }
+        initExtraTimeView()
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        logic.realTimeLogic.registerTimeModificationListener(timeModificationListener)
+
+        update()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        logic.realTimeLogic.unregisterTimeModificationListener(timeModificationListener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        unscheduleUpdate()
     }
 }
 

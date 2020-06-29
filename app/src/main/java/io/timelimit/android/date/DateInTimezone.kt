@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,12 @@
  */
 package io.timelimit.android.date
 
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.ChronoUnit
 import java.util.*
 
-data class DateInTimezone(val dayOfWeek: Int, val dayOfEpoch: Int) {
+data class DateInTimezone(val dayOfWeek: Int, val dayOfEpoch: Int, val localDate: LocalDate) {
     companion object {
         fun convertDayOfWeek(dayOfWeek: Int) = when(dayOfWeek) {
             Calendar.MONDAY -> 0
@@ -32,7 +33,18 @@ data class DateInTimezone(val dayOfWeek: Int, val dayOfEpoch: Int) {
             else -> throw IllegalStateException()
         }
 
-        fun newInstance(timeInMillis: Long, timeZone: TimeZone): DateInTimezone {
+        fun convertDayOfWeek(dayOfWeek: DayOfWeek) = when(dayOfWeek) {
+            DayOfWeek.MONDAY -> 0
+            DayOfWeek.TUESDAY -> 1
+            DayOfWeek.WEDNESDAY -> 2
+            DayOfWeek.THURSDAY -> 3
+            DayOfWeek.FRIDAY -> 4
+            DayOfWeek.SATURDAY -> 5
+            DayOfWeek.SUNDAY -> 6
+            else -> throw IllegalStateException()
+        }
+
+        fun getLocalDate(timeInMillis: Long, timeZone: TimeZone): LocalDate {
             val calendar = CalendarCache.getCalendar()
 
             calendar.firstDayOfWeek = Calendar.MONDAY
@@ -40,17 +52,19 @@ data class DateInTimezone(val dayOfWeek: Int, val dayOfEpoch: Int) {
             calendar.timeZone = timeZone
             calendar.timeInMillis = timeInMillis
 
-            val dayOfWeek = convertDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
-
-            val localDate = LocalDate.of(
+            return LocalDate.of(
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH) + 1,
                     calendar.get(Calendar.DAY_OF_MONTH)
             )
-
-            val dayOfEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), localDate).toInt()
-
-            return DateInTimezone(dayOfWeek, dayOfEpoch)
         }
+
+        fun newInstance(localDate: LocalDate): DateInTimezone = DateInTimezone(
+                dayOfEpoch = localDate.toEpochDay().toInt(),
+                dayOfWeek = convertDayOfWeek(localDate.dayOfWeek),
+                localDate = localDate
+        )
+
+        fun newInstance(timeInMillis: Long, timeZone: TimeZone) = newInstance(getLocalDate(timeInMillis, timeZone))
     }
 }

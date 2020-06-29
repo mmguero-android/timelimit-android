@@ -21,6 +21,7 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.User
+import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.actions.SignOutAtDeviceAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
@@ -30,6 +31,8 @@ import kotlinx.coroutines.sync.withLock
 class DefaultUserLogic(private val appLogic: AppLogic) {
     companion object {
         private const val LOG_TAG = "DefaultUserLogic"
+
+        fun hasAutomaticSignOut(device: DeviceRelatedData): Boolean = device.hasValidDefaultUser && device.deviceEntry.defaultUserTimeout > 0
     }
 
     private fun defaultUserEntry() = appLogic.deviceEntry.map { device ->
@@ -40,10 +43,7 @@ class DefaultUserLogic(private val appLogic: AppLogic) {
         else
             liveDataFromValue(null as User?)
     }
-    private fun hasDefaultUser() = defaultUserEntry().map { it != null }.ignoreUnchanged()
     private fun defaultUserTimeout() = appLogic.deviceEntry.map { it?.defaultUserTimeout ?: 0 }.ignoreUnchanged()
-    private fun hasDefaultUserTimeout() = defaultUserTimeout().map { it != 0 }.ignoreUnchanged()
-    fun hasAutomaticSignOut() = hasDefaultUser().and(hasDefaultUserTimeout())
 
     private val logoutLock = Mutex()
 

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ package io.timelimit.android.logic
 
 import android.util.Log
 import io.timelimit.android.BuildConfig
+import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.NetworkTime
 import io.timelimit.android.livedata.ignoreUnchanged
@@ -27,6 +28,7 @@ import java.io.IOException
 class RealTimeLogic(private val appLogic: AppLogic) {
     companion object {
         private const val LOG_TAG = "RealTimeLogic"
+        private const val MISSING_NETWORK_TIME_GRACE_PERIOD = 5 * 1000L
     }
 
     private val deviceEntry = appLogic.deviceEntryIfEnabled
@@ -48,6 +50,10 @@ class RealTimeLogic(private val appLogic: AppLogic) {
 
                 requireRemoteTimeUptime = appLogic.timeApi.getCurrentUptimeInMillis()
                 tryQueryTime()
+
+                Threads.mainThreadHandler.postDelayed({
+                    callTimeModificationListeners()
+                }, MISSING_NETWORK_TIME_GRACE_PERIOD)
             } else {
                 if (BuildConfig.DEBUG) {
                     Log.d(LOG_TAG, "shouldQueryTime = false")
@@ -55,6 +61,10 @@ class RealTimeLogic(private val appLogic: AppLogic) {
 
                 appLogic.timeApi.cancelScheduledAction(tryQueryTime)
             }
+        }
+
+        appLogic.platformIntegration.systemClockChangeListener = Runnable {
+            callTimeModificationListeners()
         }
     }
 
@@ -65,6 +75,19 @@ class RealTimeLogic(private val appLogic: AppLogic) {
 
     private val queryTimeLock = Mutex()
     private val tryQueryTime = Runnable { tryQueryTime() }
+    private val timeModificationListeners = mutableSetOf<() -> Unit>()
+
+    fun registerTimeModificationListener(listener: () -> Unit) = synchronized(timeModificationListeners) {
+        timeModificationListeners.add(listener)
+    }
+
+    fun unregisterTimeModificationListener(listener: () -> Unit) = synchronized(timeModificationListeners) {
+        timeModificationListeners.remove(listener)
+    }
+
+    fun callTimeModificationListeners() = synchronized(timeModificationListeners) {
+        timeModificationListeners.forEach { it() }
+    }
 
     fun tryQueryTime() {
         if (BuildConfig.DEBUG) {
@@ -103,6 +126,8 @@ class RealTimeLogic(private val appLogic: AppLogic) {
 
                     // schedule refresh in 2 hours
                     appLogic.timeApi.runDelayed(tryQueryTime, 1000 * 60 * 60 * 2)
+
+                    callTimeModificationListeners()
                 } catch (ex: Exception) {
                     if (uptimeRealTimeOffset == null) {
                         // schedule next attempt in 10 seconds
@@ -127,6 +152,8 @@ class RealTimeLogic(private val appLogic: AppLogic) {
         val systemTime = appLogic.timeApi.getCurrentTimeInMillis()
 
         confirmedUptimeSystemTimeOffset = systemTime - uptime
+
+        callTimeModificationListeners()
     }
 
     fun getRealTime(time: RealTime) {
@@ -174,7 +201,7 @@ class RealTimeLogic(private val appLogic: AppLogic) {
             } else {
                 time.timeInMillis = systemTime
                 // 5 seconds grace period
-                time.shouldTrustTimeTemporarily = requireRemoteTimeUptime + 5000 > systemUptime
+                time.shouldTrustTimeTemporarily = requireRemoteTimeUptime + MISSING_NETWORK_TIME_GRACE_PERIOD > systemUptime
                 time.shouldTrustTimePermanently = false
                 time.isNetworkTime = false
             }

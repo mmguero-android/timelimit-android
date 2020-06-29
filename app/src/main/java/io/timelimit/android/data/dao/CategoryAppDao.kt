@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ abstract class CategoryAppDao {
 
     @Query("SELECT * FROM category_app WHERE category_id IN (:categoryIds)")
     abstract fun getCategoryApps(categoryIds: List<String>): LiveData<List<CategoryApp>>
+
+    @Query("SELECT * FROM category_app WHERE category_id IN (SELECT category_id FROM category WHERE child_id = :userId)")
+    abstract fun getCategoryAppsByUserIdSync(userId: String): List<CategoryApp>
 
     @Insert
     abstract fun addCategoryAppsSync(items: Collection<CategoryApp>)

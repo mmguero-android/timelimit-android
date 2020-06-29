@@ -16,7 +16,9 @@
 package io.timelimit.android.data
 
 import io.timelimit.android.data.dao.*
-import java.io.Closeable
+import io.timelimit.android.data.invalidation.Observer
+import io.timelimit.android.data.invalidation.Table
+import java.lang.ref.WeakReference
 
 interface Database {
     fun app(): AppDao
@@ -34,8 +36,13 @@ interface Database {
     fun allowedContact(): AllowedContactDao
     fun userKey(): UserKeyDao
     fun sessionDuration(): SessionDurationDao
+    fun derivedDataDao(): DerivedDataDao
 
     fun <T> runInTransaction(block: () -> T): T
+    fun <T> runInUnobservedTransaction(block: () -> T): T
+    fun registerWeakObserver(tables: Array<Table>, observer: WeakReference<Observer>)
+    fun registerTransactionCommitListener(listener: () -> Unit)
+    fun unregisterTransactionCommitListener(listener: () -> Unit)
 
     fun deleteAllData()
     fun close()

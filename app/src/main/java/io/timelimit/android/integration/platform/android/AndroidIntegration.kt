@@ -87,6 +87,12 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
                 installedAppsChangeListener?.run()
             }
         })
+
+        context.registerReceiver(object: BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                systemClockChangeListener?.run()
+            }
+        }, IntentFilter(Intent.ACTION_TIME_CHANGED))
     }
 
     override fun getLocalApps(deviceId: String): Collection<App> {

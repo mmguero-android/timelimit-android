@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,17 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.logic.extension
 
-import io.timelimit.android.data.model.Category
-import io.timelimit.android.integration.platform.BatteryStatus
+package io.timelimit.android.data.invalidation
 
-fun BatteryStatus.isCategoryAllowed(category: Category?): Boolean {
-    return if (category == null) {
-        true
-    } else if (this.charging) {
-        this.level >= category.minBatteryLevelWhileCharging
-    } else {
-        this.level >= category.minBatteryLevelMobile
-    }
+interface Observer {
+    fun onInvalidated(tables: Set<Table>)
 }

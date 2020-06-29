@@ -16,7 +16,6 @@
 
 package io.timelimit.android.data.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.timelimit.android.data.model.SessionDuration
 
@@ -34,7 +33,7 @@ interface SessionDurationDao {
     ): SessionDuration?
 
     @Query("SELECT * FROM session_duration WHERE category_id = :categoryId")
-    fun getSessionDurationItemsByCategoryId(categoryId: String): LiveData<List<SessionDuration>>
+    fun getSessionDurationItemsByCategoryIdSync(categoryId: String): List<SessionDuration>
 
     @Insert
     fun insertSessionDurationItemSync(item: SessionDuration)

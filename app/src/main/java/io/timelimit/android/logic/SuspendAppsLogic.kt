@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,104 +15,154 @@
  */
 package io.timelimit.android.logic
 
-import androidx.lifecycle.LiveData
-import io.timelimit.android.data.model.Category
+import io.timelimit.android.async.Threads
+import io.timelimit.android.data.invalidation.Observer
+import io.timelimit.android.data.invalidation.Table
 import io.timelimit.android.data.model.CategoryApp
 import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.UserType
+import io.timelimit.android.data.model.derived.UserRelatedData
+import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
-import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromValue
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
-import java.util.*
+import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
+import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
-class SuspendAppsLogic(private val appLogic: AppLogic) {
-    private val blockingAtActivityLevel = appLogic.deviceEntry.map { it?.enableActivityLevelBlocking ?: false }
-    private val blockingReasonUtil = CategoriesBlockingReasonUtil(appLogic)
+class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
+    private var lastDefaultCategory: String? = null
+    private var lastAllowedCategoryList = emptySet<String>()
+    private var lastCategoryApps = emptyList<CategoryApp>()
+    private val installedAppsModified = AtomicBoolean(false)
+    private val categoryHandlingCache = CategoryHandlingCache()
+    private val realTime = RealTime.newInstance()
+    private var batteryStatus = appLogic.platformIntegration.getBatteryStatus()
+    private val pendingSync = AtomicBoolean(true)
+    private val executor = Executors.newSingleThreadExecutor()
 
-    private val knownInstalledApps = appLogic.deviceId.switchMap { deviceId ->
-        if (deviceId.isNullOrEmpty()) {
-            liveDataFromValue(emptyList())
-        } else {
-            appLogic.database.app().getAppsByDeviceIdAsync(deviceId).map { apps ->
-                apps.map { it.packageName }
-            }
-        }
-    }.ignoreUnchanged()
+    private val backgroundRunnable = Runnable {
+        while (pendingSync.getAndSet(false)) {
+            updateBlockingSync()
 
-    private val categoryData = appLogic.deviceUserEntry.switchMap { deviceUser ->
-        if (deviceUser?.type == UserType.Child) {
-            appLogic.database.category().getCategoriesByChildId(deviceUser.id).switchMap { categories ->
-                appLogic.database.categoryApp().getCategoryApps(categories.map { it.id }).map { categoryApps ->
-                    RealCategoryData(
-                            categoryForUnassignedApps = deviceUser.categoryForNotAssignedApps,
-                            categories = categories,
-                            categoryApps = categoryApps
-                    ) as CategoryData
-                }
-            }
-        } else {
-            liveDataFromValue(NoChildUser as CategoryData)
-        }
-    }.ignoreUnchanged()
-
-    private val categoryBlockingReasons: LiveData<Map<String, BlockingReason>?> = appLogic.deviceUserEntry.switchMap { deviceUser ->
-        if (deviceUser?.type == UserType.Child) {
-            appLogic.database.category().getCategoriesByChildId(deviceUser.id).switchMap { categories ->
-                blockingReasonUtil.getCategoryBlockingReasons(
-                        childDisableLimitsUntil = liveDataFromValue(deviceUser.disableLimitsUntil),
-                        timeZone = liveDataFromValue(TimeZone.getTimeZone(deviceUser.timeZone)),
-                        categories = categories
-                ) as LiveData<Map<String, BlockingReason>?>
-            }
-        } else {
-            liveDataFromValue(null as Map<String, BlockingReason>?)
-        }
-    }.ignoreUnchanged()
-
-    private val appsToBlock = categoryBlockingReasons.switchMap { blockingReasons ->
-        if (blockingReasons == null) {
-            liveDataFromValue(emptyList<String>())
-        } else {
-            categoryData.switchMap { categories ->
-                when (categories) {
-                    is NoChildUser -> liveDataFromValue(emptyList<String>())
-                    is RealCategoryData -> {
-                        knownInstalledApps.switchMap { installedApps ->
-                            blockingAtActivityLevel.map { blockingAtActivityLevel ->
-                                val prepared = getAppsWithCategories(installedApps, categories, blockingAtActivityLevel)
-                                val result = mutableListOf<String>()
-
-                                installedApps.forEach { packageName ->
-                                    val appCategories = prepared[packageName] ?: emptySet()
-
-                                    if (appCategories.find { categoryId -> (blockingReasons[categoryId] ?: BlockingReason.None) == BlockingReason.None } == null) {
-                                        if (!AndroidIntegrationApps.appsToNotSuspend.contains(packageName)) {
-                                            result.add(packageName)
-                                        }
-                                    }
-                                }
-
-                                result
-                            }
-                        }
-                    }
-                } as LiveData<List<String>>
-            }
+            Thread.sleep(500)
         }
     }
 
-    private val realAppsToBlock = appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.SYSTEM_LEVEL_BLOCKING).switchMap { systemLevelBlocking ->
-        if (systemLevelBlocking) {
-            appsToBlock
-        } else {
-            liveDataFromValue(emptyList())
-        }
-    }.ignoreUnchanged()
+    private val triggerRunnable = Runnable {
+        triggerUpdate()
+    }
 
-    private fun getAppsWithCategories(packageNames: List<String>, data: RealCategoryData, blockingAtActivityLevel: Boolean): Map<String, Set<String>> {
-        val categoryForUnassignedApps = if (data.categories.find { it.id == data.categoryForUnassignedApps } != null) data.categoryForUnassignedApps else null
+    private fun triggerUpdate() {
+        pendingSync.set(true); executor.submit(backgroundRunnable)
+    }
+
+    private fun scheduleUpdate(delay: Long) {
+        appLogic.timeApi.cancelScheduledAction(triggerRunnable)
+        appLogic.timeApi.runDelayedByUptime(triggerRunnable, delay)
+    }
+
+    init {
+        appLogic.database.registerWeakObserver(arrayOf(Table.App), WeakReference(this))
+        appLogic.platformIntegration.getBatteryStatusLive().observeForever { batteryStatus = it; triggerUpdate() }
+        appLogic.realTimeLogic.registerTimeModificationListener { triggerUpdate() }
+        appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataLive().observeForever { triggerUpdate() }
+    }
+
+    override fun onInvalidated(tables: Set<Table>) {
+        installedAppsModified.set(true); triggerUpdate()
+    }
+
+    private fun updateBlockingSync() {
+        val userAndDeviceRelatedData = appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
+
+        val isRestrictedUser = userAndDeviceRelatedData?.userRelatedData?.user?.type == UserType.Child
+        val enableBlockingAtSystemLevel = userAndDeviceRelatedData?.deviceRelatedData?.isExperimentalFlagSetSync(ExperimentalFlags.SYSTEM_LEVEL_BLOCKING) ?: false
+        val hasPermission = appLogic.platformIntegration.getCurrentProtectionLevel() == ProtectionLevel.DeviceOwner
+        val enableBlocking = isRestrictedUser && enableBlockingAtSystemLevel && hasPermission
+
+        if (!enableBlocking) {
+            appLogic.platformIntegration.stopSuspendingForAllApps()
+
+            lastAllowedCategoryList = emptySet()
+            lastCategoryApps = emptyList()
+
+            return
+        }
+
+        val userRelatedData = userAndDeviceRelatedData!!.userRelatedData!!
+
+        val latch = CountDownLatch(1)
+
+        Threads.mainThreadHandler.post { appLogic.realTimeLogic.getRealTime(realTime); latch.countDown() }
+
+        latch.await()
+
+        categoryHandlingCache.reportStatus(
+                user = userRelatedData,
+                shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
+                timeInMillis = realTime.timeInMillis,
+                batteryStatus = batteryStatus,
+                assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(
+                        device = userAndDeviceRelatedData.deviceRelatedData,
+                        user = userRelatedData
+                )
+        )
+
+        val defaultCategory = userRelatedData.user.categoryForNotAssignedApps
+        val blockingAtActivityLevel = userAndDeviceRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking
+        val categoryApps = userRelatedData.categoryApps
+        val categoryHandlings = userRelatedData.categoryById.keys.map { categoryHandlingCache.get(it) }
+        val categoryIdsToAllow = categoryHandlings.filterNot { it.shouldBlockAtSystemLevel }.map { it.createdWithCategoryRelatedData.category.id }.toMutableSet()
+
+        var didModify: Boolean
+
+        do {
+            didModify = false
+
+            val iterator = categoryIdsToAllow.iterator()
+
+            for (categoryId in iterator) {
+                val parentCategory = userRelatedData.categoryById[userRelatedData.categoryById[categoryId]?.category?.parentCategoryId]
+
+                if (parentCategory != null && !categoryIdsToAllow.contains(parentCategory.category.id)) {
+                    iterator.remove(); didModify = true
+                }
+            }
+        } while (didModify)
+
+        categoryHandlings.minBy { it.dependsOnMaxTime }?.let {
+            scheduleUpdate((it.dependsOnMaxTime - realTime.timeInMillis))
+        }
+
+        if (
+                categoryIdsToAllow != lastAllowedCategoryList || categoryApps != lastCategoryApps ||
+                installedAppsModified.getAndSet(false) || defaultCategory != lastDefaultCategory
+        ) {
+            lastAllowedCategoryList = categoryIdsToAllow
+            lastCategoryApps = categoryApps
+            lastDefaultCategory = defaultCategory
+
+            val installedApps = appLogic.platformIntegration.getLocalAppPackageNames()
+            val prepared = getAppsWithCategories(installedApps, userRelatedData, blockingAtActivityLevel)
+            val appsToBlock = mutableListOf<String>()
+
+            installedApps.forEach { packageName ->
+                val appCategories = prepared[packageName] ?: emptySet()
+
+                if (appCategories.find { categoryId -> categoryIdsToAllow.contains(categoryId) } == null) {
+                    if (!AndroidIntegrationApps.appsToNotSuspend.contains(packageName)) {
+                        appsToBlock.add(packageName)
+                    }
+                }
+            }
+
+            applySuspendedApps(appsToBlock)
+        }
+    }
+
+    private fun getAppsWithCategories(packageNames: List<String>, data: UserRelatedData, blockingAtActivityLevel: Boolean): Map<String, Set<String>> {
+        val categoryForUnassignedApps = data.categoryById[data.user.categoryForNotAssignedApps]
 
         if (blockingAtActivityLevel) {
             val categoriesByPackageName = data.categoryApps.groupBy { it.packageNameWithoutActivityName }
@@ -126,7 +176,7 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
 
                 if (!isMainAppIncluded) {
                     if (categoryForUnassignedApps != null) {
-                        categories.add(categoryForUnassignedApps)
+                        categories.add(categoryForUnassignedApps.category.id)
                     }
                 }
 
@@ -140,7 +190,7 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
             val result = mutableMapOf<String, Set<String>>()
 
             packageNames.forEach { packageName ->
-                val category = categoryByPackageName[packageName]?.categoryId ?: categoryForUnassignedApps
+                val category = categoryByPackageName[packageName]?.categoryId ?: categoryForUnassignedApps?.category?.id
 
                 result[packageName] = if (category != null) setOf(category) else emptySet()
             }
@@ -160,16 +210,4 @@ class SuspendAppsLogic(private val appLogic: AppLogic) {
             appLogic.platformIntegration.setSuspendedApps(packageNames, true)
         }
     }
-
-    init {
-        realAppsToBlock.observeForever { appsToBlock -> applySuspendedApps(appsToBlock) }
-    }
 }
-
-internal sealed class CategoryData
-internal object NoChildUser: CategoryData()
-internal class RealCategoryData(
-        val categoryForUnassignedApps: String,
-        val categories: List<Category>,
-        val categoryApps: List<CategoryApp>
-): CategoryData()
