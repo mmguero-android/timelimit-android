@@ -15,6 +15,8 @@
  */
 package io.timelimit.android.data.cache.multi
 
+import io.timelimit.android.data.cache.TempLock
+
 internal class ListenerHolder<K, V> (val listener: DataCacheListener<K, V>) {
     var closed = false
 }
@@ -24,33 +26,33 @@ internal class DataCacheElement<K, IV, EV> (var value: IV) {
     val listeners = mutableListOf<ListenerHolder<K, EV>>()
 }
 
-// thread safe, but most likely slower than possible
 fun <K, IV, EV> DataCacheHelperInterface<K, IV, EV>.createCache(): DataCache<K, EV> {
     val helper = this
     val elements = mutableMapOf<K, DataCacheElement<K, IV, EV>>()
-    val updateLock = Object()
-    val closeLock = Object()
-    var isClosed = false
-
-    fun assertNotClosed() {
-        if (isClosed) {
-            throw IllegalStateException()
-        }
-    }
+    val lock = Object()
+    val tempLock = TempLock()
 
     fun updateSync(key: K, item: DataCacheElement<K, IV, EV>) {
-        synchronized(updateLock) {
-            assertNotClosed()
+        if (item.users == 0) return
 
-            val oldValue = item.value
-            val newValue = helper.updateItemSync(key, oldValue)
+        val oldValue = item.value
+        val newValue = helper.updateItemSync(key, oldValue)
 
-            if (newValue !== oldValue) {
-                item.value = newValue
+        if (newValue !== oldValue) {
+            val listeners = synchronized(lock) {
+                val element = elements[key]
 
-                val listeners = synchronized(closeLock) { item.listeners.toList() }
+                if (element !== item || element.value !== oldValue) {
+                    disposeItemFast(key, newValue)
+                    return
+                } else {
+                    element.value = newValue
+                    element.listeners.toList()
+                }
+            }
 
-                listeners.forEach {
+            listeners.forEach {
+                synchronized(it) {
                     if (!it.closed) {
                         it.listener.onElementUpdated(key, helper.prepareForUser(oldValue), helper.prepareForUser(newValue))
                     }
@@ -59,57 +61,78 @@ fun <K, IV, EV> DataCacheHelperInterface<K, IV, EV>.createCache(): DataCache<K, 
         }
     }
 
-    fun updateSync() {
-        synchronized(updateLock) {
-            assertNotClosed()
-
-            elements.forEach { updateSync(it.key, it.value) }
+    fun updateSync() = tempLock.withTempLock {
+        synchronized(lock) {
+            elements.toMap()
+        }.forEach {
+            updateSync(it.key, it.value)
         }
     }
 
-    fun openSync(key: K, listener: DataCacheListener<K, EV>?): EV {
-        synchronized(updateLock) {
-            assertNotClosed()
+    fun openSync(key: K, listener: DataCacheListener<K, EV>?): EV = tempLock.withTempLock {
+        val oldItemToReturn = synchronized(lock) { elements[key]?.also { oldItem -> oldItem.users++ } }
 
-            val oldItemToReturn = synchronized(closeLock) {
-                elements[key]?.also { oldItem -> oldItem.users++ }
+        if (oldItemToReturn != null) {
+            updateSync(key, oldItemToReturn)
+
+            synchronized(lock) {
+                if (elements[key] !== oldItemToReturn) {
+                    throw IllegalStateException()
+                }
+
+                if (listener != null) {
+                    if (oldItemToReturn.listeners.find { it.listener === listener } == null) {
+                        oldItemToReturn.listeners.add(ListenerHolder(listener))
+                    }
+                }
+
+                return@withTempLock helper.prepareForUser(oldItemToReturn.value)
             }
+        } else {
+            val newValue = helper.openItemSync(key)
 
-            if (oldItemToReturn != null) {
-                updateSync(key, oldItemToReturn)
+            synchronized(lock) {
+                val currentElement = elements[key]
 
-                synchronized(closeLock) {
-                    if (listener != null) {
-                        if (oldItemToReturn.listeners.find { it.listener === listener } == null) {
-                            oldItemToReturn.listeners.add(ListenerHolder(listener))
+                if (currentElement == null) {
+                    elements[key] = DataCacheElement<K, IV, EV>(newValue).also {
+                        if (listener != null) {
+                            it.listeners.add(ListenerHolder(listener))
                         }
                     }
-                }
 
-                return helper.prepareForUser(oldItemToReturn.value)
-            }
+                    return@withTempLock helper.prepareForUser(newValue)
+                } else {
+                    disposeItemFast(key, newValue)
 
-            val value = helper.openItemSync(key)
+                    currentElement.users++
 
-            synchronized(closeLock) {
-                elements[key] = DataCacheElement<K, IV, EV>(value).also {
                     if (listener != null) {
-                        it.listeners.add(ListenerHolder(listener))
+                        if (currentElement.listeners.find { it.listener === listener } == null) {
+                            currentElement.listeners.add(ListenerHolder(listener))
+                        }
                     }
+
+                    return@withTempLock helper.prepareForUser(currentElement.value)
                 }
             }
-
-            return helper.prepareForUser(value)
         }
     }
 
     fun close(key: K, listener: DataCacheListener<K, EV>?) {
-        synchronized(closeLock) {
-            assertNotClosed()
-
+        synchronized(lock) {
             val item = elements[key] ?: throw IllegalStateException()
 
-            item.listeners.removeAll { if (it.listener === listener) { it.closed = true; true } else false }
+            val iterator = item.listeners.iterator()
+
+            for (listenerItem in iterator) {
+                if (listenerItem.listener === listener) {
+                    synchronized(listenerItem) {
+                        listenerItem.closed = true
+                        iterator.remove()
+                    }
+                }
+            }
 
             item.users--
 
@@ -128,26 +151,10 @@ fun <K, IV, EV> DataCacheHelperInterface<K, IV, EV>.createCache(): DataCache<K, 
         }
     }
 
-    fun close() {
-        synchronized(updateLock) {
-            synchronized(closeLock) {
-                assertNotClosed()
-
-                elements.entries.forEach { it.value.listeners.clear(); helper.disposeItemFast(it.key, it.value.value) }
-                elements.clear()
-
-                isClosed = true
-
-                helper.close()
-            }
-        }
-    }
-
     val ownerInterface = object: DataCacheOwnerInterface { override fun updateSync() = helper.wrapOpenOrUpdate { updateSync() } }
     val userInterface = object: DataCacheUserInterface<K, EV> {
         override fun openSync(key: K, listener: DataCacheListener<K, EV>?): EV = helper.wrapOpenOrUpdate { openSync(key, listener) }
         override fun close(key: K, listener: DataCacheListener<K, EV>?) = close(key, listener)
-        override fun close() = close()
     }
 
     return DataCache(ownerInterface, userInterface)

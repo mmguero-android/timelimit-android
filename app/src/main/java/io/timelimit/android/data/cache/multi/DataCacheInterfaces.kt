@@ -15,7 +15,7 @@
  */
 package io.timelimit.android.data.cache.multi
 
-interface DataCacheUserInterface<K, V>: AutoCloseable {
+interface DataCacheUserInterface<K, V> {
     fun openSync(key: K, listener: DataCacheListener<K, V>?): V
     fun close(key: K, listener: DataCacheListener<K, V>?)
 }
@@ -37,7 +37,6 @@ interface DataCacheHelperInterface<K, IV, EV> {
     fun openItemSync(key: K): IV
     fun updateItemSync(key: K, item: IV): IV
     fun disposeItemFast(key: K, item: IV)
-    fun close()
     fun prepareForUser(item: IV): EV
     fun <R> wrapOpenOrUpdate(block: () -> R): R
 }

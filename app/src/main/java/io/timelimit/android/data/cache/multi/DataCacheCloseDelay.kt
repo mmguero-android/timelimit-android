@@ -31,7 +31,6 @@ fun <K, V> DataCacheUserInterface<K, V>.delayClosingItems(delay: Long): DataCach
     // 0 never occurs in user counters, key is only in wipe times or user counters
     val userCounters = mutableMapOf<K, AtomicInteger>()
     val wipeTimes = mutableMapOf<K, Long>()
-    var isClosed = false
     var minWipeTime = Long.MAX_VALUE
 
     lateinit var handleWipingRunnable: Runnable
@@ -48,10 +47,6 @@ fun <K, V> DataCacheUserInterface<K, V>.delayClosingItems(delay: Long): DataCach
 
     handleWipingRunnable = Runnable {
         synchronized(lock) {
-            if (isClosed) {
-                return@synchronized
-            }
-
             val now = now()
             var nextWipeTime = Long.MAX_VALUE
 
@@ -119,14 +114,6 @@ fun <K, V> DataCacheUserInterface<K, V>.delayClosingItems(delay: Long): DataCach
             }
 
             parent.close(key, listener)
-        }
-
-        override fun close() {
-            synchronized(lock) {
-                isClosed = true
-
-                parent.close()
-            }
         }
     }
 }
