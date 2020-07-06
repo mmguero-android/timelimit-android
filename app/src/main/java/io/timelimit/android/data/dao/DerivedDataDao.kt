@@ -71,12 +71,11 @@ class DerivedDataDao (private val database: Database) {
         }
 
         override fun updateItemSync(item: DeviceAndUserRelatedData?): DeviceAndUserRelatedData? {
-            try {
-                val newItem = openItemSync()
+            val newItem = openItemSync()
 
-                return if (newItem != item) newItem else item
-            } finally {
-                disposeItemFast(item)
+            return if (newItem != item) newItem else {
+                disposeItemFast(newItem)
+                item
             }
         }
 
@@ -117,12 +116,11 @@ class DerivedDataDao (private val database: Database) {
         }
 
         override fun updateItemSync(key: String, item: CompleteUserLoginRelatedData?): CompleteUserLoginRelatedData? {
-            try {
-                val newItem = openItemSync(key)
+            val newItem = openItemSync(key)
 
-                return if (newItem != item) newItem else item
-            } finally {
-                disposeItemFast(key, item)
+            return if (newItem != item) newItem else {
+                disposeItemFast(key, newItem)
+                item
             }
         }
 
