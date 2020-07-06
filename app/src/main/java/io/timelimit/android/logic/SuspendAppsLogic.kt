@@ -40,6 +40,7 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
     private var batteryStatus = appLogic.platformIntegration.getBatteryStatus()
     private val pendingSync = AtomicBoolean(true)
     private val executor = Executors.newSingleThreadExecutor()
+    private var lastSuspendedApps: List<String>? = null
 
     private val backgroundRunnable = Runnable {
         while (pendingSync.getAndSet(false)) {
@@ -83,6 +84,7 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
 
         if (!enableBlocking) {
             appLogic.platformIntegration.stopSuspendingForAllApps()
+            lastSuspendedApps = emptyList()
 
             lastAllowedCategoryList = emptySet()
             lastCategoryApps = emptyList()
@@ -200,14 +202,18 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
     }
 
     private fun applySuspendedApps(packageNames: List<String>) {
-        if (packageNames.isEmpty()) {
+        if (packageNames == lastSuspendedApps) {
+            // nothing to do
+        } else if (packageNames.isEmpty()) {
             appLogic.platformIntegration.stopSuspendingForAllApps()
+            lastSuspendedApps = emptyList()
         } else {
             val allApps = appLogic.platformIntegration.getLocalAppPackageNames()
             val appsToNotBlock = allApps.subtract(packageNames)
 
             appLogic.platformIntegration.setSuspendedApps(appsToNotBlock.toList(), false)
             appLogic.platformIntegration.setSuspendedApps(packageNames, true)
+            lastSuspendedApps = packageNames
         }
     }
 }
