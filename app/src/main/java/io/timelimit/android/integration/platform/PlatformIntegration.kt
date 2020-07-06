@@ -72,6 +72,8 @@ abstract class PlatformIntegration(
     // this function requires the device owner permission and a recent android version
     abstract fun setForceNetworkTime(enable: Boolean)
 
+    abstract fun restartApp()
+
     var installedAppsChangeListener: Runnable? = null
     var systemClockChangeListener: Runnable? = null
 }

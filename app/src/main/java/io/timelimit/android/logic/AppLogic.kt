@@ -96,6 +96,7 @@ class AppLogic(
 
     init {
         SyncInstalledAppsLogic(this)
+        WatchdogLogic(this)
     }
 
     val manipulationLogic = ManipulationLogic(this)

@@ -170,4 +170,6 @@ class DummyIntegration(
 
     override fun setEnableCustomHomescreen(enable: Boolean) = Unit
     override fun setForceNetworkTime(enable: Boolean) = Unit
+
+    override fun restartApp() = Unit
 }

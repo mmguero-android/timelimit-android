@@ -39,17 +39,20 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.runAsyncExpectForever
 import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.integration.platform.android.foregroundapp.ForegroundAppHelper
+import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.homescreen.HomescreenActivity
 import io.timelimit.android.ui.lock.LockActivity
 import io.timelimit.android.ui.manipulation.AnnoyActivity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
+import kotlin.system.exitProcess
 
 
 class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectionLevel) {
@@ -500,6 +503,22 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && (!BuildConfig.storeCompilant)) {
             if (policyManager.isDeviceOwnerApp(context.packageName)) {
                 policyManager.setAutoTimeRequired(deviceAdmin, enable)
+            }
+        }
+    }
+
+    override fun restartApp() {
+        Threads.mainThreadHandler.post {
+            if (lastAppStatusMessage != null) {
+                LockActivity.start(context, BuildConfig.APPLICATION_ID, null)
+
+                if (!BackgroundService.isBackgroundActivityRestricted(context)) {
+                    context.startService(Intent(context, BackgroundActionService::class.java))
+                }
+            }
+
+            Threads.mainThreadHandler.post {
+                exitProcess(0)
             }
         }
     }
