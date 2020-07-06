@@ -1,12 +1,8 @@
 Neue Funktionen:
 
-- Möglichkeit, Kinder daran zu hindern die Nutzungsdauern und Zeiten der anderen Kinder der Familie zu sehen
+- Verschachtelung von Kategorien in mehr als zwei Ebenen
+- Anmeldeverhinderungskategorie als Nachfolger für das Zeitschloss
 
 Änderungen:
 
-- Anpassung der Erkennung der aktiven App
-
-behobene Fehler:
-
-- Layoutfehler beim Zeitbegrenzungseditor auf kleinen Bildschirmen
-- Zählen der Zeit für nicht aktive Zeitfenster am aktuellen Tag
+Überarbeitung des Codes zum Entscheiden, ob/ warum eine App gesperrt werden soll. Dieser ist getestet, aber kann dennoch Fehler enthalten. Durch diese Überarbeitung werden zukünftige Fehler vermieden und Erweiterungen einfacher.

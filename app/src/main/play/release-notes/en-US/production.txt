@@ -1,12 +1,8 @@
 New feature:
 
-- option to prevent child users to view the settings and usage durations of other child users within the same family
+- category nesting with more than two levels
+- limit login category as a successor of the time lock
 
 Changes:
 
-- modified detection of the currently running App
-
-Fixed issues:
-
-- layout issues at the time limit rule editor at small screens
-- counting time for not active slots of the current day
+Rewritten code to device if/ why an App should be blocked. This is tested, but can still contain bugs. This change makes future bugs less likely and makes future extensions easier.
