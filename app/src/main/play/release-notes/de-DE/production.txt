@@ -1,8 +1,3 @@
-Neue Funktionen:
+Fehlerbehebungen:
 
-- Verschachtelung von Kategorien in mehr als zwei Ebenen
-- Anmeldeverhinderungskategorie als Nachfolger für das Zeitschloss
-
-Änderungen:
-
-Überarbeitung des Codes zum Entscheiden, ob/ warum eine App gesperrt werden soll. Dieser ist getestet, aber kann dennoch Fehler enthalten. Durch diese Überarbeitung werden zukünftige Fehler vermieden und Erweiterungen einfacher.
+Maßnahmen gegen Deadlocks hinzugefügt, die manchmal zu der fehlenden Anzeige von Benutzern/ Kategorien geführt haben

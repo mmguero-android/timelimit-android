@@ -1,8 +1,3 @@
-New feature:
+Bugfixes:
 
-- category nesting with more than two levels
-- limit login category as a successor of the time lock
-
-Changes:
-
-Rewritten code to device if/ why an App should be blocked. This is tested, but can still contain bugs. This change makes future bugs less likely and makes future extensions easier.
+added measurments against deadlock which caused TimeLimit to show no users/ categories in some cases
