@@ -43,7 +43,9 @@ fun <K, V> DataCacheUserInterface<K, V>.openLive(key: K, executor: Executor): Li
         override fun onInactive() {
             super.onInactive()
 
-            cache.close(key, listener)
+            executor.execute {
+                cache.close(key, listener)
+            }
         }
     }
 }

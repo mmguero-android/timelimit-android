@@ -41,6 +41,8 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
     private val pendingSync = AtomicBoolean(true)
     private val executor = Executors.newSingleThreadExecutor()
     private var lastSuspendedApps: List<String>? = null
+    private val userAndDeviceRelatedDataLive = appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataLive()
+    private var didLoadUserAndDeviceRelatedData = false
 
     private val backgroundRunnable = Runnable {
         while (pendingSync.getAndSet(false)) {
@@ -67,7 +69,7 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
         appLogic.database.registerWeakObserver(arrayOf(Table.App), WeakReference(this))
         appLogic.platformIntegration.getBatteryStatusLive().observeForever { batteryStatus = it; triggerUpdate() }
         appLogic.realTimeLogic.registerTimeModificationListener { triggerUpdate() }
-        appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataLive().observeForever { triggerUpdate() }
+        userAndDeviceRelatedDataLive.observeForever { didLoadUserAndDeviceRelatedData = true; triggerUpdate() }
     }
 
     override fun onInvalidated(tables: Set<Table>) {
@@ -75,7 +77,9 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
     }
 
     private fun updateBlockingSync() {
-        val userAndDeviceRelatedData = appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
+        if (!didLoadUserAndDeviceRelatedData) return
+
+        val userAndDeviceRelatedData = userAndDeviceRelatedDataLive.value
 
         val isRestrictedUser = userAndDeviceRelatedData?.userRelatedData?.user?.type == UserType.Child
         val enableBlockingAtSystemLevel = userAndDeviceRelatedData?.deviceRelatedData?.isExperimentalFlagSetSync(ExperimentalFlags.SYSTEM_LEVEL_BLOCKING) ?: false

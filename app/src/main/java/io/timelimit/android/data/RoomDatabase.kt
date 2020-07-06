@@ -21,6 +21,7 @@ import androidx.room.Database
 import androidx.room.InvalidationTracker
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import io.timelimit.android.async.Threads
 import io.timelimit.android.data.dao.DerivedDataDao
 import io.timelimit.android.data.invalidation.Observer
 import io.timelimit.android.data.invalidation.Table
@@ -28,6 +29,7 @@ import io.timelimit.android.data.invalidation.TableUtil
 import io.timelimit.android.data.model.*
 import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @Database(entities = [
     User::class,
@@ -113,6 +115,7 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
                             DatabaseMigrations.MIGRATE_TO_V30,
                             DatabaseMigrations.MIGRATE_TO_V31
                     )
+                    .setQueryExecutor(Threads.database)
                     .build()
         }
     }
@@ -157,20 +160,20 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
             val latch = CountDownLatch(1)
 
             try {
-                queryExecutor.execute { latch.await() }
+                queryExecutor.execute { latch.await(5, TimeUnit.SECONDS) }
 
                 // without requesting a async refresh, no sync refresh will happen
                 invalidationTracker.refreshVersionsAsync()
                 invalidationTracker.refreshVersionsSync()
-
-                openHelper.readableDatabase.beginTransaction()
-                try {
-                    synchronized(transactionCommitListeners) { transactionCommitListeners.toList() }.forEach { it() }
-                } finally {
-                    openHelper.readableDatabase.endTransaction()
-                }
             } finally {
                 latch.countDown()
+            }
+
+            openHelper.readableDatabase.beginTransaction()
+            try {
+                synchronized(transactionCommitListeners) { transactionCommitListeners.toList() }.forEach { it() }
+            } finally {
+                openHelper.readableDatabase.endTransaction()
             }
         }
     }

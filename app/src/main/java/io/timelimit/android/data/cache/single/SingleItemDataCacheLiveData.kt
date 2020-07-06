@@ -43,7 +43,9 @@ fun <V> SingleItemDataCacheUserInterface<V>.openLive(executor: Executor): LiveDa
         override fun onInactive() {
             super.onInactive()
 
-            cache.close(listener)
+            executor.execute {
+                cache.close(listener)
+            }
         }
     }
 }
