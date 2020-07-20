@@ -60,6 +60,7 @@ object AndroidIntegrationApps {
 
     private val ignoredActivities = setOf<String>(
             "com.android.settings:com.android.settings.enterprise.ActionDisabledByAdminDialog",
+            "com.android.settings:com.android.settings.FallbackHome",
             "com.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionActivity",
             "com.google.android.packageinstaller:com.android.packageinstaller.permission.ui.GrantPermissionsActivity",
             "com.android.permissioncontroller:com.android.permissioncontroller.permission.ui.GrantPermissionActivity",
