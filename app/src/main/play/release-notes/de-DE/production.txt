@@ -1,3 +1,6 @@
-Fehlerbehebungen:
+Detailänderungen:
 
-Maßnahmen gegen Deadlocks hinzugefügt, die manchmal zu der fehlenden Anzeige von Benutzern/ Kategorien geführt haben
+- Überspringen der Benutzerauswahl bei der Authentifizierung, wenn es nur einen Benutzer mit Passwort gibt
+- FallbackHome zur Whitelist hinzugefügt
+- Text überarbeitet, der angezeigt wird, wenn eine Authentifizierung erforderlich ist
+- Build-Tools und Libraries aktualisiert

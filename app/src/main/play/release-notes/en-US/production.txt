@@ -1,3 +1,6 @@
-Bugfixes:
+detail changes:
 
-added measurments against deadlock which caused TimeLimit to show no users/ categories in some cases
+- skip user selection during the authentication if there is only one user with a password
+- added FallbackHome to the whitelist
+- refactored text which is shown when a authentication is required
+- updated build tools and libraries
