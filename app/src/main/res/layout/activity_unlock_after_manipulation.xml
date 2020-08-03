@@ -54,7 +54,6 @@
         style="?materialButtonOutlinedStyle"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:background="?selectableItemBackground"
         android:layout_gravity="center_horizontal"
         android:id="@+id/use_backdoor"
         android:text="@string/backdoor_start_btn"

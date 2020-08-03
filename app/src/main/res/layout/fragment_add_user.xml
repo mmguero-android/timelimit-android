@@ -102,7 +102,6 @@
                             android:id="@+id/create_btn"
                             android:layout_gravity="end"
                             android:text="@string/generic_create"
-                            android:background="?selectableItemBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content" />
 

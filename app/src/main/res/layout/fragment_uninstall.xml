@@ -107,7 +107,6 @@
                         android:layout_gravity="end"
                         android:id="@+id/uninstall"
                         android:text="@string/generic_ok"
-                        android:background="?selectableItemBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 

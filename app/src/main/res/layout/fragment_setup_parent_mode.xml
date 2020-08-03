@@ -136,7 +136,6 @@
                 <Button
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="4dp"
-                    android:background="?selectableItemBackground"
                     android:enabled="@{safeUnbox(enableOkButton)}"
                     android:id="@+id/ok"
                     android:layout_gravity="end"
