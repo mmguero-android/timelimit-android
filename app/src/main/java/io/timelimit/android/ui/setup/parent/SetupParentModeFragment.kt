@@ -66,25 +66,21 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
                     }
                 }
             }
-        }.observe(this, Observer {
+        }.observe(viewLifecycleOwner, Observer {
             binding.switcher.displayedChild = it!!
         })
 
-        val isNewFamily = model.statusOfMailAddress.map {
-            it == null || it.status == StatusOfMailAddress.MailAddressWithoutFamily
-        }
-
-        model.statusOfMailAddress.observe(this, Observer {
+        model.statusOfMailAddress.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 binding.isNewFamily = when (it.status) {
                     StatusOfMailAddress.MailAddressWithoutFamily -> true
                     StatusOfMailAddress.MailAddressWithFamily -> false
                 }
+
+                binding.showLimitedProInfo = !it.alwaysPro
                 binding.mail = it.mail
             }
         })
-
-        isNewFamily.observe(this, Observer { binding.isNewFamily = it })
 
         // TODO: require that an device name and an parent name are set
         val isInputValid = model.statusOfMailAddress.switchMap {
@@ -98,7 +94,7 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
             }
         }
 
-        isInputValid.observe(this, Observer {
+        isInputValid.observe(viewLifecycleOwner, Observer {
             binding.enableOkButton = it!!
         })
 

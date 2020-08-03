@@ -87,7 +87,7 @@ class SyncNotificationLogic (private val appLogic: AppLogic) {
         currentWarnings.addAll(manipulatedDevices.map { NotificationTypes.MANIPULATION to it })
         currentWarnings.addAll(outdatedDevices.map { NotificationTypes.UPDATE_MISSING to it })
 
-        if (fullVersionEndTime != null && fullVersionEndTime > now && !isChildDevice) {
+        if (fullVersionEndTime != null && fullVersionEndTime != 1L && fullVersionEndTime > now && !isChildDevice) {
             currentWarnings.add(NotificationTypes.PREMIUM_EXPIRES to "")
         }
 

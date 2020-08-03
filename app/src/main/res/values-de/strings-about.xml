@@ -34,6 +34,9 @@
     <string name="about_full_version_until">
         Die Vollversion ist gültig bis %s.
     </string>
+    <string name="about_full_version_always">
+        Der von Ihnen verwendete Server schränkt den Zugang zu den Funktionen der Vollversion nicht ein.
+    </string>
     <string name="about_full_version_tap_hint">
         Zum Erwerben oder Verlängern der Vollversion hier tippen.
     </string>

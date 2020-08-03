@@ -58,6 +58,8 @@ class AboutFragment : Fragment() {
             } else if (fullVersionUntil != null) {
                 if (fullVersionUntil == 0L) {
                     binding.fullVersionStatus = FullVersionStatus.Expired
+                } else if (fullVersionUntil == 1L) {
+                    binding.fullVersionStatus = FullVersionStatus.AlwaysAvailable
                 } else {
                     binding.fullVersionStatus = FullVersionStatus.Available
                     binding.fullVersionEndDate = DateUtils.formatDateTime(
@@ -69,7 +71,7 @@ class AboutFragment : Fragment() {
             }
         })
 
-        logic.database.config().getCustomServerUrlAsync().observe(this, Observer {
+        logic.database.config().getCustomServerUrlAsync().observe(viewLifecycleOwner, Observer {
             binding.customServerUrl = it
         })
 
@@ -79,7 +81,7 @@ class AboutFragment : Fragment() {
 
                 if (status == FullVersionStatus.Expired || status == FullVersionStatus.Available) {
                     listener.onShowPurchaseScreen()
-                } else if (status == FullVersionStatus.InLocalMode) {
+                } else if (status == FullVersionStatus.InLocalMode || status == FullVersionStatus.AlwaysAvailable) {
                     listener.onShowStayAwesomeScreen()
                 }
             }
@@ -123,7 +125,7 @@ interface AboutFragmentHandlers {
 }
 
 enum class FullVersionStatus {
-    InLocalMode, Available, Expired
+    InLocalMode, Available, Expired, AlwaysAvailable
 }
 
 interface AboutFragmentParentHandlers {

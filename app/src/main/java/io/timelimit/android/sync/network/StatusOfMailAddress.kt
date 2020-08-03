@@ -20,13 +20,15 @@ import android.util.JsonReader
 data class StatusOfMailAddressResponse(
         val mail: String,
         val status: StatusOfMailAddress,
-        val canCreateFamily: Boolean
+        val canCreateFamily: Boolean,
+        val alwaysPro: Boolean
 ) {
     companion object {
         fun parse(reader: JsonReader): StatusOfMailAddressResponse {
             var mail: String? = null
             var status: StatusOfMailAddress? = null
             var canCreateFamily = true
+            var alwaysPro = false
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -38,6 +40,7 @@ data class StatusOfMailAddressResponse(
                     }
                     "mail" -> mail = reader.nextString()
                     "canCreateFamily" -> canCreateFamily = reader.nextBoolean()
+                    "alwaysPro" -> alwaysPro = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -46,7 +49,8 @@ data class StatusOfMailAddressResponse(
             return StatusOfMailAddressResponse(
                     mail = mail!!,
                     status = status!!,
-                    canCreateFamily = canCreateFamily
+                    canCreateFamily = canCreateFamily,
+                    alwaysPro = alwaysPro
             )
         }
     }

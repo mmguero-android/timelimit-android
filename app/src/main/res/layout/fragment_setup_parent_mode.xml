@@ -30,6 +30,10 @@
             name="enableOkButton"
             type="Boolean" />
 
+        <variable
+            name="showLimitedProInfo"
+            type="boolean" />
+
         <import type="android.view.View" />
     </data>
 
@@ -121,6 +125,7 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:visibility="@{showLimitedProInfo ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceSmall"
                             android:text="@string/purchase_demo_temporarily_notice"
                             android:layout_width="match_parent"

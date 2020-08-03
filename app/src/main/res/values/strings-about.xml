@@ -34,6 +34,9 @@
     <string name="about_full_version_until">
         You have got the premium version until %s.
     </string>
+    <string name="about_full_version_always">
+        The server you are using does not limit the access to the features of the premium version.
+    </string>
     <string name="about_full_version_tap_hint">
         Tap here to buy or extend the premium version.
     </string>

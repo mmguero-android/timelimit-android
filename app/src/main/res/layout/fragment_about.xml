@@ -139,8 +139,15 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
+                        android:visibility="@{fullVersionStatus == FullVersionStatus.AlwaysAvailable ? View.VISIBLE : View.GONE}"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/about_full_version_always"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
                         tools:text="@string/about_full_version_tap_hint"
-                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode ? @string/about_sal_tap_hint : @string/about_full_version_tap_hint}"
+                        android:text="@{fullVersionStatus == FullVersionStatus.InLocalMode || fullVersionStatus == FullVersionStatus.AlwaysAvailable ? @string/about_sal_tap_hint : @string/about_full_version_tap_hint}"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
