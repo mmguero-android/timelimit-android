@@ -151,7 +151,9 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
     fun tryDefaultLogin(model: ActivityViewModel) {
         runAsync {
             loginLock.withLock {
-                logic.database.user().getParentUsersLive().waitForNonNullValue().singleOrNull()?.let { user ->
+                val allUsers = logic.database.user().getAllUsersLive().waitForNonNullValue()
+
+                allUsers.singleOrNull { it.type == UserType.Parent }?.let { user ->
                     val emptyPasswordValid = Threads.crypto.executeAndWait { PasswordHashing.validateSync("", user.password) }
                     val hasBlockedTimes = !user.blockedTimes.dataNotToModify.isEmpty
 
@@ -178,6 +180,12 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                         }
 
                         isLoginDone.value = true
+                    }
+                }
+
+                if (isLoginDone.value == false) {
+                    allUsers.singleOrNull { it.password.isNotEmpty() }?.let { user ->
+                        selectedUserId.value = user.id
                     }
                 }
             }
