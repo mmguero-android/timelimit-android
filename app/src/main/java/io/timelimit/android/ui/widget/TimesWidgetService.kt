@@ -18,6 +18,7 @@ package io.timelimit.android.ui.widget
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import androidx.lifecycle.LiveData
@@ -25,6 +26,7 @@ import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.manage.child.category.CategoryItemLeftPadding
 import io.timelimit.android.util.TimeTextUtil
 
 class TimesWidgetService: RemoteViewsService() {
@@ -72,6 +74,16 @@ class TimesWidgetService: RemoteViewsService() {
                     else
                         TimeTextUtil.remaining(category.remainingTimeToday.toInt(), this@TimesWidgetService)
             )
+
+            result.setViewPadding(
+                    R.id.widgetInnerContainer,
+                    // not much space here => / 2
+                    CategoryItemLeftPadding.calculate(category.level, this@TimesWidgetService) / 2,
+                    0, 0, 0
+            )
+
+            result.setViewVisibility(R.id.topPadding, if (position == 0) View.VISIBLE else View.GONE)
+            result.setViewVisibility(R.id.bottomPadding, if (position == count - 1) View.VISIBLE else View.GONE)
 
             return result
         }

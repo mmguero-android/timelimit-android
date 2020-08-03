@@ -15,86 +15,103 @@
  */
 package io.timelimit.android.ui.widget
 
-import android.util.SparseLongArray
 import androidx.lifecycle.LiveData
-import io.timelimit.android.data.extensions.mapToTimezone
-import io.timelimit.android.data.model.getCurrentTimeSlotStartMinute
-import io.timelimit.android.data.model.getSlotSwitchMinutes
-import io.timelimit.android.date.DateInTimezone
-import io.timelimit.android.date.getMinuteOfWeek
-import io.timelimit.android.extensions.MinuteOfDay
+import androidx.lifecycle.MediatorLiveData
+import io.timelimit.android.async.Threads
+import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromFunction
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
-import io.timelimit.android.logic.RemainingTime
+import io.timelimit.android.logic.RealTime
+import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
 
 object TimesWidgetItems {
     fun with(logic: AppLogic): LiveData<List<TimesWidgetItem>> {
-        val userEntry = logic.deviceUserEntry
-        val userId = logic.deviceUserId
-        val userTimezone = userEntry.mapToTimezone()
-        val userDate = userTimezone.switchMap { timeZone ->
-            liveDataFromFunction { DateInTimezone.newInstance(logic.realTimeLogic.getCurrentTimeInMillis(), timeZone) }
-        }.ignoreUnchanged()
-        val userMinuteOfWeek = userTimezone.switchMap { timeZone ->
-            liveDataFromFunction {
-                getMinuteOfWeek(logic.realTimeLogic.getCurrentTimeInMillis(), timeZone)
+        val database = logic.database
+        val realTimeLogic = logic.realTimeLogic
+        val categoryHandlingCache = CategoryHandlingCache()
+        val realTime = RealTime.newInstance()
+        val handler = Threads.mainThreadHandler
+
+        val deviceAndUserRelatedDataLive = database.derivedDataDao().getUserAndDeviceRelatedDataLive()
+        var deviceAndUserRelatedDataLiveLoaded = false
+
+        val batteryStatusLive = logic.platformIntegration.getBatteryStatusLive()
+
+        lateinit var timeModificationListener: () -> Unit
+        lateinit var updateByClockRunnable: Runnable
+        var isActive = false
+
+        val newResult = object: MediatorLiveData<List<TimesWidgetItem>>() {
+            override fun onActive() {
+                super.onActive()
+
+                isActive = true
+
+                realTimeLogic.registerTimeModificationListener(timeModificationListener)
+
+                // ensure that the next update gets scheduled
+                updateByClockRunnable.run()
             }
-        }.ignoreUnchanged()
-        val categories = userId.switchMap { logic.database.category().getCategoriesByChildId(it) }
-        val usedTimeItemsForWeek = userDate.switchMap { date ->
-            categories.switchMap { categories ->
-                logic.database.usedTimes().getUsedTimesByDayAndCategoryIds(
-                        categoryIds = categories.map { it.id },
-                        startingDayOfEpoch = date.dayOfEpoch - date.dayOfWeek,
-                        endDayOfEpoch = date.dayOfEpoch - date.dayOfWeek + 6
+
+            override fun onInactive() {
+                super.onInactive()
+
+                isActive = true
+
+                realTimeLogic.unregisterTimeModificationListener(timeModificationListener)
+                handler.removeCallbacks(updateByClockRunnable)
+            }
+        }
+
+        fun update() {
+            handler.removeCallbacks(updateByClockRunnable)
+
+            if (!deviceAndUserRelatedDataLiveLoaded) { return }
+
+            val deviceAndUserRelatedData = deviceAndUserRelatedDataLive.value
+            val userRelatedData = deviceAndUserRelatedData?.userRelatedData
+
+            if (userRelatedData == null) {
+                newResult.value = emptyList(); return
+            }
+
+            categoryHandlingCache.reportStatus(
+                    user = userRelatedData,
+                    timeInMillis = realTime.timeInMillis,
+                    batteryStatus = logic.platformIntegration.getBatteryStatus(),
+                    shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
+                    assumeCurrentDevice = true
+            )
+
+            var maxTime = Long.MAX_VALUE
+
+            val list = userRelatedData.sortedCategories().map { (level, category) ->
+                val handling = categoryHandlingCache.get(categoryId = category.category.id)
+
+                maxTime = maxTime.coerceAtMost(handling.dependsOnMaxTime)
+
+                TimesWidgetItem(
+                        title = category.category.title,
+                        level = level,
+                        remainingTimeToday = handling.remainingTime?.includingExtraTime
                 )
             }
-        }
-        val timeLimitRules = categories.switchMap { categories ->
-            logic.database.timeLimitRules().getTimeLimitRulesByCategories(
-                    categories.map { category -> category.id }
-            )
-        }
-        val timeLimitSlot = timeLimitRules.map { it.getSlotSwitchMinutes() }.switchMap {
-            userMinuteOfWeek.switchMap { minuteOfWeek ->
-                getCurrentTimeSlotStartMinute(it, userMinuteOfWeek.map { it % MinuteOfDay.LENGTH })
+
+            newResult.value = list
+
+            if (isActive && maxTime != Long.MAX_VALUE) {
+                val delay = maxTime - realTime.timeInMillis
+
+                handler.postDelayed(updateByClockRunnable, delay)
             }
         }
-        val categoryItems = categories.switchMap { categories ->
-            timeLimitRules.switchMap { timeLimitRules ->
-                timeLimitSlot.switchMap { timeLimitSlot ->
-                    userDate.switchMap { childDate ->
-                        usedTimeItemsForWeek.map { usedTimeItemsForWeek ->
-                            val rulesByCategoryId = timeLimitRules.groupBy { rule -> rule.categoryId }
-                            val usedTimesByCategory = usedTimeItemsForWeek.groupBy { item -> item.categoryId }
-                            val firstDayOfWeek = childDate.dayOfEpoch - childDate.dayOfWeek
 
-                            categories.map { category ->
-                                val rules = rulesByCategoryId[category.id] ?: emptyList()
-                                val usedTimeItemsForCategory = usedTimesByCategory[category.id]
-                                        ?: emptyList()
+        timeModificationListener = { update() }
+        updateByClockRunnable = Runnable { update() }
 
-                                TimesWidgetItem(
-                                        title = category.title,
-                                        remainingTimeToday = RemainingTime.getRemainingTime(
-                                                dayOfWeek = childDate.dayOfWeek,
-                                                usedTimes = usedTimeItemsForCategory,
-                                                rules = rules,
-                                                extraTime = category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
-                                                minuteOfDay = timeLimitSlot,
-                                                firstDayOfWeekAsEpochDay = firstDayOfWeek
-                                        )?.includingExtraTime
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }.ignoreUnchanged()
+        newResult.addSource(deviceAndUserRelatedDataLive) { deviceAndUserRelatedDataLiveLoaded = true; update() }
+        newResult.addSource(batteryStatusLive) { update() }
 
-        return categoryItems
+        return newResult.ignoreUnchanged()
     }
 }

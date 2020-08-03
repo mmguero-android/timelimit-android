@@ -13,10 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.widget
 
-data class TimesWidgetItem(
-        val title: String,
-        val level: Int,
-        val remainingTimeToday: Long?
-)
+package io.timelimit.android.ui.manage.child.category
+
+import android.content.Context
+import kotlin.math.log2
+import kotlin.math.roundToInt
+
+object CategoryItemLeftPadding {
+    fun calculate(level: Int, context: Context) = (context.resources.displayMetrics.density * 32.0 * log2((level + 1).toDouble())).roundToInt()
+}

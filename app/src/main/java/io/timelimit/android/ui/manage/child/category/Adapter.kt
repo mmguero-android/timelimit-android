@@ -129,7 +129,7 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
                 }
                 binding.usedForAppsWithoutCategory = item.usedForNotAssignedApps
                 binding.leftSpace.layoutParams = LinearLayout.LayoutParams(
-                        (context.resources.displayMetrics.density * 32.0 * log2((item.categoryNestingLevel + 1).toDouble())).roundToInt(),
+                        CategoryItemLeftPadding.calculate(item.categoryNestingLevel, context),
                         0
                 )
 
