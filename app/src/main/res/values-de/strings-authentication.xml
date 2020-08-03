@@ -14,8 +14,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="authentication_required_overlay_title">Authentifizierung erforderlich</string>
-    <string name="authentication_required_overlay_text">Verwenden Sie zum Authentifizieren diesen Button</string>
+    <string name="authentication_required_overlay_title">Melden Sie sich an, um Einstellungen zu ändern</string>
+    <string name="authentication_required_overlay_text">Die Einstellungen werden wieder gesperrt, wenn Sie TimeLimit verlassen</string>
 
     <string name="authenticate_by_mail_text">
         Zum Fortfahren wird eine E-Mail-Adresse sowie der Nachweis, dass Sie zu dieser Zugang haben, benötigt

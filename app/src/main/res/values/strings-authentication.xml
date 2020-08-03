@@ -14,8 +14,8 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="authentication_required_overlay_title">Authentication required</string>
-    <string name="authentication_required_overlay_text">Use this button to authenticate</string>
+    <string name="authentication_required_overlay_title">Sign in to change settings</string>
+    <string name="authentication_required_overlay_text">The settings will be locked again when you leave TimeLimit</string>
 
     <string name="authenticate_by_mail_text">
         To continue, you need an e-mail address to which you have got access
