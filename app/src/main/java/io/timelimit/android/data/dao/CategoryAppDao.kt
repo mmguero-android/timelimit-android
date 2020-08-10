@@ -26,6 +26,9 @@ abstract class CategoryAppDao {
     @Query("SELECT * FROM category_app WHERE category_id IN (:categoryIds) AND package_name = :packageName")
     abstract fun getCategoryApp(categoryIds: List<String>, packageName: String): LiveData<CategoryApp?>
 
+    @Query("SELECT * FROM category_app WHERE category_id IN (:categoryIds) AND package_name = :packageName")
+    abstract fun getCategoryAppSync(categoryIds: List<String>, packageName: String): CategoryApp?
+
     @Query("SELECT * FROM category_app WHERE category_id = :categoryId")
     abstract fun getCategoryApps(categoryId: String): LiveData<List<CategoryApp>>
 

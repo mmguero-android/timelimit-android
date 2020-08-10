@@ -335,11 +335,12 @@ object LocalDatabaseAppLogicActionDispatcher {
                     }
 
                     LocalDatabaseParentActionDispatcher.dispatchParentActionSync(
-                            SetDeviceUserAction(
+                            action = SetDeviceUserAction(
                                     deviceId = deviceEntry.id,
                                     userId = deviceEntry.defaultUser
                             ),
-                            database
+                            database = database,
+                            fromChildSelfLimitAddChildUserId = null
                     )
 
                     null

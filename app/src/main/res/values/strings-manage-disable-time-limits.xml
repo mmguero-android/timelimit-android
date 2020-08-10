@@ -30,4 +30,5 @@
 
     <string name="manage_disable_time_limits_dialog_until">Disable time limits until ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">The selected time is in the past</string>
+    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">The time may be increased but not decreased without a parent who signs in</string>
 </resources>

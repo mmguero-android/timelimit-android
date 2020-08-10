@@ -49,7 +49,7 @@ object ParentCategoryView {
         })
 
         binding.selectParentButton.setOnClickListener {
-            if (auth.requestAuthenticationOrReturnTrue()) {
+            if (auth.requestAuthenticationOrReturnTrueAllowChild(childId)) {
                 SelectParentCategoryDialogFragment.newInstance(
                         childId = childId,
                         categoryId = categoryId

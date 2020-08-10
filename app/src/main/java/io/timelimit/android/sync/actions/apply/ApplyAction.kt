@@ -219,23 +219,37 @@ object ApplyActionUtil {
     suspend fun applyParentAction(action: ParentAction, database: Database, authentication: ApplyActionParentAuthentication, syncUtil: SyncUtil, platformIntegration: PlatformIntegration) {
         Threads.database.executeAndWait {
             database.runInTransaction {
-                val deviceUserIdBeforeDispatchingForDeviceAuth = if (authentication is ApplyActionParentDeviceAuthentication) {
+                val deviceUserIdBeforeDispatchingForDeviceAuth = if (authentication is ApplyActionParentDeviceAuthentication || authentication is ApplyActionChildAddLimitAuthentication) {
                     val deviceId = database.config().getOwnDeviceIdSync()!!
                     val device = database.device().getDeviceByIdSync(deviceId)!!
                     val user = database.user().getUserByIdSync(device.currentUserId)
 
-                    if (user?.type != UserType.Parent) {
-                        throw IllegalStateException("no parent assigned to device")
-                    }
+                    if (authentication is ApplyActionParentDeviceAuthentication) {
+                        if (user?.type != UserType.Parent) {
+                            throw IllegalStateException("no parent assigned to device")
+                        }
 
-                    if (!device.isUserKeptSignedIn) {
-                        throw IllegalArgumentException("user is not kept signed in")
+                        if (!device.isUserKeptSignedIn) {
+                            throw IllegalArgumentException("user is not kept signed in")
+                        }
+                    } else if (authentication is ApplyActionChildAddLimitAuthentication) {
+                        if (user?.type != UserType.Child) {
+                            throw IllegalStateException("no child assigned to device")
+                        } else if (!user.allowSelfLimitAdding) {
+                            throw IllegalStateException("this child may not add limits by itself")
+                        }
+                    } else {
+                        throw IllegalStateException()
                     }
 
                     user.id
                 } else null
 
-                LocalDatabaseParentActionDispatcher.dispatchParentActionSync(action, database)
+                LocalDatabaseParentActionDispatcher.dispatchParentActionSync(
+                        action = action,
+                        database = database,
+                        fromChildSelfLimitAddChildUserId = if (authentication is ApplyActionChildAddLimitAuthentication) deviceUserIdBeforeDispatchingForDeviceAuth else null
+                )
 
                 if (action is SetDeviceUserAction) {
                     val thisDeviceId = database.config().getOwnDeviceIdSync()!!
@@ -282,6 +296,16 @@ object ApplyActionUtil {
                                     sequenceNumber = sequenceNumber,
                                     encodedAction = serializedAction,
                                     integrity = "device",
+                                    scheduledForUpload = false,
+                                    type = PendingSyncActionType.Parent,
+                                    userId = deviceUserIdBeforeDispatchingForDeviceAuth!!
+                            )
+                        }
+                        ApplyActionChildAddLimitAuthentication -> {
+                            PendingSyncAction(
+                                    sequenceNumber = sequenceNumber,
+                                    encodedAction = serializedAction,
+                                    integrity = "childDevice",
                                     scheduledForUpload = false,
                                     type = PendingSyncActionType.Parent,
                                     userId = deviceUserIdBeforeDispatchingForDeviceAuth!!
@@ -355,6 +379,7 @@ object ApplyActionUtil {
 
 sealed class ApplyActionParentAuthentication
 object ApplyActionParentDeviceAuthentication: ApplyActionParentAuthentication()
+object ApplyActionChildAddLimitAuthentication: ApplyActionParentAuthentication()
 data class ApplyActionParentPasswordAuthentication(val parentUserId: String, val secondPasswordHash: String): ApplyActionParentAuthentication()
 
 data class ApplyActionChildAuthentication(val childUserId: String, val secondPasswordHash: String)

@@ -168,6 +168,9 @@ data class User(
     val restrictViewingToParents: Boolean
         get() = flags and UserFlags.RESTRICT_VIEWING_TO_PARENTS == UserFlags.RESTRICT_VIEWING_TO_PARENTS
 
+    val allowSelfLimitAdding: Boolean
+        get() = flags and UserFlags.ALLOW_SELF_LIMIT_ADD == UserFlags.ALLOW_SELF_LIMIT_ADD
+
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 
@@ -220,5 +223,6 @@ class UserTypeConverter {
 
 object UserFlags {
     const val RESTRICT_VIEWING_TO_PARENTS = 1L
-    const val ALL_FLAGS = RESTRICT_VIEWING_TO_PARENTS
+    const val ALLOW_SELF_LIMIT_ADD = 2L
+    const val ALL_FLAGS = RESTRICT_VIEWING_TO_PARENTS or ALLOW_SELF_LIMIT_ADD
 }

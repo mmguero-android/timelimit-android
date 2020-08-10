@@ -98,8 +98,9 @@ object ApplyServerDataStatus {
                             oldUserId ->
 
                             LocalDatabaseParentActionDispatcher.dispatchParentActionSync(
-                                    RemoveUserAction(userId = oldUserId, authentication = null),
-                                    database
+                                    action = RemoveUserAction(userId = oldUserId, authentication = null),
+                                    database = database,
+                                    fromChildSelfLimitAddChildUserId = null
                             )
                         }
                     }
@@ -287,10 +288,11 @@ object ApplyServerDataStatus {
                         // category was likely deleted with the user, ignore it
                     } else {
                         LocalDatabaseParentActionDispatcher.dispatchParentActionSync(
-                                DeleteCategoryAction(
+                                action = DeleteCategoryAction(
                                         categoryId = categoryId
                                 ),
-                                database
+                                database = database,
+                                fromChildSelfLimitAddChildUserId = null
                         )
                     }
                 }

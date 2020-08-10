@@ -26,6 +26,10 @@
             name="emptyViewText"
             type="String" />
 
+        <variable
+            name="someOptionsDisabledDueToChildAuthentication"
+            type="boolean" />
+
         <import type="android.text.TextUtils" />
         <import type="android.view.View" />
     </data>
@@ -74,6 +78,16 @@
             android:text="@{hiddenEntries}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <TextView
+            android:visibility="@{someOptionsDisabledDueToChildAuthentication ? View.VISIBLE : View.GONE}"
+            android:drawablePadding="8dp"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:padding="8dp"
+            android:text="@string/child_self_limit_add_caused_missing_options_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:drawableStartCompat="@drawable/ic_vpn_key_black_24dp" />
 
         <LinearLayout
             android:orientation="horizontal"

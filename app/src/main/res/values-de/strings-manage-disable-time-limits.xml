@@ -30,4 +30,5 @@
 
     <string name="manage_disable_time_limits_dialog_until">Zeitbegrenzungen deaktivieren bis ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">Der gewählte Zeitpunkt liegt in der Vergangenheit</string>
+    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">Ohne Anmeldung als Elternteil darf die Zeit verlängert werden, aber nicht verkürzt werden</string>
 </resources>

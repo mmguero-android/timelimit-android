@@ -17,13 +17,24 @@ package io.timelimit.android.sync.actions.dispatch
 
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.customtypes.ImmutableBitmask
+import io.timelimit.android.data.extensions.getCategoryWithParentCategories
 import io.timelimit.android.data.extensions.getChildCategories
 import io.timelimit.android.data.model.*
 import io.timelimit.android.sync.actions.*
 import java.util.*
 
 object LocalDatabaseParentActionDispatcher {
-    fun dispatchParentActionSync(action: ParentAction, database: Database) {
+    fun dispatchParentActionSync(action: ParentAction, database: Database, fromChildSelfLimitAddChildUserId: String?) {
+        if (fromChildSelfLimitAddChildUserId != null) {
+            val isSupportedAction = action is CreateTimeLimitRuleAction || action is CreateCategoryAction ||
+                    action is UpdateCategoryBlockAllNotificationsAction || action is SetParentCategory ||
+                    action is AddCategoryAppsAction || action is UpdateCategoryTemporarilyBlockedAction
+
+            if (!isSupportedAction) {
+                throw RuntimeException("unsupported action for the child limit self mode")
+            }
+        }
+
         database.runInTransaction {
             when (action) {
                 is AddCategoryAppsAction -> {
@@ -31,8 +42,51 @@ object LocalDatabaseParentActionDispatcher {
                     val categoryEntry = database.category().getCategoryByIdSync(action.categoryId)
                             ?: throw IllegalArgumentException("category with the specified id does not exist")
 
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (categoryEntry.childId != fromChildSelfLimitAddChildUserId) {
+                            throw RuntimeException("can not add apps to other users")
+                        }
+                    }
+
                     // remove same apps from other categories of the same child
                     val allCategoriesOfChild = database.category().getCategoriesByChildIdSync(categoryEntry.childId)
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        val parentCategoriesOfTargetCategory = allCategoriesOfChild.getCategoryWithParentCategories(action.categoryId)
+                        val userEntry = database.user().getUserByIdSync(fromChildSelfLimitAddChildUserId) ?: throw RuntimeException("user not found")
+                        val validatedDefaultCategoryId = (allCategoriesOfChild.find {
+                            it.id == userEntry.categoryForNotAssignedApps
+                        })?.id
+                        val allowUnassignedElements = parentCategoriesOfTargetCategory.contains(validatedDefaultCategoryId)
+                        val userCategoryIds = allCategoriesOfChild.map { it.id }
+
+                        fun assertCanAddApp(packageName: String, isApp: Boolean) {
+                            val categoryAppEntry = database.categoryApp().getCategoryAppSync(categoryIds = userCategoryIds, packageName = packageName)
+
+                            if (categoryAppEntry == null) {
+                                if ((isApp && allowUnassignedElements) || (!isApp)) {
+                                    // allow
+                                } else {
+                                    throw RuntimeException("can not assign apps without category as child")
+                                }
+                            } else {
+                                if (parentCategoriesOfTargetCategory.contains(categoryAppEntry.categoryId)) {
+                                    // allow
+                                } else {
+                                    throw RuntimeException("can not add app which is not contained in the parent category")
+                                }
+                            }
+                        }
+
+                        action.packageNames.forEach { packageName ->
+                            if (packageName.contains(":")) {
+                                assertCanAddApp(packageName.substring(0, packageName.indexOf(":")), true)
+                                assertCanAddApp(packageName, false)
+                            } else {
+                                assertCanAddApp(packageName, true)
+                            }
+                        }
+                    }
 
                     database.categoryApp().removeCategoryAppsSyncByCategoryIds(
                             packageNames = action.packageNames,
@@ -60,6 +114,12 @@ object LocalDatabaseParentActionDispatcher {
                 }
                 is CreateCategoryAction -> {
                     DatabaseValidation.assertChildExists(database, action.childId)
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (action.childId != fromChildSelfLimitAddChildUserId) {
+                            throw RuntimeException("can not create categories for other child users")
+                        }
+                    }
 
                     // create the category
                     val sort = database.category().getNextCategorySortKeyByChildId(action.childId)
@@ -147,7 +207,24 @@ object LocalDatabaseParentActionDispatcher {
                     null
                 }
                 is UpdateCategoryTemporarilyBlockedAction -> {
-                    DatabaseValidation.assertCategoryExists(database, action.categoryId)
+                    val category = database.category().getCategoryByIdSync(action.categoryId)
+                            ?: throw IllegalArgumentException("category with the specified id does not exist")
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (category.childId != fromChildSelfLimitAddChildUserId) {
+                            throw RuntimeException("can not add limits for different child")
+                        }
+
+                        if (action.endTime == null || !action.blocked) {
+                            throw RuntimeException("the child may only enable a temporarily blocking")
+                        }
+
+                        if (category.temporarilyBlocked) {
+                            if (action.endTime < category.temporarilyBlockedEndTime || category.temporarilyBlockedEndTime == 0L) {
+                                throw RuntimeException("the child may not reduce the temporarily blocking")
+                            }
+                        }
+                    }
 
                     database.category().updateCategoryTemporarilyBlocked(
                             categoryId = action.categoryId,
@@ -184,7 +261,14 @@ object LocalDatabaseParentActionDispatcher {
                     database.category().updateCategoryBlockedTimes(action.categoryId, action.blockedTimes)
                 }
                 is CreateTimeLimitRuleAction -> {
-                    DatabaseValidation.assertCategoryExists(database, action.rule.categoryId)
+                    val category = database.category().getCategoryByIdSync(action.rule.categoryId)
+                            ?: throw IllegalArgumentException("category with the specified id does not exist")
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (fromChildSelfLimitAddChildUserId != category.childId) {
+                            throw IllegalArgumentException("can not add rules for other users")
+                        }
+                    }
 
                     database.timeLimitRules().addTimeLimitRule(action.rule)
                 }
@@ -269,10 +353,11 @@ object LocalDatabaseParentActionDispatcher {
                             category ->
 
                             dispatchParentActionSync(
-                                    DeleteCategoryAction(
+                                    action = DeleteCategoryAction(
                                             categoryId = category.id
                                     ),
-                                    database
+                                    database = database,
+                                    fromChildSelfLimitAddChildUserId = null
                             )
                         }
                     }
@@ -374,6 +459,12 @@ object LocalDatabaseParentActionDispatcher {
                 is SetParentCategory -> {
                     val category = database.category().getCategoryByIdSync(action.categoryId)!!
 
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (category.childId != fromChildSelfLimitAddChildUserId) {
+                            throw RuntimeException("can not set parent category for other user")
+                        }
+                    }
+
                     if (action.parentCategory.isNotEmpty()) {
                         val categories = database.category().getCategoriesByChildIdSync(category.childId)
 
@@ -384,6 +475,15 @@ object LocalDatabaseParentActionDispatcher {
 
                         if (childCategoryIds.contains(action.parentCategory) || action.parentCategory == action.categoryId) {
                             throw IllegalArgumentException("can not set a category as parent which is a child of the category")
+                        }
+
+                        if (fromChildSelfLimitAddChildUserId != null) {
+                            val ownParentCategory = categories.find { it.id == category.parentCategoryId }
+                            val enableDueToLimitAddingWhenChild = ownParentCategory == null || categories.getCategoryWithParentCategories(action.parentCategory).contains(ownParentCategory.id)
+
+                            if (!enableDueToLimitAddingWhenChild) {
+                                throw RuntimeException("can not change parent categories in a way which reduces limits")
+                            }
                         }
                     }
 
@@ -504,6 +604,16 @@ object LocalDatabaseParentActionDispatcher {
                 is UpdateCategoryBlockAllNotificationsAction -> {
                     val categoryEntry = database.category().getCategoryByIdSync(action.categoryId)
                             ?: throw IllegalArgumentException("can not update notification blocking for non exsistent category")
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (fromChildSelfLimitAddChildUserId != categoryEntry.childId) {
+                            throw RuntimeException("can not enable filter for other child user")
+                        }
+
+                        if (!action.blocked) {
+                            throw RuntimeException("can not disable filter as child")
+                        }
+                    }
 
                     database.category().updateCategorySync(
                             categoryEntry.copy(

@@ -77,7 +77,7 @@ class CategorySettingsFragment : Fragment() {
                 childId = params.childId,
                 database = appLogic.database,
                 auth = auth,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         CategoryBatteryLimitView.bind(
@@ -86,7 +86,7 @@ class CategorySettingsFragment : Fragment() {
                 category = categoryEntry,
                 auth = auth,
                 categoryId = params.categoryId,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         ParentCategoryView.bind(
@@ -95,16 +95,17 @@ class CategorySettingsFragment : Fragment() {
                 categoryId = params.categoryId,
                 childId = params.childId,
                 database = appLogic.database,
-                fragmentManager = fragmentManager!!,
+                fragmentManager = parentFragmentManager,
                 auth = auth
         )
 
         CategoryNotificationFilter.bind(
                 view = binding.notificationFilter,
                 lifecycleOwner = this,
-                fragmentManager = fragmentManager!!,
+                fragmentManager = parentFragmentManager,
                 auth = auth,
-                categoryLive = categoryEntry
+                categoryLive = categoryEntry,
+                childId = params.childId
         )
 
         CategoryTimeWarningView.bind(
@@ -112,7 +113,7 @@ class CategorySettingsFragment : Fragment() {
                 auth = auth,
                 categoryLive = categoryEntry,
                 lifecycleOwner = this,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }
@@ -122,7 +123,7 @@ class CategorySettingsFragment : Fragment() {
             HelpDialogFragment.newInstance(
                     title = R.string.category_settings_extra_time_title,
                     text = R.string.category_settings_extra_time_info
-            ).show(fragmentManager!!)
+            ).show(parentFragmentManager)
         }
 
         fun updateEditExtraTimeConfirmButtonVisibility() {
@@ -180,7 +181,7 @@ class CategorySettingsFragment : Fragment() {
                         binding.extraTimeBtnOk.visibility = View.GONE
                     }
                 } else {
-                    RequiresPurchaseDialogFragment().show(fragmentManager!!)
+                    RequiresPurchaseDialogFragment().show(parentFragmentManager)
                 }
             }
         })
@@ -210,13 +211,13 @@ class CategorySettingsFragment : Fragment() {
 
     private fun renameCategory() {
         if (auth.requestAuthenticationOrReturnTrue()) {
-            RenameCategoryDialogFragment.newInstance(params).show(fragmentManager!!)
+            RenameCategoryDialogFragment.newInstance(params).show(parentFragmentManager)
         }
     }
 
     private fun deleteCategory() {
         if (auth.requestAuthenticationOrReturnTrue()) {
-            DeleteCategoryDialogFragment.newInstance(params).show(fragmentManager!!)
+            DeleteCategoryDialogFragment.newInstance(params).show(parentFragmentManager)
         }
     }
 }

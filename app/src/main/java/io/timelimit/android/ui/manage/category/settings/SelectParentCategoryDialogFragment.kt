@@ -26,12 +26,15 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.timelimit.android.R
 import io.timelimit.android.data.Database
+import io.timelimit.android.data.extensions.getCategoryWithParentCategories
 import io.timelimit.android.data.extensions.getChildCategories
 import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.databinding.BottomSheetSelectionListBinding
 import io.timelimit.android.extensions.showSafe
+import io.timelimit.android.livedata.map
+import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.SetParentCategory
@@ -61,16 +64,6 @@ class SelectParentCategoryDialogFragment: BottomSheetDialogFragment() {
 
     val userRelatedData: LiveData<UserRelatedData?> by lazy { database.derivedDataDao().getUserRelatedDataLive(childId) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        auth.authenticatedUser.observe(this, Observer {
-            if (it?.second?.type != UserType.Parent) {
-                dismissAllowingStateLoss()
-            }
-        })
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = BottomSheetSelectionListBinding.inflate(inflater, container, false)
 
@@ -78,66 +71,90 @@ class SelectParentCategoryDialogFragment: BottomSheetDialogFragment() {
 
         val list = binding.list
 
-        userRelatedData.observe(viewLifecycleOwner, Observer { userRelatedData ->
-            val ownCategory = userRelatedData?.categoryById?.get(categoryId) ?: kotlin.run {
-                dismissAllowingStateLoss()
-                return@Observer
-            }
-            val ownParentCategory = userRelatedData.categoryById[ownCategory.category.parentCategoryId]
-            val currentChildCategories = userRelatedData.getChildCategories(ownCategory.category.id)
+        userRelatedData
+                .switchMap { a -> auth.authenticatedUserOrChild.map { b -> a to b } }
+                .observe(viewLifecycleOwner, Observer { (userRelatedData, authenticatedUser) ->
+                    authenticatedUser ?: kotlin.run { dismissAllowingStateLoss(); return@Observer }
 
-            list.removeAllViews()
+                    val ownCategory = userRelatedData?.categoryById?.get(categoryId) ?: kotlin.run {
+                        dismissAllowingStateLoss()
+                        return@Observer
+                    }
+                    val ownParentCategory = userRelatedData.categoryById[ownCategory.category.parentCategoryId]
+                    val currentChildCategories = userRelatedData.getChildCategories(ownCategory.category.id)
 
-            fun buildRow(): CheckedTextView = LayoutInflater.from(context!!).inflate(
-                    android.R.layout.simple_list_item_single_choice,
-                    list,
-                    false
-            ) as CheckedTextView
+                    val parentAuthenticated = authenticatedUser.second.type == UserType.Parent
+                    val childAuthenticated = authenticatedUser.second.type == UserType.Child && authenticatedUser.second.id == childId
+                    val anyoneAuthenticated = parentAuthenticated || childAuthenticated
 
-            userRelatedData.sortedCategories().forEach { (_, category) ->
-                if (category.category.id != categoryId) {
-                    val row = buildRow()
+                    if (!anyoneAuthenticated) { dismissAllowingStateLoss(); return@Observer }
 
-                    row.text = category.category.title
-                    row.isChecked = category.category.id == ownCategory.category.parentCategoryId
-                    row.isEnabled = !currentChildCategories.contains(category.category.id)
-                    row.setOnClickListener {
-                        if (!row.isChecked) {
-                            auth.tryDispatchParentAction(
-                                    SetParentCategory(
-                                            categoryId = categoryId,
-                                            parentCategory = category.category.id
+                    list.removeAllViews()
+
+                    fun buildRow(): CheckedTextView = LayoutInflater.from(context!!).inflate(
+                            android.R.layout.simple_list_item_single_choice,
+                            list,
+                            false
+                    ) as CheckedTextView
+
+                    var someOptionsDisabledDueToChildAuthentication = false
+
+                    userRelatedData.sortedCategories().forEach { (_, category) ->
+                        if (category.category.id != categoryId) {
+                            val row = buildRow()
+
+                            val enableDueToRecursion = !currentChildCategories.contains(category.category.id)
+                            val enableDueToLimitAddingWhenChild = ownParentCategory == null || userRelatedData.getCategoryWithParentCategories(category.category.id).contains(ownParentCategory.category.id)
+                            val enableDueToLimitAdding = parentAuthenticated || enableDueToLimitAddingWhenChild
+                            val enableRow = enableDueToRecursion && enableDueToLimitAdding
+                            someOptionsDisabledDueToChildAuthentication = someOptionsDisabledDueToChildAuthentication || (enableDueToRecursion && !enableDueToLimitAdding)
+
+                            row.text = category.category.title
+                            row.isChecked = category.category.id == ownCategory.category.parentCategoryId
+                            row.isEnabled = enableRow
+                            row.setOnClickListener {
+                                if (!row.isChecked) {
+                                    auth.tryDispatchParentAction(
+                                            action = SetParentCategory(
+                                                    categoryId = categoryId,
+                                                    parentCategory = category.category.id
+                                            ),
+                                            allowAsChild = true
                                     )
-                            )
+                                }
+
+                                dismiss()
+                            }
+
+                            list.addView(row)
+                        }
+                    }
+
+                    buildRow().let { row ->
+                        row.setText(R.string.category_settings_parent_category_none)
+                        row.isChecked = ownParentCategory == null
+                        row.isEnabled = parentAuthenticated || ownParentCategory == null
+                        someOptionsDisabledDueToChildAuthentication = someOptionsDisabledDueToChildAuthentication || (!row.isEnabled)
+
+                        row.setOnClickListener {
+                            if (!row.isChecked) {
+                                auth.tryDispatchParentAction(
+                                        action = SetParentCategory(
+                                                categoryId = categoryId,
+                                                parentCategory = ""
+                                        ),
+                                        allowAsChild = true
+                                )
+                            }
+
+                            dismiss()
                         }
 
-                        dismiss()
+                        list.addView(row)
                     }
 
-                    list.addView(row)
-                }
-            }
-
-            buildRow().let { row ->
-                row.setText(R.string.category_settings_parent_category_none)
-                row.isChecked = ownParentCategory == null
-
-                row.setOnClickListener {
-                    if (!row.isChecked) {
-                        auth.tryDispatchParentAction(
-                                SetParentCategory(
-                                        categoryId = categoryId,
-                                        parentCategory = ""
-                                )
-                        )
-                    }
-
-                    dismiss()
-                }
-
-                list.addView(row)
-            }
-        })
+                    binding.someOptionsDisabledDueToChildAuthentication = someOptionsDisabledDueToChildAuthentication
+                })
 
         return binding.root
     }

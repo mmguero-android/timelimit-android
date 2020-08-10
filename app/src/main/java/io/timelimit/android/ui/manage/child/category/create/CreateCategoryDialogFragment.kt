@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,11 +51,12 @@ class CreateCategoryDialogFragment: EditTextBottomSheetDialog() {
 
         if (text.isNotEmpty()) {
             auth.tryDispatchParentAction(
-                    CreateCategoryAction(
+                    action = CreateCategoryAction(
                             categoryId = IdGenerator.generateId(),
                             title = text,
                             childId = params.childId
-                    )
+                    ),
+                    allowAsChild = true
             )
         }
 

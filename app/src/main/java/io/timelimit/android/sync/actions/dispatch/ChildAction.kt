@@ -33,7 +33,8 @@ object LocalDatabaseChildActionDispatcher {
                                     deviceId = deviceId,
                                     userId = childId
                             ),
-                            database = database
+                            database = database,
+                            fromChildSelfLimitAddChildUserId = null
                     )
 
                     val userEntry = database.user().getUserByIdSync(childId)!!

@@ -79,6 +79,21 @@ fun UserRelatedData.getCategoryWithParentCategories(startCategoryId: String): Se
     return categoryIds
 }
 
+fun List<Category>.getCategoryWithParentCategories(startCategoryId: String): Set<String> {
+    val categoryById = this.associateBy { it.id }
+
+    val startCategory = categoryById[startCategoryId]!!
+    val categoryIds = mutableSetOf(startCategoryId)
+
+    var currentCategory: Category? = categoryById[startCategory.parentCategoryId]
+
+    while (currentCategory != null && categoryIds.add(currentCategory.id)) {
+        currentCategory = categoryById[currentCategory.parentCategoryId]
+    }
+
+    return categoryIds
+}
+
 fun List<Category>.getChildCategories(categoryId: String): Set<String> {
     if (this.find { it.id == categoryId } != null) {
         return emptySet()

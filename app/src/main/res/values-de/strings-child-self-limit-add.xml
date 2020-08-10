@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="child_self_limit_add_title">Selbsteinschränkungshinzufügung</string>
+    <string name="child_self_limit_add_switch">Erlaube es diesem Benutzer, Einschränkungen für sich selbst hinzuzufügen</string>
+    <string name="child_self_limit_add_help">Das ist bei der Selbstbeschränkung hilfreich.
+        Damit kann der Benutzer ohne sich als Elternteil anzumelden einige Beschränkungen hinzufügen:
+        \n- Hinzufügen von Zeitbegrenzungsregeln
+        \n- Kategorien erstellen
+        \n- Benachrichtigungsfilter für eine Kategorie aktivieren
+        \n- eine Oberkategorie wählen, sofern die Kategorie dabei weiter nach unten in der Hierarchie verschoben wird
+        \n- Apps zu einer Kategorie hinzufügen, sofern diese in einer Unterkategorie ihrer aktuellen Kategorie verschoben werden;
+        Apps ohne Kategorie können zu einer Unterkategorie der Kategorie für Apps ohne Kategorie hinzugefügt werden
+        \n- Kategorien vorübergehend Sperren/ vorübergehende Sperrung von Kategorien verlängern
+    </string>
+    <string name="child_self_limit_add_caused_missing_options_hint">
+        Einige Optionen sind nicht verfügbar, weil kein Elternteil angemeldet ist
+    </string>
+</resources>

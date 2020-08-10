@@ -38,6 +38,7 @@ import io.timelimit.android.ui.manage.child.advanced.limituserviewing.LimitUserV
 import io.timelimit.android.ui.manage.child.advanced.manageblocktemporarily.ManageBlockTemporarilyView
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.advanced.password.ManageChildPassword
+import io.timelimit.android.ui.manage.child.advanced.selflimitadd.ChildSelfLimitAddView
 import io.timelimit.android.ui.manage.child.advanced.timezone.UserTimezoneView
 import io.timelimit.android.ui.manage.child.primarydevice.PrimaryDeviceView
 import kotlin.concurrent.fixedRateTimer
@@ -86,7 +87,7 @@ class ManageChildAdvancedFragment : Fragment() {
         run {
             // disable time limits
 
-            mergeLiveData(childEntry, logic.fullVersion.shouldProvideFullVersionFunctions).observe(this, Observer {
+            mergeLiveData(childEntry, logic.fullVersion.shouldProvideFullVersionFunctions).observe(viewLifecycleOwner, Observer {
                 (child, hasFullVersion) ->
 
                 if (child != null) {
@@ -107,7 +108,7 @@ class ManageChildAdvancedFragment : Fragment() {
                 } else {
                     ManageDisableTimelimitsViewHelper.getDisabledUntilString(child, time, context!!)
                 }
-            }.observe(this, Observer {
+            }.observe(viewLifecycleOwner, Observer {
                 binding.disableTimeLimits.disableTimeLimitsUntilString = it
             })
         }
@@ -129,13 +130,13 @@ class ManageChildAdvancedFragment : Fragment() {
 
         binding.deleteUserButton.setOnClickListener {
             if (auth.requestAuthenticationOrReturnTrue()) {
-                DeleteChildDialogFragment.newInstance(params.childId).show(fragmentManager!!)
+                DeleteChildDialogFragment.newInstance(params.childId).show(parentFragmentManager)
             }
         }
 
         PrimaryDeviceView.bind(
                 view = binding.primaryDeviceView,
-                fragmentManager = fragmentManager!!,
+                fragmentManager = parentFragmentManager,
                 childId = params.childId,
                 lifecycleOwner = this,
                 logic = logic,
@@ -148,11 +149,20 @@ class ManageChildAdvancedFragment : Fragment() {
                 childEntry = childEntry,
                 lifecycleOwner = this,
                 auth = auth,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         LimitUserViewingView.bind(
                 view = binding.limitViewing,
+                auth = auth,
+                lifecycleOwner = viewLifecycleOwner,
+                fragmentManager = parentFragmentManager,
+                userEntry = childEntry,
+                userId = params.childId
+        )
+
+        ChildSelfLimitAddView.bind(
+                view = binding.selfLimitAdd,
                 auth = auth,
                 lifecycleOwner = viewLifecycleOwner,
                 fragmentManager = parentFragmentManager,

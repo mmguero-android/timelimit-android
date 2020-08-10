@@ -34,7 +34,8 @@ object CategoryNotificationFilter {
             auth: ActivityViewModel,
             categoryLive: LiveData<Category?>,
             lifecycleOwner: LifecycleOwner,
-            fragmentManager: FragmentManager
+            fragmentManager: FragmentManager,
+            childId: String
     ) {
         view.titleView.setOnClickListener {
             HelpDialogFragment.newInstance(
@@ -52,10 +53,18 @@ object CategoryNotificationFilter {
             view.checkbox.isChecked = shouldBeChecked
             view.checkbox.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked != shouldBeChecked) {
-                    if (isChecked && (hasPremium != true)) {
-                        RequiresPurchaseDialogFragment().show(fragmentManager)
-                        view.checkbox.isChecked = shouldBeChecked
-                    } else {
+                    if (isChecked) {
+                        if (hasPremium != true) {
+                            RequiresPurchaseDialogFragment().show(fragmentManager)
+                        } else if (auth.requestAuthenticationOrReturnTrueAllowChild(childId) && category != null) {
+                            EnableNotificationFilterDialogFragment.newInstance(
+                                    childId = childId,
+                                    categoryId = category.id
+                            ).show(fragmentManager)
+                        }
+
+                        view.checkbox.isChecked = false
+                    } else /* not isChecked */ {
                         if (
                                 category != null &&
                                 auth.tryDispatchParentAction(
@@ -67,7 +76,7 @@ object CategoryNotificationFilter {
                         ) {
                             // ok
                         } else {
-                            view.checkbox.isChecked = shouldBeChecked
+                            view.checkbox.isChecked = true
                         }
                     }
                 }

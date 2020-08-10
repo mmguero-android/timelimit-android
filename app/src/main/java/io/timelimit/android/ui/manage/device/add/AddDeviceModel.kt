@@ -23,12 +23,14 @@ import io.timelimit.android.livedata.castDown
 import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.livedata.waitUntilValueMatches
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.actions.apply.ApplyActionChildAddLimitAuthentication
 import io.timelimit.android.sync.actions.apply.ApplyActionParentDeviceAuthentication
 import io.timelimit.android.sync.actions.apply.ApplyActionParentPasswordAuthentication
 import io.timelimit.android.ui.main.ActivityViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import java.lang.RuntimeException
 
 class AddDeviceModel(application: Application): AndroidViewModel(application) {
     private val statusInternal = MutableLiveData<Status>()
@@ -77,6 +79,7 @@ class AddDeviceModel(application: Application): AndroidViewModel(application) {
                                 parentUserId = auth.parentUserId,
                                 parentPasswordSecondHash = auth.secondPasswordHash
                         )
+                        is ApplyActionChildAddLimitAuthentication -> throw RuntimeException("child can not do that")
                     }
 
                     statusInternal.value = ShowingToken(response.token)

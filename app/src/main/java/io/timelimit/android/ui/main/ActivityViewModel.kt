@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
@@ -32,10 +33,7 @@ import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.ParentAction
-import io.timelimit.android.sync.actions.apply.ApplyActionParentAuthentication
-import io.timelimit.android.sync.actions.apply.ApplyActionParentDeviceAuthentication
-import io.timelimit.android.sync.actions.apply.ApplyActionParentPasswordAuthentication
-import io.timelimit.android.sync.actions.apply.ApplyActionUtil
+import io.timelimit.android.sync.actions.apply.*
 
 class ActivityViewModel(application: Application): AndroidViewModel(application) {
     companion object {
@@ -81,7 +79,13 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
         }
     }.ignoreUnchanged()
 
-    val authenticatedUser = userWhichIsKeptSignedIn.switchMap { signedInUser ->
+    private val authenticatedChild: LiveData<Pair<ApplyActionParentAuthentication, User>?> = deviceUser.map { user ->
+        if (user?.type == UserType.Child && user.allowSelfLimitAdding) {
+            ApplyActionChildAddLimitAuthentication as ApplyActionParentAuthentication to user
+        } else null
+    }
+
+    val authenticatedUserOrChild: LiveData<Pair<ApplyActionParentAuthentication, User>?> = userWhichIsKeptSignedIn.switchMap { signedInUser ->
         if (signedInUser != null) {
             liveDataFromValue(
                     (ApplyActionParentDeviceAuthentication to signedInUser)
@@ -92,16 +96,18 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
                 authenticatedUser ->
 
                 if (authenticatedUser == null) {
-                    liveDataFromValue(null as Pair<ApplyActionParentAuthentication, User>?)
+                    authenticatedChild
                 } else {
-                    database.user().getUserByIdLive(authenticatedUser.userId).map {
+                    database.user().getUserByIdLive(authenticatedUser.userId).switchMap {
                         if (it == null || it.password != authenticatedUser.firstPasswordHash) {
-                            null as Pair<ApplyActionParentAuthentication, User>?
+                            authenticatedChild
                         } else {
-                            ApplyActionParentPasswordAuthentication(
-                                    parentUserId = authenticatedUser.userId,
-                                    secondPasswordHash = authenticatedUser.secondPasswordHash
-                            ) to it
+                            liveDataFromValue(
+                                    (ApplyActionParentPasswordAuthentication(
+                                            parentUserId = authenticatedUser.userId,
+                                            secondPasswordHash = authenticatedUser.secondPasswordHash
+                                    ) to it) as Pair<ApplyActionParentAuthentication, User>?
+                            )
                         }
                     }
                 }
@@ -109,10 +115,18 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
         }
     }
 
+    val authenticatedUser = authenticatedUserOrChild.map { if (it?.second?.type != UserType.Parent) null else it }
+
     fun isParentAuthenticated(): Boolean {
         val user = authenticatedUser.value
 
         return user != null && user.second.type == UserType.Parent
+    }
+
+    fun isParentOrChildAuthenticated(childId: String): Boolean {
+        val user = authenticatedUserOrChild.value
+
+        return user != null && (user.second.type == UserType.Parent || user.second.id == childId)
     }
 
     fun requestAuthentication() {
@@ -129,12 +143,22 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
         }
     }
 
-    fun tryDispatchParentAction(action: ParentAction): Boolean = tryDispatchParentActions(listOf(action))
+    fun requestAuthenticationOrReturnTrueAllowChild(childId: String): Boolean {
+        if (isParentOrChildAuthenticated(childId)) {
+            return true
+        } else {
+            requestAuthentication()
 
-    fun tryDispatchParentActions(actions: List<ParentAction>): Boolean {
-        val status = authenticatedUser.value
+            return false
+        }
+    }
 
-        if (status == null || status.second.type != UserType.Parent) {
+    fun tryDispatchParentAction(action: ParentAction, allowAsChild: Boolean = false): Boolean = tryDispatchParentActions(listOf(action), allowAsChild)
+
+    fun tryDispatchParentActions(actions: List<ParentAction>, allowAsChild: Boolean = false): Boolean {
+        val status = authenticatedUserOrChild.value
+
+        if (status == null || (status.second.type != UserType.Parent && !allowAsChild)) {
             requestAuthentication()
             return false
         }

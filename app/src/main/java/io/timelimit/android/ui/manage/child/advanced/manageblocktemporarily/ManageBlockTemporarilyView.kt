@@ -77,14 +77,21 @@ object ManageBlockTemporarilyView {
 
                 checkbox.setOnLongClickListener {
                     if (hasFullVersion != true) {
-                        checkbox.isChecked = false
-
                         RequiresPurchaseDialogFragment().show(fragmentManager)
-                    } else if (auth.requestAuthenticationOrReturnTrue()) {
-                        BlockTemporarilyDialogFragment.newInstance(
-                                childId = childId,
-                                categoryId = category.categoryId
-                        ).show(fragmentManager)
+                    } else {
+                        val requireParent = category.checked && category.endTime == 0L
+                        val hasMatchingAuth = if (requireParent)
+                            auth.requestAuthenticationOrReturnTrue()
+                        else
+                            auth.requestAuthenticationOrReturnTrueAllowChild(childId)
+
+                        if (hasMatchingAuth) {
+                            BlockTemporarilyDialogFragment.newInstance(
+                                    childId = childId,
+                                    categoryId = category.categoryId,
+                                    childAddLimitMode = !auth.isParentAuthenticated()
+                            ).show(fragmentManager)
+                        }
                     }
 
                     true

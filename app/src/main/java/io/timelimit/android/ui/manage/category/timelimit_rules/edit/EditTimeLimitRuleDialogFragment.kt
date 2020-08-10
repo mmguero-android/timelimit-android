@@ -144,8 +144,8 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
 
         view = FragmentEditTimeLimitRuleDialogBinding.inflate(layoutInflater, container, false)
 
-        auth.authenticatedUser.observe(viewLifecycleOwner, Observer {
-            if (it == null || it.second.type != UserType.Parent) {
+        auth.authenticatedUserOrChild.observe(viewLifecycleOwner, Observer {
+            if (it == null || (it.second.type != UserType.Parent && existingRule != null)) {
                 dismissAllowingStateLoss()
             }
         })
@@ -288,9 +288,10 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
                     listener.notifyRuleUpdated(existingRule!!, newRule)
                 } else {
                     if (!auth.tryDispatchParentAction(
-                                    CreateTimeLimitRuleAction(
+                                    action = CreateTimeLimitRuleAction(
                                             rule = newRule
-                                    )
+                                    ),
+                                    allowAsChild = true
                             )) {
                         return
                     }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.timelimit.android.R
 import io.timelimit.android.data.Database
+import io.timelimit.android.data.extensions.getCategoryWithParentCategories
 import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.FragmentAddCategoryAppsBinding
@@ -41,7 +42,6 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 import io.timelimit.android.ui.manage.category.apps.addactivity.AddAppActivitiesDialogFragment
 import io.timelimit.android.ui.view.AppFilterView
 
@@ -50,13 +50,19 @@ class AddCategoryAppsFragment : DialogFragment() {
         private const val DIALOG_TAG = "x"
         private const val STATUS_PACKAGE_NAMES = "d"
         private const val STATUS_EDUCATED = "e"
+        private const val PARAM_CHILD_ID = "childId"
+        private const val PARAM_CATEGORY_ID = "categoryId"
+        private const val PARAM_CHILD_ADD_LIMIT_MODE = "addLimitMode"
 
-        fun newInstance(params: ManageCategoryFragmentArgs) = AddCategoryAppsFragment().apply {
-            arguments = params.toBundle()
+        fun newInstance(childId: String, categoryId: String, childAddLimitMode: Boolean) = AddCategoryAppsFragment().apply {
+            arguments = Bundle().apply {
+                putString(PARAM_CHILD_ID, childId)
+                putString(PARAM_CATEGORY_ID, categoryId)
+                putBoolean(PARAM_CHILD_ADD_LIMIT_MODE, childAddLimitMode)
+            }
         }
     }
 
-    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(arguments!!) }
     private val database: Database by lazy { DefaultAppLogic.with(context!!).database }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
     private val adapter = AddAppAdapter()
@@ -64,12 +70,6 @@ class AddCategoryAppsFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        auth.authenticatedUser.observe(this, Observer {
-            if (it == null || it.second.type != UserType.Parent) {
-                dismissAllowingStateLoss()
-            }
-        })
 
         if (savedInstanceState != null) {
             adapter.selectedApps = savedInstanceState.getStringArrayList(STATUS_PACKAGE_NAMES)!!.toSet()
@@ -86,6 +86,20 @@ class AddCategoryAppsFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = FragmentAddCategoryAppsBinding.inflate(LayoutInflater.from(context))
+        val childId = arguments!!.getString(PARAM_CHILD_ID)!!
+        val categoryId = arguments!!.getString(PARAM_CATEGORY_ID)!!
+        val childAddLimitMode = arguments!!.getBoolean(PARAM_CHILD_ADD_LIMIT_MODE)
+
+        auth.authenticatedUserOrChild.observe(this, Observer {
+            val parentAuthValid = it?.second?.type == UserType.Parent
+            val childAuthValid = it?.second?.id == childId && childAddLimitMode
+            val authValid = parentAuthValid || childAuthValid
+
+            if (!authValid) {
+                dismissAllowingStateLoss()
+            }
+        })
+
         val filter = AppFilterView.getFilterLive(binding.filter)
         val isLocalMode = database.config().getDeviceAuthTokenAsync().map { it.isEmpty() }
         val showAppsFromOtherDevicesChecked = MutableLiveData<Boolean>().apply {
@@ -113,7 +127,7 @@ class AddCategoryAppsFragment : DialogFragment() {
         binding.recycler.layoutManager = LinearLayoutManager(context)
         binding.recycler.adapter = adapter
 
-        val appsAtAssignedDevices = database.device().getDevicesByUserId(params.childId)
+        val appsAtAssignedDevices = database.device().getDevicesByUserId(childId)
                 .map { devices -> devices.map { it.id } }
                 .ignoreUnchanged()
                 .switchMap { database.app().getAppsByDeviceIds(it) }
@@ -124,19 +138,45 @@ class AddCategoryAppsFragment : DialogFragment() {
             if (appsFromAllDevices) appsAtAllDevices else appsAtAssignedDevices
         }.map { apps -> apps.distinctBy { app -> app.packageName } }
 
+        val userRelatedDataLive = database.derivedDataDao().getUserRelatedDataLive(childId)
 
-        val childCategories = database.category().getCategoriesByChildId(params.childId)
-        val childCategoriesWithApps = childCategories.switchMap { categories ->
-            database.categoryApp().getCategoryApps(categories.map { it.id })
-                    .map { categoyApps -> categories to categoyApps }
+        val categoryTitleByPackageName = userRelatedDataLive.map { userRelatedData ->
+            val result = mutableMapOf<String, String>()
+
+            userRelatedData?.categoryApps?.forEach { app ->
+                result[app.packageName] = userRelatedData.categoryById[app.categoryId]!!.category.title
+            }
+
+            result
         }
 
-        val packageNamesAssignedToOtherCategories = childCategoriesWithApps.map { (_, apps) ->
-            apps.filter { it.categoryId != params.categoryId }.map { it.packageName }.toSet()
-        }.ignoreUnchanged()
+        val packageNamesAssignedToOtherCategories = userRelatedDataLive
+                .map { it?.categoryApps?.map { app -> app.packageName }?.toSet() ?: emptySet() }
+
+        val shownApps = if (childAddLimitMode) {
+            userRelatedDataLive.switchMap { userRelatedData ->
+                installedApps.map { installedApps ->
+                    if (userRelatedData == null || !userRelatedData.categoryById.containsKey(categoryId))
+                        emptyList()
+                    else {
+                        val parentCategories = userRelatedData.getCategoryWithParentCategories(categoryId)
+                        val defaultCategory = userRelatedData.categoryById[userRelatedData.user.categoryForNotAssignedApps]
+                        val allowAppsWithoutCategory = defaultCategory != null && parentCategories.contains(defaultCategory.category.id)
+                        val packageNameToCategoryId = userRelatedData.categoryApps.associateBy { it.packageName }
+
+                        installedApps.filter { app ->
+                            val appCategoryId = packageNameToCategoryId[app.packageName]?.categoryId
+                            val categoryNotFound = !userRelatedData.categoryById.containsKey(appCategoryId)
+
+                            parentCategories.contains(appCategoryId) || (categoryNotFound && allowAppsWithoutCategory)
+                        }
+                    }
+                }
+            }
+        } else installedApps
 
         filter.switchMap { filter ->
-            installedApps.map { filter to it }
+            shownApps.map { filter to it }
         }.map { (search, apps) ->
             apps.filter { search.matches(it) }
         }.switchMap { apps ->
@@ -163,28 +203,22 @@ class AddCategoryAppsFragment : DialogFragment() {
                 resources.getQuantityString(R.plurals.category_apps_add_dialog_hidden_entries, hiddenSelectedPackageNames, hiddenSelectedPackageNames)
         })
 
-        childCategoriesWithApps.map { (categories, apps) ->
-            val categoryById = categories.associateBy { it.id }
-            val categoryTitleByCategoryId = mutableMapOf<String, String>()
-
-            apps.forEach {
-                categoryTitleByCategoryId[it.packageName] = categoryById[it.categoryId]?.title ?: ""
-            }
-
-            categoryTitleByCategoryId
-        }.observe(this, Observer {
+        categoryTitleByPackageName.observe(this, Observer {
             adapter.categoryTitleByPackageName = it
         })
+
+        binding.someOptionsDisabledDueToChildAuthentication = childAddLimitMode
 
         binding.addAppsButton.setOnClickListener {
             val packageNames = adapter.selectedApps.toList()
 
             if (packageNames.isNotEmpty()) {
                 auth.tryDispatchParentAction(
-                        AddCategoryAppsAction(
-                                categoryId = params.categoryId,
+                        action = AddCategoryAppsAction(
+                                categoryId = categoryId,
                                 packageNames = packageNames
-                        )
+                        ),
+                        allowAsChild = childAddLimitMode
                 )
             }
 
@@ -219,10 +253,11 @@ class AddCategoryAppsFragment : DialogFragment() {
             override fun onAppLongClicked(app: App): Boolean {
                 return if (adapter.selectedApps.isEmpty()) {
                     AddAppActivitiesDialogFragment.newInstance(
-                            childId = params.childId,
-                            categoryId = params.categoryId,
-                            packageName = app.packageName
-                    ).show(fragmentManager!!)
+                            childId = childId,
+                            categoryId = categoryId,
+                            packageName = app.packageName,
+                            childAddLimitMode = childAddLimitMode
+                    ).show(parentFragmentManager)
 
                     dismissAllowingStateLoss()
 
