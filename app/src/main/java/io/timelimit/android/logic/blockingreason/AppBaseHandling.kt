@@ -18,7 +18,6 @@ package io.timelimit.android.logic.blockingreason
 
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.data.extensions.getCategoryWithParentCategories
-import io.timelimit.android.data.model.derived.CategoryRelatedData
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
@@ -101,16 +100,16 @@ sealed class AppBaseHandling {
             }
         }
 
-        fun getCategoriesForCounting(a: AppBaseHandling, b: AppBaseHandling): Set<String> {
-            return if (a is UseCategories && b is UseCategories && a.shouldCount && b.shouldCount) {
-                a.categoryIds + b.categoryIds
-            } else if (a is UseCategories && a.shouldCount) {
-                a.categoryIds
-            } else if (b is UseCategories && b.shouldCount) {
-                b.categoryIds
-            } else {
-                emptySet()
+        fun getCategoriesForCounting(items: List<AppBaseHandling>): Set<String> {
+            val result = mutableSetOf<String>()
+
+            items.forEach { item ->
+                if (item is UseCategories && item.shouldCount) {
+                    result.addAll(item.categoryIds)
+                }
             }
+
+            return result
         }
     }
 }

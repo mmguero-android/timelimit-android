@@ -48,7 +48,7 @@ abstract class PlatformIntegration(
     abstract fun muteAudioIfPossible(packageName: String)
     abstract fun setShowBlockingOverlay(show: Boolean, blockedElement: String? = null)
     // this should throw an SecurityException if the permission is missing
-    abstract suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long)
+    abstract suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp>
     abstract fun getMusicPlaybackPackage(): String?
     abstract fun setAppStatusMessage(message: AppStatusMessage?)
     abstract fun isScreenOn(): Boolean
@@ -78,11 +78,7 @@ abstract class PlatformIntegration(
     var systemClockChangeListener: Runnable? = null
 }
 
-data class ForegroundAppSpec(var packageName: String?, var activityName: String?) {
-    companion object {
-        fun newInstance() = ForegroundAppSpec(packageName = null, activityName = null)
-    }
-}
+data class ForegroundApp(val packageName: String, val activityName: String)
 
 enum class ProtectionLevel {
     None, SimpleDeviceAdmin, PasswordDeviceAdmin, DeviceOwner

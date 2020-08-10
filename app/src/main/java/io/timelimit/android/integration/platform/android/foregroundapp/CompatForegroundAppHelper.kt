@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,37 @@ package io.timelimit.android.integration.platform.android.foregroundapp
 
 import android.app.ActivityManager
 import android.content.Context
-import io.timelimit.android.integration.platform.ForegroundAppSpec
+import io.timelimit.android.integration.platform.ForegroundApp
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class CompatForegroundAppHelper(context: Context) : ForegroundAppHelper() {
     private val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
-    override suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long) {
-        try {
-            val activity = activityManager.getRunningTasks(1)[0].topActivity!!
+    private var lastForegroundApp: ForegroundApp? = null
+    private var lastForegroundAppList: Set<ForegroundApp> = emptySet()
+    private val mutex = Mutex()
 
-            result.packageName = activity.packageName
-            result.activityName = activity.className
-        } catch (ex: NullPointerException) {
-            result.activityName = null
-            result.packageName = null
+    override suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp> {
+        mutex.withLock {
+            try {
+                val activity = activityManager.getRunningTasks(1)[0].topActivity!!
+
+                val last = lastForegroundApp
+
+                if (last == null || last.packageName != activity.packageName || last.activityName != activity.className) {
+                    val new = ForegroundApp(activity.packageName, activity.className)
+
+                    lastForegroundApp = new
+                    lastForegroundAppList = setOf(new)
+                }
+            } catch (ex: NullPointerException) {
+                lastForegroundApp = null
+                lastForegroundAppList = emptySet()
+            }
+
+            return lastForegroundAppList
         }
     }
 

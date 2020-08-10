@@ -29,7 +29,6 @@ import io.timelimit.android.data.model.*
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.integration.platform.AppStatusMessage
-import io.timelimit.android.integration.platform.ForegroundAppSpec
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AccessibilityService
 import io.timelimit.android.livedata.*
@@ -156,8 +155,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         }
     }
 
-    private val foregroundAppSpec = ForegroundAppSpec.newInstance()
-
     private suspend fun commitUsedTimeUpdaters() {
         usedTimeUpdateHelper.flush()
     }
@@ -279,20 +276,20 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     )
                 }; reportStatusToCategoryHandlingCache(userRelatedData)
 
-                appLogic.platformIntegration.getForegroundApp(foregroundAppSpec, appLogic.getForegroundAppQueryInterval())
-                val foregroundAppPackageName = foregroundAppSpec.packageName
-                val foregroundAppActivityName = foregroundAppSpec.activityName
+                val foregroundApps = appLogic.platformIntegration.getForegroundApps(appLogic.getForegroundAppQueryInterval())
                 val audioPlaybackPackageName = appLogic.platformIntegration.getMusicPlaybackPackage()
                 val activityLevelBlocking = appLogic.deviceEntry.value?.enableActivityLevelBlocking ?: false
 
-                val foregroundAppBaseHandling = AppBaseHandling.calculate(
-                        foregroundAppPackageName = foregroundAppPackageName,
-                        foregroundAppActivityName = foregroundAppActivityName,
-                        pauseForegroundAppBackgroundLoop = pauseForegroundAppBackgroundLoop,
-                        userRelatedData = userRelatedData,
-                        deviceRelatedData = deviceRelatedData,
-                        pauseCounting = !isScreenOn
-                )
+                val foregroundAppWithBaseHandlings = foregroundApps.map { app ->
+                    app to AppBaseHandling.calculate(
+                            foregroundAppPackageName = app.packageName,
+                            foregroundAppActivityName = app.activityName,
+                            pauseForegroundAppBackgroundLoop = pauseForegroundAppBackgroundLoop,
+                            userRelatedData = userRelatedData,
+                            deviceRelatedData = deviceRelatedData,
+                            pauseCounting = !isScreenOn
+                    )
+                }
 
                 val backgroundAppBaseHandling = AppBaseHandling.calculate(
                         foregroundAppPackageName = audioPlaybackPackageName,
@@ -304,10 +301,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 )
 
                 // check if should be blocked
-                val blockForegroundApp = foregroundAppBaseHandling is AppBaseHandling.BlockDueToNoCategory ||
-                        (foregroundAppBaseHandling is AppBaseHandling.UseCategories && foregroundAppBaseHandling.categoryIds.find {
-                            categoryHandlingCache.get(it).shouldBlockActivities
-                        } != null)
+                val blockedForegroundApp = foregroundAppWithBaseHandlings.find { (_, foregroundAppBaseHandling) ->
+                    foregroundAppBaseHandling is AppBaseHandling.BlockDueToNoCategory ||
+                            (foregroundAppBaseHandling is AppBaseHandling.UseCategories && foregroundAppBaseHandling.categoryIds.find {
+                                categoryHandlingCache.get(it).shouldBlockActivities
+                            } != null)
+                }?.first
 
                 val blockAudioPlayback = backgroundAppBaseHandling is AppBaseHandling.BlockDueToNoCategory ||
                         (backgroundAppBaseHandling is AppBaseHandling.UseCategories && backgroundAppBaseHandling.categoryIds.find {
@@ -321,7 +320,9 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 // update times
                 val timeToSubtract = Math.min(previousMainLogicExecutionTime, maxUsedTimeToAdd)
 
-                val categoryHandlingsToCount = AppBaseHandling.getCategoriesForCounting(foregroundAppBaseHandling, backgroundAppBaseHandling)
+                val categoryHandlingsToCount = AppBaseHandling.getCategoriesForCounting(
+                        foregroundAppWithBaseHandlings.map { it.second } + listOf(backgroundAppBaseHandling)
+                )
                         .map { categoryHandlingCache.get(it) }
                         .filter { it.shouldCountTime }
 
@@ -471,44 +472,76 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 val showBackgroundStatus = !(backgroundAppBaseHandling is AppBaseHandling.Idle) &&
                         !blockAudioPlayback &&
-                        audioPlaybackPackageName != foregroundAppPackageName
+                        foregroundApps.find { it.packageName == audioPlaybackPackageName } == null
 
-                val statusMessage = if (blockForegroundApp) {
+                val statusMessage = if (blockedForegroundApp != null) {
                     buildStatusMessageWithCurrentAppTitle(
                             text = appLogic.context.getString(R.string.background_logic_opening_lockscreen),
-                            appPackageName = foregroundAppPackageName,
-                            appActivityToShow = if (activityLevelBlocking) foregroundAppActivityName else null
+                            appPackageName = blockedForegroundApp.packageName,
+                            appActivityToShow = if (activityLevelBlocking) blockedForegroundApp.activityName else null
                     )
                 } else {
-                    val pagesForTheForegroundApp = if (foregroundAppBaseHandling is AppBaseHandling.UseCategories) foregroundAppBaseHandling.categoryIds.size else 1
+                    val pagesForTheForegroundApps = foregroundAppWithBaseHandlings.sumBy { (_, foregroundAppBaseHandling) ->
+                        // category ids are never empty/ this would trigger an exception
+                        if (foregroundAppBaseHandling is AppBaseHandling.UseCategories) foregroundAppBaseHandling.categoryIds.size else 1
+                    }
                     val pagesForTheBackgroundApp = if (!showBackgroundStatus) 0 else if (backgroundAppBaseHandling is AppBaseHandling.UseCategories) backgroundAppBaseHandling.categoryIds.size else 1
-                    val totalPages = pagesForTheForegroundApp + pagesForTheBackgroundApp
+                    val totalPages = pagesForTheForegroundApps.coerceAtLeast(1) + pagesForTheBackgroundApp
                     val currentPage = (nowTimestamp / 3000 % totalPages).toInt()
 
                     val suffix = if (totalPages == 1) "" else " (${currentPage + 1} / $totalPages)"
 
-                    if (currentPage < pagesForTheForegroundApp) {
-                        val pageWithin = currentPage
-
-                        if (foregroundAppBaseHandling is AppBaseHandling.UseCategories) {
-                            val categoryId = foregroundAppBaseHandling.categoryIds.toList()[pageWithin]
-
-                            buildNotificationForAppWithCategoryUsage(
-                                    appPackageName = foregroundAppPackageName,
-                                    appActivityToShow = if (activityLevelBlocking) foregroundAppActivityName else null,
+                    if (currentPage < pagesForTheForegroundApps.coerceAtLeast(1)) {
+                        if (pagesForTheForegroundApps == 0) {
+                            buildNotificationForAppWithoutCategoryUsage(
+                                    appPackageName = null,
+                                    appActivityToShow = null,
                                     suffix = suffix,
-                                    categoryId = categoryId
+                                    handling = AppBaseHandling.Idle
                             )
                         } else {
-                            buildNotificationForAppWithoutCategoryUsage(
-                                    appPackageName = foregroundAppPackageName,
-                                    appActivityToShow = if (activityLevelBlocking) foregroundAppActivityName else null,
-                                    suffix = suffix,
-                                    handling = foregroundAppBaseHandling
-                            )
+                            val pageWithin = currentPage
+
+                            var listItemIndex = 0
+                            var indexWithinListItem = 0
+                            var totalIndex = 0
+
+                            while (listItemIndex < foregroundAppWithBaseHandlings.size) {
+                                val item = foregroundAppWithBaseHandlings[listItemIndex]
+                                val handling = item.second
+                                val itemLength = if (handling is AppBaseHandling.UseCategories) handling.categoryIds.size else 1
+
+                                if (pageWithin < totalIndex + itemLength) {
+                                    indexWithinListItem = pageWithin - totalIndex
+                                    break
+                                }
+
+                                totalIndex += itemLength
+                                listItemIndex++
+                            }
+
+                            val (app, handling) = foregroundAppWithBaseHandlings[listItemIndex]
+
+                            if (handling is AppBaseHandling.UseCategories) {
+                                val categoryId = handling.categoryIds.toList()[indexWithinListItem]
+
+                                buildNotificationForAppWithCategoryUsage(
+                                        appPackageName = app.packageName,
+                                        appActivityToShow = if (activityLevelBlocking) app.activityName else null,
+                                        suffix = suffix,
+                                        categoryId = categoryId
+                                )
+                            } else {
+                                buildNotificationForAppWithoutCategoryUsage(
+                                        appPackageName = app.packageName,
+                                        appActivityToShow = if (activityLevelBlocking) app.activityName else null,
+                                        suffix = suffix,
+                                        handling = handling
+                                )
+                            }
                         }
                     } else {
-                        val pageWithin = currentPage - pagesForTheForegroundApp
+                        val pageWithin = currentPage - pagesForTheForegroundApps
 
                         if (backgroundAppBaseHandling is AppBaseHandling.UseCategories) {
                             val categoryId = backgroundAppBaseHandling.categoryIds.toList()[pageWithin]
@@ -533,8 +566,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 appLogic.platformIntegration.setAppStatusMessage(statusMessage)
 
                 // handle blocking
-                if (blockForegroundApp) {
-                    openLockscreen(foregroundAppPackageName!!, foregroundAppActivityName)
+                if (blockedForegroundApp != null) {
+                    openLockscreen(blockedForegroundApp.packageName, blockedForegroundApp.activityName)
                 } else {
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
                 }

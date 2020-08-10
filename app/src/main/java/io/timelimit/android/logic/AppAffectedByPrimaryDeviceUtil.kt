@@ -18,9 +18,7 @@ package io.timelimit.android.logic
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.data.model.UserType
-import io.timelimit.android.integration.platform.ForegroundAppSpec
-import io.timelimit.android.livedata.waitForNonNullValue
-import io.timelimit.android.livedata.waitForNullableValue
+import io.timelimit.android.integration.platform.ForegroundApp
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
 
 object AppAffectedByPrimaryDeviceUtil {
@@ -41,38 +39,34 @@ object AppAffectedByPrimaryDeviceUtil {
             }
         }
 
-        val currentApp = ForegroundAppSpec.newInstance()
-
-        try {
-            logic.platformIntegration.getForegroundApp(currentApp, logic.getForegroundAppQueryInterval())
+        val currentApps = try {
+            logic.platformIntegration.getForegroundApps(logic.getForegroundAppQueryInterval())
         } catch (ex: SecurityException) {
-            // ignore
+            emptySet<ForegroundApp>()
         }
 
-        if (currentApp.packageName == null) {
-            return false
-        }
+        return currentApps.find { currentApp ->
+            val handling = AppBaseHandling.calculate(
+                    foregroundAppPackageName = currentApp.packageName,
+                    foregroundAppActivityName = currentApp.activityName,
+                    deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
+                    userRelatedData = deviceAndUserRelatedData.userRelatedData,
+                    pauseCounting = false,
+                    pauseForegroundAppBackgroundLoop = false
+            )
 
-        val handling = AppBaseHandling.calculate(
-                foregroundAppPackageName = currentApp.packageName,
-                foregroundAppActivityName = currentApp.activityName,
-                deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
-                userRelatedData = deviceAndUserRelatedData.userRelatedData,
-                pauseCounting = false,
-                pauseForegroundAppBackgroundLoop = false
-        )
+            if (!(handling is AppBaseHandling.UseCategories)) {
+                return false
+            }
 
-        if (!(handling is AppBaseHandling.UseCategories)) {
-            return false
-        }
+            return handling.categoryIds.find { categoryId ->
+                val category = deviceAndUserRelatedData.userRelatedData.categoryById[categoryId]!!
 
-        return handling.categoryIds.find { categoryId ->
-            val category = deviceAndUserRelatedData.userRelatedData.categoryById[categoryId]!!
+                val hasBlockedTimeAreas = !category.category.blockedMinutesInWeek.dataNotToModify.isEmpty
+                val hasRules = category.rules.isNotEmpty()
 
-            val hasBlockedTimeAreas = !category.category.blockedMinutesInWeek.dataNotToModify.isEmpty
-            val hasRules = category.rules.isNotEmpty()
-
-            hasBlockedTimeAreas || hasRules
+                hasBlockedTimeAreas || hasRules
+            } != null
         } != null
     }
 }

@@ -112,13 +112,16 @@ class DummyIntegration(
         }
     }
 
-    override suspend fun getForegroundApp(result: ForegroundAppSpec, queryInterval: Long) {
+    override suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp> {
         if (foregroundAppPermission == RuntimePermissionStatus.NotGranted) {
             throw SecurityException()
         }
 
-        result.packageName = foregroundApp
-        result.activityName = null
+        return foregroundApp?.let { packageName ->
+            setOf(
+                    ForegroundApp(packageName, "invalid.activity")
+            )
+        } ?: emptySet()
     }
 
     override fun getMusicPlaybackPackage(): String? = null
