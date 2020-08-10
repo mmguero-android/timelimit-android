@@ -45,4 +45,21 @@
     <string name="category_apps_item_removed_toast">%s wurde entfernt</string>
 
     <string name="category_apps_add_dialog_already_assigned_to">Bereits zugeordnet zu %s</string>
+
+    <string name="category_apps_add_empty_local_mode">TimeLimit hat (noch) keine installierten Apps erfasst</string>
+    <string name="category_apps_add_empty_due_to_filter">Es gibt keine Apps, die zur aktuellen Filterung der Liste passen</string>
+    <string name="category_apps_add_empty_due_to_child_mode">Es gibt keine Apps, die ohne Elternteil zugeordnet werden können</string>
+    <string name="category_apps_add_empty_no_child_devices">Es gibt kein Gerät, dem dieser Nutzer zugerodnet wurde
+        und daher auch keine Apps auf Geräten, die dem Benutzer zugeordnet wurden
+    </string>
+    <string name="category_apps_add_empty_child_devices_no_apps">Es gibt mindestens ein Gerät für diesen Benutzer,
+        aber es sind keine Apps von diesem Gerät bekannt. Ist die Benutzerzuordnung am entsprechenden Gerät angekommen?
+    </string>
+    <string name="category_apps_add_empty_all_devices_no_apps_no_childs">Es gibt kein Gerät, das einem Kind zugeordnet wurde.
+        Daher wurden keine Apps erfasst und dadurch sind jetzt keine Apps bekannt, die zugerodnet werden können.
+    </string>
+    <string name="category_apps_add_empty_all_devices_no_apps_but_child_devices">Es gibt kein Gerät, von dem
+        installierte Apps bekannt sind, aber es gibt mindestens ein Gerät, das einem Kind zugeordnet wurde.
+        Ist die Benutzerzuordnung am entsprechenden Gerät angekommen?
+    </string>
 </resources>

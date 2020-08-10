@@ -26,6 +26,10 @@
             name="someOptionsDisabledDueToChildAuthentication"
             type="boolean" />
 
+        <variable
+            name="emptyText"
+            type="String" />
+
         <import type="android.text.TextUtils" />
         <import type="android.view.View" />
     </data>
@@ -69,6 +73,18 @@
 
                 </LinearLayout>
             </com.google.android.material.appbar.AppBarLayout>
+
+            <!-- this gets a custom behavior for the correct align -->
+            <TextView
+                android:id="@+id/empty_view"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:padding="16dp"
+                android:gravity="center"
+                tools:text="Es gab einen schlimmen Fehler, daher ist diese Liste jetzt leer"
+                android:text="@{emptyText}"
+                android:visibility="@{TextUtils.isEmpty(emptyText) ? View.GONE : View.VISIBLE}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"

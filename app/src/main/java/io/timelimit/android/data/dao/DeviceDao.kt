@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,6 +85,9 @@ abstract class DeviceDao {
 
     @Query("UPDATE device SET is_user_kept_signed_in = :keepSignedIn WHERE id = :deviceId")
     abstract fun updateKeepSignedIn(deviceId: String, keepSignedIn: Boolean)
+
+    @Query("SELECT COUNT(*) FROM device JOIN user ON (device.current_user_id = user.id) WHERE user.type = \"child\"")
+    abstract fun countDevicesWithChildUser(): LiveData<Long>
 }
 
 data class DeviceWithAppVersion(
