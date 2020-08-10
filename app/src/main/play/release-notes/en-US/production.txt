@@ -1,6 +1,3 @@
-detail changes:
-
-- skip user selection during the authentication if there is only one user with a password
-- added FallbackHome to the whitelist
-- refactored text which is shown when a authentication is required
-- updated build tools and libraries
+- option that a limited user adds limitations for itself if this was enabled by the parent user
+- improved handling of the split screen feature/ modified detection of the current App; This was tested and did not cause any problems; It is still possible that it causes problems at some devices/ situations
+- improved Widget

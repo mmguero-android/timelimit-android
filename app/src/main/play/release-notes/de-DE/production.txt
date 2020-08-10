@@ -1,6 +1,3 @@
-Detailänderungen:
-
-- Überspringen der Benutzerauswahl bei der Authentifizierung, wenn es nur einen Benutzer mit Passwort gibt
-- FallbackHome zur Whitelist hinzugefügt
-- Text überarbeitet, der angezeigt wird, wenn eine Authentifizierung erforderlich ist
-- Build-Tools und Libraries aktualisiert
+- Möglichkeit, als eingeschränkter Benutzer Beschränkungen hinzuzufügen, sofern es vom Elternteil aktiviert wurde
+- verbesserter Umgang mit der Splitscreen-Funktion/ Veränderungen bei der Erkennung der aktiven App; Das ist umfangreich getestet und hat zu keinen Problemen geführt; Dennoch könnte es bei bestimmten Modellen/ Situationen zu Problemen führen
+- Widget überarbeitet
