@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.Device
+import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.User
 import io.timelimit.android.integration.platform.PlatformIntegration
 import io.timelimit.android.integration.time.TimeApi
-import io.timelimit.android.livedata.castDown
-import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromValue
-import io.timelimit.android.livedata.switchMap
+import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.SyncUtil
 import io.timelimit.android.sync.network.api.ServerApi
 import io.timelimit.android.sync.websocket.NetworkStatus
@@ -74,7 +72,12 @@ class AppLogic(
     }.ignoreUnchanged()
 
     private val foregroundAppQueryInterval = database.config().getForegroundAppQueryIntervalAsync().apply { observeForever {  } }
+    private val enableMultiAppDetection = database.config().experimentalFlags
+            .map { it and ExperimentalFlags.MULTI_APP_DETECTION == ExperimentalFlags.MULTI_APP_DETECTION }.ignoreUnchanged()
+            .apply {observeForever {  } }
+
     fun getForegroundAppQueryInterval() = foregroundAppQueryInterval.value ?: 0L
+    fun getEnableMultiAppDetection() = enableMultiAppDetection.value ?: false
 
     val serverLogic = ServerLogic(this)
     val defaultUserLogic = DefaultUserLogic(this)

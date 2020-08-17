@@ -38,7 +38,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
         private const val LOG_TAG = "LollipopForegroundApp"
 
         private val foregroundAppThread: Executor by lazy { Executors.newSingleThreadExecutor() }
-        private val enableMultiAppDetection = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+        val enableMultiAppDetectionGeneral = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
         private val supportsCompleteEvents = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
         private fun hash(event: UsageEvents.Event): Int {
@@ -63,24 +63,28 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
     private var lastHandledEventTime: Long = 0
     private val event = UsageEvents.Event()
     private var callsSinceLastActivityExistsCheck = 0
+    private var lastEnableMultiAppDetection = false
 
     @Throws(SecurityException::class)
-    override suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp> {
+    override suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp> {
         if (getPermissionStatus() == RuntimePermissionStatus.NotGranted) {
             throw SecurityException()
         }
+
+        val effectiveEnableMultiAppDetection = enableMultiAppDetection && enableMultiAppDetectionGeneral
 
         foregroundAppThread.executeAndWait {
             val now = System.currentTimeMillis()
             var currentForegroundAppsModified = false
 
-            if (lastQueryTime > now || queryInterval >= 1000 * 60 * 60 * 24 /* 1 day */) {
+            if (lastQueryTime > now || queryInterval >= 1000 * 60 * 60 * 24 /* 1 day */ || lastEnableMultiAppDetection != effectiveEnableMultiAppDetection) {
                 // if the time went backwards, forget everything
                 lastQueryTime = 0
                 lastHandledEventTime = 0
                 currentForegroundApps.clear(); currentForegroundAppsModified = true
                 seenEvents.clear()
                 expectedStopEvents.clear()
+                lastEnableMultiAppDetection = effectiveEnableMultiAppDetection
             }
 
             val queryStartTime = if (lastQueryTime == 0L) {
@@ -123,7 +127,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
                                 Log.d(LOG_TAG, "resume ${event.packageName}:${event.className}")
                             }
 
-                            if (enableMultiAppDetection) {
+                            if (effectiveEnableMultiAppDetection) {
                                 val app = ForegroundApp(event.packageName, event.className)
 
                                 if (!doesActivityExist(app)) {
@@ -152,7 +156,7 @@ class LollipopForegroundAppHelper(private val context: Context) : ForegroundAppH
                                 }
                             }
                         } else if (event.eventType == UsageEvents.Event.MOVE_TO_BACKGROUND) {
-                            if (enableMultiAppDetection) {
+                            if (effectiveEnableMultiAppDetection && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                                 val app = ForegroundApp(event.packageName, event.className)
 
                                 if (BuildConfig.DEBUG) {

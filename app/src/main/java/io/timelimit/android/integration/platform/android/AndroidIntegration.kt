@@ -126,7 +126,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         return AdminStatus.getAdminStatus(context, policyManager)
     }
 
-    override suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp> = foregroundAppHelper.getForegroundApps(queryInterval)
+    override suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp> = foregroundAppHelper.getForegroundApps(queryInterval, enableMultiAppDetection)
 
     override fun getForegroundAppPermissionStatus(): RuntimePermissionStatus {
         return foregroundAppHelper.getPermissionStatus()

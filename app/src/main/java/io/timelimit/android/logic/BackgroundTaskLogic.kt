@@ -276,7 +276,11 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     )
                 }; reportStatusToCategoryHandlingCache(userRelatedData)
 
-                val foregroundApps = appLogic.platformIntegration.getForegroundApps(appLogic.getForegroundAppQueryInterval())
+                val foregroundApps = appLogic.platformIntegration.getForegroundApps(
+                        appLogic.getForegroundAppQueryInterval(),
+                        appLogic.getEnableMultiAppDetection()
+                )
+
                 val audioPlaybackPackageName = appLogic.platformIntegration.getMusicPlaybackPackage()
                 val activityLevelBlocking = appLogic.deviceEntry.value?.enableActivityLevelBlocking ?: false
 

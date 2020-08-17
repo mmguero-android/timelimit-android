@@ -29,7 +29,7 @@ class CompatForegroundAppHelper(context: Context) : ForegroundAppHelper() {
     private var lastForegroundAppList: Set<ForegroundApp> = emptySet()
     private val mutex = Mutex()
 
-    override suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp> {
+    override suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp> {
         mutex.withLock {
             try {
                 val activity = activityManager.getRunningTasks(1)[0].topActivity!!

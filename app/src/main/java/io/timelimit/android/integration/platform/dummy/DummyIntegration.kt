@@ -112,7 +112,7 @@ class DummyIntegration(
         }
     }
 
-    override suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp> {
+    override suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp> {
         if (foregroundAppPermission == RuntimePermissionStatus.NotGranted) {
             throw SecurityException()
         }

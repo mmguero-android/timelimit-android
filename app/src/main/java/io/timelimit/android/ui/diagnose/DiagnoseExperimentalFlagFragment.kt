@@ -31,6 +31,7 @@ import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.databinding.DiagnoseExperimentalFlagFragmentBinding
 import io.timelimit.android.databinding.DiagnoseExperimentalFlagItemBinding
+import io.timelimit.android.integration.platform.android.foregroundapp.LollipopForegroundAppHelper
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.homescreen.ConfigureHomescreenDelayDialogFragment
@@ -172,6 +173,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.KEEP_CONNECTED_WHEN_SCREEN_OFF,
                         disableFlags = ExperimentalFlags.KEEP_CONNECTED_WHEN_SCREEN_OFF,
                         enable = { true }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_mad,
+                        enableFlags = ExperimentalFlags.MULTI_APP_DETECTION,
+                        disableFlags = ExperimentalFlags.MULTI_APP_DETECTION,
+                        enable = { LollipopForegroundAppHelper.enableMultiAppDetectionGeneral }
                 )
         )
     }

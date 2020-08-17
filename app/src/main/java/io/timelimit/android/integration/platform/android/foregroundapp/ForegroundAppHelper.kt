@@ -21,7 +21,7 @@ import io.timelimit.android.integration.platform.ForegroundApp
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 
 abstract class ForegroundAppHelper {
-    abstract suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp>
+    abstract suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp>
     abstract fun getPermissionStatus(): RuntimePermissionStatus
 
     companion object {

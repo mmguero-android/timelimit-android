@@ -226,4 +226,5 @@ object ExperimentalFlags {
     const val HIGH_MAIN_LOOP_DELAY = 128L
     // const val DISCONNECT_WHEN_SCREEN_OFF = 256L
     const val KEEP_CONNECTED_WHEN_SCREEN_OFF = 512L
+    const val MULTI_APP_DETECTION = 1024L
 }

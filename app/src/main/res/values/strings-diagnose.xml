@@ -62,6 +62,7 @@
     <string name="diagnose_exf_nas">Force network time at system level</string>
     <string name="diagnose_exf_mld">Increase the main loop interval</string>
     <string name="diagnose_exf_kcs">Keep connected when the screen is off</string>
+    <string name="diagnose_exf_mad">Try to detect multiple active Apps (splitscreen support)</string>
 
     <string name="diagnose_bg_task_loop_ex">Background task loop exception</string>
 

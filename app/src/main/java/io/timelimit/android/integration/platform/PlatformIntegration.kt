@@ -48,7 +48,7 @@ abstract class PlatformIntegration(
     abstract fun muteAudioIfPossible(packageName: String)
     abstract fun setShowBlockingOverlay(show: Boolean, blockedElement: String? = null)
     // this should throw an SecurityException if the permission is missing
-    abstract suspend fun getForegroundApps(queryInterval: Long): Set<ForegroundApp>
+    abstract suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp>
     abstract fun getMusicPlaybackPackage(): String?
     abstract fun setAppStatusMessage(message: AppStatusMessage?)
     abstract fun isScreenOn(): Boolean
