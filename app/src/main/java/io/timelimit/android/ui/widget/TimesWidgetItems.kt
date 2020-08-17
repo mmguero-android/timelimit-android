@@ -75,6 +75,8 @@ object TimesWidgetItems {
                 newResult.value = emptyList(); return
             }
 
+            realTimeLogic.getRealTime(realTime)
+
             categoryHandlingCache.reportStatus(
                     user = userRelatedData,
                     timeInMillis = realTime.timeInMillis,
