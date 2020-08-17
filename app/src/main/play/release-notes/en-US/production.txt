@@ -1,3 +1,4 @@
-- option that a limited user adds limitations for itself if this was enabled by the parent user
-- improved handling of the split screen feature/ modified detection of the current App; This was tested and did not cause any problems; It is still possible that it causes problems at some devices/ situations
-- improved Widget
+Bug fixes:
+
+- splitscreen support disabled by default because it caused problems
+- added missing handling of the current time in the Widget

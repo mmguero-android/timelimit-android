@@ -1,3 +1,4 @@
-- Möglichkeit, als eingeschränkter Benutzer Beschränkungen hinzuzufügen, sofern es vom Elternteil aktiviert wurde
-- verbesserter Umgang mit der Splitscreen-Funktion/ Veränderungen bei der Erkennung der aktiven App; Das ist umfangreich getestet und hat zu keinen Problemen geführt; Dennoch könnte es bei bestimmten Modellen/ Situationen zu Problemen führen
-- Widget überarbeitet
+Fehlerbehebungen:
+
+- Splitscreen-Unterstützung standardmäßig nicht mehr aktiv, da diese Probleme verursacht hat
+- fehlende Verarbeitung der aktuellen Zeit im Widget behoben
