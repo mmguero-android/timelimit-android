@@ -167,7 +167,6 @@ class NotificationListener: NotificationListenerService() {
             } else if (appHandling is AppBaseHandling.UseCategories) {
                 val time = RealTime.newInstance()
                 val battery = appLogic.platformIntegration.getBatteryStatus()
-                val allowNotificationFilter = deviceAndUserRelatedData.deviceRelatedData.isConnectedAndHasPremium || deviceAndUserRelatedData.deviceRelatedData.isLocalMode
                 val networkId = if (appHandling.needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId().getNetworkIdOrNull() else null
                 val hasPremiumOrLocalMode = appLogic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue()
 
@@ -191,7 +190,7 @@ class NotificationListener: NotificationListenerService() {
                     )
                 }
 
-                if (allowNotificationFilter && categoryHandlings.find { it.blockAllNotifications } != null) {
+                if (categoryHandlings.find { it.blockAllNotifications } != null) {
                     BlockingReason.NotificationsAreBlocked
                 } else {
                     categoryHandlings.find { it.shouldBlockActivities }?.activityBlockingReason
