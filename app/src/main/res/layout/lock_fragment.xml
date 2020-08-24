@@ -545,7 +545,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <io.timelimit.android.ui.view.ManageDisableTimelimitsView
-                    android:visibility="@{reason == BlockingReason.BlockedAtThisTime || reason == BlockingReason.TimeOver || reason == BlockingReason.TimeOverExtraTimeCanBeUsedLater || reason == BlockingReason.SessionDurationLimit ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{reason == BlockingReason.BlockedAtThisTime || reason == BlockingReason.TimeOver || reason == BlockingReason.TimeOverExtraTimeCanBeUsedLater || reason == BlockingReason.SessionDurationLimit || reason == BlockingReason.MissingRequiredNetwork ? View.VISIBLE : View.GONE}"
                     android:id="@+id/manage_disable_time_limits"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
