@@ -32,7 +32,8 @@ sealed class AppBaseHandling {
     data class UseCategories(
             val categoryIds: Set<String>,
             val shouldCount: Boolean,
-            val level: BlockingLevel
+            val level: BlockingLevel,
+            val needsNetworkId: Boolean
     ): AppBaseHandling() {
         init {
             if (categoryIds.isEmpty()) {
@@ -85,14 +86,19 @@ sealed class AppBaseHandling {
                 if (startCategory == null) {
                     return BlockDueToNoCategory
                 } else {
+                    val categoryIds = userRelatedData.getCategoryWithParentCategories(startCategoryId = startCategory.category.id)
+
                     return UseCategories(
-                            categoryIds = userRelatedData.getCategoryWithParentCategories(startCategoryId = startCategory.category.id),
+                            categoryIds = categoryIds,
                             shouldCount = !pauseCounting,
                             level = when (appCategory?.specifiesActivity) {
                                 null -> BlockingLevel.Activity // occurs when using a default category
                                 true -> BlockingLevel.Activity
                                 false -> BlockingLevel.App
-                            }
+                            },
+                            needsNetworkId = categoryIds.find { categoryId ->
+                                userRelatedData.categoryById[categoryId]!!.networks.isNotEmpty()
+                            } != null
                     )
                 }
             } else {
@@ -113,3 +119,5 @@ sealed class AppBaseHandling {
         }
     }
 }
+
+fun AppBaseHandling.needsNetworkId(): Boolean = if (this is AppBaseHandling.UseCategories) this.needsNetworkId else false

@@ -175,4 +175,6 @@ class DummyIntegration(
     override fun setForceNetworkTime(enable: Boolean) = Unit
 
     override fun restartApp() = Unit
+
+    override fun getCurrentNetworkId(): NetworkId = NetworkId.NoNetworkConnected
 }

@@ -112,7 +112,9 @@ class SuspendAppsLogic(private val appLogic: AppLogic): Observer {
                 assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(
                         device = userAndDeviceRelatedData.deviceRelatedData,
                         user = userRelatedData
-                )
+                ),
+                currentNetworkId = null, // not relevant/ not suspending Apps if there is no matching network
+                hasPremiumOrLocalMode = userAndDeviceRelatedData.deviceRelatedData.isLocalMode || userAndDeviceRelatedData.deviceRelatedData.isConnectedAndHasPremium
         )
 
         val defaultCategory = userRelatedData.user.categoryForNotAssignedApps

@@ -15,15 +15,19 @@
  */
 package io.timelimit.android.ui.lock
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
@@ -36,10 +40,13 @@ import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.integration.platform.BatteryStatus
+import io.timelimit.android.integration.platform.NetworkId
+import io.timelimit.android.integration.platform.getNetworkIdOrNull
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
 import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
+import io.timelimit.android.logic.blockingreason.needsNetworkId
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.sync.actions.IncrementCategoryExtraTimeAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
@@ -50,6 +57,7 @@ import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.manage.category.settings.networks.RequestWifiPermission
 import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.category.create.CreateCategoryDialogFragment
@@ -63,6 +71,7 @@ class LockFragment : Fragment() {
         private const val EXTRA_PACKAGE_NAME = "pkg"
         private const val EXTRA_ACTIVITY = "activitiy"
         private const val STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN = "didOpenSetCurrentDeviceScreen"
+        private const val LOCATION_REQUEST_CODE = 1
 
         fun newInstance(packageName: String, activity: String?): LockFragment {
             val result = LockFragment()
@@ -96,6 +105,12 @@ class LockFragment : Fragment() {
     private val batteryStatus: LiveData<BatteryStatus> by lazy {
         logic.platformIntegration.getBatteryStatusLive()
     }
+    private val needsNetworkIdLive = MutableLiveData<Boolean>().apply { value = false }
+    private val realNetworkIdLive: LiveData<NetworkId> by lazy { liveDataFromFunction { logic.platformIntegration.getCurrentNetworkId() } }
+    private val networkIdLive: LiveData<NetworkId?> by lazy { needsNetworkIdLive.switchMap { needsNetworkId ->
+        if (needsNetworkId) realNetworkIdLive as LiveData<NetworkId?> else liveDataFromValue(null as NetworkId?)
+    } }
+    private val hasPremiumOrLocalMode: LiveData<Boolean> by lazy { logic.fullVersion.shouldProvideFullVersionFunctions }
     private lateinit var binding: LockFragmentBinding
     private val handlingCache = CategoryHandlingCache()
     private val realTime = RealTime.newInstance()
@@ -115,6 +130,8 @@ class LockFragment : Fragment() {
     private fun update() {
         val deviceAndUserRelatedData = deviceAndUserRelatedData.value ?: return
         val batteryStatus = batteryStatus.value ?: return
+        val hasPremiumOrLocalMode = hasPremiumOrLocalMode.value ?: return
+        val networkId = networkIdLive.value
 
         logic.realTimeLogic.getRealTime(realTime)
 
@@ -125,14 +142,6 @@ class LockFragment : Fragment() {
             return
         }
 
-        handlingCache.reportStatus(
-                user = deviceAndUserRelatedData.userRelatedData,
-                assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceAndUserRelatedData.deviceRelatedData, deviceAndUserRelatedData.userRelatedData),
-                batteryStatus = batteryStatus,
-                timeInMillis = realTime.timeInMillis,
-                shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily
-        )
-
         val appBaseHandling = AppBaseHandling.calculate(
                 foregroundAppPackageName = packageName,
                 foregroundAppActivityName = activityName,
@@ -140,6 +149,24 @@ class LockFragment : Fragment() {
                 userRelatedData = deviceAndUserRelatedData.userRelatedData,
                 pauseForegroundAppBackgroundLoop = false,
                 pauseCounting = false
+        )
+
+        val needsNetworkId = appBaseHandling.needsNetworkId()
+
+        if (needsNetworkId != needsNetworkIdLive.value) {
+            needsNetworkIdLive.value = needsNetworkId
+        }
+
+        if (needsNetworkId && networkId == null) return
+
+        handlingCache.reportStatus(
+                user = deviceAndUserRelatedData.userRelatedData,
+                assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceAndUserRelatedData.deviceRelatedData, deviceAndUserRelatedData.userRelatedData),
+                batteryStatus = batteryStatus,
+                timeInMillis = realTime.timeInMillis,
+                shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
+                currentNetworkId = networkId?.getNetworkIdOrNull(),
+                hasPremiumOrLocalMode = hasPremiumOrLocalMode
         )
 
         binding.activityName = if (deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking)
@@ -278,6 +305,10 @@ class LockFragment : Fragment() {
             }
 
             override fun setThisDeviceAsCurrentDevice() = this@LockFragment.setThisDeviceAsCurrentDevice()
+
+            override fun requestLocationPermission() {
+                RequestWifiPermission.doRequest(this@LockFragment, LOCATION_REQUEST_CODE)
+            }
         }
     }
 
@@ -373,6 +404,12 @@ class LockFragment : Fragment() {
         }
     }
 
+    private fun initGrantPermissionView() {
+        networkIdLive.observe(viewLifecycleOwner, Observer {
+            binding.missingNetworkIdPermission = it is NetworkId.MissingPermission
+        })
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -411,6 +448,8 @@ class LockFragment : Fragment() {
 
         deviceAndUserRelatedData.observe(viewLifecycleOwner, Observer { update() })
         batteryStatus.observe(viewLifecycleOwner, Observer { update() })
+        networkIdLive.observe(viewLifecycleOwner, Observer { update() })
+        hasPremiumOrLocalMode.observe(viewLifecycleOwner, Observer { update() })
 
         binding.packageName = packageName
 
@@ -418,6 +457,7 @@ class LockFragment : Fragment() {
         binding.appIcon.setImageDrawable(logic.platformIntegration.getAppIcon(packageName))
 
         initExtraTimeView()
+        initGrantPermissionView()
 
         return binding.root
     }
@@ -441,6 +481,12 @@ class LockFragment : Fragment() {
 
         unscheduleUpdate()
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (grantResults.find { it != PackageManager.PERMISSION_GRANTED } != null) {
+            Toast.makeText(context!!, R.string.generic_runtime_permission_rejected, Toast.LENGTH_LONG).show()
+        }
+    }
 }
 
 interface Handlers {
@@ -452,4 +498,5 @@ interface Handlers {
     fun disableTemporarilyLockForAllCategories()
     fun showAuthenticationScreen()
     fun setThisDeviceAsCurrentDevice()
+    fun requestLocationPermission()
 }

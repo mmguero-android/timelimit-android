@@ -729,6 +729,30 @@ object LocalDatabaseParentActionDispatcher {
                                 )
                         ) }
                 }
+                is AddCategoryNetworkId -> {
+                    DatabaseValidation.assertCategoryExists(database, action.categoryId)
+
+                    val count = database.categoryNetworkId().countByCategoryIdSync(action.categoryId)
+
+                    if (count + 1 > CategoryNetworkId.MAX_ITEMS) {
+                        throw IllegalArgumentException()
+                    }
+
+                    val oldItem = database.categoryNetworkId().getByCategoryIdAndItemIdSync(categoryId = action.categoryId, itemId = action.itemId)
+
+                    if (oldItem != null) {
+                        throw IllegalArgumentException("id already used")
+                    }
+
+                    database.categoryNetworkId().insertItemSync(CategoryNetworkId(
+                            categoryId = action.categoryId,
+                            networkItemId = action.itemId,
+                            hashedNetworkId = action.hashedNetworkId
+                    ))
+                }
+                is ResetCategoryNetworkIds -> {
+                    database.categoryNetworkId().deleteByCategoryId(categoryId = action.categoryId)
+                }
             }.let { }
         }
     }

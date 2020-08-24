@@ -95,6 +95,9 @@
             <include android:id="@+id/notification_filter"
                 layout="@layout/category_notification_filter" />
 
+            <include android:id="@+id/networks"
+                layout="@layout/manage_category_networks_view" />
+
             <androidx.cardview.widget.CardView
                 app:cardUseCompatPadding="true"
                 android:layout_width="match_parent"

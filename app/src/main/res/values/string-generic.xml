@@ -32,4 +32,5 @@
     </plurals>
 
     <string name="generic_swipe_to_dismiss">Swipe to the side to remove this message</string>
+    <string name="generic_runtime_permission_rejected">Permission rejected; You can manage permissions in the system settings</string>
 </resources>

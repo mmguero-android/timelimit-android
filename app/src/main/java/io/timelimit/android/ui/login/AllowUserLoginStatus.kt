@@ -73,7 +73,9 @@ object AllowUserLoginStatusUtil {
                         assumeCurrentDevice = true,
                         timeInMillis = time.timeInMillis,
                         batteryStatus = batteryStatus,
-                        shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily
+                        shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily,
+                        currentNetworkId = null, // only checks shouldBlockAtSystemLevel which ignores the network id
+                        hasPremiumOrLocalMode = data.deviceRelatedData.isLocalMode || data.deviceRelatedData.isConnectedAndHasPremium
                 )
 
                 val categoryIds = data.limitLoginCategoryUserRelatedData.getCategoryWithParentCategories(data.loginRelatedData.limitLoginCategory.categoryId)

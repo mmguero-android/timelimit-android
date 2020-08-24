@@ -34,6 +34,7 @@
     <string name="diagnose_connection_own_server">TimeLimit Server: %s</string>
     <string name="diagnose_connection_yes">connected</string>
     <string name="diagnose_connection_no">not connected</string>
+    <string name="diagnose_connection_network_id">Network ID</string>
 
     <string name="diagnose_sync_title">Synchronization</string>
     <string name="diagnose_sync_empty">There is nothing which needs to be synchronized</string>

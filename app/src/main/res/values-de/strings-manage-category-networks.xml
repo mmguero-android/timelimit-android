@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="category_networks_title">Netzwerke</string>
+    <string name="category_networks_help">Hier können WLAN-Drahtlosnetzwerke hinzugefügt werden.
+        Diese Kategorie wird gesperrt, wenn Netzwerke hinzugefügt wurden und es keine
+        Verbindung zu einem der angegebenen Netzwerke gibt.
+        Ein Netzwerk wird durch einen Access Point identifiziert. Im Fall von mehreren Access Point/ Repeatern
+        müssen alle einzeln hinzugefügt werden.
+        Das vorübergehende Deaktivieren von Zeitbegrenzungen deaktiviert auch die Beschränkungen durch diese Funktion.
+    </string>
+    <string name="category_networks_empty">Sie haben keine Netzwerke hinzugefügt. Diese Kategorie wird
+        nicht abhängig vom Netzwerk gesperrt.
+    </string>
+    <string name="category_networks_not_empty">Es wurden %s hinzugefügt. Diese Kategorie kann nur in den
+        angegebenen Netzwerken verwendet werden.</string>
+    <plurals name="category_networks_counter">
+        <item quantity="one">%d Netzwerk</item>
+        <item quantity="other">%d Netzwerke</item>
+    </plurals>
+    <string name="category_networks_status_missing_permission">Die Berechtigung zum Abrufen vom aktuellen Netzwerk fehlt</string>
+    <string name="category_networks_status_none_connected">Sie sind mit keinem WLAN verbunden</string>
+    <string name="category_networks_status_connected_no_match">Das aktuelle WLAN wurde nicht hinzugefügt</string>
+    <string name="category_networks_status_connected_no_match_full">Das aktuelle WLAN wurde nicht hinzugefügt,
+        aber es können keine weiteren WLANs hinzugefügt werden
+    </string>
+    <string name="category_networks_status_connected_has_match">Das aktuelle WLAN wurde hinzugefügt</string>
+    <string name="category_networks_action_add">Netzwerk hinzufügen</string>
+    <string name="category_networks_action_grant">Berechtigung erteilen</string>
+    <string name="category_networks_action_remove">Alle Netzwerke entfernen</string>
+    <string name="category_networks_toast_all_removed">alle Netzwerke entfernt</string>
+
+    <string name="category_networks_toast_enable_location_service">Bitte den Standortzugriff aktivieren</string>
+</resources>

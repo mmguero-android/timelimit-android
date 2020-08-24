@@ -31,6 +31,8 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.UserType
+import io.timelimit.android.integration.platform.getNetworkIdOrNull
+import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
 import io.timelimit.android.logic.blockingreason.CategoryItselfHandling
@@ -117,6 +119,7 @@ class NotificationListener: NotificationListenerService() {
                                                     BlockingReason.NotificationsAreBlocked -> getString(R.string.lock_reason_short_notification_blocking)
                                                     BlockingReason.BatteryLimit -> getString(R.string.lock_reason_short_battery_limit)
                                                     BlockingReason.SessionDurationLimit -> getString(R.string.lock_reason_short_session_duration)
+                                                    BlockingReason.MissingRequiredNetwork -> getString(R.string.lock_reason_short_missing_required_network)
                                                     BlockingReason.None -> throw IllegalStateException()
                                                 }
                                 )
@@ -165,12 +168,16 @@ class NotificationListener: NotificationListenerService() {
                 val time = RealTime.newInstance()
                 val battery = appLogic.platformIntegration.getBatteryStatus()
                 val allowNotificationFilter = deviceAndUserRelatedData.deviceRelatedData.isConnectedAndHasPremium || deviceAndUserRelatedData.deviceRelatedData.isLocalMode
+                val networkId = if (appHandling.needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId().getNetworkIdOrNull() else null
+                val hasPremiumOrLocalMode = appLogic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue()
 
                 appLogic.realTimeLogic.getRealTime(time)
 
                 val categoryHandlings = appHandling.categoryIds.map { categoryId ->
+                    val categoryRelatedData = deviceAndUserRelatedData.userRelatedData.categoryById[categoryId]!!
+
                     CategoryItselfHandling.calculate(
-                            categoryRelatedData = deviceAndUserRelatedData.userRelatedData.categoryById[categoryId]!!,
+                            categoryRelatedData = categoryRelatedData,
                             user = deviceAndUserRelatedData.userRelatedData,
                             assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(
                                     device = deviceAndUserRelatedData.deviceRelatedData,
@@ -178,7 +185,9 @@ class NotificationListener: NotificationListenerService() {
                             ),
                             batteryStatus = battery,
                             shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily,
-                            timeInMillis = time.timeInMillis
+                            timeInMillis = time.timeInMillis,
+                            currentNetworkId = networkId,
+                            hasPremiumOrLocalMode = hasPremiumOrLocalMode
                     )
                 }
 

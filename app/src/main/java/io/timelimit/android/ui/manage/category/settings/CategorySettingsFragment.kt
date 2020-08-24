@@ -15,10 +15,12 @@
  */
 package io.timelimit.android.ui.manage.category.settings
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
@@ -36,11 +38,14 @@ import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 import io.timelimit.android.ui.manage.category.settings.addusedtime.AddUsedTimeDialogFragment
+import io.timelimit.android.ui.manage.category.settings.networks.ManageCategoryNetworksView
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 
 class CategorySettingsFragment : Fragment() {
     companion object {
+        private const val PERMISSION_REQUEST_CODE = 1
+
         fun newInstance(params: ManageCategoryFragmentArgs): CategorySettingsFragment {
             val result = CategorySettingsFragment()
             result.arguments = params.toBundle()
@@ -115,6 +120,16 @@ class CategorySettingsFragment : Fragment() {
                 categoryLive = categoryEntry,
                 lifecycleOwner = this,
                 fragmentManager = parentFragmentManager
+        )
+
+        ManageCategoryNetworksView.bind(
+                view = binding.networks,
+                auth = auth,
+                lifecycleOwner = viewLifecycleOwner,
+                fragmentManager = parentFragmentManager,
+                fragment = this,
+                permissionRequestCode = PERMISSION_REQUEST_CODE,
+                categoryId = params.categoryId
         )
 
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }
@@ -229,6 +244,14 @@ class CategorySettingsFragment : Fragment() {
                     childId = params.childId,
                     categoryId = params.categoryId
             ).show(parentFragmentManager)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.find { it != PackageManager.PERMISSION_GRANTED } != null) {
+                Toast.makeText(context!!, R.string.generic_runtime_permission_rejected, Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

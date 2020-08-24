@@ -70,6 +70,8 @@ object ActionParser {
         // UpdateCategorySorting
         // UpdateUserFlagsAction
         // UpdateUserLimitLoginCategory
+        // AddCategoryNetworkId
+        // ResetCategoryNetworkIds
         else -> throw IllegalStateException()
     }
 }

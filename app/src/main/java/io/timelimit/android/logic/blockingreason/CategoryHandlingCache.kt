@@ -27,19 +27,25 @@ class CategoryHandlingCache {
     private var shouldTrustTimeTemporarily: Boolean = false
     private var timeInMillis: Long = 0
     private var assumeCurrentDevice: Boolean = false
+    private var currentNetworkId: String? = null
+    private var hasPremiumOrLocalMode: Boolean = false
 
     fun reportStatus(
             user: UserRelatedData,
             batteryStatus: BatteryStatus,
             shouldTrustTimeTemporarily: Boolean,
             timeInMillis: Long,
-            assumeCurrentDevice: Boolean
+            assumeCurrentDevice: Boolean,
+            currentNetworkId: String?,
+            hasPremiumOrLocalMode: Boolean
     ) {
         this.user = user
         this.batteryStatus = batteryStatus
         this.shouldTrustTimeTemporarily = shouldTrustTimeTemporarily
         this.timeInMillis = timeInMillis
         this.assumeCurrentDevice = assumeCurrentDevice
+        this.currentNetworkId = currentNetworkId
+        this.hasPremiumOrLocalMode = hasPremiumOrLocalMode
 
         val iterator = cachedItems.iterator()
 
@@ -54,7 +60,9 @@ class CategoryHandlingCache {
                             batteryStatus = batteryStatus,
                             assumeCurrentDevice = assumeCurrentDevice,
                             shouldTrustTimeTemporarily = shouldTrustTimeTemporarily,
-                            timeInMillis = timeInMillis
+                            timeInMillis = timeInMillis,
+                            currentNetworkId = currentNetworkId,
+                            hasPremiumOrLocalMode = hasPremiumOrLocalMode
                     )
             ) {
                 iterator.remove()
@@ -76,6 +84,8 @@ class CategoryHandlingCache {
             batteryStatus = batteryStatus,
             assumeCurrentDevice = assumeCurrentDevice,
             shouldTrustTimeTemporarily = shouldTrustTimeTemporarily,
-            timeInMillis = timeInMillis
+            timeInMillis = timeInMillis,
+            currentNetworkId = currentNetworkId,
+            hasPremiumOrLocalMode = hasPremiumOrLocalMode
     )
 }

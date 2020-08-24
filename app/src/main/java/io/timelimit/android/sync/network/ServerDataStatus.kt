@@ -17,6 +17,8 @@ package io.timelimit.android.sync.network
 
 import android.util.JsonReader
 import android.util.JsonToken
+import io.timelimit.android.crypto.HexString
+import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
 import io.timelimit.android.data.model.*
@@ -443,7 +445,8 @@ data class ServerUpdatedCategoryBaseData(
         val timeWarnings: Int,
         val minBatteryLevelCharging: Int,
         val minBatteryLevelMobile: Int,
-        val sort: Int
+        val sort: Int,
+        val networks: List<ServerCategoryNetworkId>
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -461,6 +464,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val MIN_BATTERY_LEVEL_MOBILE = "mblMobile"
         private const val MIN_BATTERY_LEVEL_CHARGING = "mblCharging"
         private const val SORT = "sort"
+        private const val NETWORKS = "networks"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -479,6 +483,7 @@ data class ServerUpdatedCategoryBaseData(
             var minBatteryLevelCharging = 0
             var minBatteryLevelMobile = 0
             var sort = 0
+            var networks: List<ServerCategoryNetworkId> = emptyList()
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -498,6 +503,7 @@ data class ServerUpdatedCategoryBaseData(
                     MIN_BATTERY_LEVEL_CHARGING -> minBatteryLevelCharging = reader.nextInt()
                     MIN_BATTERY_LEVEL_MOBILE -> minBatteryLevelMobile = reader.nextInt()
                     SORT -> sort = reader.nextInt()
+                    NETWORKS -> networks = ServerCategoryNetworkId.parseList(reader)
                     else -> reader.skipValue()
                 }
             }
@@ -518,11 +524,47 @@ data class ServerUpdatedCategoryBaseData(
                     timeWarnings = timeWarnings,
                     minBatteryLevelCharging = minBatteryLevelCharging,
                     minBatteryLevelMobile = minBatteryLevelMobile,
-                    sort = sort
+                    sort = sort,
+                    networks = networks
             )
         }
 
         fun parseList(reader: JsonReader) = parseJsonArray(reader) { parse(reader) }
+    }
+}
+
+data class ServerCategoryNetworkId(val itemId: String, val hashedNetworkId: String) {
+    companion object {
+        private const val ITEM_ID = "itemId"
+        private const val HASHED_NETWORK_ID = "hashedNetworkId"
+
+        fun parse(reader: JsonReader): ServerCategoryNetworkId {
+            var itemId: String? = null
+            var hashedNetworkId: String? = null
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    ITEM_ID -> itemId = reader.nextString()
+                    HASHED_NETWORK_ID -> hashedNetworkId = reader.nextString()
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+
+            return ServerCategoryNetworkId(
+                    itemId = itemId!!,
+                    hashedNetworkId = hashedNetworkId!!
+            )
+        }
+
+        fun parseList(reader: JsonReader) = parseJsonArray(reader) { parse(reader) }
+    }
+
+    init {
+        IdGenerator.assertIdValid(itemId)
+        HexString.assertIsHexString(hashedNetworkId)
+        if (hashedNetworkId.length != CategoryNetworkId.ANONYMIZED_NETWORK_ID_LENGTH) throw IllegalArgumentException()
     }
 }
 

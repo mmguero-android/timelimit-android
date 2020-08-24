@@ -52,6 +52,9 @@
     <string name="lock_confirm_time_title">Confirm time manually</string>
     <string name="lock_confirm_time_btn">This time is correct</string>
 
+    <string name="lock_grant_permission_title">Grant permission</string>
+    <string name="lock_grant_permission_text">Allow TimeLimit to see the connected network</string>
+
     <string name="lock_reason_no_category">
         This App was not assigned to any category.
         Due to that, there are no restriction settings.
@@ -89,6 +92,9 @@
         and this limit was reached.
         It will be unlocked after the break duration.
     </string>
+    <string name="lock_reason_missing_required_network">
+        This %s is only allowed in some networks, but no connection to such network was found.
+    </string>
 
     <string name="lock_reason_short_no_category">no category</string>
     <string name="lock_reason_short_temporarily_blocked">temporarily blocked</string>
@@ -99,6 +105,7 @@
     <string name="lock_reason_short_notification_blocking">all notifications are blocked</string>
     <string name="lock_reason_short_battery_limit">battery limit reached</string>
     <string name="lock_reason_short_session_duration">session duration limit reached</string>
+    <string name="lock_reason_short_missing_required_network">no allowed network</string>
 
     <string name="lock_overlay_warning">
         Failed to open the lock screen.

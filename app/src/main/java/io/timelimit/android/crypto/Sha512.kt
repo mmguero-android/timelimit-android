@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,5 +24,5 @@ object Sha512 {
         return HexString.toHex(hashSync(data.toByteArray(charset("UTF-8"))))
     }
 
-    fun hashSync(data: ByteArray) = messageDigest.digest(data)
+    fun hashSync(data: ByteArray): ByteArray = messageDigest.digest(data)
 }

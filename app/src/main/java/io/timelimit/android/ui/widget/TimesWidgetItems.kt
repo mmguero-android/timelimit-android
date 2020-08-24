@@ -82,7 +82,9 @@ object TimesWidgetItems {
                     timeInMillis = realTime.timeInMillis,
                     batteryStatus = logic.platformIntegration.getBatteryStatus(),
                     shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
-                    assumeCurrentDevice = true
+                    assumeCurrentDevice = true,
+                    currentNetworkId = null, // not relevant here
+                    hasPremiumOrLocalMode = false   // not relevant here
             )
 
             var maxTime = Long.MAX_VALUE

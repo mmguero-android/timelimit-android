@@ -31,9 +31,11 @@ import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.integration.platform.AppStatusMessage
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AccessibilityService
+import io.timelimit.android.integration.platform.getNetworkIdOrNull
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
 import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
+import io.timelimit.android.logic.blockingreason.needsNetworkId
 import io.timelimit.android.sync.actions.UpdateDeviceStatusAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.ui.IsAppInForeground
@@ -266,16 +268,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
                 }
 
-                fun reportStatusToCategoryHandlingCache(userRelatedData: UserRelatedData) {
-                    categoryHandlingCache.reportStatus(
-                            user = userRelatedData,
-                            timeInMillis = nowTimestamp,
-                            shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
-                            assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceRelatedData, userRelatedData),
-                            batteryStatus = batteryStatus
-                    )
-                }; reportStatusToCategoryHandlingCache(userRelatedData)
-
                 val foregroundApps = appLogic.platformIntegration.getForegroundApps(
                         appLogic.getForegroundAppQueryInterval(),
                         appLogic.getEnableMultiAppDetection()
@@ -303,6 +295,21 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         deviceRelatedData = deviceRelatedData,
                         pauseCounting = false
                 )
+
+                val needsNetworkId = foregroundAppWithBaseHandlings.find { it.second.needsNetworkId() } != null || backgroundAppBaseHandling.needsNetworkId()
+                val networkId: String? = if (needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId().getNetworkIdOrNull() else null
+
+                fun reportStatusToCategoryHandlingCache(userRelatedData: UserRelatedData) {
+                    categoryHandlingCache.reportStatus(
+                            user = userRelatedData,
+                            timeInMillis = nowTimestamp,
+                            shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
+                            assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceRelatedData, userRelatedData),
+                            batteryStatus = batteryStatus,
+                            currentNetworkId = networkId,
+                            hasPremiumOrLocalMode = deviceRelatedData.isLocalMode || deviceRelatedData.isConnectedAndHasPremium
+                    )
+                }; reportStatusToCategoryHandlingCache(userRelatedData)
 
                 // check if should be blocked
                 val blockedForegroundApp = foregroundAppWithBaseHandlings.find { (_, foregroundAppBaseHandling) ->

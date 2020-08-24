@@ -50,6 +50,9 @@
     <string name="lock_confirm_time_title">Systemzeit manuell bestätigen</string>
     <string name="lock_confirm_time_btn">Diese Zeit ist richtig</string>
 
+    <string name="lock_grant_permission_title">Berechtigung erteilen</string>
+    <string name="lock_grant_permission_text">TimeLimit ermöglichen, das verbundene Netzwerk zu erkennen</string>
+
     <string name="lock_reason_no_category">
         Die App wurde zu keiner Kategorie zugeordnet. Das bedeutet, dass es keine Einschränkungs-Einstellungen gibt. Und da ist es die einfachste Lösung, die App zu sperren.
     </string>
@@ -84,6 +87,10 @@
         Für diese %s gibt es eine Sitzungsdauerbegrenzung.
         Nach dem Ablauf der Pausenzeit wird die Sperre aufgehoben.
     </string>
+    <string name="lock_reason_missing_required_network">
+        Diese %s darf nur in bestimmten Netzwerken verwendet werden,
+        aber es wurde keine Verbindung zu einem entsprechenden Netzwerk gefunden.
+    </string>
 
     <string name="lock_reason_short_no_category">keine Kategorie</string>
     <string name="lock_reason_short_temporarily_blocked">vorübergehend gesperrt</string>
@@ -94,6 +101,7 @@
     <string name="lock_reason_short_notification_blocking">alle Benachrichtigungen werden blockiert</string>
     <string name="lock_reason_short_battery_limit">Akkulimit unterschritten</string>
     <string name="lock_reason_short_session_duration">Sitzungsdauergrenze erreicht</string>
+    <string name="lock_reason_short_missing_required_network">kein erlaubtes Netzwerk</string>
 
     <string name="lock_overlay_warning">
         Öffnen des Sperrbildschirms fehlgeschlagen.

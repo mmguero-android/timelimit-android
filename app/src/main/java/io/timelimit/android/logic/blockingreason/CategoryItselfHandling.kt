@@ -15,6 +15,7 @@
  */
 package io.timelimit.android.logic.blockingreason
 
+import io.timelimit.android.data.model.CategoryNetworkId
 import io.timelimit.android.data.model.derived.CategoryRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.date.DateInTimezone
@@ -37,6 +38,7 @@ data class CategoryItselfHandling (
         val areLimitsTemporarilyDisabled: Boolean,
         val okByBattery: Boolean,
         val okByTempBlocking: Boolean,
+        val okByNetworkId: Boolean,
         val okByBlockedTimeAreas: Boolean,
         val okByTimeLimitRules: Boolean,
         val okBySessionDurationLimits: Boolean,
@@ -50,11 +52,14 @@ data class CategoryItselfHandling (
         val dependsOnBatteryCharging: Boolean,
         val dependsOnMinBatteryLevel: Int,
         val dependsOnMaxBatteryLevel: Int,
+        val dependsOnNetworkId: Boolean,
         val createdWithCategoryRelatedData: CategoryRelatedData,
         val createdWithUserRelatedData: UserRelatedData,
         val createdWithBatteryStatus: BatteryStatus,
         val createdWithTemporarilyTrustTime: Boolean,
-        val createdWithAssumeCurrentDevice: Boolean
+        val createdWithAssumeCurrentDevice: Boolean,
+        val createdWithNetworkId: String?,
+        val createdWithHasPremiumOrLocalMode: Boolean
 ) {
     companion object {
         fun calculate(
@@ -63,7 +68,9 @@ data class CategoryItselfHandling (
                 batteryStatus: BatteryStatus,
                 shouldTrustTimeTemporarily: Boolean,
                 timeInMillis: Long,
-                assumeCurrentDevice: Boolean
+                assumeCurrentDevice: Boolean,
+                currentNetworkId: String?,
+                hasPremiumOrLocalMode: Boolean
         ): CategoryItselfHandling {
             val dependsOnMinTime = timeInMillis
             val dateInTimezone = DateInTimezone.newInstance(timeInMillis, user.timeZone)
@@ -87,6 +94,14 @@ data class CategoryItselfHandling (
             val areLimitsTemporarilyDisabled = shouldTrustTimeTemporarily && timeInMillis < user.user.disableLimitsUntil
             val dependsOnMaxTimeByTemporarilyDisabledLimits = if (areLimitsTemporarilyDisabled) user.user.disableLimitsUntil else Long.MAX_VALUE
             // ignore it for this case: val requiresTrustedTimeForTempLimitsDisabled = user.user.disableLimitsUntil != 0L
+
+            val dependsOnNetworkId = categoryRelatedData.networks.isNotEmpty()
+            val okByNetworkId = if (categoryRelatedData.networks.isEmpty() || areLimitsTemporarilyDisabled || !hasPremiumOrLocalMode)
+                true
+            else if (currentNetworkId == null)
+                false
+            else
+                categoryRelatedData.networks.find { CategoryNetworkId.anonymizeNetworkId(itemId = it.networkItemId, networkId = currentNetworkId) == it.hashedNetworkId } != null
 
             val missingNetworkTimeForBlockedTimeAreas = !categoryRelatedData.category.blockedMinutesInWeek.dataNotToModify.isEmpty
             val okByBlockedTimeAreas = areLimitsTemporarilyDisabled || !categoryRelatedData.category.blockedMinutesInWeek.read(minuteInWeek)
@@ -195,7 +210,7 @@ data class CategoryItselfHandling (
             else
                 emptySet()
 
-            val blockAllNotifications = categoryRelatedData.category.blockAllNotifications
+            val blockAllNotifications = categoryRelatedData.category.blockAllNotifications &&hasPremiumOrLocalMode
 
             return CategoryItselfHandling(
                     shouldCountTime = shouldCountTime,
@@ -205,6 +220,7 @@ data class CategoryItselfHandling (
                     areLimitsTemporarilyDisabled = areLimitsTemporarilyDisabled,
                     okByBattery = okByBattery,
                     okByTempBlocking = okByTempBlocking,
+                    okByNetworkId = okByNetworkId,
                     okByBlockedTimeAreas = okByBlockedTimeAreas,
                     okByTimeLimitRules = okByTimeLimitRules,
                     okBySessionDurationLimits = okBySessionDurationLimits,
@@ -219,22 +235,27 @@ data class CategoryItselfHandling (
                     dependsOnBatteryCharging = dependsOnBatteryCharging,
                     dependsOnMinBatteryLevel = dependsOnMinBatteryLevel,
                     dependsOnMaxBatteryLevel = dependsOnMaxBatteryLevel,
+                    dependsOnNetworkId = dependsOnNetworkId,
                     createdWithCategoryRelatedData = categoryRelatedData,
                     createdWithBatteryStatus = batteryStatus,
                     createdWithTemporarilyTrustTime = shouldTrustTimeTemporarily,
                     createdWithAssumeCurrentDevice = assumeCurrentDevice,
-                    createdWithUserRelatedData = user
+                    createdWithUserRelatedData = user,
+                    createdWithNetworkId = currentNetworkId,
+                    createdWithHasPremiumOrLocalMode = hasPremiumOrLocalMode
             )
         }
     }
 
     val okBasic = okByBattery && okByTempBlocking && okByBlockedTimeAreas && okByTimeLimitRules && okBySessionDurationLimits && !missingNetworkTime
-    val okAll = okBasic && okByCurrentDevice
+    val okAll = okBasic && okByCurrentDevice && okByNetworkId
     val shouldBlockActivities = !okAll
     val activityBlockingReason: BlockingReason = if (!okByBattery)
         BlockingReason.BatteryLimit
     else if (!okByTempBlocking)
         BlockingReason.TemporarilyBlocked
+    else if (!okByNetworkId)
+        BlockingReason.MissingRequiredNetwork
     else if (!okByBlockedTimeAreas)
         BlockingReason.BlockedAtThisTime
     else if (!okByTimeLimitRules)
@@ -278,7 +299,9 @@ data class CategoryItselfHandling (
             batteryStatus: BatteryStatus,
             shouldTrustTimeTemporarily: Boolean,
             timeInMillis: Long,
-            assumeCurrentDevice: Boolean
+            assumeCurrentDevice: Boolean,
+            currentNetworkId: String?,
+            hasPremiumOrLocalMode: Boolean
     ): Boolean {
         if (
                 categoryRelatedData != createdWithCategoryRelatedData || user != createdWithUserRelatedData ||
@@ -296,6 +319,14 @@ data class CategoryItselfHandling (
         }
 
         if (batteryStatus.level < dependsOnMinBatteryLevel || batteryStatus.level > dependsOnMaxBatteryLevel) {
+            return false
+        }
+
+        if (dependsOnNetworkId && currentNetworkId != createdWithNetworkId) {
+            return false
+        }
+
+        if (hasPremiumOrLocalMode != createdWithHasPremiumOrLocalMode) {
             return false
         }
 

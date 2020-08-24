@@ -83,6 +83,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     private val deviceAdmin = ComponentName(context.applicationContext, AdminReceiver::class.java)
     private val overlay = OverlayUtil(context as Application)
     private val battery = BatteryStatusUtil(context)
+    private val connectedNetwork = ConnectedNetworkUtil(context)
 
     init {
         AppsChangeListener.registerBroadcastReceiver(this.context, object : BroadcastReceiver() {
@@ -520,4 +521,6 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
             }
         }
     }
+
+    override fun getCurrentNetworkId(): NetworkId = connectedNetwork.getNetworkId()
 }

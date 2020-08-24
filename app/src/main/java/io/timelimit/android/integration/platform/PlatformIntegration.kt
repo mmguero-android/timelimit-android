@@ -74,6 +74,8 @@ abstract class PlatformIntegration(
 
     abstract fun restartApp()
 
+    abstract fun getCurrentNetworkId(): NetworkId
+
     var installedAppsChangeListener: Runnable? = null
     var systemClockChangeListener: Runnable? = null
 }
@@ -217,3 +219,11 @@ data class BatteryStatus(
         }
     }
 }
+
+sealed class NetworkId {
+    object NoNetworkConnected : NetworkId()
+    object MissingPermission: NetworkId()
+    data class Network(val id: String): NetworkId()
+}
+
+fun NetworkId.getNetworkIdOrNull(): String? = if (this is NetworkId.Network) this.id else null

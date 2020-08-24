@@ -17,28 +17,28 @@
 package io.timelimit.android.data.model.derived
 
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.model.Category
-import io.timelimit.android.data.model.SessionDuration
-import io.timelimit.android.data.model.TimeLimitRule
-import io.timelimit.android.data.model.UsedTimeItem
+import io.timelimit.android.data.model.*
 
 data class CategoryRelatedData(
         val category: Category,
         val rules: List<TimeLimitRule>,
         val usedTimes: List<UsedTimeItem>,
-        val durations: List<SessionDuration>
+        val durations: List<SessionDuration>,
+        val networks: List<CategoryNetworkId>
 ) {
     companion object {
         fun load(category: Category, database: Database): CategoryRelatedData = database.runInUnobservedTransaction {
             val rules = database.timeLimitRules().getTimeLimitRulesByCategorySync(category.id)
             val usedTimes = database.usedTimes().getUsedTimeItemsByCategoryId(category.id)
             val durations = database.sessionDuration().getSessionDurationItemsByCategoryIdSync(category.id)
+            val networks = database.categoryNetworkId().getByCategoryIdSync(category.id)
 
             CategoryRelatedData(
                     category = category,
                     rules = rules,
                     usedTimes = usedTimes,
-                    durations = durations
+                    durations = durations,
+                    networks = networks
             )
         }
     }
@@ -48,6 +48,7 @@ data class CategoryRelatedData(
             updateRules: Boolean,
             updateTimes: Boolean,
             updateDurations: Boolean,
+            updateNetworks: Boolean,
             database: Database
     ): CategoryRelatedData = database.runInUnobservedTransaction {
         if (category.id != this.category.id) {
@@ -57,15 +58,17 @@ data class CategoryRelatedData(
         val rules = if (updateRules) database.timeLimitRules().getTimeLimitRulesByCategorySync(category.id) else rules
         val usedTimes = if (updateTimes) database.usedTimes().getUsedTimeItemsByCategoryId(category.id) else usedTimes
         val durations = if (updateDurations) database.sessionDuration().getSessionDurationItemsByCategoryIdSync(category.id) else durations
+        val networks = if (updateNetworks) database.categoryNetworkId().getByCategoryIdSync(category.id) else networks
 
-        if (category == this.category && rules == this.rules && usedTimes == this.usedTimes && durations == this.durations) {
+        if (category == this.category && rules == this.rules && usedTimes == this.usedTimes && durations == this.durations && networks == this.networks) {
             this
         } else {
             CategoryRelatedData(
                     category = category,
                     rules = rules,
                     usedTimes = usedTimes,
-                    durations = durations
+                    durations = durations,
+                    networks = networks
             )
         }
     }

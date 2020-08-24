@@ -51,6 +51,10 @@
             name="blockedKindLabel"
             type="String" />
 
+        <variable
+            name="missingNetworkIdPermission"
+            type="boolean" />
+
         <import type="android.view.View" />
         <import type="io.timelimit.android.logic.BlockingReason" />
         <import type="android.text.TextUtils" />
@@ -281,11 +285,11 @@
                             tools:ignore="UnusedAttribute"
                             android:drawablePadding="16dp"
                             android:drawableTint="?colorOnSurface"
-                            android:drawableStart="@drawable/ic_pause_circle_outline_black_24dp"
-                            android:visibility="@{reason == BlockingReason.SessionDurationLimit ? View.VISIBLE : View.GONE}"
+                            android:drawableStart="@drawable/ic_baseline_wifi_lock_24"
+                            android:visibility="@{reason == BlockingReason.MissingRequiredNetwork ? View.VISIBLE : View.GONE}"
                             android:textAppearance="?android:textAppearanceMedium"
-                            android:text="@{@string/lock_reason_session_duration(blockedKindLabel)}"
-                            tools:text="@string/lock_reason_session_duration"
+                            android:text="@{@string/lock_reason_missing_required_network(blockedKindLabel)}"
+                            tools:text="@string/lock_reason_missing_required_network"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -560,6 +564,34 @@
                         <TextView
                             android:textAppearance="?android:textAppearanceSmall"
                             android:text="@string/purchase_required_info_only_networking"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:visibility="@{reason == BlockingReason.MissingRequiredNetwork &amp;&amp; missingNetworkIdPermission ? View.VISIBLE : View.GONE}"
+                    android:foreground="?selectableItemBackground"
+                    android:onClick="@{() -> handlers.requestLocationPermission()}"
+                    app:cardUseCompatPadding="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:padding="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="@string/lock_grant_permission_title"
+                            android:textAppearance="?android:textAppearanceLarge"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="@string/lock_grant_permission_text"
+                            android:textAppearance="?android:textAppearanceMedium"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 

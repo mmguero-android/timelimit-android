@@ -354,6 +354,21 @@ object ApplyServerDataStatus {
                                 database.category().updateCategorySync(updatedCategory)
                             }
                         }
+
+                        // apply networks
+                        database.categoryNetworkId().deleteByCategoryId(newCategory.categoryId)
+
+                        if (newCategory.networks.isNotEmpty()) {
+                            database.categoryNetworkId().insertItemsSync(
+                                    newCategory.networks.map { network ->
+                                        CategoryNetworkId(
+                                                categoryId = newCategory.categoryId,
+                                                networkItemId = network.itemId,
+                                                hashedNetworkId = network.hashedNetworkId
+                                        )
+                                    }
+                            )
+                        }
                     }
                 }
             }

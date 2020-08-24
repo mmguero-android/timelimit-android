@@ -32,7 +32,8 @@ enum class BlockingReason {
     RequiresCurrentDevice,
     NotificationsAreBlocked,
     BatteryLimit,
-    SessionDurationLimit
+    SessionDurationLimit,
+    MissingRequiredNetwork
 }
 
 enum class BlockingLevel {

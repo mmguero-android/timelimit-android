@@ -32,7 +32,8 @@ enum class Table {
     UsedTimeItem,
     User,
     UserKey,
-    UserLimitLoginCategory
+    UserLimitLoginCategory,
+    CategoryNetworkId
 }
 
 object TableNames {
@@ -52,6 +53,7 @@ object TableNames {
     const val USER = "user"
     const val USER_KEY = "user_key"
     const val USER_LIMIT_LOGIN_CATEGORY = "user_limit_login_category"
+    const val CATEGORY_NETWORK_ID = "category_network_id"
 }
 
 object TableUtil {
@@ -72,6 +74,7 @@ object TableUtil {
         Table.User -> TableNames.USER
         Table.UserKey -> TableNames.USER_KEY
         Table.UserLimitLoginCategory -> TableNames.USER_LIMIT_LOGIN_CATEGORY
+        Table.CategoryNetworkId -> TableNames.CATEGORY_NETWORK_ID
     }
 
     fun toEnum(value: String): Table = when (value) {
@@ -91,6 +94,7 @@ object TableUtil {
         TableNames.USER -> Table.User
         TableNames.USER_KEY -> Table.UserKey
         TableNames.USER_LIMIT_LOGIN_CATEGORY -> Table.UserLimitLoginCategory
+        TableNames.CATEGORY_NETWORK_ID -> Table.CategoryNetworkId
         else -> throw IllegalArgumentException()
     }
 }

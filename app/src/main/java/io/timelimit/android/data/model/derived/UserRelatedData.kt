@@ -38,7 +38,8 @@ data class UserRelatedData(
 
         private val relatedTables = arrayOf(
                 Table.User, Table.Category, Table.TimeLimitRule,
-                Table.UsedTimeItem, Table.SessionDuration, Table.CategoryApp
+                Table.UsedTimeItem, Table.SessionDuration, Table.CategoryApp,
+                Table.CategoryNetworkId
         )
 
         fun load(user: User, database: Database): UserRelatedData = database.runInUnobservedTransaction {
@@ -82,9 +83,10 @@ data class UserRelatedData(
     private var usedTimesInvalidated = false
     private var sessionDurationsInvalidated = false
     private var categoryAppsInvalidated = false
+    private var categoryNetworksInvalidated = false
 
     private val invalidated
-        get() = userInvalidated || categoriesInvalidated || rulesInvalidated || usedTimesInvalidated || sessionDurationsInvalidated || categoryAppsInvalidated
+        get() = userInvalidated || categoriesInvalidated || rulesInvalidated || usedTimesInvalidated || sessionDurationsInvalidated || categoryAppsInvalidated || categoryNetworksInvalidated
 
     override fun onInvalidated(tables: Set<Table>) {
         tables.forEach {
@@ -95,6 +97,7 @@ data class UserRelatedData(
                 Table.UsedTimeItem -> usedTimesInvalidated = true
                 Table.SessionDuration -> sessionDurationsInvalidated = true
                 Table.CategoryApp -> categoryAppsInvalidated = true
+                Table.CategoryNetworkId -> categoryNetworksInvalidated = true
                 else -> {/* do nothing */}
             }
         }
@@ -117,20 +120,22 @@ data class UserRelatedData(
                         database = database,
                         updateDurations = sessionDurationsInvalidated,
                         updateRules = rulesInvalidated,
-                        updateTimes = usedTimesInvalidated
+                        updateTimes = usedTimesInvalidated,
+                        updateNetworks = categoryNetworksInvalidated
                 ) ?: CategoryRelatedData.load(
                         category = category,
                         database = database
                 )
             }
-        } else if (sessionDurationsInvalidated || rulesInvalidated || usedTimesInvalidated) {
+        } else if (sessionDurationsInvalidated || rulesInvalidated || usedTimesInvalidated || categoryNetworksInvalidated) {
             categories.map {
                 it.update(
                         category = it.category,
                         database = database,
                         updateDurations = sessionDurationsInvalidated,
                         updateRules = rulesInvalidated,
-                        updateTimes = usedTimesInvalidated
+                        updateTimes = usedTimesInvalidated,
+                        updateNetworks = categoryNetworksInvalidated
                 )
             }
         } else {

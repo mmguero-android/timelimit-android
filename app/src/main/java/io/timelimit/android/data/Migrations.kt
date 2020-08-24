@@ -231,4 +231,10 @@ object DatabaseMigrations {
             database.execSQL("CREATE INDEX IF NOT EXISTS `user_limit_login_category_index_category_id` ON `user_limit_login_category` (`category_id`)")
         }
     }
+
+    val MIGRATE_TO_V32 = object: Migration(31, 32) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `category_network_id` (`category_id` TEXT NOT NULL, `network_item_id` TEXT NOT NULL, `hashed_network_id` TEXT NOT NULL, PRIMARY KEY(`category_id`, `network_item_id`), FOREIGN KEY(`category_id`) REFERENCES `category`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
+        }
+    }
 }

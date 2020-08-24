@@ -965,6 +965,50 @@ data class UpdateCategorySortingAction(val categoryIds: List<String>): ParentAct
         writer.endObject()
     }
 }
+
+data class AddCategoryNetworkId(val categoryId: String, val itemId: String, val hashedNetworkId: String): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "ADD_CATEGORY_NETWORK_ID"
+        private const val CATEGORY_ID = "categoryId"
+        private const val ITEM_ID = "itemId"
+        private const val HASHED_NETWORK_ID = "hashedNetworkId"
+    }
+
+    init {
+        IdGenerator.assertIdValid(categoryId)
+        IdGenerator.assertIdValid(itemId)
+        HexString.assertIsHexString(hashedNetworkId)
+        if (hashedNetworkId.length != CategoryNetworkId.ANONYMIZED_NETWORK_ID_LENGTH) throw IllegalArgumentException()
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(ITEM_ID).value(itemId)
+        writer.name(HASHED_NETWORK_ID).value(hashedNetworkId)
+
+        writer.endObject()
+    }
+}
+
+data class ResetCategoryNetworkIds(val categoryId: String): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "RESET_CATEGORY_NETWORK_IDS"
+        private const val CATEGORY_ID = "categoryId"
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+
+        writer.endObject()
+    }
+}
+
 // DeviceDao
 
 data class UpdateDeviceStatusAction(

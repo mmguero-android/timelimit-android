@@ -43,6 +43,7 @@ object DatabaseBackupLowlevel {
     private const val USER_KEY = "userKey"
     private const val SESSION_DURATION = "sessionDuration"
     private const val USER_LIMIT_LOGIN_CATEGORY = "userLimitLoginCategory"
+    private const val CATEGORY_NETWORK_ID = "categoryNetworkId"
 
     fun outputAsBackupJson(database: Database, outputStream: OutputStream) {
         val writer = JsonWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
@@ -90,6 +91,7 @@ object DatabaseBackupLowlevel {
         handleCollection(USER_KEY) { offset, pageSize -> database.userKey().getUserKeyPageSync(offset, pageSize) }
         handleCollection(SESSION_DURATION) { offset, pageSize -> database.sessionDuration().getSessionDurationPageSync(offset, pageSize) }
         handleCollection(USER_LIMIT_LOGIN_CATEGORY) { offset, pageSize -> database.userLimitLoginCategoryDao().getAllowedContactPageSync(offset, pageSize) }
+        handleCollection(CATEGORY_NETWORK_ID) { offset, pageSize -> database.categoryNetworkId().getPageSync(offset, pageSize) }
 
         writer.endObject().flush()
     }
@@ -98,6 +100,7 @@ object DatabaseBackupLowlevel {
         val reader = JsonReader(InputStreamReader(inputStream, Charsets.UTF_8))
 
         var userLoginLimitCategories = emptyList<UserLimitLoginCategory>()
+        var categoryNetworkId = emptyList<CategoryNetworkId>()
 
         database.runInTransaction {
             database.deleteAllData()
@@ -251,12 +254,26 @@ object DatabaseBackupLowlevel {
 
                         reader.endArray()
                     }
+                    CATEGORY_NETWORK_ID -> {
+                        reader.beginArray()
+
+                        mutableListOf<CategoryNetworkId>().let { list ->
+                            while (reader.hasNext()) {
+                                list.add(CategoryNetworkId.parse(reader))
+                            }
+
+                            categoryNetworkId = list
+                        }
+
+                        reader.endArray()
+                    }
                     else -> reader.skipValue()
                 }
             }
             reader.endObject()
 
-            database.userLimitLoginCategoryDao().addItemsSync(userLoginLimitCategories)
+            if (userLoginLimitCategories.isNotEmpty()) { database.userLimitLoginCategoryDao().addItemsSync(userLoginLimitCategories) }
+            if (categoryNetworkId.isNotEmpty()) { database.categoryNetworkId().insertItemsSync(categoryNetworkId) }
         }
     }
 }

@@ -25,6 +25,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseConnectionBinding
+import io.timelimit.android.integration.platform.NetworkId
+import io.timelimit.android.livedata.liveDataFromFunction
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.websocket.NetworkStatus
@@ -35,19 +37,27 @@ class DiagnoseConnectionFragment : Fragment(), FragmentWithCustomTitle {
         val binding = FragmentDiagnoseConnectionBinding.inflate(inflater, container, false)
         val logic = DefaultAppLogic.with(context!!)
 
-        logic.networkStatus.observe(this, Observer {
+        logic.networkStatus.observe(viewLifecycleOwner, Observer {
             binding.generalStatus = getString(when (it!!) {
                 NetworkStatus.Online -> R.string.diagnose_connection_yes
                 NetworkStatus.Offline -> R.string.diagnose_connection_no
             })
         })
 
-        logic.isConnected.observe(this, Observer {
+        logic.isConnected.observe(viewLifecycleOwner, Observer {
             binding.ownServerStatus = getString(if (it == true)
                 R.string.diagnose_connection_yes
             else
                 R.string.diagnose_connection_no
             )
+        })
+
+        liveDataFromFunction { logic.platformIntegration.getCurrentNetworkId() }.observe(viewLifecycleOwner, Observer {
+            binding.networkId = when (it) {
+                NetworkId.MissingPermission -> "missing permission"
+                NetworkId.NoNetworkConnected -> "no network connected"
+                is NetworkId.Network -> it.id
+            }
         })
 
         return binding.root
