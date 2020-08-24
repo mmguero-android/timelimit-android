@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -16,7 +16,7 @@
 <resources>
     <string name="setup_device_permissions_text">
         TimeLimit needs some permissions to work.
-        Only the first permission is absolutely necessary.
+        Only the usage stats access permission is absolutely necessary.
         Starting Android 10, the permission \"Draw over other Apps\" or \"Accessibility service\"
         is required to open the lockscreen.
         The other permissions are required for some extra features.
