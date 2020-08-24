@@ -999,6 +999,10 @@ data class ResetCategoryNetworkIds(val categoryId: String): ParentAction() {
         private const val CATEGORY_ID = "categoryId"
     }
 
+    init {
+        IdGenerator.assertIdValid(categoryId)
+    }
+
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 
