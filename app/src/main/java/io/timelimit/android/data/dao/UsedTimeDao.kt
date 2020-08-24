@@ -39,8 +39,8 @@ abstract class UsedTimeDao {
     @Insert
     abstract fun insertUsedTimes(item: List<UsedTimeItem>)
 
-    @Query("UPDATE used_time SET used_time = used_time + :timeToAdd WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch AND start_time_of_day = :start AND end_time_of_day = :end")
-    abstract fun addUsedTime(categoryId: String, dayOfEpoch: Int, timeToAdd: Int, start: Int, end: Int): Int
+    @Query("UPDATE used_time SET used_time = MAX(0, MIN(used_time + :timeToAdd, :maximum)) WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch AND start_time_of_day = :start AND end_time_of_day = :end")
+    abstract fun addUsedTime(categoryId: String, dayOfEpoch: Int, timeToAdd: Int, start: Int, end: Int, maximum: Int): Int
 
     @Query("SELECT * FROM used_time WHERE category_id = :categoryId AND day_of_epoch = :dayOfEpoch AND start_time_of_day = :start AND end_time_of_day = :end")
     abstract fun getUsedTimeItemSync(categoryId: String, dayOfEpoch: Int, start: Int, end: Int): UsedTimeItem?

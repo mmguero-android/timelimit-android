@@ -27,6 +27,9 @@ abstract class UserDao {
     @Query("SELECT * from user WHERE id = :userId")
     abstract fun getUserByIdLive(userId: String): LiveData<User?>
 
+    @Query("SELECT * from user WHERE id = :userId")
+    suspend abstract fun getUserByIdCoroutine(userId: String): User?
+
     @Query("SELECT * from user WHERE id = :userId AND type = \"child\"")
     abstract fun getChildUserByIdLive(userId: String): LiveData<User?>
 

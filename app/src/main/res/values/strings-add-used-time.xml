@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="add_used_time_title">Add usage duration</string>
+    <string name="add_used_time_title_with_category_title">Add usage duration for %s</string>
+    <!-- telescreen is a reference to https://en.wikipedia.org/wiki/Nineteen_Eighty-Four -->
+    <string name="add_used_time_description">This allows to add used time/ mark time as used
+        in case it was used outside of TimeLimit, e.g. when you want to add telescreen usage
+        to the used time
+    </string>
+    <string name="add_used_time_confirmation_toast">%1$s used time added for %2$s</string>
+</resources>

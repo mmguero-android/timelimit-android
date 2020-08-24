@@ -19,7 +19,7 @@ package io.timelimit.android.extensions
 object MinuteOfDay {
     const val MIN = 0
     const val MAX = 24 * 60 - 1
-    const val LENGTH = 24 *  60
+    const val LENGTH = 24 * 60
 
     fun isValid(value: Int) = value >= MIN && value <= MAX
 

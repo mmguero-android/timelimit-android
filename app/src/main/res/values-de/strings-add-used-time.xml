@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="add_used_time_title">benutzte Zeit eintragen</string>
+    <string name="add_used_time_title_with_category_title">Benutzte Zeit für %s eintragen</string>
+    <!-- Teleschirm bezieht sich auf auf https://de.wikipedia.org/wiki/1984_(Roman) -->
+    <string name="add_used_time_description">Hiermit kann benutzte Zeit eingetragen/ hinzugefügt werden,
+        wenn diese außerhalb von TimeLimit verwendet wurde, z.B. um eine Teleschirm-Nutzung als Nutzungszeit
+        einzutragen
+    </string>
+    <string name="add_used_time_confirmation_toast">%1$s Nutzungszeit für %2$s hinzugefügt</string>
+</resources>

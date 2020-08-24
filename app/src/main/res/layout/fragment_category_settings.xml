@@ -113,6 +113,13 @@
 
                     <Button
                         style="?materialButtonOutlinedStyle"
+                        android:id="@+id/add_used_time_btn"
+                        android:text="@string/add_used_time_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        style="?materialButtonOutlinedStyle"
                         android:id="@+id/edit_category_title_go"
                         android:text="@string/category_settings_rename"
                         android:layout_width="match_parent"

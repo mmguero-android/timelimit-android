@@ -38,13 +38,17 @@ object LocalDatabaseAppLogicActionDispatcher {
                         null
 
                     fun handleAddUsedTime(categoryId: String) {
+                        val lengthInMinutes = MinuteOfDay.LENGTH
+                        val lengthInMs = lengthInMinutes * 1000 * 60
+
                         // try to update
                         val updatedRows = database.usedTimes().addUsedTime(
                                 categoryId = categoryId,
                                 timeToAdd = action.timeToAdd,
                                 dayOfEpoch = action.dayOfEpoch,
                                 start = MinuteOfDay.MIN,
-                                end = MinuteOfDay.MAX
+                                end = MinuteOfDay.MAX,
+                                maximum = lengthInMs
                         )
 
                         if (updatedRows == 0) {
@@ -53,7 +57,7 @@ object LocalDatabaseAppLogicActionDispatcher {
                             database.usedTimes().insertUsedTime(UsedTimeItem(
                                     categoryId = categoryId,
                                     dayOfEpoch = action.dayOfEpoch,
-                                    usedMillis = action.timeToAdd.toLong(),
+                                    usedMillis = action.timeToAdd.coerceAtMost(lengthInMs).toLong(),
                                     startTimeOfDay = MinuteOfDay.MIN,
                                     endTimeOfDay = MinuteOfDay.MAX
                             ))
@@ -82,12 +86,16 @@ object LocalDatabaseAppLogicActionDispatcher {
                                 ?: throw CategoryNotFoundException()
 
                         fun handle(start: Int, end: Int) {
+                            val lengthInMinutes = (end - start) + 1
+                            val lengthInMs = lengthInMinutes * 1000 * 60
+
                             val updatedRows = database.usedTimes().addUsedTime(
                                     categoryId = item.categoryId,
                                     timeToAdd = item.timeToAdd,
                                     dayOfEpoch = action.dayOfEpoch,
                                     start = start,
-                                    end = end
+                                    end = end,
+                                    maximum = lengthInMs
                             )
 
                             if (updatedRows == 0) {
@@ -96,7 +104,7 @@ object LocalDatabaseAppLogicActionDispatcher {
                                 database.usedTimes().insertUsedTime(UsedTimeItem(
                                         categoryId = item.categoryId,
                                         dayOfEpoch = action.dayOfEpoch,
-                                        usedMillis = item.timeToAdd.toLong(),
+                                        usedMillis = item.timeToAdd.coerceAtMost(lengthInMs).toLong(),
                                         startTimeOfDay = start,
                                         endTimeOfDay = end
                                 ))
