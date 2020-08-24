@@ -227,4 +227,5 @@ object ExperimentalFlags {
     // const val DISCONNECT_WHEN_SCREEN_OFF = 256L
     const val KEEP_CONNECTED_WHEN_SCREEN_OFF = 512L
     const val MULTI_APP_DETECTION = 1024L
+    const val REQUIRE_SYNC_FOR_PARENT_LOGIN = 2048L
 }

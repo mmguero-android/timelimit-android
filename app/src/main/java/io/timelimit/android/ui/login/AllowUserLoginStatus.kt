@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import io.timelimit.android.async.Threads
 import io.timelimit.android.data.extensions.getCategoryWithParentCategories
+import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.derived.CompleteUserLoginRelatedData
 import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.integration.platform.BatteryStatus
@@ -34,11 +35,12 @@ sealed class AllowUserLoginStatus {
     data class Allow(val maxTime: Long): AllowUserLoginStatus()
     data class ForbidByCurrentTime(val missingNetworkTime: Boolean, val maxTime: Long): AllowUserLoginStatus()
     data class ForbidByCategory(val categoryTitle: String, val blockingReason: BlockingReason, val maxTime: Long): AllowUserLoginStatus()
+    object ForbidByMissingSync: AllowUserLoginStatus()
     object ForbidUserNotFound: AllowUserLoginStatus()
 }
 
 object AllowUserLoginStatusUtil {
-    private fun calculate(data: CompleteUserLoginRelatedData, time: RealTime, cache: CategoryHandlingCache, batteryStatus: BatteryStatus): AllowUserLoginStatus = synchronized(cache) {
+    private fun calculate(data: CompleteUserLoginRelatedData, time: RealTime, cache: CategoryHandlingCache, batteryStatus: BatteryStatus, missingSyncForLimitLoginUser: Boolean): AllowUserLoginStatus = synchronized(cache) {
         val hasPremium = data.deviceRelatedData.isConnectedAndHasPremium || data.deviceRelatedData.isLocalMode
 
         if (!hasPremium) {
@@ -63,41 +65,46 @@ object AllowUserLoginStatusUtil {
         }
 
         return if (data.limitLoginCategoryUserRelatedData != null && data.loginRelatedData.limitLoginCategory != null) {
-            cache.reportStatus(
-                    user = data.limitLoginCategoryUserRelatedData,
-                    assumeCurrentDevice = true,
-                    timeInMillis = time.timeInMillis,
-                    batteryStatus = batteryStatus,
-                    shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily
-            )
-
-            val categoryIds = data.limitLoginCategoryUserRelatedData.getCategoryWithParentCategories(data.loginRelatedData.limitLoginCategory.categoryId)
-            val handlings = categoryIds.map { cache.get(it) }
-
-            val blockingHandling = handlings.find { it.shouldBlockAtSystemLevel }
-
-            if (blockingHandling != null) {
-                AllowUserLoginStatus.ForbidByCategory(
-                        categoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title,
-                        blockingReason = blockingHandling.systemLevelBlockingReason,
-                        maxTime = blockingHandling.dependsOnMaxTime.coerceAtMost(
-                                if (data.loginRelatedData.user.blockedTimes.dataNotToModify.isEmpty)
-                                    Long.MAX_VALUE
-                                else
-                                    time.timeInMillis + 1000 * 5
-                        )
-                )
+            if (missingSyncForLimitLoginUser) {
+                AllowUserLoginStatus.ForbidByMissingSync
             } else {
-                val maxTimeByCategories = handlings.minBy { it.dependsOnMaxTime }?.dependsOnMaxTime ?: Long.MAX_VALUE
-
-                AllowUserLoginStatus.Allow(
-                        maxTime = maxTimeByCategories.coerceAtMost(
-                                if (data.loginRelatedData.user.blockedTimes.dataNotToModify.isEmpty)
-                                    Long.MAX_VALUE
-                                else
-                                    time.timeInMillis + 1000 * 5
-                        )
+                cache.reportStatus(
+                        user = data.limitLoginCategoryUserRelatedData,
+                        assumeCurrentDevice = true,
+                        timeInMillis = time.timeInMillis,
+                        batteryStatus = batteryStatus,
+                        shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily
                 )
+
+                val categoryIds = data.limitLoginCategoryUserRelatedData.getCategoryWithParentCategories(data.loginRelatedData.limitLoginCategory.categoryId)
+                val handlings = categoryIds.map { cache.get(it) }
+
+                val blockingHandling = handlings.find { it.shouldBlockAtSystemLevel }
+
+                if (blockingHandling != null) {
+                    AllowUserLoginStatus.ForbidByCategory(
+                            categoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title,
+                            blockingReason = blockingHandling.systemLevelBlockingReason,
+                            maxTime = blockingHandling.dependsOnMaxTime.coerceAtMost(
+                                    if (data.loginRelatedData.user.blockedTimes.dataNotToModify.isEmpty)
+                                        Long.MAX_VALUE
+                                    else
+                                        time.timeInMillis + 1000 * 5
+                            )
+                    )
+                } else {
+                    val maxTimeByCategories = handlings.minBy { it.dependsOnMaxTime }?.dependsOnMaxTime
+                            ?: Long.MAX_VALUE
+
+                    AllowUserLoginStatus.Allow(
+                            maxTime = maxTimeByCategories.coerceAtMost(
+                                    if (data.loginRelatedData.user.blockedTimes.dataNotToModify.isEmpty)
+                                        Long.MAX_VALUE
+                                    else
+                                        time.timeInMillis + 1000 * 5
+                            )
+                    )
+                }
             }
         } else {
             AllowUserLoginStatus.Allow(
@@ -109,7 +116,10 @@ object AllowUserLoginStatusUtil {
         }
     }
 
-    fun calculateSync(logic: AppLogic, userId: String): AllowUserLoginStatus {
+    fun calculateSync(logic: AppLogic, userId: String, didSync: Boolean): AllowUserLoginStatus {
+        val requireSyncOnConnected = logic.database.config().isExperimentalFlagsSetSync(ExperimentalFlags.REQUIRE_SYNC_FOR_PARENT_LOGIN)
+        val isConnectedMode = logic.database.config().getDeviceAuthTokenSync().isNotEmpty()
+        val requireSyncOnLimitLoginUser = requireSyncOnConnected && isConnectedMode
         val userRelatedData = logic.database.derivedDataDao().getUserLoginRelatedDataSync(userId) ?: return AllowUserLoginStatus.ForbidUserNotFound
         val realTime = RealTime.newInstance()
         val batteryStatus = logic.platformIntegration.getBatteryStatus()
@@ -126,16 +136,22 @@ object AllowUserLoginStatusUtil {
                 data = userRelatedData,
                 batteryStatus = batteryStatus,
                 time = realTime,
-                cache = CategoryHandlingCache()
+                cache = CategoryHandlingCache(),
+                missingSyncForLimitLoginUser = requireSyncOnLimitLoginUser && !didSync
         )
     }
 
-    fun calculateLive(logic: AppLogic, userId: String): LiveData<AllowUserLoginStatus> = object : MediatorLiveData<AllowUserLoginStatus>() {
+    fun calculateLive(logic: AppLogic, userId: String, didSyncLive: LiveData<Boolean>): LiveData<AllowUserLoginStatus> = object : MediatorLiveData<AllowUserLoginStatus>() {
         val cache = CategoryHandlingCache()
         val time = RealTime.newInstance()
         var batteryStatus: BatteryStatus? = null
         var hasUserLoginRelatedData = false
         var userLoginRelatedData: CompleteUserLoginRelatedData? = null
+        var requireSyncForLimitLoginUsers = false
+        var didLoadRequireSyncForLimitLoginUsers = false
+        var isConnectedMode = false
+        var didLoadIsConnectedMode = false
+        var didSync = false
 
         init {
             addSource(logic.platformIntegration.getBatteryStatusLive(), androidx.lifecycle.Observer {
@@ -144,6 +160,18 @@ object AllowUserLoginStatusUtil {
 
             addSource(logic.database.derivedDataDao().getUserLoginRelatedDataLive(userId), androidx.lifecycle.Observer {
                 userLoginRelatedData = it; hasUserLoginRelatedData = true; update()
+            })
+
+            addSource(logic.fullVersion.isLocalMode, androidx.lifecycle.Observer {
+                this.isConnectedMode = !it; didLoadIsConnectedMode = true; update()
+            })
+
+            addSource(logic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.REQUIRE_SYNC_FOR_PARENT_LOGIN), androidx.lifecycle.Observer {
+                requireSyncForLimitLoginUsers = it; didLoadRequireSyncForLimitLoginUsers = true
+            })
+
+            addSource(didSyncLive, androidx.lifecycle.Observer {
+                didSync = it; update()
             })
         }
 
@@ -154,7 +182,7 @@ object AllowUserLoginStatusUtil {
             val batteryStatus = batteryStatus
             val userLoginRelatedData = userLoginRelatedData
 
-            if (batteryStatus == null || !hasUserLoginRelatedData) return
+            if (batteryStatus == null || !hasUserLoginRelatedData || !didLoadRequireSyncForLimitLoginUsers || !didLoadIsConnectedMode) return
 
             if (userLoginRelatedData == null) {
                 if (value !== AllowUserLoginStatus.ForbidUserNotFound) {
@@ -170,7 +198,8 @@ object AllowUserLoginStatusUtil {
                     data = userLoginRelatedData,
                     batteryStatus = batteryStatus,
                     cache = cache,
-                    time = time
+                    time = time,
+                    missingSyncForLimitLoginUser = isConnectedMode && requireSyncForLimitLoginUsers && !didSync
             )
 
             if (result != value) {
@@ -179,6 +208,7 @@ object AllowUserLoginStatusUtil {
 
             val scheduledTime: Long = when (result) {
                 AllowUserLoginStatus.ForbidUserNotFound -> Long.MAX_VALUE
+                AllowUserLoginStatus.ForbidByMissingSync -> Long.MAX_VALUE
                 is AllowUserLoginStatus.ForbidByCurrentTime -> result.maxTime
                 is AllowUserLoginStatus.Allow -> result.maxTime
                 is AllowUserLoginStatus.ForbidByCategory -> result.maxTime

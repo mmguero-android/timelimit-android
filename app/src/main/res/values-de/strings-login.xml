@@ -29,6 +29,7 @@
     <string name="login_child_done_toast">Der Benutzer dieses Gerätes wurde geändert</string>
     <string name="login_missing_trusted_time">Zum Anmelden mit diesem Benutzer wird die Uhrzeit benötigt</string>
     <string name="login_blocked_time">Das Anmelden mit diesem Benutzer zu dieser Zeit wurde gesperrt</string>
+    <string name="login_missing_sync">Warte auf erfolgreiche Synchronisation</string>
     <string name="login_scan_code">Code scannen</string>
     <string name="login_scan_code_err_expired">Dieser Code ist alt</string>
     <string name="login_scan_code_err_not_linked">Dieser Schlüssel ist nicht verknüpft</string>

@@ -179,6 +179,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.MULTI_APP_DETECTION,
                         disableFlags = ExperimentalFlags.MULTI_APP_DETECTION,
                         enable = { LollipopForegroundAppHelper.enableMultiAppDetectionGeneral }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_rsl,
+                        enableFlags = ExperimentalFlags.REQUIRE_SYNC_FOR_PARENT_LOGIN,
+                        disableFlags = ExperimentalFlags.REQUIRE_SYNC_FOR_PARENT_LOGIN,
+                        enable = { true }
                 )
         )
     }

@@ -53,6 +53,7 @@ class NewLoginFragment: DialogFragment() {
         private const val BLOCKED_LOGIN_TIME = 6
         private const val UNVERIFIED_TIME = 7
         private const val PARENT_LOGIN_BLOCKED = 8
+        private const val WAITING_FOR_SYNC = 9
     }
 
     private val model: LoginDialogFragmentModel by lazy {
@@ -330,6 +331,15 @@ class NewLoginFragment: DialogFragment() {
                         BlockingReason.SessionDurationLimit -> getString(R.string.lock_reason_short_session_duration)
                         BlockingReason.NotPartOfAnCategory -> "???"
                         BlockingReason.None -> "???"
+                    }
+
+                    null
+                }
+                ParentUserLoginWaitingForSync -> {
+                    if (binding.switcher.displayedChild != WAITING_FOR_SYNC) {
+                        binding.switcher.setInAnimation(context!!, R.anim.wizard_open_step_in)
+                        binding.switcher.setOutAnimation(context!!, R.anim.wizard_open_step_out)
+                        binding.switcher.displayedChild = WAITING_FOR_SYNC
                     }
 
                     null

@@ -45,5 +45,7 @@
         <include layout="@layout/new_login_fragment_parent_login_blocked"
             android:id="@+id/parent_login_blocked" />
 
+        <include layout="@layout/new_login_fragment_waiting_for_sync" />
+
     </io.timelimit.android.ui.view.SafeViewFlipper>
 </layout>

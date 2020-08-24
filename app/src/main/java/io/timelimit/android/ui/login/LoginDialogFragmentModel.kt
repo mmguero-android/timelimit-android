@@ -30,7 +30,6 @@ import io.timelimit.android.data.model.UserType
 import io.timelimit.android.data.model.derived.CompleteUserLoginRelatedData
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.BlockingReason
-import io.timelimit.android.logic.BlockingReasonUtil
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.ChildSignInAction
 import io.timelimit.android.sync.actions.SetDeviceUserAction
@@ -46,7 +45,6 @@ import kotlinx.coroutines.sync.withLock
 class LoginDialogFragmentModel(application: Application): AndroidViewModel(application) {
     val selectedUserId = MutableLiveData<String?>().apply { value = null }
     private val logic = DefaultAppLogic.with(application)
-    private val blockingReasonUtil = BlockingReasonUtil(logic)
     private val users = logic.database.user().getAllUsersLive()
     private val selectedUser = selectedUserId.switchMap { selectedUserId ->
         if (selectedUserId != null)
@@ -57,6 +55,8 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
     private val isCheckingPassword = MutableLiveData<Boolean>().apply { value = false }
     private val wasPasswordWrong = MutableLiveData<Boolean>().apply { value = false }
     private val isLoginDone = MutableLiveData<Boolean>().apply { value = false }
+    private val didSync = MutableLiveData<Boolean>().apply { value = false }
+    private var didRequestSync = false
     private val loginLock = Mutex()
 
     val status: LiveData<LoginDialogStatus> = isLoginDone.switchMap { isLoginDone ->
@@ -81,7 +81,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                             }
                         }
 
-                        AllowUserLoginStatusUtil.calculateLive(logic, selectedUser.id).switchMap { status ->
+                        AllowUserLoginStatusUtil.calculateLive(logic, selectedUser.id, didSync).switchMap { status ->
                             if (status is AllowUserLoginStatus.Allow) {
                                 loginScreen
                             } else if (
@@ -98,6 +98,18 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                                 reason = status.blockingReason
                                         ) as LoginDialogStatus
                                 )
+                            } else if (status is AllowUserLoginStatus.ForbidByMissingSync) {
+                                if (!didRequestSync) {
+                                    didRequestSync = true
+
+                                    runAsync {
+                                        logic.syncUtil.requestImportantSyncAndWait()
+
+                                        didSync.value = true
+                                    }
+                                }
+
+                                liveDataFromValue(ParentUserLoginWaitingForSync as LoginDialogStatus)
                             } else {
                                 loginScreen
                             }
@@ -161,7 +173,8 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                         Threads.database.executeAndWait {
                             AllowUserLoginStatusUtil.calculateSync(
                                     logic = logic,
-                                    userId = user.id
+                                    userId = user.id,
+                                    didSync = didSync.value ?: false
                             ) is AllowUserLoginStatus.Allow
                         }
                     } else {
@@ -233,7 +246,8 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                     val shouldSignIn = Threads.database.executeAndWait {
                         AllowUserLoginStatusUtil.calculateSync(
                                 logic = logic,
-                                userId = user.id
+                                userId = user.id,
+                                didSync = didSync.value ?: false
                         ) is AllowUserLoginStatus.Allow
                     }
 
@@ -300,7 +314,8 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                     val shouldSignIn = Threads.database.executeAndWait {
                         AllowUserLoginStatusUtil.calculateSync(
                                 logic = logic,
-                                userId = userEntry.id
+                                userId = userEntry.id,
+                                didSync = didSync.value ?: false
                         ) is AllowUserLoginStatus.Allow
                     }
 
@@ -421,6 +436,7 @@ sealed class LoginDialogStatus
 data class UserListLoginDialogStatus(val usersToShow: List<User>, val isLocalMode: Boolean): LoginDialogStatus()
 object ParentUserLoginMissingTrustedTime: LoginDialogStatus()
 object ParentUserLoginBlockedTime: LoginDialogStatus()
+object ParentUserLoginWaitingForSync: LoginDialogStatus()
 data class ParentUserLoginBlockedByCategory(val categoryTitle: String, val reason: BlockingReason): LoginDialogStatus()
 data class ParentUserLogin(
         val isConnectedMode: Boolean,
