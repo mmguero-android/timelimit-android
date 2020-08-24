@@ -210,7 +210,7 @@ data class CategoryItselfHandling (
             else
                 emptySet()
 
-            val blockAllNotifications = categoryRelatedData.category.blockAllNotifications &&hasPremiumOrLocalMode
+            val blockAllNotifications = categoryRelatedData.category.blockAllNotifications && hasPremiumOrLocalMode
 
             return CategoryItselfHandling(
                     shouldCountTime = shouldCountTime,
