@@ -70,6 +70,8 @@
         This is used to \"press\" the home button before showing the lock screen.
         This fixes blocking in some cases.
         Moreover, this is one way to allow TimeLimit at newer Android versions to open the lockscreen.
+        Additionally, it makes it possible to detect and leave the split screen mode when it is used and
+        you enable that limitation feature.
     </string>
 
     <string name="manage_device_permission_device_admin_title">Device admin</string>

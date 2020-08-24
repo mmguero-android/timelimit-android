@@ -185,6 +185,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.REQUIRE_SYNC_FOR_PARENT_LOGIN,
                         disableFlags = ExperimentalFlags.REQUIRE_SYNC_FOR_PARENT_LOGIN,
                         enable = { true }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_bss,
+                        enableFlags = ExperimentalFlags.BLOCK_SPLIT_SCREEN,
+                        disableFlags = ExperimentalFlags.BLOCK_SPLIT_SCREEN,
+                        enable = { true }
                 )
         )
     }

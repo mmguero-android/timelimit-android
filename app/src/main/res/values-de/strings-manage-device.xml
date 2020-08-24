@@ -72,6 +72,8 @@
         Das kann das Sperren in einigen Fällen verbessern.
         Außerdem ist diese Berechtigung eine Möglichkeit, um TimeLimit bei neueren Android-Versionen zu erlauben,
         den Sperrbildschirm zu öffnen.
+        Zusätzlich kann TimeLimit damit den Splitscreen-Modus erkennen und sperren, sofern Sie die
+        entsprechende Option aktivieren.
     </string>
 
     <string name="manage_device_permission_device_admin_title">Geräte-Administrator</string>

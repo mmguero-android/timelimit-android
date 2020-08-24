@@ -65,6 +65,7 @@
     <string name="diagnose_exf_kcs">Verbindung aufrecht halten, wenn der Bildschirm aus ist</string>
     <string name="diagnose_exf_mad">Versuche, mehrere aktive Apps zu erkennen (Splitscreen-Untersützung)</string>
     <string name="diagnose_exf_rsl">Anmeldung von Eltern mit Anmeldeverhinderungskategorie nur nach einer Synchronisation erlauben</string>
+    <string name="diagnose_exf_bss">Splitscreen automatisch beenden per Bedienhilfe</string>
 
     <string name="diagnose_bg_task_loop_ex">Hintergrundaufgabenschleifenfehler</string>
 
