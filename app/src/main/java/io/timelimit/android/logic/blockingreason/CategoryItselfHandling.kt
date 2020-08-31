@@ -130,7 +130,8 @@ data class CategoryItselfHandling (
 
             val remainingTime = RemainingTime.getRemainingTime(
                     usedTimes = categoryRelatedData.usedTimes,
-                    extraTime = categoryRelatedData.category.extraTimeInMillis,
+                    // dependsOnMaxTimeByRules always depends on the day so that this is invalidated correctly
+                    extraTime = categoryRelatedData.category.getExtraTime(dayOfEpoch = dayOfEpoch),
                     rules = relatedRules,
                     dayOfWeek = dayOfWeek,
                     minuteOfDay = minuteInWeek % MinuteOfDay.LENGTH,
@@ -160,6 +161,7 @@ data class CategoryItselfHandling (
             val dependsOnMaxTimeByRules = if (dependsOnMaxTimeByMinuteOfDay <= MinuteOfDay.LENGTH) {
                 localDate.atStartOfDay(ZoneId.of(user.user.timeZone)).plusMinutes(dependsOnMaxTimeByMinuteOfDay.toLong()).toEpochSecond() * 1000
             } else {
+                // always depend on the current day
                 localDate.plusDays(1).atStartOfDay(ZoneId.of(user.user.timeZone)).toEpochSecond() * 1000
             }
             val dependsOnMaxTimeBySessionDurationLimitItems = (
