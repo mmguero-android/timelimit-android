@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,20 +64,25 @@ class BlockedTimeAreasFragment : Fragment(), CopyBlockedTimeAreasDialogFragmentL
     fun updateBlockedTimes(oldMask: ImmutableBitmask, newMask: ImmutableBitmask) {
         if (
                 auth.tryDispatchParentAction(
-                        UpdateCategoryBlockedTimesAction(
+                        action = UpdateCategoryBlockedTimesAction(
                                 categoryId = params.categoryId,
                                 blockedTimes = newMask
-                        )
+                        ),
+                        allowAsChild = true
                 )
         ) {
-            Snackbar.make(coordinator, R.string.blocked_time_areas_snackbar_modified, Snackbar.LENGTH_SHORT)
-                    .setAction(R.string.generic_undo) {
-                        auth.tryDispatchParentAction(
-                                UpdateCategoryBlockedTimesAction(
-                                        categoryId = params.categoryId,
-                                        blockedTimes = oldMask
+            Snackbar.make(coordinator.parent as View, R.string.blocked_time_areas_snackbar_modified, Snackbar.LENGTH_SHORT)
+                    .also {
+                        if (auth.isParentAuthenticated()) {
+                            it.setAction(R.string.generic_undo) {
+                                auth.tryDispatchParentAction(
+                                        UpdateCategoryBlockedTimesAction(
+                                                categoryId = params.categoryId,
+                                                blockedTimes = oldMask
+                                        )
                                 )
-                        )
+                            }
+                        }
                     }
                     .show()
         }
@@ -93,7 +98,7 @@ class BlockedTimeAreasFragment : Fragment(), CopyBlockedTimeAreasDialogFragmentL
         super.onViewCreated(view, savedInstanceState)
 
         btn_help.setOnClickListener {
-            BlockedTimeAreasHelpDialog().show(fragmentManager!!)
+            BlockedTimeAreasHelpDialog().show(parentFragmentManager)
         }
 
         btn_copy_to_other_days.setOnClickListener {
@@ -106,7 +111,20 @@ class BlockedTimeAreasFragment : Fragment(), CopyBlockedTimeAreasDialogFragmentL
                 recycler = recycler,
                 daySpinner = spinner_day,
                 detailedModeCheckbox = detailed_mode,
-                requestAuthenticationOrReturnTrue = { auth.requestAuthenticationOrReturnTrue() },
+                checkAuthentication = {
+                    if (auth.isParentAuthenticated()) {
+                        BlockedTimeAreasLogic.Authentication.FullyAvailable
+                    } else if (auth.isParentOrChildAuthenticated(childId = params.childId)) {
+                        BlockedTimeAreasLogic.Authentication.OnlyAllowAddingLimits(
+                                showHintHook = { Snackbar.make(coordinator.parent as View, R.string.blocked_time_areas_snackbar_child_hint, Snackbar.LENGTH_LONG).show() },
+                                showErrorHook = { auth.requestAuthentication() }
+                        )
+                    } else {
+                        BlockedTimeAreasLogic.Authentication.Missing(
+                                requestHook = { auth.requestAuthentication() }
+                        )
+                    }
+                },
                 updateBlockedTimes = { a, b -> updateBlockedTimes(a, b) },
                 currentData = category.map { it?.blockedMinutesInWeek },
                 lifecycleOwner = this

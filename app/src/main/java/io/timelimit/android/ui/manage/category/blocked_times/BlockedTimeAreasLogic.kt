@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ object BlockedTimeAreasLogic {
             recycler: RecyclerView,
             daySpinner: Spinner,
             detailedModeCheckbox: CheckBox,
-            requestAuthenticationOrReturnTrue: () -> Boolean,
+            checkAuthentication: () -> Authentication,
             updateBlockedTimes: (ImmutableBitmask, ImmutableBitmask) -> Unit,
             currentData: LiveData<ImmutableBitmask?>,
             lifecycleOwner: LifecycleOwner
@@ -59,57 +59,83 @@ object BlockedTimeAreasLogic {
 
         adapter.handlers = object: Handlers {
             override fun onMinuteTileClick(time: MinuteTile) {
-                if (requestAuthenticationOrReturnTrue()) {
-                    val selectedMinuteOfWeek = adapter.selectedMinuteOfWeek
-                    val blockedTimeAreas = adapter.blockedTimeAreas
+                val auth = checkAuthentication()
 
-                    if (blockedTimeAreas == null) {
-                        // nothing to work with
-                    } else if (selectedMinuteOfWeek == null) {
-                        adapter.selectedMinuteOfWeek = time.minuteOfWeek
-                    } else if (selectedMinuteOfWeek == time.minuteOfWeek) {
-                        adapter.selectedMinuteOfWeek = null
+                if (auth is Authentication.Missing) {
+                    auth.requestHook()
 
-                        val newBlockMask = blockedTimeAreas.clone() as BitSet
-                        newBlockMask.set(
-                                selectedMinuteOfWeek,
-                                selectedMinuteOfWeek + items.value!!.minutesPerTile,
-                                !newBlockMask[selectedMinuteOfWeek]
-                        )
+                    return
+                }
 
-                        updateBlockedTimes(ImmutableBitmask(blockedTimeAreas), ImmutableBitmask(newBlockMask))
-                    } else {
-                        var times = selectedMinuteOfWeek to time.minuteOfWeek
-                        adapter.selectedMinuteOfWeek = null
+                val selectedMinuteOfWeek = adapter.selectedMinuteOfWeek
+                val blockedTimeAreas = adapter.blockedTimeAreas
 
-                        // sort selected times
-                        if (times.first > times.second) {
-                            times = times.second to times.first
+                if (blockedTimeAreas == null) {
+                    // nothing to work with
+                } else if (selectedMinuteOfWeek == null) {
+                    if (auth is Authentication.OnlyAllowAddingLimits) {
+                        val start = time.minuteOfWeek
+                        val end = start + time.lengthInMinutes
+
+                        // if a fully blocked tile was selected
+                        if (blockedTimeAreas.nextClearBit(start) >= end) {
+                            auth.showErrorHook()
+
+                            return
                         }
 
-                        // mark until the end
-                        times = times.first to (times.second + items.value!!.minutesPerTile - 1)
-
-                        // get majority of current value
-                        var allowed = 0
-                        var blocked = 0
-
-                        for (i in times.first..times.second) {
-                            if (blockedTimeAreas[i]) {
-                                blocked++
-                            } else {
-                                allowed++
-                            }
-                        }
-
-                        val isMajorityBlocked = blocked > allowed
-                        val shouldBlock = !isMajorityBlocked
-
-                        val newBlockMask = blockedTimeAreas.clone() as BitSet
-                        newBlockMask.set(times.first, times.second + 1, shouldBlock)
-
-                        updateBlockedTimes(ImmutableBitmask(blockedTimeAreas), ImmutableBitmask(newBlockMask))
+                        auth.showHintHook()
                     }
+
+                    adapter.selectedMinuteOfWeek = time.minuteOfWeek
+                } else if (selectedMinuteOfWeek == time.minuteOfWeek) {
+                    adapter.selectedMinuteOfWeek = null
+
+                    val newBlockMask = blockedTimeAreas.clone() as BitSet
+                    newBlockMask.set(
+                            selectedMinuteOfWeek,
+                            selectedMinuteOfWeek + items.value!!.minutesPerTile,
+                            auth is Authentication.OnlyAllowAddingLimits || !newBlockMask[selectedMinuteOfWeek]
+                    )
+
+                    updateBlockedTimes(ImmutableBitmask(blockedTimeAreas), ImmutableBitmask(newBlockMask))
+                } else {
+                    var times = selectedMinuteOfWeek to time.minuteOfWeek
+                    adapter.selectedMinuteOfWeek = null
+
+                    // sort selected times
+                    if (times.first > times.second) {
+                        times = times.second to times.first
+                    }
+
+                    // mark until the end
+                    times = times.first to (times.second + items.value!!.minutesPerTile - 1)
+
+                    // get majority of current value
+                    var allowed = 0
+                    var blocked = 0
+
+                    for (i in times.first..times.second) {
+                        if (blockedTimeAreas[i]) {
+                            blocked++
+                        } else {
+                            allowed++
+                        }
+                    }
+
+                    val isMajorityBlocked = blocked > allowed
+                    val shouldBlock = auth is Authentication.OnlyAllowAddingLimits || !isMajorityBlocked
+
+                    if (auth is Authentication.OnlyAllowAddingLimits && allowed == 0) {
+                        auth.showErrorHook()
+
+                        return
+                    }
+
+                    val newBlockMask = blockedTimeAreas.clone() as BitSet
+                    newBlockMask.set(times.first, times.second + 1, shouldBlock)
+
+                    updateBlockedTimes(ImmutableBitmask(blockedTimeAreas), ImmutableBitmask(newBlockMask))
                 }
             }
         }
@@ -192,5 +218,11 @@ object BlockedTimeAreasLogic {
 
         // loading data
         currentData.observe(lifecycleOwner, Observer { adapter.blockedTimeAreas = it?.dataNotToModify })
+    }
+
+    sealed class Authentication {
+        class Missing(val requestHook: () -> Unit): Authentication()
+        object FullyAvailable: Authentication()
+        class OnlyAllowAddingLimits(val showHintHook: () -> Unit, val showErrorHook: () -> Unit): Authentication()
     }
 }

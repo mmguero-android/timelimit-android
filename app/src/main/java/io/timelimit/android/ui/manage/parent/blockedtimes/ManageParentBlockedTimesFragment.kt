@@ -162,7 +162,14 @@ class ManageParentBlockedTimesFragment : Fragment(), FragmentWithCustomTitle, Co
                 recycler = binding.recycler,
                 daySpinner = binding.spinnerDay,
                 detailedModeCheckbox = binding.detailedMode,
-                requestAuthenticationOrReturnTrue = { requestAuthenticationOrReturnTrue() },
+                checkAuthentication = {
+                    if (requestAuthenticationOrReturnTrue()) {
+                        BlockedTimeAreasLogic.Authentication.FullyAvailable
+                    } else {
+                        // empty hook ... not clean, but it works good enough (and this component is old)
+                        BlockedTimeAreasLogic.Authentication.Missing({})
+                    }
+                },
                 updateBlockedTimes = { a, b -> updateBlockedTimes(a, b) },
                 currentData = parent.map { it?.blockedTimes },
                 lifecycleOwner = this

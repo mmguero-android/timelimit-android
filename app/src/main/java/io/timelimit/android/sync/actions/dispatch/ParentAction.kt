@@ -28,7 +28,8 @@ object LocalDatabaseParentActionDispatcher {
         if (fromChildSelfLimitAddChildUserId != null) {
             val isSupportedAction = action is CreateTimeLimitRuleAction || action is CreateCategoryAction ||
                     action is UpdateCategoryBlockAllNotificationsAction || action is SetParentCategory ||
-                    action is AddCategoryAppsAction || action is UpdateCategoryTemporarilyBlockedAction
+                    action is AddCategoryAppsAction || action is UpdateCategoryTemporarilyBlockedAction ||
+                    action is UpdateCategoryBlockedTimesAction
 
             if (!isSupportedAction) {
                 throw RuntimeException("unsupported action for the child limit self mode")
@@ -256,7 +257,30 @@ object LocalDatabaseParentActionDispatcher {
                     ))
                 }
                 is UpdateCategoryBlockedTimesAction -> {
-                    DatabaseValidation.assertCategoryExists(database, action.categoryId)
+                    val category = database.category().getCategoryByIdSync(action.categoryId) ?: throw IllegalArgumentException("category not found")
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (category.childId != fromChildSelfLimitAddChildUserId) {
+                            throw IllegalArgumentException("can not update blocked time areas for other child users")
+                        }
+
+                        val oldBlocked = category.blockedMinutesInWeek.dataNotToModify
+                        val newBlocked = action.blockedTimes.dataNotToModify
+
+                        var readIndex = 0
+
+                        while (true) {
+                            val blockStart = oldBlocked.nextSetBit(readIndex)
+                            if (blockStart < 0) break
+                            val afterBlockEnd = oldBlocked.nextClearBit(blockStart + 1)
+
+                            if (newBlocked.nextClearBit(blockStart) < afterBlockEnd) {
+                                throw IllegalArgumentException("new blocked time areas are smaller")
+                            }
+
+                            readIndex = afterBlockEnd + 1
+                        }
+                    }
 
                     database.category().updateCategoryBlockedTimes(action.categoryId, action.blockedTimes)
                 }
