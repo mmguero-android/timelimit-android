@@ -1,4 +1,5 @@
-Bug fixes:
-
-- splitscreen support disabled by default because it caused problems
-- added missing handling of the current time in the Widget
+- block/ allow depending on the current network
+- allow adding used time manually (possible with the self limitation, too)
+- allow extending blocked time areas with the self limitation
+- optionally force syncing before signing in as parent with limit login category
+- optionally auto leave the splitscreen mode

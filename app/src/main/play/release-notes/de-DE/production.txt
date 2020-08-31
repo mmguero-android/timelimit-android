@@ -1,4 +1,5 @@
-Fehlerbehebungen:
-
-- Splitscreen-Unterstützung standardmäßig nicht mehr aktiv, da diese Probleme verursacht hat
-- fehlende Verarbeitung der aktuellen Zeit im Widget behoben
+- Kategorienfreigabe abhängig vom aktuellen Netzwerk
+- Eintragen von verwendeter Zeit ermöglicht, auch im Rahmen der Selbstbeschränkung
+- Sperrzeitenerweiterung bei Selbstbeschränkung ermöglicht
+- optionales Erzwingen einer Synchronisation vor der Anmeldung eines Elternteils mit Anmeldeverhinderungskategorie
+- optionales automatisches Verlassen vom Splitscreen-Modus
