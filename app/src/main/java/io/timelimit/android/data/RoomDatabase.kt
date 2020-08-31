@@ -83,7 +83,7 @@ abstract class RoomDatabase: RoomDatabase(), io.timelimit.android.data.Database 
                     name
             )
                     .setJournalMode(JournalMode.TRUNCATE)
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigrationOnDowngrade()
                     .addMigrations(
                             DatabaseMigrations.MIGRATE_TO_V2,
                             DatabaseMigrations.MIGRATE_TO_V3,
