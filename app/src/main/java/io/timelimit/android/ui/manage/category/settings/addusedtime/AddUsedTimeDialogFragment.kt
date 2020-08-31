@@ -63,8 +63,12 @@ class AddUsedTimeDialogFragment: BottomSheetDialogFragment() {
         val auth = (activity as ActivityViewModelHolder).getActivityViewModel()
 
         // check if parent is signed in
-        auth.authenticatedUser.observe(viewLifecycleOwner, Observer {
-            if (it == null) dismissAllowingStateLoss()
+        auth.authenticatedUserOrChild.observe(viewLifecycleOwner, Observer {
+            val validParent = it?.second?.type == UserType.Parent
+            val validChild = it?.second?.type == UserType.Child && childId == it.second.id
+            val valid = validParent || validChild
+
+            if (!valid) dismissAllowingStateLoss()
         })
 
         // load category title/ check if it exists and show it
@@ -93,7 +97,7 @@ class AddUsedTimeDialogFragment: BottomSheetDialogFragment() {
             val timeToAdd = binding.timeToAdd.timeInMillis
 
             if (timeToAdd > 0L) {
-                if (auth.isParentAuthenticated()) {
+                if (auth.isParentOrChildAuthenticated(childId = childId)) {
                     val logic = auth.logic
                     val time = RealTime.newInstance(); logic.realTimeLogic.getRealTime(time)
                     val savedContext = context!!.applicationContext

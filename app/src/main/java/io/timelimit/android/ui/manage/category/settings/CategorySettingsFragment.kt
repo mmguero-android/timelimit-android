@@ -239,7 +239,7 @@ class CategorySettingsFragment : Fragment() {
     }
 
     private fun addUsedTime() {
-        if (auth.requestAuthenticationOrReturnTrue()) {
+        if (auth.requestAuthenticationOrReturnTrueAllowChild(childId = params.childId)) {
             AddUsedTimeDialogFragment.newInstance(
                     childId = params.childId,
                     categoryId = params.categoryId

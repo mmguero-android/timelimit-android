@@ -20,6 +20,7 @@
         It allows the user to add some limits without signing in as parent:
         \n- adding time limit rules
         \n- extending blocked time areas
+        \n- adding used time
         \n- creating categories
         \n- enabling the notification filter for a category
         \n- setting a parent category as long as the category is moved downwards in the category hierarchy
