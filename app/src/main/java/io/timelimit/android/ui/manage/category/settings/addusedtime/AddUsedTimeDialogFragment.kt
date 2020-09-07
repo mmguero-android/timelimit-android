@@ -31,9 +31,12 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.AddUsedTimeDialogBinding
 import io.timelimit.android.date.DateInTimezone
+import io.timelimit.android.date.getMinuteOfWeek
+import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.logic.RealTime
 import io.timelimit.android.sync.actions.AddUsedTimeActionItem
+import io.timelimit.android.sync.actions.AddUsedTimeActionItemAdditionalCountingSlot
 import io.timelimit.android.sync.actions.AddUsedTimeActionVersion2
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.ui.main.ActivityViewModelHolder
@@ -108,10 +111,24 @@ class AddUsedTimeDialogFragment: BottomSheetDialogFragment() {
                             val childUser = logic.database.user().getUserByIdCoroutine(childId)
                             if (childUser?.type != UserType.Child) throw IllegalArgumentException()
 
-                            val dayOfEpoch = DateInTimezone.getLocalDate(
+                            val rules = logic.database.timeLimitRules().getTimeLimitRulesByCategoryCoroutine(categoryId = categoryId)
+
+                            val minuteOfWeek = getMinuteOfWeek(time.timeInMillis, TimeZone.getTimeZone(childUser.timeZone))
+                            val localDate = DateInTimezone.getLocalDate(
                                     timeInMillis = time.timeInMillis,
                                     timeZone = TimeZone.getTimeZone(childUser.timeZone)
-                            ).toEpochDay()
+                            )
+
+                            val dayOfEpoch = localDate.toEpochDay()
+                            val dayOfWeek = DateInTimezone.convertDayOfWeek(localDate.dayOfWeek)
+                            val minuteOfDay = minuteOfWeek % MinuteOfDay.LENGTH
+
+                            val additionalSlots = rules
+                                    .filter { /* related to today */ it.dayMask.toInt() and (1 shl dayOfWeek) != 0 }
+                                    .filter { /* related to the current time */ it.startMinuteOfDay <= minuteOfDay && minuteOfDay <= it.endMinuteOfDay }
+                                    .filterNot { it.appliesToWholeDay }
+                                    .map { AddUsedTimeActionItemAdditionalCountingSlot(it.startMinuteOfDay, it.endMinuteOfDay) }
+                                    .toSet()
 
                             ApplyActionUtil.applyAppLogicAction(
                                     action = AddUsedTimeActionVersion2(
@@ -121,7 +138,7 @@ class AddUsedTimeDialogFragment: BottomSheetDialogFragment() {
                                                             categoryId = categoryId,
                                                             timeToAdd = timeToAdd.toInt(),
                                                             extraTimeToSubtract = 0,
-                                                            additionalCountingSlots = emptySet(),
+                                                            additionalCountingSlots = additionalSlots,
                                                             sessionDurationLimits = emptySet()
                                                     )
                                             ),
