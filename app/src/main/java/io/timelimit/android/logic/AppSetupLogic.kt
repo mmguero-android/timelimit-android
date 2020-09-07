@@ -128,7 +128,6 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             categoryForNotAssignedApps = "",
                             relaxPrimaryDevice = false,
                             mailNotificationFlags = 0,
-                            blockedTimes = ImmutableBitmask(BitSet()),
                             flags = 0
                     )
 
@@ -151,7 +150,6 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             categoryForNotAssignedApps = "",
                             relaxPrimaryDevice = false,
                             mailNotificationFlags = 0,
-                            blockedTimes = ImmutableBitmask(BitSet()),
                             flags = 0
                     )
 

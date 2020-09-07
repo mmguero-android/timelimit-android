@@ -1832,48 +1832,6 @@ data class RenameChildAction(val childId: String, val newName: String): ParentAc
     }
 }
 
-data class UpdateParentBlockedTimesAction(val parentId: String, val blockedTimes: ImmutableBitmask): ParentAction() {
-    companion object {
-        const val TYPE_VALUE = "UPDATE_PARENT_BLOCKED_TIMES"
-        private const val PARENT_ID = "parentId"
-        private const val BLOCKED_TIMES = "times"
-    }
-
-    init {
-        IdGenerator.assertIdValid(parentId)
-    }
-
-    override fun serialize(writer: JsonWriter) {
-        writer.beginObject()
-
-        writer.name(TYPE).value(TYPE_VALUE)
-        writer.name(PARENT_ID).value(parentId)
-        writer.name(BLOCKED_TIMES).value(ImmutableBitmaskJson.serialize(blockedTimes))
-
-        writer.endObject()
-    }
-}
-
-data class ResetParentBlockedTimesAction(val parentId: String): ParentAction() {
-    companion object {
-        const val TYPE_VALUE = "RESET_PARENT_BLOCKED_TIMES"
-        private const val PARENT_ID = "parentId"
-    }
-
-    init {
-        IdGenerator.assertIdValid(parentId)
-    }
-
-    override fun serialize(writer: JsonWriter) {
-        writer.beginObject()
-
-        writer.name(TYPE).value(TYPE_VALUE)
-        writer.name(PARENT_ID).value(parentId)
-
-        writer.endObject()
-    }
-}
-
 data class UpdateUserFlagsAction(val userId: String, val modifiedBits: Long, val newValues: Long): ParentAction() {
     companion object {
         private const val TYPE_VALUE = "UPDATE_USER_FLAGS"

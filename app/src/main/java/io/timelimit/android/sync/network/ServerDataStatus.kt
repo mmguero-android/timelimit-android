@@ -174,7 +174,6 @@ data class ServerUserData(
         val categoryForNotAssignedApps: String,
         val relaxPrimaryDevice: Boolean,
         val mailNotificationFlags: Int,
-        val blockedTimes: ImmutableBitmask,
         val flags: Long,
         val limitLoginCategory: String?
 ) {
@@ -191,7 +190,6 @@ data class ServerUserData(
         private const val CATEGORY_FOR_NOT_ASSIGNED_APPS = "categoryForNotAssignedApps"
         private const val RELAX_PRIMARY_DEVICE = "relaxPrimaryDevice"
         private const val MAIL_NOTIFICATION_FLAGS = "mailNotificationFlags"
-        private const val BLOCKED_TIMES = "blockedTimes"
         private const val FLAGS = "flags"
         private const val USER_LIMIT_LOGIN_CATEGORY = "llc"
 
@@ -227,7 +225,6 @@ data class ServerUserData(
                     CATEGORY_FOR_NOT_ASSIGNED_APPS -> categoryForNotAssignedApps = reader.nextString()
                     RELAX_PRIMARY_DEVICE -> relaxPrimaryDevice = reader.nextBoolean()
                     MAIL_NOTIFICATION_FLAGS -> mailNotificationFlags = reader.nextInt()
-                    BLOCKED_TIMES -> blockedTimes = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
                     FLAGS -> flags = reader.nextLong()
                     USER_LIMIT_LOGIN_CATEGORY -> if (reader.peek() == JsonToken.NULL) reader.nextNull() else limitLoginCategory = reader.nextString()
                     else -> reader.skipValue()
@@ -248,7 +245,6 @@ data class ServerUserData(
                     categoryForNotAssignedApps = categoryForNotAssignedApps,
                     relaxPrimaryDevice = relaxPrimaryDevice,
                     mailNotificationFlags = mailNotificationFlags,
-                    blockedTimes = blockedTimes,
                     flags = flags,
                     limitLoginCategory = limitLoginCategory
             )

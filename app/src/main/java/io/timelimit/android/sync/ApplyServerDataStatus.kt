@@ -66,7 +66,6 @@ object ApplyServerDataStatus {
                                     categoryForNotAssignedApps = newEntry.categoryForNotAssignedApps,
                                     relaxPrimaryDevice = newEntry.relaxPrimaryDevice,
                                     mailNotificationFlags = newEntry.mailNotificationFlags,
-                                    blockedTimes = newEntry.blockedTimes,
                                     flags = newEntry.flags
                             )
 

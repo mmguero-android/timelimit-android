@@ -38,8 +38,6 @@
         <include android:id="@+id/child_without_premium"
             layout="@layout/new_login_fragment_child_without_premium" />
 
-        <include layout="@layout/new_login_fragment_blocked_time" />
-
         <include layout="@layout/new_login_fragment_missing_trusted_time" />
 
         <include layout="@layout/new_login_fragment_parent_login_blocked"

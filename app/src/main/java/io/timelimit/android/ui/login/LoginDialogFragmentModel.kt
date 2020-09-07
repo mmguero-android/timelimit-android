@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.login
 
 import android.app.Application
+import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -43,6 +44,34 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class LoginDialogFragmentModel(application: Application): AndroidViewModel(application) {
+    companion object {
+        private fun formatAllowLoginStatusError(status: AllowUserLoginStatus, context: Context): String = when (status) {
+            is AllowUserLoginStatus.Allow -> context.getString(R.string.error_general)
+            is AllowUserLoginStatus.ForbidUserNotFound -> context.getString(R.string.error_general)
+            is AllowUserLoginStatus.ForbidByCategory -> context.getString(
+                    R.string.login_category_blocked,
+                    status.categoryTitle,
+                    formatBlockingReasonForLimitLoginCategory(status.blockingReason, context)
+            )
+            is AllowUserLoginStatus.ForbidByMissingSync -> context.getString(R.string.login_missing_sync)
+        }
+
+        fun formatBlockingReasonForLimitLoginCategory(reason: BlockingReason, context: Context) = when (reason) {
+            BlockingReason.TemporarilyBlocked -> context.getString(R.string.lock_reason_short_temporarily_blocked)
+            BlockingReason.TimeOver -> context.getString(R.string.lock_reason_short_time_over)
+            BlockingReason.TimeOverExtraTimeCanBeUsedLater -> context.getString(R.string.lock_reason_short_time_over)
+            BlockingReason.BlockedAtThisTime -> context.getString(R.string.lock_reason_short_blocked_time_area)
+            BlockingReason.MissingNetworkTime -> context.getString(R.string.lock_reason_short_missing_network_time)
+            BlockingReason.RequiresCurrentDevice -> context.getString(R.string.lock_reason_short_requires_current_device)
+            BlockingReason.NotificationsAreBlocked -> context.getString(R.string.lock_reason_short_notification_blocking)
+            BlockingReason.BatteryLimit -> context.getString(R.string.lock_reason_short_battery_limit)
+            BlockingReason.SessionDurationLimit -> context.getString(R.string.lock_reason_short_session_duration)
+            BlockingReason.MissingRequiredNetwork -> context.getString(R.string.lock_reason_short_missing_required_network)
+            BlockingReason.NotPartOfAnCategory -> "???"
+            BlockingReason.None -> "???"
+        }
+    }
+
     val selectedUserId = MutableLiveData<String?>().apply { value = null }
     private val logic = DefaultAppLogic.with(application)
     private val users = logic.database.user().getAllUsersLive()
@@ -85,12 +114,9 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                             if (status is AllowUserLoginStatus.Allow) {
                                 loginScreen
                             } else if (
-                                    (status is AllowUserLoginStatus.ForbidByCurrentTime && status.missingNetworkTime) ||
                                     (status is AllowUserLoginStatus.ForbidByCategory && status.blockingReason == BlockingReason.MissingNetworkTime)
                             ) {
                                 liveDataFromValue(ParentUserLoginMissingTrustedTime as LoginDialogStatus)
-                            } else if (status is AllowUserLoginStatus.ForbidByCurrentTime) {
-                                liveDataFromValue(ParentUserLoginBlockedTime as LoginDialogStatus)
                             } else if (status is AllowUserLoginStatus.ForbidByCategory) {
                                 liveDataFromValue(
                                         ParentUserLoginBlockedByCategory(
@@ -167,7 +193,6 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
 
                 allUsers.singleOrNull { it.type == UserType.Parent }?.let { user ->
                     val emptyPasswordValid = Threads.crypto.executeAndWait { PasswordHashing.validateSync("", user.password) }
-                    val hasBlockedTimes = !user.blockedTimes.dataNotToModify.isEmpty
 
                     val shouldSignIn = if (emptyPasswordValid) {
                         Threads.database.executeAndWait {
@@ -187,10 +212,6 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                 firstPasswordHash = user.password,
                                 secondPasswordHash = Threads.crypto.executeAndWait { PasswordHashing.hashSyncWithSalt("", user.secondPasswordSalt) }
                         ))
-
-                        if (hasBlockedTimes) {
-                            Toast.makeText(getApplication(), R.string.manage_parent_blocked_times_toast, Toast.LENGTH_LONG).show()
-                        }
 
                         isLoginDone.value = true
                     }
@@ -241,15 +262,15 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                 }
 
                 if (user != null && user.type == UserType.Parent) {
-                    val hasBlockedTimes = !user.blockedTimes.dataNotToModify.isEmpty
-
-                    val shouldSignIn = Threads.database.executeAndWait {
+                    val allowLoginStatus = Threads.database.executeAndWait {
                         AllowUserLoginStatusUtil.calculateSync(
                                 logic = logic,
                                 userId = user.id,
                                 didSync = didSync.value ?: false
-                        ) is AllowUserLoginStatus.Allow
+                        )
                     }
+
+                    val shouldSignIn = allowLoginStatus is AllowUserLoginStatus.Allow
 
                     if (shouldSignIn) {
                         // this feature is limited to the local mode
@@ -259,13 +280,9 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                 secondPasswordHash = "device"
                         ))
 
-                        if (hasBlockedTimes) {
-                            Toast.makeText(getApplication(), R.string.manage_parent_blocked_times_toast, Toast.LENGTH_LONG).show()
-                        }
-
                         isLoginDone.value = true
                     } else {
-                        Toast.makeText(getApplication(), R.string.login_blocked_time, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(getApplication(), formatAllowLoginStatusError(allowLoginStatus, getApplication()), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -310,26 +327,23 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                             secondPasswordHash = secondPasswordHash
                     )
 
-                    val hasBlockedTimes = !userEntry.blockedTimes.dataNotToModify.isEmpty
-                    val shouldSignIn = Threads.database.executeAndWait {
+                    val allowLoginStatus = Threads.database.executeAndWait {
                         AllowUserLoginStatusUtil.calculateSync(
                                 logic = logic,
                                 userId = userEntry.id,
                                 didSync = didSync.value ?: false
-                        ) is AllowUserLoginStatus.Allow
+                        )
                     }
 
+                    val shouldSignIn = allowLoginStatus is AllowUserLoginStatus.Allow
+
                     if (!shouldSignIn) {
-                        Toast.makeText(getApplication(), R.string.login_blocked_time, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(getApplication(), formatAllowLoginStatusError(allowLoginStatus, getApplication()), Toast.LENGTH_SHORT).show()
 
                         return@runAsync
                     }
 
                     model.setAuthenticatedUser(authenticatedUser)
-
-                    if (hasBlockedTimes) {
-                        Toast.makeText(getApplication(), R.string.manage_parent_blocked_times_toast, Toast.LENGTH_LONG).show()
-                    }
 
                     if (setAsDeviceUser) {
                         if (userEntryInfo.deviceRelatedData.deviceEntry.currentUserId != userEntry.id) {
@@ -435,7 +449,6 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
 sealed class LoginDialogStatus
 data class UserListLoginDialogStatus(val usersToShow: List<User>, val isLocalMode: Boolean): LoginDialogStatus()
 object ParentUserLoginMissingTrustedTime: LoginDialogStatus()
-object ParentUserLoginBlockedTime: LoginDialogStatus()
 object ParentUserLoginWaitingForSync: LoginDialogStatus()
 data class ParentUserLoginBlockedByCategory(val categoryTitle: String, val reason: BlockingReason): LoginDialogStatus()
 data class ParentUserLogin(

@@ -20,11 +20,8 @@ import android.util.JsonWriter
 import androidx.room.*
 import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.data.JsonSerializable
-import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.customtypes.ImmutableBitmaskAdapter
-import io.timelimit.android.data.customtypes.ImmutableBitmaskJson
 import io.timelimit.android.util.parseJsonArray
-import java.util.*
 
 @Entity(tableName = "user")
 @TypeConverters(
@@ -62,7 +59,8 @@ data class User(
         @ColumnInfo(name = "mail_notification_flags")
         val mailNotificationFlags: Int,
         @ColumnInfo(name = "blocked_times")
-        val blockedTimes: ImmutableBitmask,
+        @Deprecated(message = "this feature was removed; the limit login category is a replacement")
+        val obsoleteBlockedTimes: String = "",
         @ColumnInfo(name = "flags")
         val flags: Long
 ): JsonSerializable {
@@ -79,7 +77,7 @@ data class User(
         private const val CATEGORY_FOR_NOT_ASSIGNED_APPS = "categoryForNotAssignedApps"
         private const val RELAX_PRIMARY_DEVICE = "relaxPrimaryDevice"
         private const val MAIL_NOTIFICATION_FLAGS = "mailNotificationFlags"
-        private const val BLOCKED_TIMES = "blockedTimes"
+        private const val OBSOLETE_BLOCKED_TIMES = "blockedTimes"
         private const val FLAGS = "flags"
 
         fun parse(reader: JsonReader): User {
@@ -95,7 +93,6 @@ data class User(
             var categoryForNotAssignedApps = ""
             var relaxPrimaryDevice = false
             var mailNotificationFlags = 0
-            var blockedTimes = ImmutableBitmask(BitSet())
             var flags = 0L
 
             reader.beginObject()
@@ -113,7 +110,6 @@ data class User(
                     CATEGORY_FOR_NOT_ASSIGNED_APPS -> categoryForNotAssignedApps = reader.nextString()
                     RELAX_PRIMARY_DEVICE -> relaxPrimaryDevice = reader.nextBoolean()
                     MAIL_NOTIFICATION_FLAGS -> mailNotificationFlags = reader.nextInt()
-                    BLOCKED_TIMES -> blockedTimes = ImmutableBitmaskJson.parse(reader.nextString(), Category.BLOCKED_MINUTES_IN_WEEK_LENGTH)
                     FLAGS -> flags = reader.nextLong()
                     else -> reader.skipValue()
                 }
@@ -133,7 +129,6 @@ data class User(
                     categoryForNotAssignedApps = categoryForNotAssignedApps,
                     relaxPrimaryDevice = relaxPrimaryDevice,
                     mailNotificationFlags = mailNotificationFlags,
-                    blockedTimes = blockedTimes,
                     flags = flags
             )
         }
@@ -186,7 +181,7 @@ data class User(
         writer.name(CATEGORY_FOR_NOT_ASSIGNED_APPS).value(categoryForNotAssignedApps)
         writer.name(RELAX_PRIMARY_DEVICE).value(relaxPrimaryDevice)
         writer.name(MAIL_NOTIFICATION_FLAGS).value(mailNotificationFlags)
-        writer.name(BLOCKED_TIMES).value(ImmutableBitmaskJson.serialize(blockedTimes))
+        writer.name(OBSOLETE_BLOCKED_TIMES).value("")
         writer.name(FLAGS).value(flags)
 
         writer.endObject()

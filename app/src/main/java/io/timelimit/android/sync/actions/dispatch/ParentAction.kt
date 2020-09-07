@@ -252,7 +252,6 @@ object LocalDatabaseParentActionDispatcher {
                             categoryForNotAssignedApps = "",
                             relaxPrimaryDevice = false,
                             mailNotificationFlags = 0,
-                            blockedTimes = ImmutableBitmask(BitSet()),
                             flags = 0
                     ))
                 }
@@ -673,32 +672,6 @@ object LocalDatabaseParentActionDispatcher {
                     }
 
                     null
-                }
-                is UpdateParentBlockedTimesAction -> {
-                    val userEntry = database.user().getUserByIdSync(action.parentId)
-
-                    if (userEntry?.type != UserType.Parent) {
-                        throw IllegalArgumentException("no valid parent id")
-                    }
-
-                    database.user().updateUserSync(
-                            userEntry.copy(
-                                    blockedTimes = action.blockedTimes
-                            )
-                    )
-                }
-                is ResetParentBlockedTimesAction -> {
-                    val userEntry = database.user().getUserByIdSync(action.parentId)
-
-                    if (userEntry?.type != UserType.Parent) {
-                        throw IllegalArgumentException("no valid parent id")
-                    }
-
-                    database.user().updateUserSync(
-                            userEntry.copy(
-                                    blockedTimes = ImmutableBitmask(BitSet())
-                            )
-                    )
                 }
                 is UpdateCategoryBatteryLimit -> {
                     val categoryEntry = database.category().getCategoryByIdSync(action.categoryId)

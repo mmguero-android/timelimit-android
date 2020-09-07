@@ -81,7 +81,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "blockedTimes",
+            "fieldPath": "obsoleteBlockedTimes",
             "columnName": "blocked_times",
             "affinity": "TEXT",
             "notNull": true

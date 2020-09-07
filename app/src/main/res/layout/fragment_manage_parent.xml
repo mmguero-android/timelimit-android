@@ -166,39 +166,6 @@
                 <include android:id="@+id/parent_limit_login"
                     layout="@layout/parent_limit_login_view" />
 
-                <androidx.cardview.widget.CardView
-                    app:cardUseCompatPadding="true"
-                    android:onClick="@{() -> handlers.onManageBlockedTimesClicked()}"
-                    android:foreground="?selectableItemBackground"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:padding="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:text="@string/manage_parent_blocked_times_title"
-                            android:textAppearance="?android:textAppearanceLarge"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
-                            android:text="@string/manage_parent_blocked_times_description"
-                            android:textAppearance="?android:textAppearanceMedium"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <TextView
-                            android:textAppearance="?android:textAppearanceSmall"
-                            android:text="@string/purchase_required_info_local_mode_free"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
                 <include android:id="@+id/delete_parent"
                     layout="@layout/delete_parent_view" />
 
