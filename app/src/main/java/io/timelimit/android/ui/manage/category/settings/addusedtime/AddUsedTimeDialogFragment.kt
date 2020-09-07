@@ -131,6 +131,8 @@ class AddUsedTimeDialogFragment: BottomSheetDialogFragment() {
                                     ignoreIfDeviceIsNotConfigured = true
                             )
 
+                            logic.syncUtil.requestImportantSync(enqueueIfOffline = true)
+
                             Toast.makeText(
                                     savedContext,
                                     savedContext.getString(R.string.add_used_time_confirmation_toast, TimeTextUtil.time(timeToAdd.toInt(), savedContext), categoryTitle),
