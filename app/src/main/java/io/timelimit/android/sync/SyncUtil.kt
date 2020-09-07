@@ -163,9 +163,11 @@ class SyncUtil (private val logic: AppLogic) {
 
     suspend fun requestImportantSyncAndWait() {
         withContext (Dispatchers.Main) {
+            val currentLastSync = lastSync.value
+
             importantSyncRequested.value = true
 
-            importantSyncRequested.waitUntilValueMatches { it == false }
+            lastSync.waitUntilValueMatches { it != currentLastSync }
         }
     }
 
