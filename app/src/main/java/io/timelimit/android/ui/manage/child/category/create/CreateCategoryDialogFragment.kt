@@ -23,20 +23,23 @@ import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.sync.actions.CreateCategoryAction
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.util.EditTextBottomSheetDialog
 
 
 class CreateCategoryDialogFragment: EditTextBottomSheetDialog() {
     companion object {
-        private const val DIALOG_TAG = "a"
+        private const val DIALOG_TAG = "CreateCategoryDialogFragment"
+        private const val CHILD_ID = "childId"
 
-        fun newInstance(params: ManageChildFragmentArgs) = CreateCategoryDialogFragment().apply {
-            arguments = params.toBundle()
+        fun newInstance(childId: String) = CreateCategoryDialogFragment().apply {
+            arguments = Bundle().apply {
+                putString(CHILD_ID, childId)
+            }
         }
     }
 
-    val params: ManageChildFragmentArgs by lazy { ManageChildFragmentArgs.fromBundle(arguments!!) }
+    private val childId: String
+        get() = arguments!!.getString(CHILD_ID)!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,7 +57,7 @@ class CreateCategoryDialogFragment: EditTextBottomSheetDialog() {
                     action = CreateCategoryAction(
                             categoryId = IdGenerator.generateId(),
                             title = text,
-                            childId = params.childId
+                            childId = childId
                     ),
                     allowAsChild = true
             )

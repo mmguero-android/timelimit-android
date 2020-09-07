@@ -342,7 +342,7 @@ class LockFragment : Fragment() {
             button.button.setOnClickListener {
                 if (auth.requestAuthenticationOrReturnTrue()) {
                     CreateCategoryDialogFragment
-                            .newInstance(ManageChildFragmentArgs(childId = userRelatedData.user.id))
+                            .newInstance(childId = userRelatedData.user.id)
                             .show(fragmentManager!!)
                 }
             }

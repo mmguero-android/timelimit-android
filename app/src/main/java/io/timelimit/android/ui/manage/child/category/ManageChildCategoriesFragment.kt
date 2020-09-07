@@ -78,7 +78,7 @@ class ManageChildCategoriesFragment : Fragment() {
 
             override fun onCreateCategoryClicked() {
                 if (auth.requestAuthenticationOrReturnTrueAllowChild(childId = params.childId)) {
-                    CreateCategoryDialogFragment.newInstance(params)
+                    CreateCategoryDialogFragment.newInstance(childId = params.childId)
                             .show(parentFragmentManager)
                 }
             }

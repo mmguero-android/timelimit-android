@@ -119,9 +119,7 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 when (status) {
                     SetupDeviceModelStatus.Done -> {
                         runAsync {
-                            if (BuildConfig.storeCompilant) {
-                                MustReadFragment.newInstance(R.string.must_read_child_manipulation).show(fragmentManager!!)
-                            }
+                            MustReadFragment.newInstance(R.string.must_read_child_manipulation).show(fragmentManager!!)
 
                             val ownDeviceId = logic.deviceId.waitForNullableValue()!!
 

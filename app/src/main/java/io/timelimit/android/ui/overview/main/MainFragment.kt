@@ -122,7 +122,7 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
 
                         if (user?.type == UserType.Child) {
                             if (isAdded && parentFragmentManager.isStateSaved == false) {
-                                openManageChildScreen(user.id)
+                                openManageChildScreen(user.id, fromRedirect = true)
                             }
                         }
 
@@ -188,9 +188,11 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
         )
     }
 
-    override fun openManageChildScreen(childId: String) {
+    override fun openManageChildScreen(childId: String) = openManageChildScreen(childId = childId, fromRedirect = false)
+
+    private fun openManageChildScreen(childId: String, fromRedirect: Boolean) {
         navigation.safeNavigate(
-                MainFragmentDirections.actionOverviewFragmentToManageChildFragment(childId),
+                MainFragmentDirections.actionOverviewFragmentToManageChildFragment(childId = childId, fromRedirect = fromRedirect),
                 R.id.overviewFragment
         )
     }

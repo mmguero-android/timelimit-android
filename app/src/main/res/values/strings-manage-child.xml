@@ -56,4 +56,6 @@
     <string name="manage_child_password_status_no">This child does not have a password</string>
     <string name="manage_child_password_btn_set">Set password (for parents)</string>
     <string name="manage_child_password_btn_change">Change password (for the child itself)</string>
+
+    <string name="manage_child_redirected_toast">Press back to show the overview screen of TimeLimit</string>
 </resources>

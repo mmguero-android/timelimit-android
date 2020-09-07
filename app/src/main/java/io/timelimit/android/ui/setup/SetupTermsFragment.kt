@@ -67,7 +67,7 @@ class SetupTermsFragment : Fragment() {
 
     private fun acceptTerms() {
         Navigation.findNavController(view!!).safeNavigate(
-                SetupTermsFragmentDirections.actionSetupTermsFragmentToSetupSelectModeFragment(),
+                SetupTermsFragmentDirections.actionSetupTermsFragmentToSetupHelpInfoFragment(),
                 R.id.setupTermsFragment
         )
     }

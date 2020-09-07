@@ -61,9 +61,7 @@ class SetupLocalModeFragment : Fragment() {
 
         model.status.observe(this, Observer {
             if (it == SetupLocalModeModel.Status.Done) {
-                if (BuildConfig.storeCompilant) {
-                    MustReadFragment.newInstance(R.string.must_read_child_manipulation).show(fragmentManager!!)
-                }
+                MustReadFragment.newInstance(R.string.must_read_child_manipulation).show(fragmentManager!!)
 
                 navigation.popBackStack(R.id.overviewFragment, false)
             }
