@@ -64,6 +64,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
         private const val MAX_USED_TIME_PER_ROUND_SHORT = 1000          // 1 second
         private const val BACKGROUND_SERVICE_INTERVAL_LONG = 1000L      // every second
         private const val MAX_USED_TIME_PER_ROUND_LONG = 2000           // 1 second
+        const val EXTEND_SESSION_TOLERANCE = 5 * 1000L                  // 5 seconds
     }
 
     init {

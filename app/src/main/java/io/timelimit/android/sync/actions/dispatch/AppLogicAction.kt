@@ -23,6 +23,7 @@ import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.integration.platform.NewPermissionStatusUtil
 import io.timelimit.android.integration.platform.ProtectionLevelUtil
 import io.timelimit.android.integration.platform.RuntimePermissionStatusUtil
+import io.timelimit.android.logic.BackgroundTaskLogic
 import io.timelimit.android.logic.ManipulationLogic
 import io.timelimit.android.sync.actions.*
 
@@ -130,13 +131,46 @@ object LocalDatabaseAppLogicActionDispatcher {
                                         endMinuteOfDay = limit.endMinuteOfDay
                                 )
 
-                                val newItem = oldItem?.copy(
-                                        lastUsage = if (hasTrustedTimestamp) action.trustedTimestamp else oldItem.lastUsage,
-                                        lastSessionDuration = if (hasTrustedTimestamp && action.trustedTimestamp - item.timeToAdd > oldItem.lastUsage + oldItem.sessionPauseDuration)
-                                            item.timeToAdd.toLong()
-                                        else
-                                            oldItem.lastSessionDuration + item.timeToAdd.toLong()
-                                ) ?: SessionDuration(
+                                if (BuildConfig.DEBUG) {
+                                    Log.d(LOG_TAG, "handle session duration limit $limit")
+                                    Log.d(LOG_TAG, "timestamp: ${action.trustedTimestamp}")
+                                    Log.d(LOG_TAG, "time to add: ${item.timeToAdd}")
+                                    Log.d(LOG_TAG, "oldItem: $oldItem")
+                                }
+
+                                val newItem = if (oldItem != null) {
+                                    val extendSession = if (!hasTrustedTimestamp)
+                                        true
+                                    else {
+                                        /*
+                                         * Why the tolerance?
+                                         *
+                                         * The main loop is executed in some interval and it assumes
+                                         * at the end of the interval that the same application was used during
+                                         * the previous phase.
+                                         *
+                                         * Now, if the session duration limit ends during this phase and the application is
+                                         * launched again, then it extends the session (because it is assumed to be running
+                                         * before the session ended) and blocks again.
+                                         *
+                                         * Due to this, a session is reset if it would be over in a few seconds, too.
+                                         */
+                                        val tolerance = BackgroundTaskLogic.EXTEND_SESSION_TOLERANCE
+                                        val timeWhenStartingCurrentUsage = action.trustedTimestamp - item.timeToAdd
+                                        val nextSessionStart = oldItem.lastUsage + oldItem.sessionPauseDuration - tolerance
+
+                                        Log.d(LOG_TAG, "timeWhenStartingCurrentUsage = $timeWhenStartingCurrentUsage")
+                                        Log.d(LOG_TAG, "nextSessionStart = $nextSessionStart")
+                                        Log.d(LOG_TAG, "timeWhenStartingCurrentUsage - nextSessionStart = ${timeWhenStartingCurrentUsage - nextSessionStart}")
+
+                                        timeWhenStartingCurrentUsage <= nextSessionStart
+                                    }
+
+                                    oldItem.copy(
+                                            lastUsage = if (hasTrustedTimestamp) action.trustedTimestamp else oldItem.lastUsage,
+                                            lastSessionDuration = if (extendSession) oldItem.lastSessionDuration + item.timeToAdd.toLong() else  item.timeToAdd.toLong()
+                                    )
+                                } else SessionDuration(
                                         categoryId = item.categoryId,
                                         maxSessionDuration = limit.maxSessionDuration,
                                         sessionPauseDuration = limit.sessionPauseDuration,
@@ -146,6 +180,10 @@ object LocalDatabaseAppLogicActionDispatcher {
                                         // this will cause a small loss of session durations
                                         lastUsage = if (hasTrustedTimestamp) action.trustedTimestamp else 0
                                 )
+
+                                if (BuildConfig.DEBUG) {
+                                    Log.d(LOG_TAG, "newItem: $newItem")
+                                }
 
                                 if (oldItem == null) {
                                     database.sessionDuration().insertSessionDurationItemSync(newItem)
