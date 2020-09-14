@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_device_default_user_title">Usuário predefinido</string>
+    <string name="manage_device_default_user_info">O usuário predefinido é um usuário
+        para quem qualquer usuário do dispositivo pode trocar sem senha (para sair).
+        Isto é útil em dispositivos que podem ser usados por vários usuários diferentes.
+    </string>
+    <string name="manage_device_default_user_status">O usuário predefinido atual é %s</string>
+    <string name="manage_device_default_user_switch_btn">Mudar para o usuário predefinido</string>
+    <string name="manage_device_default_user_switch_reason_remote">Você só pode mudar para o usuário predefinido no próprio dispositivo</string>
+    <string name="manage_device_default_user_switch_reason_unset">Você só pode mudar para o usuário predefinido se um tiver sido configurado</string>
+    <string name="manage_device_default_user_switch_reason_already_done">Você não pode mudar para o usuário predefinido se ele for o usuário atual</string>
+    <string name="manage_device_default_user_set_btn_set">Definir usuário predefinido</string>
+    <string name="manage_device_default_user_set_btn_change">Alterar usuário predefinido</string>
+    <string name="manage_device_default_user_selection_none">Nenhum usuário predefinido</string>
+    <string name="manage_device_default_user_timeout_off">O dispositivo não mudará automaticamente para o usuário predefinido</string>
+    <string name="manage_device_default_user_timeout_on">O dispositivo mudará automaticamente para o usuário predefinido quando não tiver sido utilizado por %s</string>
+    <string name="manage_device_default_user_timeout_btn_enable">permitir mudar automaticamente para o usuário predefinido</string>
+    <string name="manage_device_default_user_timeout_btn_change">configurar a alteração automatica para o usuário predefinido</string>
+    <string name="manage_device_default_user_timeout_dialog_title">Mudar automaticamente para o usuário predefinido</string>
+    <string name="manage_device_default_user_timeout_dialog_disable">nunca</string>
+</resources>

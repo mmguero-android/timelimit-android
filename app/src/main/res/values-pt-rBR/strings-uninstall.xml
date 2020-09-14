@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="uninstall_gplay_title">Sem proteção por senha</string>
+    <string name="uninstall_gplay_text">
+        Os aplicativos do Google Play devem ser desinstaláveis pelo usuário.
+        Devido a isso, TimeLimit pode ser desinstalado sem uma senha.
+        Além disso, é melhor que a criança aceite os limites de tempo voluntariamente.
+    </string>
+
+    <string name="uninstall_reset_title">Resetar Aplicativo</string>
+    <string name="uninstall_reset_text">
+        Todas as configurações de TimeLimit são excluídos deste dispositivo.
+        Depois disso, você pode reconfigurar TimeLimit ou desinstalá-lo.
+    </string>
+    <string name="uninstall_reset_check_permissions">
+        Desativar (algumas) permissões para permitir a desinstalação de TimeLimit.
+    </string>
+    <string name="uninstall_reset_check_conirm">Tenho certeza que quero excluir o TimeLimit deste dispositivo</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="setup_privacy_connected_title">Rede e Privacidade</string>
+    <string name="setup_privacy_connected_text_general_intro">Para o modo conectado,
+        há uma unidade central - o servidor. Este servidor salva as configurações, as durações de uso
+        e o status dos dispositivos (permissões concedidas, Aplicativos instalados e versão de SO).
+    </string>
+    <string name="setup_privacy_connected_text_default_server">Porque você não selecionou nada diferente,
+        você está usando o servidor padrão que é fornecido pelo desenvolvedor do Aplicativo.
+        Aplica-se a política de privacidade.
+    </string>
+    <string name="setup_privacy_connected_text_custom_server">Você selecionou um servidor.
+        A política de privacidade do provedor deste servidor se aplica.
+    </string>
+    <string name="setup_privacy_connected_text_general_outro">Você pode evitar
+        o envio de dados usando o modo local.
+    </string>
+</resources>

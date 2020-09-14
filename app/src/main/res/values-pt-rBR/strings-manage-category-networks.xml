@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="category_networks_title">Redes</string>
+    <string name="category_networks_help">Aqui você pode adicionar redes WiFi. Esta categoria será bloqueada
+        se houver redes WiFi adicionadas e não houver conexão com uma rede específica.
+        Uma rede é identificada por um ponto de acesso. No caso de múltiplos pontos de acesso/ repetidores,
+        você tem que adicionar todas elas uma a uma.
+        Desativação temporária dos limites de tempo também, desabilita as limitações causadas por este recurso.
+    </string>
+    <string name="category_networks_empty">Você não acrescentou nenhuma rede. Esta categoria não está limitada a redes específicas.</string>
+    <string name="category_networks_not_empty">Você adicionou %s. Esta categoria é limitada às redes especificadas.</string>
+    <plurals name="category_networks_counter">
+        <item quantity="one">%d rede</item>
+        <item quantity="other">%d redes</item>
+    </plurals>
+    <string name="category_networks_status_missing_permission">Falta a permissão para obter a rede conectada</string>
+    <string name="category_networks_status_none_connected">Você não está conectado a nenhuma rede WiFi</string>
+    <string name="category_networks_status_connected_no_match">Você está conectado a uma rede que não foi adicionada</string>
+    <string name="category_networks_status_connected_no_match_full">Você está conectado a uma rede que não foi adicionada,
+        você não pode adicionar mais redes a esta categoria
+    </string>
+    <string name="category_networks_status_connected_has_match">Você está conectado a uma rede que foi adicionada</string>
+    <string name="category_networks_action_add">Adicionar rede</string>
+    <string name="category_networks_action_grant">Conceder permissão</string>
+    <string name="category_networks_action_remove">Excluir todas as redes</string>
+    <string name="category_networks_toast_all_removed">Todas as redes excluídas</string>
+
+    <string name="category_networks_toast_enable_location_service">Favor ativar o acesso ao localização</string>
+</resources>

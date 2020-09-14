@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="login_user_selection_text">Escolha um usuário para autenticar</string>
+    <string name="login_password_hint">Senha</string>
+    <string name="login_btn_do">Entrar</string>
+    <string name="login_snackbar_wrong">A senha é inválida</string>
+    <string name="login_dialog_password_text">Digite sua senha para entrar</string>
+    <string name="login_assign_to_device">Definir-me como usuário atual deste dispositivo</string>
+    <string name="login_keep_logged_in_checkbox">Não pergunte novamente neste dispositivo</string>
+    <string name="login_keep_logged_in_not_possible">Você só pode desativar solicitando uma senha nos dispositivos para os quais você foi designado.</string>
+    <string name="login_child_without_password">Você não pode entrar como %s porque não havia senha configurada</string>
+    <string name="login_child_without_premium">Entrar como criança requer a versão premium</string>
+    <string name="login_child_already_current_user">Você já é o usuário atual deste dispositivo</string>
+    <string name="login_child_info">Isto o colocará como o usuário atual deste dispositivo</string>
+    <string name="login_child_done_toast">O usuário deste dispositivo foi trocado</string>
+    <string name="login_missing_trusted_time">A hora atual é necessária para entrar com este usuário</string>
+    <string name="login_missing_sync">Esperando por uma sincronização bem sucedida</string>
+    <string name="login_scan_code">Escanear código</string>
+    <string name="login_scan_code_err_expired">Este código é antigo</string>
+    <string name="login_scan_code_err_not_linked">Esta chave não está vinculada</string>
+    <string name="login_category_blocked">A categoria %1$s está bloqueada agora (%2$s), portanto você não pode entrar com este usuário agora</string>
+</resources>

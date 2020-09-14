@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="must_read_child_manipulation">
+        Porque alguns usuários não se dão conta disso:
+        \n1st: Nas configurações padrão, TimeLimit pode ser facilmente desinstalado, mesmo por crianças.
+        \n2nd: Se \"não funciona\" então isto é muito provavelmente causado por recursos de economia da bateria.
+        Estos recursos são freqüentemente ativadas mesmo que você não o tenha feito.
+    </string>
+    <string name="must_read_timelimit_rules">
+        Isso acontece às vezes porque é configurado de forma errada :
+        Uma regra limita a duração total de uso de uma categoria nos dias selecionados da semana.
+        Se houver uma regra de segunda-feira a sexta-feira com 3 horas,
+        então há um limite total de 3 horas por semana, de segunda a sexta.
+        Se houver uma regra por dia com 3 horas,
+        então há um limite de 3 horas por dia.
+    </string>
+    <string name="must_read_add_already_assigned_apps">
+        Os aplicativos com categoria são excluídos da categoria anterior quando são adicionados a uma nova categoria -
+        usar categorias de Pais e filhos para \"adicionar\" um aplicativo a múltiplas categorias
+    </string>
+</resources>

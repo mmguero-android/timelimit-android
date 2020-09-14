@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="backdoor_start_btn">Desinstale o TimeLimit sem senha via o Suporte</string>
+    <string name="backdoor_instruction_1">Enviar o seguinte aviso (com o motivo do desbloqueio) para o Suporte para obter um código de desbloqueio:</string>
+    <string name="backdoor_instruction_2">Digite o código recebido:</string>
+    <string name="backdoor_toast_invalid_code">Este código é inválido</string>
+</resources>

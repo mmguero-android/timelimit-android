@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="select_custom_server_button">selecione o servidor personalizado</string>
+    <string name="custom_server_select_dialog_title">servidor personalizado</string>
+    <string name="custom_server_select_dialog_warning">
+        Nunca use um servidor personalizado se você não conhecer seu operador ou se não confiar em seu operador.
+        O operador do servidor pode ver e editar sua configuração remotamente se você usar o modo conectado.
+        A partir do Android 9, você deve usar uma url https.
+    </string>
+    <string name="custom_server_select_dialog_hint">https://timelimit.my.server/</string>
+    <string name="custom_server_select_use_default_server">Use o servidor padrão</string>
+    <string name="custom_server_select_test_failed">Parece que este servidor não é um servidor de TimeLimit</string>
+
+    <string name="custom_server_status_title">Servidor personalizado</string>
+    <string name="custom_server_status_disabled">Você está usando o servidor padrão</string>
+    <string name="custom_server_status_enabled">Você está usando o servidor personalizado %s</string>
+</resources>

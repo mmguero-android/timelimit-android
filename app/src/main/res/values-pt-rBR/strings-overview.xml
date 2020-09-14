@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="overview_header_devices">Dispositivos</string>
+    <string name="overview_header_users">Usuários</string>
+    <string name="overview_add_device">Adicionar dispositivo</string>
+    <string name="overview_add_error_local_mode">
+        Você configurou o TimeLimit no modo local.
+        Não há vínculo, por isso você não pode adicionar dispositivos.
+    </string>
+    <string name="overview_add_device_migrate_to_connected">Migrar para o modo conectado</string>
+
+    <string name="overview_intro_title">Bem-vindo ao TimeLimit</string>
+    <string name="overview_intro_text">
+        Esta é a visão geral. Aqui você pode ver dispositivos e usuários (talvez você tenha que deslizar primeiro).
+        \n\nSob os dispositivos, você pode ver o status de um dispositivo e atribuir um usuário.
+        \n\nSob os usuários, você pode configurar os Aplicativos permitidos e os limites de tempo.
+    </string>
+
+    <string name="overview_device_item_manipulation">Houve uma manipulação neste dispositivo</string>
+    <string name="overview_device_item_missing_permission">Uma permissão necessária não foi concedida neste dispositivo</string>
+    <string name="overview_device_item_uninstall">TimeLimit foi desinstalado neste dispositivo</string>
+    <string name="overview_device_item_password_disabled">O pedido de senha foi desativado neste dispositivo</string>
+    <string name="overview_device_item_connected">Conectado</string>
+    <string name="overview_device_item_older_version">usa uma versão antiga de TimeLimit</string>
+
+    <string name="overview_user_item_temporarily_blocked">temporariamente bloqueado</string>
+    <string name="overview_user_item_temporarily_disabled">Limites de tempo temporariamente desativados</string>
+    <string name="overview_user_item_role_child">é restrito</string>
+    <string name="overview_user_item_role_parent">pode alterar as configurações</string>
+
+    <string name="overview_finish_setup_title">Concluir a configuração</string>
+    <string name="overview_finish_setup_text">Você poderia configurar o Timelimit manualmente agora. No entanto, aqui você pode fazer isso mais facilmente.</string>
+
+    <string name="overview_server_message">Mensagem</string>
+</resources>

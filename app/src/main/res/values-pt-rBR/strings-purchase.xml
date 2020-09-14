@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="purchase_intro">Please select an option</string>
+    <string name="purchase_sla_intro">
+        Se você gosta de TimeLimit e queria de pagar por isso,
+        você pode comprar uma \'stay awesome license\'.
+        Isto não desbloqueia recursos adicionais.
+    </string>
+    <!-- https://support.google.com/googleplay/android-developer/answer/112622?hl=en -->
+    <string name="purchase_info_assigned_to_account">
+        A compra é atribuída à sua \'família\' e é válida em todos os dispositivos.
+        A \'família\' são todos os dispositivos que estão ligados a este dispositivo agora e no futuro.
+        Para aplicativos e produtos oferecidos dentro dos aplicativos através do Google Play, é cobrada a taxa de 30% de qualquer compra.
+    </string>
+    <string name="purchase_sla_provision_info">
+        Para aplicativos e produtos oferecidos dentro dos aplicativos através do Google Play, é cobrada a taxa de 30% de qualquer compra.
+    </string>
+    <string name="purchase_one_month">Versão Premium por um mês</string>
+    <string name="purchase_one_year">Versão Premium por um ano</string>
+
+    <string name="purchase_error_not_supported_by_device">O pagamento via Google Play não é suportado por seu aparelho</string>
+    <string name="purchase_error_not_supported_by_app_variant">Esta versão não suporta os pagamentos.
+        Entre em contato com o suporte para compras.
+    </string>
+    <string name="purchase_error_existing_payment">
+        Você já pagou.
+        Você só pode prorrogar a versão premium se ela expirar ou pouco antes disso.
+    </string>
+    <string name="purchase_error_server_rejected">O servidor não aceita pagamentos atualmente</string>
+    <string name="purchase_error_server_different_key">O servidor não aceita pagamentos atualmente</string>
+
+    <string name="purchase_done_title">Purchase succeeded</string>
+    <string name="purchase_done_text">Pressione o botão voltar para voltar ao aplicativo</string>
+
+    <string name="purchase_required_dialog_title">Versão Premium necessária</string>
+    <string name="purchase_required_dialog_text">
+        Este recurso requer a versão premium.
+        Você pode encontrar a opção de comprá-lo na tela inicial do Aplicativo na aba \"Sobre\".
+    </string>
+
+    <string name="purchase_required_info_only_networking">Este recurso só está disponível na versão premium.</string>
+    <string name="purchase_required_info_local_mode_free">Este recurso só está disponível na versão premium e modo local.</string>
+    <string name="purchase_required_info_only_local_mode">Este recurso só está disponível no modo local.</string>
+
+    <string name="purchase_demo_temporarily_notice">
+        Você pode usar temporariamente a versão premium.
+        Depois de um tempo, os recursos da versão premium serão desativados e você só poderá
+        usar os recursos da versão gratuita ou comprar de novo a versão premium para continuar
+        usando os recursos adicionais.
+    </string>
+</resources>

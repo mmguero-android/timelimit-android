@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="setup_parent_mode_create_family">Criar Família</string>
+    <string name="setup_parent_mode_add_device">Acrescentar um novo dispositivo a Família existente</string>
+    <string name="setup_parent_mode_explaination_user_name">
+        O nome é usado para permitir o reconhecimento dos diferentes usuários da Família.
+    </string>
+    <string name="setup_parent_mode_field_name_hint">Seu primeiro nome</string>
+    <string name="setup_parent_mode_explaination_password">
+        A senha é solicitada quando você altera as configurações de TimeLimit.
+        Você pode alterar sua senha a qualquer momento se você tiver acesso a %s.
+        Você pode adicionar um usuário por Pai (cada um com uma senha própria).
+    </string>
+    <string name="setup_parent_mode_explaination_device_title">Cada dispositivo recebe um nome que lhe permite reconhecê-lo mais tarde.</string>
+    <string name="setup_parent_mode_explaination_device_title_field_hint">Nome do dispositivo</string>
+
+    <string name="setup_parent_mode_error_signup_disabled">Atualmente não é possível criar novas contas</string>
+</resources>

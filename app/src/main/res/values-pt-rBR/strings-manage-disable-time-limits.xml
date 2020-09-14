@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_disable_time_limits_title">Desativar os limites de tempo</string>
+    <string name="manage_disable_time_limits_text">Usando isto, todos os limites de tempo e áreas de tempo bloqueadas podem ser desativados</string>
+    <string name="manage_disable_time_limits_info_enabled">Os limites de tempo são desativados até %s</string>
+
+    <string name="manage_disable_time_limits_btn_enable">Ativar novamente os limites de tempo</string>
+    <string name="manage_disable_time_limits_btn_10_min">por 10 minutos</string>
+    <string name="manage_disable_time_limits_btn_30_min">por 30 minutos</string>
+    <string name="manage_disable_time_limits_btn_1_hour">por 1 hora</string>
+    <string name="manage_disable_time_limits_btn_2_hour">por 2 horas</string>
+    <string name="manage_disable_time_limits_btn_4_hour">por 4 horas</string>
+    <string name="manage_disable_time_limits_btn_today">para hoje</string>
+    <string name="manage_disable_time_limits_btn_time">until a time</string>
+    <string name="manage_disable_time_limits_btn_date">até um tempo</string>
+
+    <string name="manage_disable_time_limits_dialog_until">Desativar os limites de tempo até ...</string>
+    1. <string name="manage_disable_time_limits_toast_time_in_past">O tempo selecionado está no passado</string>
+    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">O tempo pode ser aumentado mas não diminuído sem um Pai que confirme</string>
+</resources>

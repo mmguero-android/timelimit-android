@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="migrate_to_connected_mode_title">Migrar para o modo conectado</string>
+    <string name="migrate_to_connected_mode_info">Ao usar isto, a senha de usuários infantis e de Pais sem ser aqueles que fizeram o login para este processo serão perdidos.</string>
+
+    <string name="migrate_to_connected_mode_other_account_linked">
+        Já existe uma conta com este endereço de e-mail. Devido a isso,
+        a migração para o modo conectado não é possível.
+    </string>
+
+    <string name="migrate_to_connected_mode_done">
+        A migração para o modo conectado é feita. Você pode fazer login em seu dispositivo
+        usando o mesmo endereço de e-mail ou usando o procedimento de adicionar dispositivo dentro deste dispositivo.
+        Pressione novamente para ir para a visão geral.
+    </string>
+</resources>

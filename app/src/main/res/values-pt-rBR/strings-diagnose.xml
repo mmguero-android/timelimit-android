@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="diagnose_clock_title">Relógio do sistema</string>
+
+    <string name="diagnose_clock_epoch_seconds">Segundos epocais: %d</string>
+    <string name="diagnose_clock_timezone">Fuso horário: %s</string>
+    <string name="diagnose_clock_time_of_day">Hora do dia: %s</string>
+    <string name="diagnose_clock_date">Data: %s</string>
+    <string name="diagnose_clock_day_of_week">Dia da semana (0 = segunda, ...): %d</string>
+    <string name="diagnose_clock_day_of_epoch">Dia da época: %d</string>
+    <string name="diagnose_clock_minute_of_week">Minuto da semana: %d</string>
+    <string name="diagnose_clock_last_time_request">Última solicitação de tempo: %s</string>
+    <string name="diagnose_clock_last_time_request_disabled">tempo de rede desativado</string>
+    <string name="diagnose_clock_last_time_request_never">nunca</string>
+    <string name="diagnose_clock_last_time_request_x_ago">%s atrás</string>
+    <string name="diagnose_clock_btn_sync">sincronização de tempo</string>
+
+    <string name="diagnose_connection_title">Estado da conexão</string>
+    <string name="diagnose_connection_general">Estado do sistema: %s</string>
+    <string name="diagnose_connection_own_server">Servidor do TimeLimit: %s</string>
+    <string name="diagnose_connection_yes">conectado</string>
+    <string name="diagnose_connection_no">não conectado</string>
+    <string name="diagnose_connection_network_id">Identificação da rede</string>
+
+    <string name="diagnose_sync_title">Sincronização</string>
+    <string name="diagnose_sync_empty">Não há nada que precise ser sincronizado</string>
+    <string name="diagnose_sync_copy_to_clipboard">Copiar para o clipboard</string>
+    <string name="diagnose_sync_copied_to_clipboard">Copiado para o clipboard</string>
+    <string name="diagnose_sync_btn_clear_cache">Excluir cache</string>
+    <string name="diagnose_sync_btn_clear_cache_toast">Cache excluído</string>
+    <string name="diagnose_sync_btn_request_sync">Solicitar sincronização</string>
+    <string name="diagnose_sync_btn_request_sync_toast">sincronização foi solicitada</string>
+    <string name="diagnose_sync_btn_show_exception">Mostrar detalhes das exceções</string>
+    <string name="diagnose_sync_status_idle">Inativo</string>
+    <string name="diagnose_sync_status_syncing">Sincronizando agora</string>
+    <string name="diagnose_sync_status_had_error">Inativo, a exceção ocorreu</string>
+
+    <string name="diagnose_fga_title">Detecção em primeiro plano</string>
+    <string name="diagnose_fga_query_range">Intervalo de tempo solicitado</string>
+    <string name="diagnose_fga_query_range_min">Mínimo (Padrão)</string>
+
+    <string name="diagnose_exf_title">Marcado res experimentais</string>
+    <string name="diagnose_exf_lom">Desativar o travamento após manipulações</string>
+    <string name="diagnose_exf_slb">Bloqueio de Aplicativos no nível de sistema</string>
+    <string name="diagnose_exf_mau">Irrita o usuário após a manipulação</string>
+    <string name="diagnose_exf_isc">Ignorar o status da conexão do sistema</string>
+    <string name="diagnose_exf_chs">TimeLimit como lançador</string>
+    <string name="diagnose_exf_chd">Atraso no redirecionamento do lançador</string>
+    <string name="diagnose_exf_nas">Forçar o tempo de rede a nível do sistema</string>
+    <string name="diagnose_exf_mld">Aumentar o ciclo de intervalo principal</string>
+    <string name="diagnose_exf_kcs">Mantenha-se conectado quando a tela estiver desligada</string>
+    <string name="diagnose_exf_mad">Tente detectar múltiplos Aplicativos ativos (suporte a tela dividida)</string>
+    <string name="diagnose_exf_rsl">Permitir login somente de usuários em categoria Pais com categoria de login limite após a sincronização</string>
+    <string name="diagnose_exf_bss">Desativar automaticamente a tela dividida usando o serviço de acessibilidade</string>
+
+    <string name="diagnose_bg_task_loop_ex">Exceção do ciclo de tarefas de fundo</string>
+
+    <string name="diagnose_bat_title">Bateria</string>
+    <string name="diagnose_bat_status">Status: %s</string>
+    <string name="diagnose_bat_status_charging">Carregando/ completo</string>
+    <string name="diagnose_bat_status_mobile">Não Carregando</string>
+    <string name="diagnose_bat_level">Nível: %d\%%</string>
+</resources>

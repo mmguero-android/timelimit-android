@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="lock_header_blocked">Bloqueado!</string>
+
+    <string name="lock_header_what">O que foi bloqueado?</string>
+    <string name="lock_header_why">Por que foi bloqueado?</string>
+    <string name="lock_header_how_proceed">O que você pode fazer?</string>
+
+    <string name="lock_allow_temporarily_header">permitir temporariamente</string>
+    <string name="lock_allow_temporarily_text">
+        Permitir o uso de %1$s. %1$s será bloqueado quando o
+        opção na área de notificação foi selecionada ou a
+        tela foi desligada.
+    </string>
+
+    <string name="lock_add_to_category_title">Adicionar a uma categoria</string>
+    <string name="lock_add_to_category_text">Use esta opção se você conhece este Aplicativo e quer permitir-lo</string>
+
+    <string name="lock_goto_main_title">Abrir TimeLimit</string>
+    <string name="lock_goto_main_text">Abrir TimeLimit para ver e/ou alterar as configurações</string>
+
+    <string name="lock_extratime_title">Acrescentar tempo extra</string>
+
+    <string name="lock_disable_time_verification_title">Desativar a confirmação manual de tempo neste dispositivo</string>
+    <string name="lock_disable_time_verification_text">
+        Se o tempo de rede não estiver disponível, use o relógio deste dispositivo.
+        Use esta opção se este dispositivo não tiver uma conexão de Internet com freqüência.
+    </string>
+
+    <string name="lock_update_current_device_title">Ajustar o dispositivo atual</string>
+    <string name="lock_update_current_device_text">Selecione este dispositivo como dispositivo atual</string>
+
+    <string name="lock_disable_temporarily_lock_title">Desativar o bloqueio temporário</string>
+    <string name="lock_disable_temporarily_all_categories">todas as categorias</string>
+    <string name="lock_disable_temporarily_all_categories_disabled">Somente a categoria %s é bloqueada</string>
+
+    <string name="lock_confirm_time_title">Confirmar o tempo manualmente</string>
+    <string name="lock_confirm_time_btn">Este tempo é correto</string>
+
+    <string name="lock_grant_permission_title">Conceder permissão</string>
+    <string name="lock_grant_permission_text">Permitir TimeLimit para ver a rede conectada</string>
+
+    <string name="lock_reason_no_category">
+        Este aplicativo não foi atribuído a nenhuma categoria.
+        Devido a isso, não há definições de restrição.
+        E a solução mais simples neste caso é bloquear o Aplicativo.
+    </string>
+    <string name="lock_reason_temporarily_blocked">
+        Esta %s faz parte de uma categoria que foi temporariamente bloqueada.
+    </string>
+    <string name="lock_reason_blocked_time">
+        Esta %s é parte de uma categoria que está bloqueada neste momento.
+    </string>
+    <string name="lock_reason_time_over">
+        Esta %s faz parte de uma categoria cujo limite de tempo foi atingido.
+    </string>
+    <string name="lock_reason_time_over_etra_time_can_be_used_later">
+        Esta %s faz parte de uma categoria cujo limite de tempo foi atingido.
+        Ainda há tempo extra, mas o limite de uso para o tempo extra foi atingido, também.
+    </string>
+    <string name="lock_reason_missing_network_time">
+        Para decidir se a %s é permitida, é necessário saber o tempo atual.
+        A verificação do tempo da rede está ativada e falhou.
+    </string>
+    <string name="lock_reason_requires_current_device">
+        Para evitar que os limites de tempo sejam usados várias vezes em diferentes dispositivos,
+        deve haver um dispositivo atual no qual possam ser usados Aplicativos limitados.
+        Este dispositivo não é selecionado como dispositivo atual agora.
+    </string>
+    <string name="lock_reason_battery_limit">
+        Esta %s é parte de uma categoria que tem um limite de bateria e este
+        limite da bateria foi atingido.
+        Para destravá-lo, carregue a bateria.
+    </string>
+    <string name="lock_reason_session_duration">
+        Esta %s é parte de uma categoria que tem um limite de duração de sessão
+        e este limite foi atingido.
+        Ele será desbloqueado após a duração do intervalo.
+    </string>
+    <string name="lock_reason_missing_required_network">
+        This %s is only allowed in some networks, but no connection to such network was found.
+    </string>
+Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi encontrada.
+    <string name="lock_reason_short_no_category">nenhuma categoria</string>
+    <string name="lock_reason_short_temporarily_blocked">temporariamente bloqueado</string>
+    <string name="lock_reason_short_time_over">o tempo acabou</string>
+    <string name="lock_reason_short_blocked_time_area">área de tempo bloqueada</string>
+    <string name="lock_reason_short_missing_network_time">tempo de rede em falta</string>
+    <string name="lock_reason_short_requires_current_device">dispositivo deve ser o dispositivo atual</string>
+    <string name="lock_reason_short_notification_blocking">todas as notificações são bloqueadas</string>
+    <string name="lock_reason_short_battery_limit">limite de bateria atingido</string>
+    <string name="lock_reason_short_session_duration">limite de duração da sessão atingido</string>
+    <string name="lock_reason_short_missing_required_network">nenhuma rede permitida</string>
+
+    <string name="lock_overlay_warning">
+        Falha ao desbloquear a tela de bloqueio.
+        Você pode tentar usar o botão de início  ou geral para sair desta tela.
+    </string>
+    <string name="lock_overlay_text">Blocking %s</string>
+</resources>

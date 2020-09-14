@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="parent_limit_login_title">Categoria de limite de login</string>
+    <string name="parent_limit_login_help">Aqui você pode selecionar uma categoria. Assim que os Aplicativos desta
+        categoria estão bloqueadas, você não pode entrar com seu usuário Pai. Este
+        recurso pode ser usado para evitar que você desative os limites que você mesmo estabelece enquanto eles estão ativos.
+    </string>
+    <string name="parent_limit_login_status_disabled">Você pode fazer login a qualquer momento</string>
+    <string name="parent_limit_login_status_enabled">Você não pode entrar quando o %1$s estiver bloqueado por %2$s</string>
+    <string name="parent_limit_login_status_needs_other_user">Você deve criar outro usuário Pai como backup (caso você mesmo se bloqueie) antes de poder usar este recurso</string>
+    <string name="parent_limit_login_select_button">Selecione a categoria</string>
+    <string name="parent_limit_login_dialog_no_selection">nenhuma categoria</string>
+    <string name="parent_limit_login_dialog_item">%1$s/%2$s</string>
+    <string name="parent_limit_login_error_user_itself">Você deve estar conectado como usuário
+        para selecionar uma categoria. Outros usuários só podem desativar este recurso.
+    </string>
+</resources>

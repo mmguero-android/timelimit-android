@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="background_logic_whitelisted">na lista branca interna</string>
+    <string name="background_logic_temporarily_allowed">temporariamente permitido</string>
+    <string name="background_logic_limits_disabled">limites de tempo desativados</string>
+    <string name="background_logic_no_timelimit">sem limite de tempo</string>
+    <string name="background_logic_idle_title">inativo</string>
+    <string name="background_logic_idle_text">nenhum App em execução detectado</string>
+    <string name="background_logic_error">Erro</string>
+    <string name="background_logic_error_permission">Falta permissão</string>
+    <string name="background_logic_error_internal">problema interno</string>
+    <string name="background_logic_using_extra_time">Tempo adicional (%s)</string>
+    <string name="background_logic_opening_lockscreen">Abrindo a tela de bloqueio</string>
+
+    <string name="background_logic_temporarily_allowed_title">Os aplicativos são temporariamente permitidos</string>
+    <string name="background_logic_temporarily_allowed_text">Toque aqui ou desligue a tela para desfazer</string>
+
+    <string name="background_logic_timeout_title">logout automático ativado</string>
+    <string name="background_logic_timeout_text">TimeLimit ainda está em andamento para fazer isso</string>
+
+    <string name="background_logic_paused_title">Temporariamente desativado</string>
+    <string name="background_logic_paused_text">Nenhuma limitação se aplica</string>
+
+    <string name="background_logic_toast_sync_apps">TimeLimit: Falha ao tentar atualizar a lista de aplicativos</string>
+</resources>

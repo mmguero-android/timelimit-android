@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="manage_child_tab_categories">Categorias</string>
+    <string name="manage_child_tab_other">Outros</string>
+    <string name="manage_child_block_temporarily_title">bloqueio temporário</string>
+    <string name="manage_child_block_temporarily_text">
+        Selecionar categorias que devem ser bloqueadas temporariamente.
+        Você pode desativar o bloqueio automaticamente, mantendo uma categoria
+        e selecionando um tempo final.
+    </string>
+    <string name="manage_child_block_temporarily_no_end_time">%s (indefinidamente)</string>
+    <string name="manage_child_block_temporarily_until">%1$s (até %2$s)</string>
+    <string name="manage_child_block_temporarily_dialog_until">até %s</string>
+
+    <string name="manage_child_category_no_time_limits">sem limite de tempo</string>
+
+    <string name="manage_child_categories_intro_title">Categorias</string>
+    <string name="manage_child_categories_intro_text">
+        TimeLimit gerencia os limites usando categorias.
+        Você pode selecionar múltiplos aplicativos e limites por categoria.
+        Isto permite, por exemplo, estabelecer um limite para todos os jogos.
+    </string>
+    
+    <string name="manage_child_manipulation_text">
+        Havia uma manipulação em um dispositivo desta criança.
+        Volte para a visão geral e abra a entrada do dispositivo correspondente para obter detalhes.
+    </string>
+
+    <string name="manage_child_category_for_unassigned_apps">utilizado para Aplicativos sem categoria</string>
+
+    <string name="manage_child_timezone_title">Fuso horário</string>
+    <string name="manage_child_timezone_change_button">Mudança de fuso horário</string>
+    <string name="manage_child_timezone_search_hint">Busca de fuso horário</string>
+
+    <string name="manage_child_password_title">Senhas das crianças</string>
+    <string name="manage_child_password_info">Uma criança com uma senha
+        pode se definir como o usuário atual de um dispositivo
+        (usando a tela de autenticação que é aberta pelo botão de bloqueio no canto inferior direito)
+    </string>
+    <string name="manage_child_password_status_yes">Esta criança tem uma senha</string>
+    <string name="manage_child_password_status_no">Esta criança não tem uma senha</string>
+    <string name="manage_child_password_btn_set">Definir senha (para os Pais)</string>
+    <string name="manage_child_password_btn_change">Alterar senha (para a criança)</string>
+
+    <string name="manage_child_redirected_toast">Pressione novamente para mostrar a tela de visão geral de TimeLimit</string>
+</resources>

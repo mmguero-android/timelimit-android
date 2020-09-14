@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="generic_ok">OK</string>
+    <string name="generic_cancel">Cancelar</string>
+    <string name="generic_help">Ajuda</string>
+    <string name="generic_undo">Desfazer</string>
+    <string name="generic_save">Salvar</string>
+    <string name="generic_create">Criar</string>
+    <string name="generic_delete">Excluir</string>
+    <string name="generic_retry">Tente novamente</string>
+    <string name="generic_go">Seguir</string>
+    <string name="generic_manage_card">Gerenciar</string>
+    <string name="generic_enable">Ativar</string>
+
+    <plurals name="generic_plural_app">
+        <item quantity="one">%d App</item>
+        <item quantity="other">%d Apps</item>
+    </plurals>
+
+    <string name="generic_swipe_to_dismiss">Deslize para o lado para remover esta mensagem</string>
+    <string name="generic_runtime_permission_rejected">Permissão recusada; Você pode gerenciar as permissões nas configurações do sistema</string>
+</resources>

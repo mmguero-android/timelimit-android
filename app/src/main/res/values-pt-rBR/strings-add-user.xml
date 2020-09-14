@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="add_user_title">Criar usuário</string>
+    <string name="add_user_hint_name">Nome do usuário</string>
+    <string name="add_user_type_parent">Pais</string>
+    <string name="add_user_type_child">Criança</string>
+    <string name="add_user_confirmation_done">O usuário foi criado</string>
+    <string name="add_user_child_password_info">Se você escolheu uma senha para a criança,
+        então, pode mudar para seu próprio usuário com sua senha.
+        Este recurso é desativado se uma criança não tiver uma senha.
+    </string>
+
+    <string name="add_user_authentication_required_text">
+        Somente os pais podem acrescentar usuários
+    </string>
+
+    <string name="add_user_authentication_required_btn">Autenticar</string>
+</resources>

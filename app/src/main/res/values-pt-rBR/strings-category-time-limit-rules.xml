@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="category_time_limit_rules">regras de limite de tempo</string>
+    <string name="category_time_limit_rules_about">
+        Aqui você pode configurar regras de limite de tempo.
+        Cada regra descreve um limite.
+        Regras nas quais vários dias são marcados
+        limitam a duração total de uso durante uma semana em todos os dias selecionados.
+        Regras nas quais apenas um dia é mercado limitam apenas o dia selecionado.
+    </string>
+    <string name="category_time_limit_rules_applied_to_extra_time">é aplicado também ao tempo extra</string>
+    <string name="category_time_limit_rules_time_area">aplicado somente de %s para %s</string>
+    <string name="category_time_limit_rules_session_limit">%s intervalo após %s de uso</string>
+    <string name="category_time_limit_rule_dialog_new">Criar regra</string>
+    <string name="category_time_limit_rule_dialog_edit">Editar regra</string>
+    <string name="category_time_limit_rules_apply_to_extra_time">Aplicar para o tempo extra</string>
+    <string name="category_time_limit_rules_apply_to_whole_day">Aplicar ao dia inteiro</string>
+    <string name="category_time_limit_rules_apply_to_part_day_1">Aplicar de</string>
+    <string name="category_time_limit_rules_apply_to_part_day_2">para</string>
+    <string name="category_time_limit_rules_apply_to_part_day_3"></string>
+    <string name="category_time_limit_rules_invalid_range">A hora inicial deve ser antes da hora final</string>
+    <string name="category_time_limit_rules_enable_session_limit">Limitar a duração da sessão</string>
+    <string name="category_time_limit_rules_session_limit_duration">Duração máxima da sessão</string>
+    <string name="category_time_limit_rules_session_limit_pause">Duração do intervalo após a sessão</string>
+
+    <string name="category_time_limit_rules_snackbar_created">A regra foi criada</string>
+    1. <string name="category_time_limit_rules_snackbar_updated">A regra foi modificada</string>
+    <string name="category_time_limit_rules_snackbar_deleted">A regra foi excluída</string>
+
+    <string name="category_time_limit_rules_warning_multiple_days">Esta regra
+        limitará a duração total de uso durante uma semana nos dias selecionados.
+        Se você quiser por dia, crie uma regra por dia.
+    </string>
+    <string name="category_time_limit_rules_warning_day_part">Esta regra
+        limitará a duração de uso somente no intervalo especificado.
+        Sem regras para outros tempos ou áreas de tempo bloqueadas, não
+        haverá nenhum limite fora deste intervalo.
+    </string>
+</resources>

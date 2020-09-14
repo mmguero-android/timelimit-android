@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation version 3 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <https://www.gnu.org/licenses/>.
+-->
+<resources>
+    <string name="contacts_title">Contatos</string>
+    <string name="contacts_snackbar_added">O contato foi adicionado</string>
+    <string name="contacts_title_long">Contatos permitidos</string>
+    <string name="contacts_description">Esta é uma lista de números de telefone.
+        Os pais podem adicionar itens da lista de contatos do dispositivo.
+        Cada usuário deste dispositivo pode iniciar uma chamada para um destes números usando esta tela.
+        Isto funciona se o aplicativo de telefone estiver bloqueado.
+        Os números de telefone só são salvos neste dispositivo e nunca são transmitidos.
+    </string>
+    <string name="contacts_add">Adicionar contato</string>
+    <string name="contacts_snackbar_remove_auth">Você deve fazer o login para excluir os contatos</string>
+    <string name="contacts_snackbar_removed">%s foi excluído</string>
+    <string name="contacts_snackbar_call_failed">Não foi possível efectuar a chamada</string>
+    <string name="contacts_snackbar_call_started">Chamada iniciada; Você pode desligar usando a área de notificação</string>
+</resources>
