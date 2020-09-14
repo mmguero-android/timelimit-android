@@ -295,6 +295,8 @@ data class CategoryItselfHandling (
     else
         BlockingReason.None
 
+    val hasRemainingTime = okByTimeLimitRules && okBySessionDurationLimits
+
     fun isValid(
             categoryRelatedData: CategoryRelatedData,
             user: UserRelatedData,

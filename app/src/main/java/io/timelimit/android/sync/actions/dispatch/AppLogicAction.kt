@@ -15,6 +15,8 @@
  */
 package io.timelimit.android.sync.actions.dispatch
 
+import android.util.Log
+import io.timelimit.android.BuildConfig
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.model.*
 import io.timelimit.android.extensions.MinuteOfDay
@@ -25,6 +27,8 @@ import io.timelimit.android.logic.ManipulationLogic
 import io.timelimit.android.sync.actions.*
 
 object LocalDatabaseAppLogicActionDispatcher {
+    private const val LOG_TAG = "AppLogicAction"
+
     fun dispatchAppLogicActionSync(action: AppLogicAction, deviceId: String, database: Database, manipulationLogic: ManipulationLogic) {
         DatabaseValidation.assertDeviceExists(database, deviceId)
 
@@ -378,6 +382,13 @@ object LocalDatabaseAppLogicActionDispatcher {
                                     activities = activities
                             )
                         }
+                    }
+
+                    null
+                }
+                is ForceSyncAction -> {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "dispatched force sync action")
                     }
 
                     null

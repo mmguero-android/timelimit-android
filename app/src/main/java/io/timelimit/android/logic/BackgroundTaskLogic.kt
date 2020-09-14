@@ -28,6 +28,7 @@ import io.timelimit.android.data.backup.DatabaseBackup
 import io.timelimit.android.data.model.*
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.date.DateInTimezone
+import io.timelimit.android.extensions.flattenToSet
 import io.timelimit.android.integration.platform.AppStatusMessage
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AccessibilityService
@@ -36,6 +37,7 @@ import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
 import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
 import io.timelimit.android.logic.blockingreason.needsNetworkId
+import io.timelimit.android.sync.actions.ForceSyncAction
 import io.timelimit.android.sync.actions.UpdateDeviceStatusAction
 import io.timelimit.android.sync.actions.apply.ApplyActionUtil
 import io.timelimit.android.ui.IsAppInForeground
@@ -296,7 +298,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         pauseCounting = false
                 )
 
-                val needsNetworkId = foregroundAppWithBaseHandlings.find { it.second.needsNetworkId() } != null || backgroundAppBaseHandling.needsNetworkId()
+                val allAppsBaseHandlings = foregroundAppWithBaseHandlings.map { it.second } + listOf(backgroundAppBaseHandling)
+                val currentCategoryIds = allAppsBaseHandlings.map {
+                    if (it is AppBaseHandling.UseCategories) it.categoryIds else emptySet()
+                }.flattenToSet()
+
+                val needsNetworkId = allAppsBaseHandlings.find { it.needsNetworkId() } != null
                 val networkId: String? = if (needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId().getNetworkIdOrNull() else null
 
                 fun reportStatusToCategoryHandlingCache(userRelatedData: UserRelatedData) {
@@ -312,6 +319,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }; reportStatusToCategoryHandlingCache(userRelatedData)
 
                 // check if should be blocked
+                val allCategoriesWithRemainingTimeBeforeAddingUsedTime = currentCategoryIds.filter { categoryHandlingCache.get(it).hasRemainingTime }
+
                 val blockedForegroundApp = foregroundAppWithBaseHandlings.find { (_, foregroundAppBaseHandling) ->
                     foregroundAppBaseHandling is AppBaseHandling.BlockDueToNoCategory ||
                             (foregroundAppBaseHandling is AppBaseHandling.UseCategories && foregroundAppBaseHandling.categoryIds.find {
@@ -358,6 +367,17 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
 
                     reportStatusToCategoryHandlingCache(userRelatedData = newDeviceAndUserRelatedData.userRelatedData)
+
+                    // eventually trigger sync
+                    val allCategoriesWithRemainingTimeAfterSubtractingTime = currentCategoryIds.filter { categoryHandlingCache.get(it).hasRemainingTime }
+
+                    if (allCategoriesWithRemainingTimeBeforeAddingUsedTime != allCategoriesWithRemainingTimeAfterSubtractingTime) {
+                        ApplyActionUtil.applyAppLogicAction(
+                                action = ForceSyncAction,
+                                appLogic = appLogic,
+                                ignoreIfDeviceIsNotConfigured = true
+                        )
+                    }
                 }
 
                 val categoriesToCount = categoryHandlingsToCount.map { it.createdWithCategoryRelatedData.category.id }

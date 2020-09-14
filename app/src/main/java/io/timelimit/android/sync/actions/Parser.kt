@@ -27,6 +27,7 @@ object ActionParser {
         UpdateAppActivitiesAction.TYPE_VALUE -> UpdateAppActivitiesAction.parse(action)
         UpdateDeviceStatusAction.TYPE_VALUE -> UpdateDeviceStatusAction.parse(action)
         AddUsedTimeActionVersion2.TYPE_VALUE -> AddUsedTimeActionVersion2.parse(action)
+        ForceSyncAction.TYPE_VALUE -> ForceSyncAction
         else -> throw IllegalStateException()
     }
 

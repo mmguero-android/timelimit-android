@@ -552,6 +552,18 @@ object SignOutAtDeviceAction: AppLogicAction() {
         writer.endObject()
     }
 }
+object ForceSyncAction: AppLogicAction() {
+    const val TYPE_VALUE = "FORCE_SYNC"
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+
+        writer.endObject()
+    }
+}
+
 
 data class AddCategoryAppsAction(val categoryId: String, val packageNames: List<String>): ParentAction() {
     companion object {
