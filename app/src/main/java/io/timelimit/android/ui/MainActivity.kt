@@ -42,7 +42,6 @@ import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.parent.link.LinkParentMailFragment
 import io.timelimit.android.ui.manage.parent.password.restore.RestoreParentPasswordFragment
-import io.timelimit.android.ui.migrate_to_connected.MigrateToConnectedModeFragment
 import io.timelimit.android.ui.overview.main.MainFragment
 import io.timelimit.android.ui.parentmode.ParentModeFragment
 import io.timelimit.android.ui.payment.ActivityPurchaseModel
@@ -190,8 +189,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         if (
                 currentFragment is SetupParentModeFragment ||
                 currentFragment is RestoreParentPasswordFragment ||
-                currentFragment is LinkParentMailFragment ||
-                currentFragment is MigrateToConnectedModeFragment
+                currentFragment is LinkParentMailFragment
         ) {
             return
         }

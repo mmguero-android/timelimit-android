@@ -39,7 +39,7 @@ import io.timelimit.android.ui.main.getActivityViewModel
 import kotlinx.android.synthetic.main.fragment_overview.*
 import kotlinx.coroutines.launch
 
-class OverviewFragment : CoroutineFragment(), CanNotAddDevicesInLocalModeDialogFragmentListener {
+class OverviewFragment : CoroutineFragment() {
     private val handlers: OverviewFragmentParentHandlers by lazy { parentFragment as OverviewFragmentParentHandlers }
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
@@ -127,13 +127,9 @@ class OverviewFragment : CoroutineFragment(), CanNotAddDevicesInLocalModeDialogF
                 }
         ).attachToRecyclerView(recycler)
     }
-
-    override fun migrateToConnectedMode() {
-        handlers.migrateToConnectedMode()
-    }
 }
 
-interface OverviewFragmentParentHandlers: CanNotAddDevicesInLocalModeDialogFragmentListener {
+interface OverviewFragmentParentHandlers {
     fun openAddUserScreen()
     fun openAddDeviceScreen()
     fun openManageDeviceScreen(deviceId: String)

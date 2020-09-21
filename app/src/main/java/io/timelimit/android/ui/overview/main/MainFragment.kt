@@ -15,8 +15,6 @@
  */
 package io.timelimit.android.ui.overview.main
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -49,19 +47,12 @@ import io.timelimit.android.ui.manage.device.add.AddDeviceFragment
 import io.timelimit.android.ui.obsolete.ObsoleteDialogFragment
 import io.timelimit.android.ui.overview.about.AboutFragment
 import io.timelimit.android.ui.overview.about.AboutFragmentParentHandlers
-import io.timelimit.android.ui.overview.overview.CanNotAddDevicesInLocalModeDialogFragmentListener
 import io.timelimit.android.ui.overview.overview.OverviewFragment
 import io.timelimit.android.ui.overview.overview.OverviewFragmentParentHandlers
 import io.timelimit.android.ui.overview.uninstall.UninstallFragment
-import io.timelimit.android.ui.setup.privacy.PrivacyInfoDialogFragment
 import kotlinx.android.synthetic.main.fragment_main.*
 
-class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers,
-        CanNotAddDevicesInLocalModeDialogFragmentListener, FragmentWithCustomTitle {
-    companion object {
-        private const val REQ_MIGRATE_TO_CONNECTED_PRIVACY = 1
-    }
-
+class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers, FragmentWithCustomTitle {
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private lateinit var navigation: NavController
     private val showAuthButtonLive = MutableLiveData<Boolean>()
@@ -237,23 +228,6 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                 MainFragmentDirections.actionOverviewFragmentToDiagnoseMainFragment(),
                 R.id.overviewFragment
         )
-    }
-
-    override fun migrateToConnectedMode() {
-        PrivacyInfoDialogFragment().apply {
-            setTargetFragment(this@MainFragment, REQ_MIGRATE_TO_CONNECTED_PRIVACY)
-        }.show(fragmentManager!!)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQ_MIGRATE_TO_CONNECTED_PRIVACY && resultCode == Activity.RESULT_OK) {
-            navigation.safeNavigate(
-                    MainFragmentDirections.actionOverviewFragmentToMigrateToConnectedModeFragment(),
-                    R.id.overviewFragment
-            )
-        }
     }
 
     override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.main_tab_overview)} (${getString(R.string.app_name)})")
