@@ -107,12 +107,9 @@ class Actions {
     )
 
     @Test
-    fun testActionSerializationAndDeserializationWorks() {
-        appLogicActions.forEach { originalAction ->
-            val serializedAction = SerializationUtil.serializeAction(originalAction)
-            val parsedAction = ActionParser.parseAppLogicAction(JSONObject(serializedAction))
-
-            assert(parsedAction == originalAction)
+    fun testCanSerializeAppLogicActions() {
+        appLogicActions.forEach {
+            SerializationUtil.serializeAction(it)
         }
     }
 

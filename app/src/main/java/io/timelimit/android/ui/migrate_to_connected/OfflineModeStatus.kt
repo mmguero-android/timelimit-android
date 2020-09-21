@@ -187,11 +187,18 @@ data class OfflineModeStatus(
                 // add used times
                 val thisUsedTimes = usedTimes.filter { it.categoryId == category.id }
                 thisUsedTimes.forEach { usedTime ->
-                    apply(AddUsedTimeAction(
-                            categoryId = category.id,
-                            extraTimeToSubtract = 0,
+                    apply(AddUsedTimeActionVersion2(
                             dayOfEpoch = usedTime.dayOfEpoch,
-                            timeToAdd = usedTime.usedMillis.toInt()
+                            items = listOf(
+                                    AddUsedTimeActionItem(
+                                            categoryId = category.id,
+                                            timeToAdd = usedTime.usedMillis.toInt(),
+                                            extraTimeToSubtract = 0,
+                                            sessionDurationLimits = emptySet(),
+                                            additionalCountingSlots = emptySet()
+                                    )
+                            ),
+                            trustedTimestamp = 0
                     ))
                 }
 

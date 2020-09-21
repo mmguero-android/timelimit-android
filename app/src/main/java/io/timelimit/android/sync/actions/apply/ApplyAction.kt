@@ -82,106 +82,85 @@ object ApplyActionUtil {
                 LocalDatabaseAppLogicActionDispatcher.dispatchAppLogicActionSync(action, ownDeviceId!!, database, manipulationLogic)
 
                 if (isSyncEnabled(database)) {
-                    if (action is AddUsedTimeAction) {
+                    if (action is AddUsedTimeActionVersion2) {
                         val previousAction = database.pendingSyncAction().getLatestUnscheduledActionSync()
 
                         if (previousAction != null && previousAction.type == PendingSyncActionType.AppLogic) {
-                            val parsed = ActionParser.parseAppLogicAction(JSONObject(previousAction.encodedAction))
+                            val jsonObject = JSONObject(previousAction.encodedAction)
 
-                            if (parsed is AddUsedTimeAction && parsed.categoryId == action.categoryId && parsed.dayOfEpoch == action.dayOfEpoch) {
-                                // update the previous action
-                                database.pendingSyncAction().updateEncodedActionSync(
-                                        sequenceNumber = previousAction.sequenceNumber,
-                                        action = StringWriter().apply {
-                                            JsonWriter(this).apply {
-                                                parsed.copy(
-                                                        timeToAdd = parsed.timeToAdd + action.timeToAdd,
-                                                        extraTimeToSubtract = parsed.extraTimeToSubtract + action.extraTimeToSubtract
-                                                ).serialize(this)
-                                            }
-                                        }.toString()
-                                )
+                            if (AddUsedTimeActionVersion2.doesMatch(jsonObject)) {
+                                val parsed = AddUsedTimeActionVersion2.parse(jsonObject)
 
-                                syncUtil.requestVeryUnimportantSync()
+                                if (parsed.dayOfEpoch == action.dayOfEpoch) {
+                                    var updatedAction: AddUsedTimeActionVersion2 = parsed
+                                    var issues = false
 
-                                return@runInTransaction
-                            }
-                        }
-                    } else if (action is AddUsedTimeActionVersion2) {
-                        val previousAction = database.pendingSyncAction().getLatestUnscheduledActionSync()
+                                    if (parsed.trustedTimestamp != 0L && action.trustedTimestamp != 0L) {
+                                        issues = action.items.map { it.categoryId } != parsed.items.map { it.categoryId } ||
+                                                parsed.trustedTimestamp >= action.trustedTimestamp
 
-                        if (previousAction != null && previousAction.type == PendingSyncActionType.AppLogic) {
-                            val parsed = ActionParser.parseAppLogicAction(JSONObject(previousAction.encodedAction))
+                                        updatedAction = updatedAction.copy(trustedTimestamp = action.trustedTimestamp)
 
-                            if (parsed is AddUsedTimeActionVersion2 && parsed.dayOfEpoch == action.dayOfEpoch) {
-                                var updatedAction: AddUsedTimeActionVersion2 = parsed
-                                var issues = false
+                                        // keep timestamp of the old action
+                                    } else if (parsed.trustedTimestamp != 0L || action.trustedTimestamp != 0L) {
+                                        issues = true
+                                    }
 
-                                if (parsed.trustedTimestamp != 0L && action.trustedTimestamp != 0L) {
-                                    issues = action.items.map { it.categoryId } != parsed.items.map { it.categoryId } ||
-                                            parsed.trustedTimestamp >= action.trustedTimestamp
+                                    action.items.forEach { newItem ->
+                                        if (issues) return@forEach
 
-                                    updatedAction = updatedAction.copy(trustedTimestamp = action.trustedTimestamp)
+                                        val oldItem = updatedAction.items.find { it.categoryId == newItem.categoryId }
 
-                                    // keep timestamp of the old action
-                                } else if (parsed.trustedTimestamp != 0L || action.trustedTimestamp != 0L) {
-                                    issues = true
-                                }
-
-                                action.items.forEach { newItem ->
-                                    if (issues) return@forEach
-
-                                    val oldItem = updatedAction.items.find { it.categoryId == newItem.categoryId }
-
-                                    if (oldItem == null) {
-                                        updatedAction = updatedAction.copy(
-                                                items = updatedAction.items + listOf(newItem)
-                                        )
-                                    } else {
-                                        if (
-                                                oldItem.additionalCountingSlots != newItem.additionalCountingSlots ||
-                                                oldItem.sessionDurationLimits != newItem.sessionDurationLimits
-                                        ) {
-                                            issues = true
-                                        }
-
-                                        if (parsed.trustedTimestamp != 0L && action.trustedTimestamp != 0L) {
-                                            val timeBeforeCurrentItem = action.trustedTimestamp - newItem.timeToAdd
-                                            val diff = Math.abs(timeBeforeCurrentItem - parsed.trustedTimestamp)
-
-                                            if (diff > 2 * 1000) {
+                                        if (oldItem == null) {
+                                            updatedAction = updatedAction.copy(
+                                                    items = updatedAction.items + listOf(newItem)
+                                            )
+                                        } else {
+                                            if (
+                                                    oldItem.additionalCountingSlots != newItem.additionalCountingSlots ||
+                                                    oldItem.sessionDurationLimits != newItem.sessionDurationLimits
+                                            ) {
                                                 issues = true
                                             }
-                                        }
 
-                                        val mergedItem = AddUsedTimeActionItem(
-                                                timeToAdd = oldItem.timeToAdd + newItem.timeToAdd,
-                                                extraTimeToSubtract = oldItem.extraTimeToSubtract + newItem.extraTimeToSubtract,
-                                                categoryId = newItem.categoryId,
-                                                additionalCountingSlots = oldItem.additionalCountingSlots,
-                                                sessionDurationLimits = oldItem.sessionDurationLimits
-                                        )
+                                            if (parsed.trustedTimestamp != 0L && action.trustedTimestamp != 0L) {
+                                                val timeBeforeCurrentItem = action.trustedTimestamp - newItem.timeToAdd
+                                                val diff = Math.abs(timeBeforeCurrentItem - parsed.trustedTimestamp)
 
-                                        updatedAction = updatedAction.copy(
-                                                items = updatedAction.items.filter { it.categoryId != mergedItem.categoryId } + listOf(mergedItem)
-                                        )
-                                    }
-                                }
-
-                                if (!issues) {
-                                    // update the previous action
-                                    database.pendingSyncAction().updateEncodedActionSync(
-                                            sequenceNumber = previousAction.sequenceNumber,
-                                            action = StringWriter().apply {
-                                                JsonWriter(this).apply {
-                                                    updatedAction.serialize(this)
+                                                if (diff > 2 * 1000) {
+                                                    issues = true
                                                 }
-                                            }.toString()
-                                    )
+                                            }
 
-                                    syncUtil.requestVeryUnimportantSync()
+                                            val mergedItem = AddUsedTimeActionItem(
+                                                    timeToAdd = oldItem.timeToAdd + newItem.timeToAdd,
+                                                    extraTimeToSubtract = oldItem.extraTimeToSubtract + newItem.extraTimeToSubtract,
+                                                    categoryId = newItem.categoryId,
+                                                    additionalCountingSlots = oldItem.additionalCountingSlots,
+                                                    sessionDurationLimits = oldItem.sessionDurationLimits
+                                            )
 
-                                    return@runInTransaction
+                                            updatedAction = updatedAction.copy(
+                                                    items = updatedAction.items.filter { it.categoryId != mergedItem.categoryId } + listOf(mergedItem)
+                                            )
+                                        }
+                                    }
+
+                                    if (!issues) {
+                                        // update the previous action
+                                        database.pendingSyncAction().updateEncodedActionSync(
+                                                sequenceNumber = previousAction.sequenceNumber,
+                                                action = StringWriter().apply {
+                                                    JsonWriter(this).apply {
+                                                        updatedAction.serialize(this)
+                                                    }
+                                                }.toString()
+                                        )
+
+                                        syncUtil.requestVeryUnimportantSync()
+
+                                        return@runInTransaction
+                                    }
                                 }
                             }
                         }
@@ -202,7 +181,7 @@ object ApplyActionUtil {
                             userId = ""
                     ))
 
-                    if (action is AddUsedTimeAction || action is AddUsedTimeActionVersion2) {
+                    if (action is AddUsedTimeActionVersion2) {
                         syncUtil.requestVeryUnimportantSync()
                     } else {
                         if (BuildConfig.DEBUG) {

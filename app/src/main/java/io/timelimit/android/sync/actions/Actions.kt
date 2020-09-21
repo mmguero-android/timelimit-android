@@ -99,51 +99,6 @@ sealed class ChildAction: Action()
 
 const val TYPE = "type"
 
-data class AddUsedTimeAction(val categoryId: String, val dayOfEpoch: Int, val timeToAdd: Int, val extraTimeToSubtract: Int): AppLogicAction() {
-    init {
-        IdGenerator.assertIdValid(categoryId)
-
-        if (dayOfEpoch < 0) {
-            throw IllegalArgumentException()
-        }
-
-        if (timeToAdd < 0) {
-            throw IllegalArgumentException()
-        }
-
-        if (extraTimeToSubtract < 0) {
-            throw IllegalArgumentException()
-        }
-    }
-
-    companion object {
-        const val TYPE_VALUE = "ADD_USED_TIME"
-        private const val CATEGORY_ID = "categoryId"
-        private const val DAY_OF_EPOCH = "day"
-        private const val TIME_TO_ADD = "timeToAdd"
-        private const val EXTRA_TIME_TO_SUBTRACT = "extraTimeToSubtract"
-
-        fun parse(action: JSONObject) = AddUsedTimeAction(
-                categoryId = action.getString(CATEGORY_ID),
-                dayOfEpoch = action.getInt(DAY_OF_EPOCH),
-                timeToAdd = action.getInt(TIME_TO_ADD),
-                extraTimeToSubtract = action.getInt(EXTRA_TIME_TO_SUBTRACT)
-        )
-    }
-
-    override fun serialize(writer: JsonWriter) {
-        writer.beginObject()
-
-        writer.name(TYPE).value(TYPE_VALUE)
-        writer.name(CATEGORY_ID).value(this.categoryId)
-        writer.name(DAY_OF_EPOCH).value(dayOfEpoch)
-        writer.name(TIME_TO_ADD).value(this.timeToAdd)
-        writer.name(EXTRA_TIME_TO_SUBTRACT).value(this.extraTimeToSubtract)
-
-        writer.endObject()
-    }
-}
-
 data class AddUsedTimeActionVersion2(
         val dayOfEpoch: Int,
         val items: List<AddUsedTimeActionItem>,
@@ -154,6 +109,8 @@ data class AddUsedTimeActionVersion2(
         private const val DAY_OF_EPOCH = "d"
         private const val ITEMS = "i"
         private const val TRUSTED_TIMESTAMP = "t"
+
+        fun doesMatch(action: JSONObject) = action.getString(TYPE) == TYPE_VALUE
 
         fun parse(action: JSONObject): AddUsedTimeActionVersion2 = AddUsedTimeActionVersion2(
                 dayOfEpoch = action.getInt(DAY_OF_EPOCH),
@@ -338,13 +295,6 @@ data class InstalledApp(val packageName: String, val title: String, val isLaunch
         private const val IS_LAUNCHABLE = "isLaunchable"
         private const val RECOMMENDATION = "recommendation"
 
-        fun parse(item: JSONObject) = InstalledApp(
-                packageName = item.getString(PACKAGE_NAME),
-                title = item.getString(TITLE),
-                isLaunchable = item.getBoolean(IS_LAUNCHABLE),
-                recommendation = AppRecommendationJson.parse(item.getString(RECOMMENDATION))
-        )
-
         fun parse(reader: JsonReader): InstalledApp {
             var packageName: String? = null
             var title: String? = null
@@ -399,10 +349,6 @@ data class AddInstalledAppsAction(val apps: List<InstalledApp>): AppLogicAction(
     companion object {
         const val TYPE_VALUE = "ADD_INSTALLED_APPS"
         private const val APPS = "apps"
-
-        fun parse(action: JSONObject) = AddInstalledAppsAction(
-                apps = ParseUtils.readObjectArray(action.getJSONArray(APPS)).map { InstalledApp.parse(it) }
-        )
     }
 
     init {
@@ -426,10 +372,6 @@ data class RemoveInstalledAppsAction(val packageNames: List<String>): AppLogicAc
     companion object {
         const val TYPE_VALUE = "REMOVE_INSTALLED_APPS"
         private const val PACKAGE_NAMES = "packageNames"
-
-        fun parse(action: JSONObject) = RemoveInstalledAppsAction(
-                packageNames = ParseUtils.readStringArray(action.getJSONArray(PACKAGE_NAMES))
-        )
     }
 
     init {
@@ -458,12 +400,6 @@ data class AppActivityItem (
         private const val PACKAGE_NAME = "p"
         private const val CLASS_NAME = "c"
         private const val TITLE = "t"
-
-        fun parse(item: JSONObject) = AppActivityItem(
-                packageName = item.getString(PACKAGE_NAME),
-                className = item.getString(CLASS_NAME),
-                title = item.getString(TITLE)
-        )
 
         fun parse(reader: JsonReader): AppActivityItem {
             var packageName: String? = null
@@ -508,15 +444,6 @@ data class UpdateAppActivitiesAction(
         const val TYPE_VALUE = "UPDATE_APP_ACTIVITIES"
         private const val REMOVED = "removed"
         private const val UPDATED_OR_ADDED = "updatedOrAdded"
-
-        fun parse(data: JSONObject) = UpdateAppActivitiesAction(
-                removedActivities = data.getJSONArray(REMOVED).toJsonArrayArray().map { item ->
-                    ParseUtils.readStringPair(item)
-                },
-                updatedOrAddedActivities = data.getJSONArray(UPDATED_OR_ADDED).toJsonObjectArray().map { item ->
-                    AppActivityItem.parse(item)
-                }
-        )
     }
 
     init {
@@ -571,10 +498,6 @@ data class AddCategoryAppsAction(val categoryId: String, val packageNames: List<
         private const val CATEGORY_ID = "categoryId"
         private const val PACKAGE_NAMES = "packageNames"
 
-        fun parse(action: JSONObject) = AddCategoryAppsAction(
-                categoryId = action.getString(CATEGORY_ID),
-                packageNames = ParseUtils.readStringArray(action.getJSONArray(PACKAGE_NAMES))
-        )
     }
 
     init {
@@ -601,11 +524,6 @@ data class RemoveCategoryAppsAction(val categoryId: String, val packageNames: Li
         const val TYPE_VALUE = "REMOVE_CATEGORY_APPS"
         private const val CATEGORY_ID = "categoryId"
         private const val PACKAGE_NAMES = "packageNames"
-
-        fun parse(action: JSONObject) = RemoveCategoryAppsAction(
-                categoryId = action.getString(CATEGORY_ID),
-                packageNames = ParseUtils.readStringArray(action.getJSONArray(PACKAGE_NAMES))
-        )
     }
 
     init {
@@ -634,12 +552,6 @@ data class CreateCategoryAction(val childId: String, val categoryId: String, val
         private const val CHILD_ID = "childId"
         private const val CATEGORY_ID = "categoryId"
         private const val TITLE = "title"
-
-        fun parse(action: JSONObject) = CreateCategoryAction(
-                childId = action.getString(CHILD_ID),
-                categoryId = action.getString(CATEGORY_ID),
-                title = action.getString(TITLE)
-        )
     }
 
     init {
@@ -662,10 +574,6 @@ data class DeleteCategoryAction(val categoryId: String): ParentAction() {
     companion object {
         const val TYPE_VALUE = "DELETE_CATEGORY"
         private const val CATEGORY_ID = "categoryId"
-
-        fun parse(action: JSONObject) = DeleteCategoryAction(
-                categoryId = action.getString(CATEGORY_ID)
-        )
     }
 
     init {
@@ -686,11 +594,6 @@ data class UpdateCategoryTitleAction(val categoryId: String, val newTitle: Strin
         const val TYPE_VALUE = "UPDATE_CATEGORY_TITLE"
         private const val CATEGORY_ID = "categoryId"
         private const val NEW_TITLE = "newTitle"
-
-        fun parse(action: JSONObject) = UpdateCategoryTitleAction(
-                categoryId = action.getString(CATEGORY_ID),
-                newTitle = action.getString(NEW_TITLE)
-        )
     }
 
     init {
@@ -713,12 +616,6 @@ data class SetCategoryExtraTimeAction(val categoryId: String, val newExtraTime: 
         private const val CATEGORY_ID = "categoryId"
         private const val NEW_EXTRA_TIME = "newExtraTime"
         private const val DAY = "day"
-
-        fun parse(action: JSONObject) = SetCategoryExtraTimeAction(
-                categoryId = action.getString(CATEGORY_ID),
-                newExtraTime = action.getLong(NEW_EXTRA_TIME),
-                extraTimeDay = if (action.has(DAY)) action.getInt(DAY) else -1
-        )
     }
 
     init {
@@ -753,12 +650,6 @@ data class IncrementCategoryExtraTimeAction(val categoryId: String, val addedExt
         private const val CATEGORY_ID = "categoryId"
         private const val ADDED_EXTRA_TIME = "addedExtraTime"
         private const val DAY = "day"
-
-        fun parse(action: JSONObject) = IncrementCategoryExtraTimeAction(
-                categoryId = action.getString(CATEGORY_ID),
-                addedExtraTime = action.getLong(ADDED_EXTRA_TIME),
-                extraTimeDay = if (action.has(DAY)) action.getInt(DAY) else -1
-        )
     }
 
     init {
@@ -793,12 +684,6 @@ data class UpdateCategoryTemporarilyBlockedAction(val categoryId: String, val bl
         private const val CATEGORY_ID = "categoryId"
         private const val BLOCKED = "blocked"
         private const val END_TIME = "endTime"
-
-        fun parse(action: JSONObject) = UpdateCategoryTemporarilyBlockedAction(
-                categoryId = action.getString(CATEGORY_ID),
-                blocked = action.getBoolean(BLOCKED),
-                endTime = if (action.has(END_TIME)) action.getLong(END_TIME) else null
-        )
     }
 
     init {
@@ -829,12 +714,6 @@ data class UpdateCategoryTimeWarningsAction(val categoryId: String, val enable: 
         private const val CATEGORY_ID = "categoryId"
         private const val ENABLE = "enable"
         private const val FLAGS = "flags"
-
-        fun parse(action: JSONObject) = UpdateCategoryTimeWarningsAction(
-                categoryId = action.getString(CATEGORY_ID),
-                enable = action.getBoolean(ENABLE),
-                flags = action.getInt(FLAGS)
-        )
     }
 
     init {
@@ -1057,32 +936,6 @@ data class UpdateDeviceStatusAction(
                 newAppVersion = null,
                 didReboot = false,
                 isQOrLaterNow = false
-        )
-
-        fun parse(value: JSONObject) = UpdateDeviceStatusAction(
-                newProtectionLevel = if (value.has(NEW_PROTECTION_LEVEL))
-                    ProtectionLevelUtil.parse(value.getString(NEW_PROTECTION_LEVEL))
-                else
-                    null,
-                newUsageStatsPermissionStatus = if (value.has(NEW_USAGE_STATS_PERMISSION_STATUS))
-                    RuntimePermissionStatusUtil.parse(value.getString(NEW_USAGE_STATS_PERMISSION_STATUS))
-                else
-                    null,
-                newNotificationAccessPermission = if (value.has(NEW_NOTIFICATION_ACCESS_PERMISSION))
-                    NewPermissionStatusUtil.parse(value.getString(NEW_NOTIFICATION_ACCESS_PERMISSION))
-                else
-                    null,
-                newOverlayPermission = if (value.has(NEW_OVERLAY_PERMISSION))
-                    RuntimePermissionStatusUtil.parse(value.getString(NEW_OVERLAY_PERMISSION))
-                else
-                    null,
-                newAccessibilityServiceEnabled = if (value.has(NEW_ACCESSIBILITY_SERVICE_ENABLED))
-                    value.getBoolean(NEW_ACCESSIBILITY_SERVICE_ENABLED)
-                else
-                    null,
-                newAppVersion = if (value.has(NEW_APP_VERSION)) value.getInt(NEW_APP_VERSION) else null,
-                didReboot = if (value.has(DID_REBOOT)) value.getBoolean(DID_REBOOT) else false,
-                isQOrLaterNow = if (value.has(IS_Q_OR_LATER_NOW)) value.getBoolean(IS_Q_OR_LATER_NOW) else false
         )
     }
 
@@ -1530,10 +1383,6 @@ data class DeleteTimeLimitRuleAction(val ruleId: String): ParentAction() {
     companion object {
         const val TYPE_VALUE = "DELETE_TIMELIMIT_RULE"
         private const val RULE_ID = "ruleId"
-
-        fun parse(action: JSONObject) = DeleteTimeLimitRuleAction(
-                ruleId = action.getString(RULE_ID)
-        )
     }
 
     init {
@@ -1559,23 +1408,6 @@ data class AddUserAction(val name: String, val userType: UserType, val password:
         private const val NAME = "name"
         private const val PASSWORD = "password"
         private const val TIMEZONE = "timeZone"
-
-        fun parse(action: JSONObject): AddUserAction {
-            var password: ParentPassword? = null
-            val passwordObject = action.optJSONObject(PASSWORD)
-
-            if (passwordObject != null) {
-                password = ParentPassword.parse(passwordObject)
-            }
-
-            return AddUserAction(
-                    name = action.getString(NAME),
-                    userType = UserTypeJson.parse(action.getString(USER_TYPE)),
-                    password = password,
-                    userId = action.getString(USER_ID),
-                    timeZone = action.getString(TIMEZONE)
-            )
-        }
     }
 
     init {

@@ -35,56 +35,6 @@ object LocalDatabaseAppLogicActionDispatcher {
 
         database.runInTransaction {
             when(action) {
-                is AddUsedTimeAction -> {
-                    val categoryEntry = database.category().getCategoryByIdSync(action.categoryId)!!
-                    val parentCategoryEntry = if (categoryEntry.parentCategoryId.isNotEmpty())
-                        database.category().getCategoryByIdSync(categoryEntry.parentCategoryId)
-                    else
-                        null
-
-                    fun handleAddUsedTime(categoryId: String) {
-                        val lengthInMinutes = MinuteOfDay.LENGTH
-                        val lengthInMs = lengthInMinutes * 1000 * 60
-
-                        // try to update
-                        val updatedRows = database.usedTimes().addUsedTime(
-                                categoryId = categoryId,
-                                timeToAdd = action.timeToAdd,
-                                dayOfEpoch = action.dayOfEpoch,
-                                start = MinuteOfDay.MIN,
-                                end = MinuteOfDay.MAX,
-                                maximum = lengthInMs
-                        )
-
-                        if (updatedRows == 0) {
-                            // create new entry
-
-                            database.usedTimes().insertUsedTime(UsedTimeItem(
-                                    categoryId = categoryId,
-                                    dayOfEpoch = action.dayOfEpoch,
-                                    usedMillis = action.timeToAdd.coerceAtMost(lengthInMs).toLong(),
-                                    startTimeOfDay = MinuteOfDay.MIN,
-                                    endTimeOfDay = MinuteOfDay.MAX
-                            ))
-                        }
-
-
-                        if (action.extraTimeToSubtract != 0) {
-                            database.category().subtractCategoryExtraTime(
-                                    categoryId = categoryId,
-                                    removedExtraTime = action.extraTimeToSubtract
-                            )
-                        }
-                    }
-
-                    handleAddUsedTime(categoryEntry.id)
-
-                    if (parentCategoryEntry?.childId == categoryEntry.childId) {
-                        handleAddUsedTime(parentCategoryEntry.id)
-                    }
-
-                    null
-                }
                 is AddUsedTimeActionVersion2 -> {
                     action.items.forEach { item ->
                         database.category().getCategoryByIdSync(item.categoryId)
