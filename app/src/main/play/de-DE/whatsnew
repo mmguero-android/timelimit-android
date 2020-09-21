@@ -1,0 +1,3 @@
+- Synchronisation, wenn eine Zeitbegrenzung abgelaufen ist
+- Fehler behoben beim Zurücksetzen von Sitzungsdauerbegrenzungen, wenn der Sperrbildschirm automatisch geschlossen wird
+- Option zum Migrieren vom lokalen Modus zur Vernetzung entfernt

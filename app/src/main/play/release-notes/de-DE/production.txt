@@ -1,4 +1,0 @@
-- Erweiterung des manuellen Hinzufügens von Zeiten; diese werden nun für alle aktiven Regeln und nicht nur für den aktuellen Tag eingetragen
-- integrierte Hilfe erweitert
-- Zeitschloss für Elternteile entfernt (schon länger durch die Anmeldeverhinderungskategorie ersetzt)
-- Behebung eines Fehlers, durch den eine Synchronisation zu früh als abgeschlossen eingestuft wurde

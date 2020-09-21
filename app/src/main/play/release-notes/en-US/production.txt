@@ -1,4 +1,0 @@
-- extended manually adding used time; it applies to all current rules and not only the current day
-- extended integrated help
-- removed time lock for parent users; it was replaced by the limit login category some time ago
-- fixed a issue which caused considering syncs to be done too early
