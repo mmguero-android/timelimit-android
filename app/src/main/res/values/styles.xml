@@ -61,7 +61,7 @@
         <item name="checkboxStyle">@style/CheckboxTheme</item>
 
         <item name="android:windowIsFloating">false</item>
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowBackground">?colorSurface</item>
     </style>
 
     <style name="AppHomescreenTheme" parent="AppTheme">
