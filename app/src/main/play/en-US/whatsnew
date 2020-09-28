@@ -1,3 +1,1 @@
-- sync when a limit was reached
-- fix reset of session duration limits if the lockscreen for them is closed automatically
-- removed option to migrate from the local mode to the connected mode
+- fix invisible timezone selection when using the dark mode
