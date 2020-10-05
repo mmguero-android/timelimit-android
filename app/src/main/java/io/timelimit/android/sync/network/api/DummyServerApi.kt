@@ -53,10 +53,6 @@ class DummyServerApi: ServerApi {
         throw IOException()
     }
 
-    override suspend fun canRecoverPassword(mailToken: String, parentUserId: String): Boolean {
-        throw IOException()
-    }
-
     override suspend fun registerChildDevice(registerToken: String, childDeviceInfo: NewDeviceInfo, deviceName: String): AddDeviceResponse {
         throw IOException()
     }

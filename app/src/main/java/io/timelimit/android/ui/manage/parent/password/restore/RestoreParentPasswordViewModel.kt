@@ -25,6 +25,7 @@ import io.timelimit.android.data.model.UserType
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.network.ParentPassword
+import io.timelimit.android.sync.network.StatusOfMailAddress
 
 class RestoreParentPasswordViewModel(application: Application): AndroidViewModel(application) {
     private val logic = DefaultAppLogic.with(application)
@@ -51,7 +52,11 @@ class RestoreParentPasswordViewModel(application: Application): AndroidViewModel
         runAsync {
             try {
                 val api = logic.serverLogic.getServerConfigCoroutine().api
-                val canRecover = api.canRecoverPassword(mailAuthToken, parentUserId)
+                val status = api.getStatusByMailToken(mailAuthToken)
+                val parentUserEntry = logic.database.user().getUserByIdCoroutine(parentUserId)
+                val canRecover = status.status == StatusOfMailAddress.MailAddressWithFamily &&
+                        parentUserEntry?.type == UserType.Parent &&
+                        status.mail == parentUserEntry.mail
 
                 if (canRecover) {
                     statusInternal.value = RestoreParentPasswordStatus.WaitForNewPassword

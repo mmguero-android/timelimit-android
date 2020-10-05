@@ -306,47 +306,6 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         }
     }
 
-    override suspend fun canRecoverPassword(mailToken: String, parentUserId: String): Boolean {
-        httpClient.newCall(
-                Request.Builder()
-                        .url("$endpointWithoutSlashAtEnd/parent/can-recover-password")
-                        .post(createJsonRequestBody {
-                            writer ->
-
-                            writer.beginObject()
-
-                            writer.name(MAIL_AUTH_TOKEN).value(mailToken)
-                            writer.name(PARENT_USER_ID).value(parentUserId)
-
-                            writer.endObject()
-                        })
-                        .header("Content-Encoding", "gzip")
-                        .build()
-        ).waitForResponse().use {
-            response ->
-
-            response.assertSuccess()
-
-            val body = response.body()!!
-
-            return Threads.network.executeAndWait {
-                val reader = JsonReader(body.charStream())
-                var result: Boolean? = null
-
-                reader.beginObject()
-                while (reader.hasNext()) {
-                    when (reader.nextName()) {
-                        "canRecover" -> result = reader.nextBoolean()
-                        else -> reader.skipValue()
-                    }
-                }
-                reader.endObject()
-
-                result!!
-            }
-        }
-    }
-
     override suspend fun registerChildDevice(registerToken: String, childDeviceInfo: NewDeviceInfo, deviceName: String): AddDeviceResponse {
         httpClient.newCall(
                 Request.Builder()

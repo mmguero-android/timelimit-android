@@ -39,10 +39,6 @@ interface ServerApi {
             mailToken: String,
             parentPassword: ParentPassword
     )
-    suspend fun canRecoverPassword(
-            mailToken: String,
-            parentUserId: String
-    ): Boolean
     suspend fun registerChildDevice(
             registerToken: String,
             childDeviceInfo: NewDeviceInfo,
