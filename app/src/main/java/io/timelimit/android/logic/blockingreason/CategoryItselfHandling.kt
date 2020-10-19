@@ -18,6 +18,7 @@ package io.timelimit.android.logic.blockingreason
 import io.timelimit.android.data.model.CategoryNetworkId
 import io.timelimit.android.data.model.derived.CategoryRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
+import io.timelimit.android.date.CalendarCache
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.extensions.MinuteOfDay
@@ -28,6 +29,7 @@ import io.timelimit.android.logic.RemainingTime
 import io.timelimit.android.sync.actions.AddUsedTimeActionItemAdditionalCountingSlot
 import io.timelimit.android.sync.actions.AddUsedTimeActionItemSessionDurationLimitSlot
 import org.threeten.bp.ZoneId
+import java.util.*
 
 data class CategoryItselfHandling (
         val shouldCountTime: Boolean,
@@ -159,7 +161,18 @@ data class CategoryItselfHandling (
                             .minBy { it.startMinuteOfDay }?.startMinuteOfDay ?: Int.MAX_VALUE
             ).coerceAtMost(dependsOnMaxMinuteOfDayByBlockedTimeAreas)
             val dependsOnMaxTimeByRules = if (dependsOnMaxTimeByMinuteOfDay <= MinuteOfDay.LENGTH) {
-                localDate.atStartOfDay(ZoneId.of(user.user.timeZone)).plusMinutes(dependsOnMaxTimeByMinuteOfDay.toLong()).toEpochSecond() * 1000
+                val calendar = CalendarCache.getCalendar()
+
+                calendar.firstDayOfWeek = Calendar.MONDAY
+                calendar.timeZone = user.timeZone
+
+                calendar.timeInMillis = timeInMillis
+                calendar[Calendar.HOUR_OF_DAY] = dependsOnMaxTimeByMinuteOfDay / 60
+                calendar[Calendar.MINUTE] = dependsOnMaxTimeByMinuteOfDay % 60
+                calendar[Calendar.SECOND] = 0
+                calendar[Calendar.MILLISECOND] = 0
+
+                calendar.timeInMillis
             } else {
                 // always depend on the current day
                 localDate.plusDays(1).atStartOfDay(ZoneId.of(user.user.timeZone)).toEpochSecond() * 1000
