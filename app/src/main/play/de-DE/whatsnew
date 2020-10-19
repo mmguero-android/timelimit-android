@@ -1,1 +1,2 @@
-- nicht sichtbare Zeitzonenauswahl im Dark-Mode behoben
+- Wechsel zum Standardbenutzer-Option zur Statusbenachrichtigung hinzugefügt
+- Fehler bei der Behandlung von Apps mit Activity-Alias behoben; Das behebt Fehlerkennungen in Einzelfällen

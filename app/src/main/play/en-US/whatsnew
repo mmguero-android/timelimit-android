@@ -1,1 +1,2 @@
-- fix invisible timezone selection when using the dark mode
+- add option to switch to the default user to the status notification
+- fix bug at the handling of Apps with activity-alias; this fixes the detection of running Apps in some cases
