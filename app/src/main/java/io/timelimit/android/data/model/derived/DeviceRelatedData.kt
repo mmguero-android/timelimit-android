@@ -55,6 +55,8 @@ data class DeviceRelatedData (
         }
     }
 
+    val canSwitchToDefaultUser = hasValidDefaultUser && deviceEntry.currentUserId != deviceEntry.defaultUser
+
     private var invalidated = false
 
     override fun onInvalidated(tables: Set<Table>) { invalidated = true }

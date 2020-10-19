@@ -202,7 +202,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
             if (deviceRelatedData == null || userRelatedData == null || userRelatedData.user.type != UserType.Child) {
                 commitUsedTimeUpdaters()
 
-                val shouldDoAutomaticSignOut = deviceRelatedData != null && DefaultUserLogic.hasAutomaticSignOut(deviceRelatedData)
+                val shouldDoAutomaticSignOut = deviceRelatedData != null && DefaultUserLogic.hasAutomaticSignOut(deviceRelatedData) && deviceRelatedData.canSwitchToDefaultUser
 
                 if (shouldDoAutomaticSignOut) {
                     appLogic.defaultUserLogic.reportScreenOn(appLogic.platformIntegration.isScreenOn())
@@ -418,9 +418,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         appPackageName: String?,
                         appActivityToShow: String?
                 ) = AppStatusMessage(
-                        titlePrefix + appTitleCache.query(appPackageName ?: "invalid") + titleSuffix,
-                        text,
-                        if (appActivityToShow != null && appPackageName != null) appActivityToShow.removePrefix(appPackageName) else null
+                        title = titlePrefix + appTitleCache.query(appPackageName ?: "invalid") + titleSuffix,
+                        text = text,
+                        subtext = if (appActivityToShow != null && appPackageName != null) appActivityToShow.removePrefix(appPackageName) else null,
+                        showSwitchToDefaultUserOption = deviceRelatedData.canSwitchToDefaultUser
                 )
 
                 fun getCategoryTitle(categoryId: String?): String = categoryId.let { userRelatedData.categoryById[it]?.category?.title } ?: categoryId.toString()
@@ -482,7 +483,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     AppBaseHandling.BlockDueToNoCategory -> throw IllegalArgumentException()
                     AppBaseHandling.PauseLogic -> AppStatusMessage(
                             title = appLogic.context.getString(R.string.background_logic_paused_title) + suffix,
-                            text = appLogic.context.getString(R.string.background_logic_paused_text)
+                            text = appLogic.context.getString(R.string.background_logic_paused_text),
+                            showSwitchToDefaultUserOption = deviceRelatedData.canSwitchToDefaultUser
                     )
                     AppBaseHandling.Whitelist -> buildStatusMessageWithCurrentAppTitle(
                             text = appLogic.context.getString(R.string.background_logic_whitelisted),
@@ -498,7 +500,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     )
                     AppBaseHandling.Idle -> AppStatusMessage(
                             appLogic.context.getString(R.string.background_logic_idle_title) + suffix,
-                            appLogic.context.getString(R.string.background_logic_idle_text)
+                            appLogic.context.getString(R.string.background_logic_idle_text),
+                            showSwitchToDefaultUserOption = deviceRelatedData.canSwitchToDefaultUser
                     )
                 }
 
@@ -613,7 +616,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
                         appLogic.context.getString(R.string.background_logic_error),
-                        appLogic.context.getString(R.string.background_logic_error_permission)
+                        appLogic.context.getString(R.string.background_logic_error_permission),
+                        showSwitchToDefaultUserOption = deviceRelatedData.canSwitchToDefaultUser
                 ))
                 appLogic.platformIntegration.setShowBlockingOverlay(false)
             } catch (ex: Exception) {
@@ -625,7 +629,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 appLogic.platformIntegration.setAppStatusMessage(AppStatusMessage(
                         appLogic.context.getString(R.string.background_logic_error),
-                        appLogic.context.getString(R.string.background_logic_error_internal)
+                        appLogic.context.getString(R.string.background_logic_error_internal),
+                        showSwitchToDefaultUserOption = deviceRelatedData.canSwitchToDefaultUser
                 ))
                 appLogic.platformIntegration.setShowBlockingOverlay(false)
             }
