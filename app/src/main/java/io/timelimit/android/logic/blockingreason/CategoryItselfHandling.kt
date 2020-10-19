@@ -160,7 +160,7 @@ data class CategoryItselfHandling (
                             }
                             .minBy { it.startMinuteOfDay }?.startMinuteOfDay ?: Int.MAX_VALUE
             ).coerceAtMost(dependsOnMaxMinuteOfDayByBlockedTimeAreas)
-            val dependsOnMaxTimeByRules = if (dependsOnMaxTimeByMinuteOfDay <= MinuteOfDay.LENGTH) {
+            val dependsOnMaxTimeByRules = if (dependsOnMaxTimeByMinuteOfDay <= MinuteOfDay.MAX) {
                 val calendar = CalendarCache.getCalendar()
 
                 calendar.firstDayOfWeek = Calendar.MONDAY
