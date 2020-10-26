@@ -22,14 +22,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.User
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
@@ -40,7 +38,6 @@ import io.timelimit.android.ui.manage.category.apps.CategoryAppsFragment
 import io.timelimit.android.ui.manage.category.blocked_times.BlockedTimeAreasFragment
 import io.timelimit.android.ui.manage.category.settings.CategorySettingsFragment
 import io.timelimit.android.ui.manage.category.timelimit_rules.CategoryTimeLimitRulesFragment
-import io.timelimit.android.ui.manage.category.usagehistory.UsageHistoryFragment
 import kotlinx.android.synthetic.main.fragment_manage_category.*
 
 class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
@@ -54,7 +51,6 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
         logic.database.user().getUserByIdLive(params.childId)
     }
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
-    private var wereViewsCreated = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_manage_category, container, false)
@@ -86,7 +82,6 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
                             R.id.manage_category_tab_apps -> CategoryAppsFragment.newInstance(params)
                             R.id.manage_category_tab_time_limit_rules -> CategoryTimeLimitRulesFragment.newInstance(params)
                             R.id.manage_category_tab_blocked_time_areas -> BlockedTimeAreasFragment.newInstance(params)
-                            R.id.manage_category_tab_usage_log -> UsageHistoryFragment.newInstance(userId = params.childId, categoryId = params.categoryId)
                             R.id.manage_category_tab_settings -> CategorySettingsFragment.newInstance(params)
                             else -> throw IllegalStateException()
                         })
@@ -102,14 +97,10 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
                     .commit()
         }
 
-        if (!wereViewsCreated) {
-            wereViewsCreated = true
-
-            category.observe(this, Observer {
-                if (it == null) {
-                    navigation.popBackStack()
-                }
-            })
+        category.observe(viewLifecycleOwner) {
+            if (it == null) {
+                navigation.popBackStack()
+            }
         }
     }
 

@@ -34,12 +34,6 @@
         app:showAsAction="always"
         />
     <item
-        android:icon="@drawable/ic_history_black_24dp"
-        android:id="@+id/manage_category_tab_usage_log"
-        android:title="@string/usage_history_title"
-        app:showAsAction="always"
-        />
-    <item
         android:icon="@drawable/ic_settings_white_24dp"
         android:id="@+id/manage_category_tab_settings"
         android:title="@string/category_settings"
