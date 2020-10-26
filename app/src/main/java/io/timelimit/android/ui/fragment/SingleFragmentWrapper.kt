@@ -26,7 +26,7 @@ import io.timelimit.android.R
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.single_fragment_wrapper.*
 
 abstract class SingleFragmentWrapper: Fragment() {
     val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }

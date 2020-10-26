@@ -23,7 +23,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentTransaction
 import io.timelimit.android.R
 import io.timelimit.android.ui.overview.about.AboutFragment
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.parent_mode_fragment.*
 
 class ParentModeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

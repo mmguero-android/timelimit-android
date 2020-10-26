@@ -30,7 +30,7 @@ import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
 import io.timelimit.android.ui.main.*
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.single_fragment_wrapper.*
 
 class UninstallFragment : Fragment(), FragmentWithCustomTitle {
     companion object {

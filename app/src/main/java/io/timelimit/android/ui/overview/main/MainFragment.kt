@@ -18,13 +18,8 @@ package io.timelimit.android.ui.overview.main
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
@@ -37,24 +32,20 @@ import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.livedata.waitForNullableValue
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.ui.contacts.ContactsFragment
-import io.timelimit.android.ui.main.ActivityViewModelHolder
-import io.timelimit.android.ui.main.AuthenticationFab
+import io.timelimit.android.ui.fragment.SingleFragmentWrapper
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.device.add.AddDeviceFragment
 import io.timelimit.android.ui.obsolete.ObsoleteDialogFragment
-import io.timelimit.android.ui.overview.about.AboutFragment
 import io.timelimit.android.ui.overview.about.AboutFragmentParentHandlers
 import io.timelimit.android.ui.overview.overview.OverviewFragment
 import io.timelimit.android.ui.overview.overview.OverviewFragmentParentHandlers
-import io.timelimit.android.ui.overview.uninstall.UninstallFragment
-import kotlinx.android.synthetic.main.fragment_main.*
 
-class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers, FragmentWithCustomTitle {
+class MainFragment : SingleFragmentWrapper(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers, FragmentWithCustomTitle {
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
-    private lateinit var navigation: NavController
-    private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
     private var didRedirectToUserScreen = false
+    override val showAuthButton: Boolean = true
+
+    override fun createChildFragment(): Fragment = OverviewFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,24 +53,8 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        navigation = Navigation.findNavController(container!!)
-
-        return inflater.inflate(R.layout.fragment_main, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        AuthenticationFab.manageAuthenticationFab(
-                fab = fab,
-                fragment = this,
-                shouldHighlight = activity.getActivityViewModel().shouldHighlightAuthenticationButton,
-                authenticatedUser = activity.getActivityViewModel().authenticatedUser,
-                doesSupportAuth = liveDataFromValue(true)
-        )
-
-        fab.setOnClickListener { activity.showAuthenticationScreen() }
 
         logic.isInitialized.switchMap { isInitialized ->
             if (isInitialized) {
@@ -114,13 +89,13 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                         val user = logic.deviceUserEntry.waitForNullableValue()
 
                         if (user?.type == UserType.Child) {
-                            if (isAdded && parentFragmentManager.isStateSaved == false) {
+                            if (isAdded && !parentFragmentManager.isStateSaved) {
                                 openManageChildScreen(user.id, fromRedirect = true)
                             }
                         }
 
                         if (user != null) {
-                            if (isAdded && parentFragmentManager.isStateSaved == false) {
+                            if (isAdded && !parentFragmentManager.isStateSaved) {
                                 ObsoleteDialogFragment.show(getActivity()!!, false)
                             }
                         }
@@ -128,34 +103,10 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                 }
             }
         })
-
-        bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
-        bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
-            if (childFragmentManager.isStateSaved) {
-                false
-            } else {
-                childFragmentManager.beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .replace(R.id.container, when (menuItem.itemId) {
-                            R.id.main_tab_overview -> OverviewFragment()
-                            R.id.main_tab_contacts -> ContactsFragment()
-                            else -> throw IllegalStateException()
-                        })
-                        .commit()
-
-                true
-            }
-        }
-
-        if (childFragmentManager.findFragmentById(R.id.container) == null) {
-            childFragmentManager.beginTransaction()
-                    .replace(R.id.container, OverviewFragment())
-                    .commit()
-        }
     }
 
     override fun openAddDeviceScreen() {
-        AddDeviceFragment().show(fragmentManager!!)
+        AddDeviceFragment().show(parentFragmentManager)
     }
 
     override fun openAddUserScreen() {
