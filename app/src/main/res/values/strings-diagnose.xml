@@ -13,7 +13,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="diagnose_clock_title">System clock</string>
 
     <string name="diagnose_clock_epoch_seconds">Epochal seconds: %d</string>
@@ -66,6 +66,7 @@
     <string name="diagnose_exf_mad">Try to detect multiple active Apps (splitscreen support)</string>
     <string name="diagnose_exf_rsl">Only allow login of parent users with limit login category after syncing</string>
     <string name="diagnose_exf_bss">Automatically disable splitscreen using the accessibility service</string>
+    <string name="diagnose_exf_hmw" tools:ignore="MissingTranslation">Hide manipulation warning in the category list</string>
 
     <string name="diagnose_bg_task_loop_ex">Background task loop exception</string>
 

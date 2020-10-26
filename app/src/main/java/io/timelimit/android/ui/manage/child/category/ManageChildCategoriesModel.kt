@@ -19,14 +19,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.data.extensions.sortedCategories
+import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.extensions.MinuteOfDay
-import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromFunction
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
+import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.RemainingTime
 import java.util.*
@@ -43,7 +41,11 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
 
     private val childDevices = childId.switchMap { logic.database.device().getDevicesByUserId(it) }
 
+    private val suppressChildDeviceManipulation = logic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.HIDE_MANIPULATION_WARNING)
+
     private val hasChildDevicesWithManipulation = childDevices.map { devices -> devices.find { device -> device.hasAnyManipulation } != null }.ignoreUnchanged()
+
+    private val hasNotSuppressedChildDeviceManipulation = hasChildDevicesWithManipulation.and(suppressChildDeviceManipulation.invert())
 
     private val childRelatedData = childId.switchMap { logic.database.derivedDataDao().getUserRelatedDataLive(it) }
 
@@ -106,7 +108,7 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
         }
     }
 
-    val listContent = hasChildDevicesWithManipulation.switchMap { hasChildDevicesWithManipulation ->
+    val listContent = hasNotSuppressedChildDeviceManipulation.switchMap { hasChildDevicesWithManipulation ->
         listContentStep1.map { listContent ->
             if (hasChildDevicesWithManipulation) {
                 listOf(ManipulationWarningCategoryItem) + listContent

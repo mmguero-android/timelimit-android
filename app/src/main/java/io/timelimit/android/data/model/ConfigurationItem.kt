@@ -229,4 +229,5 @@ object ExperimentalFlags {
     const val MULTI_APP_DETECTION = 1024L
     const val REQUIRE_SYNC_FOR_PARENT_LOGIN = 2048L
     const val BLOCK_SPLIT_SCREEN = 4096L
+    const val HIDE_MANIPULATION_WARNING = 8192L
 }

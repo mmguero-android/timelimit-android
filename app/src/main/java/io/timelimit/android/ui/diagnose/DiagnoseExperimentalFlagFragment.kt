@@ -191,6 +191,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.BLOCK_SPLIT_SCREEN,
                         disableFlags = ExperimentalFlags.BLOCK_SPLIT_SCREEN,
                         enable = { true }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_hmw,
+                        enableFlags = ExperimentalFlags.HIDE_MANIPULATION_WARNING,
+                        disableFlags = ExperimentalFlags.HIDE_MANIPULATION_WARNING,
+                        enable = { true }
                 )
         )
     }
