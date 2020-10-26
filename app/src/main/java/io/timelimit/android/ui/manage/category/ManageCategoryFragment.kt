@@ -86,7 +86,7 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
                             R.id.manage_category_tab_apps -> CategoryAppsFragment.newInstance(params)
                             R.id.manage_category_tab_time_limit_rules -> CategoryTimeLimitRulesFragment.newInstance(params)
                             R.id.manage_category_tab_blocked_time_areas -> BlockedTimeAreasFragment.newInstance(params)
-                            R.id.manage_category_tab_usage_log -> UsageHistoryFragment.newInstance(params)
+                            R.id.manage_category_tab_usage_log -> UsageHistoryFragment.newInstance(userId = params.childId, categoryId = params.categoryId)
                             R.id.manage_category_tab_settings -> CategorySettingsFragment.newInstance(params)
                             else -> throw IllegalStateException()
                         })

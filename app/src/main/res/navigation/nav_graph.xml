@@ -144,6 +144,13 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageChildFragment_to_childUsageHistoryFragmentWrapper"
+            app:destination="@id/childUsageHistoryFragmentWrapper"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/manageCategoryFragment"
@@ -521,4 +528,12 @@
         android:name="io.timelimit.android.ui.contacts.ContactsFragment"
         android:label="contacts_fragment"
         tools:layout="@layout/contacts_fragment" />
+    <fragment
+        android:id="@+id/childUsageHistoryFragmentWrapper"
+        android:name="io.timelimit.android.ui.fragment.ChildUsageHistoryFragmentWrapper"
+        android:label="ChildUsageHistoryFragmentWrapper" >
+        <argument
+            android:name="childId"
+            app:argType="string" />
+    </fragment>
 </navigation>

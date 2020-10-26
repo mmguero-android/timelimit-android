@@ -25,24 +25,31 @@ import androidx.paging.LivePagedListBuilder
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.timelimit.android.databinding.FragmentUsageHistoryBinding
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 
 class UsageHistoryFragment : Fragment() {
     companion object {
-        fun newInstance(params: ManageCategoryFragmentArgs) = UsageHistoryFragment().apply {
-            arguments = params.toBundle()
+        private const val USER_ID = "userId"
+        private const val CATEGORY_ID = "categoryId"
+
+        fun newInstance(userId: String, categoryId: String?) = UsageHistoryFragment().apply {
+            arguments = Bundle().apply {
+                putString(USER_ID, userId)
+                if (categoryId != null) putString(CATEGORY_ID, categoryId)
+            }
         }
     }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentUsageHistoryBinding.inflate(inflater, container, false)
-        val params = ManageCategoryFragmentArgs.fromBundle(arguments!!)
         val database = DefaultAppLogic.with(context!!).database
         val adapter = UsageHistoryAdapter()
+        val userId = requireArguments().getString(USER_ID)!!
+        val categoryId = requireArguments().getString(CATEGORY_ID)
 
         LivePagedListBuilder(
-                database.usedTimes().getUsedTimeListItemsByCategoryId(params.categoryId),
+                categoryId?.let { database.usedTimes().getUsedTimeListItemsByCategoryId(it) }
+                        ?: database.usedTimes().getUsedTimeListItemsByUserId(userId),
                 10
         )
                 .build()

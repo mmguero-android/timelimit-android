@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import io.timelimit.android.R
 import io.timelimit.android.livedata.map
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
+import io.timelimit.android.ui.manage.category.usagehistory.UsageHistoryFragment
 import io.timelimit.android.ui.manage.child.advanced.ManageChildAdvancedFragment
 import io.timelimit.android.ui.manage.child.apps.ChildAppsFragment
 
@@ -53,5 +54,14 @@ class ChildAdvancedFragmentWrapper: ChildFragmentWrapper(), FragmentWithCustomTi
     override val childId: String get() = params.childId
 
     override fun createChildFragment(): Fragment = ManageChildAdvancedFragment.newInstance(childId = childId)
+    override fun getCustomTitle() = child.map { it?.name }
+}
+
+class ChildUsageHistoryFragmentWrapper: ChildFragmentWrapper(), FragmentWithCustomTitle {
+    private val params by lazy { ChildUsageHistoryFragmentWrapperArgs.fromBundle(arguments!!) }
+    override val childId: String get() = params.childId
+    override val showAuthButton: Boolean = false
+
+    override fun createChildFragment(): Fragment = UsageHistoryFragment.newInstance(userId = childId, categoryId = null)
     override fun getCustomTitle() = child.map { it?.name }
 }

@@ -78,6 +78,14 @@ class ManageChildFragment : ChildFragmentWrapper(), FragmentWithCustomTitle {
 
             true
         }
+        R.id.menu_manage_child_usage_history -> {
+            navigation.safeNavigate(
+                    ManageChildFragmentDirections.actionManageChildFragmentToChildUsageHistoryFragmentWrapper(childId = childId),
+                    R.id.manageChildFragment
+            )
+
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
