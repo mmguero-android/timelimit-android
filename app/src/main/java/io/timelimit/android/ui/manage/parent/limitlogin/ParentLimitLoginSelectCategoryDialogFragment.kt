@@ -17,24 +17,20 @@
 package io.timelimit.android.ui.manage.parent.limitlogin
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.CheckedTextView
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.timelimit.android.R
 import io.timelimit.android.data.model.UserType
-import io.timelimit.android.databinding.BottomSheetSelectionListBinding
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.sync.actions.UpdateUserLimitLoginCategory
+import io.timelimit.android.ui.fragment.BottomSheetSelectionListDialog
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 
-class ParentLimitLoginSelectCategoryDialogFragment: BottomSheetDialogFragment() {
+class ParentLimitLoginSelectCategoryDialogFragment: BottomSheetSelectionListDialog() {
     companion object {
         private const val DIALOG_TAG = "ParentLimitLoginSelectCategoryDialogFragment"
         private const val USER_ID = "userId"
@@ -46,18 +42,16 @@ class ParentLimitLoginSelectCategoryDialogFragment: BottomSheetDialogFragment() 
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override val title: String get() = getString(R.string.parent_limit_login_title)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val userId = arguments!!.getString(USER_ID)!!
         val auth = (activity as ActivityViewModelHolder).getActivityViewModel()
         val logic = auth.logic
         val options = logic.database.userLimitLoginCategoryDao().getLimitLoginCategoryOptions(userId)
         val hasPremium = logic.fullVersion.shouldProvideFullVersionFunctions
-
-        val binding = BottomSheetSelectionListBinding.inflate(inflater, container, false)
-
-        binding.title = getString(R.string.parent_limit_login_title)
-
-        val list = binding.list
 
         hasPremium.switchMap { a ->
             options.switchMap { b ->
@@ -74,64 +68,52 @@ class ParentLimitLoginSelectCategoryDialogFragment: BottomSheetDialogFragment() 
 
             val hasSelection = categoryList.find { it.selected } != null
 
-            list.removeAllViews()
-
-            fun buildRow(): CheckedTextView = LayoutInflater.from(context!!).inflate(
-                    android.R.layout.simple_list_item_single_choice,
-                    list,
-                    false
-            ) as CheckedTextView
+            clearList()
 
             categoryList.forEach { category ->
-                val row = buildRow()
+                addListItem(
+                        label = getString(R.string.parent_limit_login_dialog_item, category.childTitle, category.categoryTitle),
+                        checked = category.selected,
+                        click = {
+                            if (!hasPremium) {
+                                RequiresPurchaseDialogFragment().show(parentFragmentManager)
+                            } else if (!category.selected) {
+                                if (isUserItself) {
+                                    auth.tryDispatchParentAction(
+                                            UpdateUserLimitLoginCategory(
+                                                    userId = userId,
+                                                    categoryId = category.categoryId
+                                            )
+                                    )
 
-                row.text = getString(R.string.parent_limit_login_dialog_item, category.childTitle, category.categoryTitle)
-                row.isChecked = category.selected
-                row.setOnClickListener {
-                    if (!hasPremium) {
-                        RequiresPurchaseDialogFragment().show(parentFragmentManager)
-                    } else if (!row.isChecked) {
-                        if (isUserItself) {
+                                    dismiss()
+                                } else {
+                                    LimitLoginRestrictedToUserItselfDialogFragment().show(parentFragmentManager)
+                                }
+                            } else {
+                                dismiss()
+                            }
+                        }
+                )
+            }
+
+            addListItem(
+                    labelRes = R.string.parent_limit_login_dialog_no_selection,
+                    checked = !hasSelection,
+                    click = {
+                        if (hasSelection) {
                             auth.tryDispatchParentAction(
                                     UpdateUserLimitLoginCategory(
                                             userId = userId,
-                                            categoryId = category.categoryId
+                                            categoryId = null
                                     )
                             )
-
-                            dismiss()
-                        } else {
-                            LimitLoginRestrictedToUserItselfDialogFragment().show(parentFragmentManager)
                         }
-                    } else {
+
                         dismiss()
                     }
-                }
-
-                list.addView(row)
-            }
-
-            buildRow().let { row ->
-                row.setText(R.string.parent_limit_login_dialog_no_selection)
-                row.isChecked = !hasSelection
-                row.setOnClickListener {
-                    if (!row.isChecked) {
-                        auth.tryDispatchParentAction(
-                                UpdateUserLimitLoginCategory(
-                                        userId = userId,
-                                        categoryId = null
-                                )
-                        )
-                    }
-
-                    dismiss()
-                }
-
-                list.addView(row)
-            }
+            )
         })
-
-        return binding.root
     }
 
     fun show(fragmentManager: FragmentManager) = showSafe(fragmentManager, DIALOG_TAG)
