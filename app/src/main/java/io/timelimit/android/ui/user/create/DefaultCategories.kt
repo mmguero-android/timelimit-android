@@ -103,7 +103,7 @@ class DefaultCategories private constructor(private val context: Context) {
                         dayMask = 1 + 2 + 4 + 8 + 16,
                         maximumTimeInMillis = 0,
                         startMinuteOfDay = 0,
-                        endMinuteOfDay = 6 * 60,
+                        endMinuteOfDay = 6 * 60 - 1,
                         sessionPauseMilliseconds = 0,
                         sessionDurationMilliseconds = 0
                 )
@@ -132,7 +132,7 @@ class DefaultCategories private constructor(private val context: Context) {
                         dayMask = 32 + 64,
                         maximumTimeInMillis = 0,
                         startMinuteOfDay = 0,
-                        endMinuteOfDay = 9 * 60,
+                        endMinuteOfDay = 9 * 60 - 1,
                         sessionPauseMilliseconds = 0,
                         sessionDurationMilliseconds = 0
                 )
