@@ -1,2 +1,4 @@
-- add option to switch to the default user to the status notification
-- fix bug at the handling of Apps with activity-alias; this fixes the detection of running Apps in some cases
+- measurements against problems which occurred during the summer time to winter time switch
+- fix showing long category lists at the limit login category screen
+- added option to hide manipulation warnings in the category list
+- hide parent users in the user list at the overview
