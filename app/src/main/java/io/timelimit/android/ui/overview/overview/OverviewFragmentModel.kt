@@ -17,7 +17,10 @@ package io.timelimit.android.ui.overview.overview
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.data.model.HintsToShow
+import io.timelimit.android.data.model.UserType
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.liveDataFromFunction
 import io.timelimit.android.livedata.map
@@ -26,6 +29,8 @@ import io.timelimit.android.logic.DefaultAppLogic
 
 class OverviewFragmentModel(application: Application): AndroidViewModel(application) {
     private val logic = DefaultAppLogic.with(application)
+
+    private val itemVisibility = MutableLiveData<OverviewItemVisibility>().apply { value = OverviewItemVisibility.default }
 
     private val categoryEntries = logic.database.category().getAllCategoriesShortInfo()
     private val usersWithTemporarilyDisabledLimits = logic.database.user().getAllUsersLive().switchMap {
@@ -112,19 +117,30 @@ class OverviewFragmentModel(application: Application): AndroidViewModel(applicat
 
     val listEntries = introEntries.switchMap { introEntries ->
         deviceEntries.switchMap { deviceEntries ->
-            userEntries.map { userEntries ->
-                mutableListOf<OverviewFragmentItem>().apply {
-                    addAll(introEntries)
+            userEntries.switchMap { userEntries ->
+                itemVisibility.map { itemVisibility ->
+                    mutableListOf<OverviewFragmentItem>().apply {
+                        addAll(introEntries)
 
-                    add(OverviewFragmentHeaderDevices)
-                    addAll(deviceEntries)
-                    add(OverviewFragmentActionAddDevice)
+                        add(OverviewFragmentHeaderDevices)
+                        addAll(deviceEntries)
+                        add(OverviewFragmentActionAddDevice)
 
-                    add(OverviewFragmentHeaderUsers)
-                    addAll(userEntries)
-                    add(OverviewFragmentActionAddUser)
+                        add(OverviewFragmentHeaderUsers)
+                        if (itemVisibility.showParentUsers) {
+                            addAll(userEntries)
+                            add(OverviewFragmentActionAddUser)
+                        } else {
+                            userEntries.forEach { if (it.user.type != UserType.Parent) add(it) }
+                            add(ShowMoreOverviewFragmentItem.ShowAllUsers)
+                        }
+                    }.toList()
                 }
-            }
+            } as LiveData<List<OverviewFragmentItem>>
         }
+    }
+
+    fun showAllUsers() {
+        itemVisibility.value = itemVisibility.value!!.copy(showParentUsers = true)
     }
 }

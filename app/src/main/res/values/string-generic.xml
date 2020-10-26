@@ -13,7 +13,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="generic_ok">OK</string>
     <string name="generic_cancel">Cancel</string>
     <string name="generic_help">Help</string>
@@ -25,6 +25,7 @@
     <string name="generic_go">Go</string>
     <string name="generic_manage_card">Manage</string>
     <string name="generic_enable">Enable</string>
+    <string name="generic_show_more" tools:ignore="MissingTranslation">Show more</string>
 
     <plurals name="generic_plural_app">
         <item quantity="one">%d App</item>

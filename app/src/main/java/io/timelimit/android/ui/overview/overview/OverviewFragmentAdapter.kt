@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ class OverviewFragmentAdapter : RecyclerView.Adapter<OverviewFragmentViewHolder>
         is OverviewFragmentHeaderIntro -> OverviewFragmentViewType.Introduction
         is OverviewFragmentHeaderFinishSetup -> OverviewFragmentViewType.FinishSetup
         is OverviewFragmentItemMessage -> OverviewFragmentViewType.ServerMessage
+        is ShowMoreOverviewFragmentItem -> OverviewFragmentViewType.ShowMoreButton
     }
 
     override fun getItemViewType(position: Int) = getItemType(getItem(position)).ordinal
@@ -149,6 +150,11 @@ class OverviewFragmentAdapter : RecyclerView.Adapter<OverviewFragmentViewHolder>
                 )
         )
 
+        OverviewFragmentViewType.ShowMoreButton.ordinal -> ShowMoreViewHolder(
+                LayoutInflater.from(parent.context)
+                        .inflate(R.layout.show_more_list_item, parent, false)
+        )
+
         else -> throw IllegalStateException()
     }
 
@@ -223,6 +229,15 @@ class OverviewFragmentAdapter : RecyclerView.Adapter<OverviewFragmentViewHolder>
                 holder.binding.text = item.message
                 holder.binding.executePendingBindings()
             }
+            is ShowMoreOverviewFragmentItem -> {
+                holder as ShowMoreViewHolder
+
+                when (item) {
+                    is ShowMoreOverviewFragmentItem.ShowAllUsers -> {
+                        holder.itemView.setOnClickListener { handlers?.onShowAllUsersClicked() }
+                    }
+                }.let {  }
+            }
         }.let {  }
     }
 }
@@ -235,7 +250,8 @@ enum class OverviewFragmentViewType {
     AddDeviceItem,
     Introduction,
     FinishSetup,
-    ServerMessage
+    ServerMessage,
+    ShowMoreButton
 }
 
 sealed class OverviewFragmentViewHolder(view: View): RecyclerView.ViewHolder(view)
@@ -247,6 +263,7 @@ class AddDeviceViewHolder(view: View): OverviewFragmentViewHolder(view)
 class IntroViewHolder(view: View): OverviewFragmentViewHolder(view)
 class FinishSetupViewHolder(view: View): OverviewFragmentViewHolder(view)
 class ServerMessageViewHolder(val binding: FragmentOverviewServerMessageBinding): OverviewFragmentViewHolder(binding.root)
+class ShowMoreViewHolder(view: View): OverviewFragmentViewHolder(view)
 
 interface OverviewFragmentHandlers {
     fun onAddUserClicked()
@@ -254,4 +271,5 @@ interface OverviewFragmentHandlers {
     fun onUserClicked(user: User)
     fun onDeviceClicked(device: Device)
     fun onFinishSetupClicked()
+    fun onShowAllUsersClicked()
 }

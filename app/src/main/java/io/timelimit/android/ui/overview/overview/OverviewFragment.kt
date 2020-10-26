@@ -98,6 +98,10 @@ class OverviewFragment : CoroutineFragment() {
             override fun onFinishSetupClicked() {
                 handlers.openSetupDeviceScreen()
             }
+
+            override fun onShowAllUsersClicked() {
+                model.showAllUsers()
+            }
         }
 
         model.listEntries.observe(this, Observer { adapter.data = it })
