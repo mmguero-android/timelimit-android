@@ -17,13 +17,7 @@ package io.timelimit.android.ui.manage.category.timelimit_rules
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.LiveData
-import io.timelimit.android.data.model.HintsToShow
-import io.timelimit.android.data.model.TimeLimitRule
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
-import io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem
 import io.timelimit.android.ui.manage.category.appsandrules.CategoryAppsAndRulesFragment
 
 class CategoryTimeLimitRulesFragment: CategoryAppsAndRulesFragment() {
@@ -36,27 +30,12 @@ class CategoryTimeLimitRulesFragment: CategoryAppsAndRulesFragment() {
     }
 
     private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(requireArguments()) }
-    private val rules: LiveData<List<TimeLimitRule>> by lazy { database.timeLimitRules().getTimeLimitRulesByCategory(params.categoryId) }
     override val childId: String get() = params.childId
     override val categoryId: String get() = params.categoryId
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val hasHiddenIntro = database.config().wereHintsShown(HintsToShow.TIME_LIMIT_RULE_INTRODUCTION)
-
-        rules.map { rules ->
-            rules.sortedBy { it.dayMask }.map { AppAndRuleItem.RuleEntry(it) }
-        }.switchMap {
-            val baseList = it + listOf(AppAndRuleItem.AddRuleItem)
-
-            hasHiddenIntro.map { hasHiddenIntro ->
-                if (hasHiddenIntro) {
-                    baseList
-                } else {
-                    listOf(AppAndRuleItem.RulesIntro) + baseList
-                }
-            }
-        }.observe(viewLifecycleOwner) { setListContent(it) }
+        model.fullRuleScreenContent.observe(viewLifecycleOwner) { setListContent(it) }
     }
 }

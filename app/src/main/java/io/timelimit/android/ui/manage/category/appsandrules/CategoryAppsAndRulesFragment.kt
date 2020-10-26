@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,6 +48,7 @@ import kotlinx.android.synthetic.main.fragment_category_apps_and_rules.*
 
 abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimitRuleDialogFragmentListener {
     private val adapter = AppAndRuleAdapter().also { it.handlers = this }
+    val model: AppsAndRulesModel by viewModels()
     val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
     val database: Database by lazy { DefaultAppLogic.with(requireContext()).database }
     abstract val childId: String
@@ -59,8 +61,15 @@ abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimit
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        model.init(userId = childId, categoryId = categoryId)
+
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
+
+        model.firstDayOfWeekAndUsedTimes.observe(viewLifecycleOwner) { (firstDayOfWeek, usedTimes) ->
+            adapter.epochDayOfStartOfWeek = firstDayOfWeek
+            adapter.usedTimes = usedTimes
+        }
 
         ItemTouchHelper(object: ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -85,22 +94,6 @@ abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimit
                 }
             }
         }).attachToRecyclerView(recycler)
-
-        val userDate = database.user().getUserByIdLive(childId).getDateLive(auth.logic.realTimeLogic)
-
-        userDate.switchMap { date ->
-            val firstDayOfWeekAsEpochDay = date.dayOfEpoch - date.dayOfWeek
-
-            database.usedTimes().getUsedTimesOfWeek(
-                    categoryId = categoryId,
-                    firstDayOfWeekAsEpochDay = firstDayOfWeekAsEpochDay
-            ).map { res ->
-                firstDayOfWeekAsEpochDay to res
-            }
-        }.observe(viewLifecycleOwner) {
-            adapter.epochDayOfStartOfWeek = it.first
-            adapter.usedTimes = it.second
-        }
     }
 
     fun setListContent(items: List<AppAndRuleItem>) { adapter.items = items }

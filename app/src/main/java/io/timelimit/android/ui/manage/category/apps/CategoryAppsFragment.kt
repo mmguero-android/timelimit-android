@@ -17,9 +17,7 @@ package io.timelimit.android.ui.manage.category.apps
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
-import io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem
 import io.timelimit.android.ui.manage.category.appsandrules.CategoryAppsAndRulesFragment
 
 class CategoryAppsFragment : CategoryAppsAndRulesFragment() {
@@ -30,14 +28,12 @@ class CategoryAppsFragment : CategoryAppsAndRulesFragment() {
     }
 
     private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(requireArguments()) }
-    private val model: CategoryAppsModel by viewModels()
     override val categoryId: String get() = params.categoryId
     override val childId: String get() = params.childId
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        model.init(params)
-        model.appEntries.observe(viewLifecycleOwner) { setListContent(it + listOf(AppAndRuleItem.AddAppItem)) }
+        model.fullAppScreenContent.observe(viewLifecycleOwner) { setListContent(it) }
     }
 }
