@@ -176,6 +176,6 @@ abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimit
         }
     }
 
-    override fun onShowAllApps() { throw NotImplementedError() }
-    override fun onShowAllRules() { throw NotImplementedError() }
+    override fun onShowAllApps() { model.showAllApps() }
+    override fun onShowAllRules() { model.showAllRules() }
 }
