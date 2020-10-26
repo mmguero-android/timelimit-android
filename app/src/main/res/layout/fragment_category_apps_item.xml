@@ -19,11 +19,11 @@
     <data>
         <variable
             name="item"
-            type="io.timelimit.android.ui.manage.category.apps.AppEntry" />
+            type="io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem.AppEntry" />
 
         <variable
             name="handlers"
-            type="io.timelimit.android.ui.manage.category.apps.Handlers" />
+            type="io.timelimit.android.ui.manage.category.apps.AppAdapterHandlers" />
 
         <import type="android.view.View" />
     </data>

@@ -33,6 +33,7 @@ import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 import io.timelimit.android.ui.manage.category.apps.add.AddCategoryAppsFragment
+import io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem
 import kotlinx.android.synthetic.main.fragment_category_apps.*
 
 class CategoryAppsFragment : Fragment() {
@@ -42,9 +43,9 @@ class CategoryAppsFragment : Fragment() {
         }
     }
 
-    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(arguments!!) }
-    private val database: Database by lazy { DefaultAppLogic.with(context!!).database }
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
+    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(requireArguments()) }
+    private val database: Database by lazy { DefaultAppLogic.with(requireContext()).database }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
     private val model: CategoryAppsModel by lazy {
         ViewModelProviders.of(this).get(CategoryAppsModel::class.java)
     }
@@ -58,8 +59,8 @@ class CategoryAppsFragment : Fragment() {
 
         val adapter = AppAdapter()
 
-        adapter.handlers = object: Handlers {
-            override fun onAppClicked(app: AppEntry) {
+        adapter.handlers = object: AppAdapterHandlers {
+            override fun onAppClicked(app: AppAndRuleItem.AppEntry) {
                 if (auth.tryDispatchParentAction(
                         RemoveCategoryAppsAction(
                                 categoryId = params.categoryId,
@@ -90,7 +91,7 @@ class CategoryAppsFragment : Fragment() {
             }
         }
 
-        recycler.layoutManager = LinearLayoutManager(context!!)
+        recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
 
         model.init(params)

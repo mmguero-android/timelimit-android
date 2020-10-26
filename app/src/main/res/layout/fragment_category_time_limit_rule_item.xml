@@ -48,7 +48,7 @@
 
         <variable
             name="handlers"
-            type="io.timelimit.android.ui.manage.category.timelimit_rules.Handlers" />
+            type="io.timelimit.android.ui.manage.category.timelimit_rules.TimeLimitRulesHandlers" />
 
         <import type="android.view.View" />
         <import type="android.text.TextUtils" />

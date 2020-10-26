@@ -40,7 +40,7 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
     var data: List<TimeLimitRuleItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
     var usedTimes: List<UsedTimeItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
     var epochDayOfStartOfWeek: Int by Delegates.observable(0) { _, _, _ -> notifyDataSetChanged() }
-    var handlers: Handlers? = null
+    var handlers: TimeLimitRulesHandlers? = null
 
     init {
         setHasStableIds(true)
@@ -160,7 +160,7 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
 open class ViewHolder(view: View): RecyclerView.ViewHolder(view)
 class ItemViewHolder(val view: FragmentCategoryTimeLimitRuleItemBinding): ViewHolder(view.root)
 
-interface Handlers {
+interface TimeLimitRulesHandlers {
     fun onTimeLimitRuleClicked(rule: TimeLimitRule)
     fun onAddTimeLimitRuleClicked()
 }

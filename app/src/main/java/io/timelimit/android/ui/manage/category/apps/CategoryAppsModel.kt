@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
+import io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem
 import java.util.*
 
 class CategoryAppsModel(application: Application): AndroidViewModel(application) {
@@ -50,9 +51,9 @@ class CategoryAppsModel(application: Application): AndroidViewModel(application)
     val appEntries = appsOfCategoryWithNames.map { apps ->
         apps.map { (app, appEntry) ->
             if (appEntry != null) {
-                AppEntry(appEntry.title, app.packageName, app.packageNameWithoutActivityName)
+                AppAndRuleItem.AppEntry(appEntry.title, app.packageName, app.packageNameWithoutActivityName)
             } else {
-                AppEntry("app not found", app.packageName, app.packageNameWithoutActivityName)
+                AppAndRuleItem.AppEntry("app not found", app.packageName, app.packageNameWithoutActivityName)
             }
         }.sortedBy { it.title.toLowerCase(Locale.US) }
     }

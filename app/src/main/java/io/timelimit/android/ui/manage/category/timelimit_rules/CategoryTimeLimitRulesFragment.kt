@@ -106,7 +106,7 @@ class CategoryTimeLimitRulesFragment : Fragment(), EditTimeLimitRuleDialogFragme
             adapter.data = it
         })
 
-        adapter.handlers = object: Handlers {
+        adapter.handlers = object: TimeLimitRulesHandlers {
             override fun onTimeLimitRuleClicked(rule: TimeLimitRule) {
                 if (auth.requestAuthenticationOrReturnTrue()) {
                     EditTimeLimitRuleDialogFragment.newInstance(rule, this@CategoryTimeLimitRulesFragment).show(fragmentManager!!)

@@ -23,6 +23,7 @@ import io.timelimit.android.R
 import io.timelimit.android.databinding.AddItemViewBinding
 import io.timelimit.android.databinding.FragmentCategoryAppsItemBinding
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem
 import kotlin.properties.Delegates
 
 class AppAdapter: RecyclerView.Adapter<ViewHolder>() {
@@ -31,14 +32,14 @@ class AppAdapter: RecyclerView.Adapter<ViewHolder>() {
         private const val TYPE_ADD = 2
     }
 
-    var data: List<AppEntry>? by Delegates.observable(null as List<AppEntry>?) { _, _, _ -> notifyDataSetChanged() }
-    var handlers: Handlers? by Delegates.observable(null as Handlers?) { _, _, _ -> notifyDataSetChanged() }
+    var data: List<AppAndRuleItem.AppEntry>? by Delegates.observable(null as List<AppAndRuleItem.AppEntry>?) { _, _, _ -> notifyDataSetChanged() }
+    var handlers: AppAdapterHandlers? by Delegates.observable(null as AppAdapterHandlers?) { _, _, _ -> notifyDataSetChanged() }
 
     init {
         setHasStableIds(true)
     }
 
-    private fun getItem(position: Int): AppEntry {
+    private fun getItem(position: Int): AppAndRuleItem.AppEntry {
         return data!![position]
     }
 
@@ -112,9 +113,7 @@ class AppAdapter: RecyclerView.Adapter<ViewHolder>() {
 open class ViewHolder(view: View): RecyclerView.ViewHolder(view)
 class AppViewHolder(val binding: FragmentCategoryAppsItemBinding): ViewHolder(binding.root)
 
-data class AppEntry(val title: String, val packageName: String, val packageNameWithoutActivityName: String)
-
-interface Handlers {
-    fun onAppClicked(app: AppEntry)
+interface AppAdapterHandlers {
+    fun onAppClicked(app: AppAndRuleItem.AppEntry)
     fun onAddAppsClicked()
 }
