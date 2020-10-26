@@ -29,6 +29,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -40,15 +41,17 @@ import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.AllowedContact
 import io.timelimit.android.databinding.ContactsFragmentBinding
+import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.util.PhoneNumberUtils
 import kotlinx.coroutines.delay
 
 
-class ContactsFragment : Fragment() {
+class ContactsFragment : Fragment(), FragmentWithCustomTitle {
     companion object {
         private const val LOG_TAG = "ContactsFragment"
         private const val REQ_SELECT_CONTACT = 1
@@ -62,6 +65,8 @@ class ContactsFragment : Fragment() {
     private val activityModelHolder: ActivityViewModelHolder by lazy { activity as ActivityViewModelHolder }
     private val auth: ActivityViewModel by lazy { activityModelHolder.getActivityViewModel() }
     private var numberToCallWithPermission: String? = null
+
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue(getString(R.string.contacts_title_long))
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = ContactsFragmentBinding.inflate(inflater, container, false)

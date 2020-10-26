@@ -70,6 +70,14 @@ class ManageChildFragment : ChildFragmentWrapper(), FragmentWithCustomTitle {
 
             true
         }
+        R.id.menu_manage_child_phone -> {
+            navigation.safeNavigate(
+                    ManageChildFragmentDirections.actionManageChildFragmentToContactsFragment(),
+                    R.id.manageChildFragment
+            )
+
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 
