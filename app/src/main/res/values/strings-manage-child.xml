@@ -13,9 +13,9 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="manage_child_tab_categories">Categories</string>
-    <string name="manage_child_tab_other">Other</string>
+    <string name="manage_child_tab_other" tools:ignore="MissingTranslation">Advanced settings</string>
     <string name="manage_child_block_temporarily_title">block temporarily</string>
     <string name="manage_child_block_temporarily_text">
         Select categories which should be blocked temporarily.

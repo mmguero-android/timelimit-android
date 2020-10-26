@@ -17,34 +17,41 @@
 package io.timelimit.android.ui.fragment
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
+import io.timelimit.android.R
+import io.timelimit.android.livedata.map
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.child.advanced.ManageChildAdvancedFragment
 import io.timelimit.android.ui.manage.child.apps.ChildAppsFragment
 
 abstract class ChildFragmentWrapper: SingleFragmentWrapper() {
     abstract val childId: String
-
     override val showAuthButton: Boolean = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    protected val child by lazy { activity.getActivityViewModel().database.user().getChildUserByIdLive(childId) }
 
-        activity.getActivityViewModel().database.user().getChildUserByIdLive(childId).observe(viewLifecycleOwner) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        child.observe(viewLifecycleOwner) {
             if (it == null) navigation.popBackStack()
         }
     }
 }
 
-class ChildAppsFragmentWrapper: ChildFragmentWrapper() {
+class ChildAppsFragmentWrapper: ChildFragmentWrapper(), FragmentWithCustomTitle {
     private val params by lazy { ChildAppsFragmentWrapperArgs.fromBundle(arguments!!) }
     override val childId: String get() = params.childId
 
     override fun createChildFragment(): Fragment = ChildAppsFragment.newInstance(childId = childId)
+    override fun getCustomTitle() = child.map { "${getString(R.string.child_apps_title)} < ${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
 }
 
-class ChildAdvancedFragmentWrapper: ChildFragmentWrapper() {
+class ChildAdvancedFragmentWrapper: ChildFragmentWrapper(), FragmentWithCustomTitle {
     private val params by lazy { ChildAdvancedFragmentWrapperArgs.fromBundle(arguments!!) }
     override val childId: String get() = params.childId
 
     override fun createChildFragment(): Fragment = ManageChildAdvancedFragment.newInstance(childId = childId)
+    override fun getCustomTitle() = child.map { it?.name }
 }

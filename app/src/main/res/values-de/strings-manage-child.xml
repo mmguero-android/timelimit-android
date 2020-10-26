@@ -15,7 +15,7 @@
 -->
 <resources>
     <string name="manage_child_tab_categories">Kategorien</string>
-    <string name="manage_child_tab_other">Sonstiges</string>
+    <string name="manage_child_tab_other">erweiterte Einstellungen</string>
     <string name="manage_child_block_temporarily_title">Vorübergehend Sperren</string>
     <string name="manage_child_block_temporarily_text">
         Wählen Sie Kategorien, die vorübergehend gesperrt werden sollen.

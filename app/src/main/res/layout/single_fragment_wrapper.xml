@@ -21,6 +21,7 @@
     tools:context="io.timelimit.android.ui.fragment.SingleFragmentWrapper">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
         android:layout_weight="1"
         android:layout_height="0dp">

@@ -15,7 +15,6 @@
 -->
 <resources>
     <string name="manage_child_tab_categories">Categorias</string>
-    <string name="manage_child_tab_other">Outros</string>
     <string name="manage_child_block_temporarily_title">bloqueio temporário</string>
     <string name="manage_child_block_temporarily_text">
         Selecionar categorias que devem ser bloqueadas temporariamente.

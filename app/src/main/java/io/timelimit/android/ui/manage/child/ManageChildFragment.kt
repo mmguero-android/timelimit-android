@@ -16,95 +16,61 @@
 package io.timelimit.android.ui.manage.child
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
-import io.timelimit.android.data.model.User
-import io.timelimit.android.data.model.UserType
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.livedata.map
-import io.timelimit.android.logic.AppLogic
-import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.ui.main.ActivityViewModelHolder
-import io.timelimit.android.ui.main.AuthenticationFab
+import io.timelimit.android.ui.fragment.ChildFragmentWrapper
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
-import io.timelimit.android.ui.manage.child.advanced.ManageChildAdvancedFragment
-import io.timelimit.android.ui.manage.child.apps.ChildAppsFragment
 import io.timelimit.android.ui.manage.child.category.ManageChildCategoriesFragment
-import kotlinx.android.synthetic.main.fragment_manage_child.*
+import kotlinx.android.synthetic.main.single_fragment_wrapper.*
 
-class ManageChildFragment : Fragment(), FragmentWithCustomTitle {
+class ManageChildFragment : ChildFragmentWrapper(), FragmentWithCustomTitle {
     private val params: ManageChildFragmentArgs by lazy { ManageChildFragmentArgs.fromBundle(arguments!!) }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
-    private val child: LiveData<User?> by lazy { logic.database.user().getUserByIdLive(params.childId) }
-    private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
-    private var wereViewsCreated = false
+    override val childId: String get() = params.childId
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_manage_child, container, false)
+    override fun createChildFragment(): Fragment = ManageChildCategoriesFragment.newInstance(params)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        AuthenticationFab.manageAuthenticationFab(
-                fab = fab,
-                fragment = this,
-                doesSupportAuth = liveDataFromValue(true),
-                authenticatedUser = activity.getActivityViewModel().authenticatedUser,
-                shouldHighlight = activity.getActivityViewModel().shouldHighlightAuthenticationButton
-        )
-
-        fab.setOnClickListener { activity.showAuthenticationScreen() }
-
-        val navigation = Navigation.findNavController(view)
-
-        // leave if the child does not exist
-        if (!wereViewsCreated) {
-            wereViewsCreated = true
-
-            child.observe(this, Observer {
-                if (it == null || it.type != UserType.Child) {
-                    navigation.popBackStack(R.id.overviewFragment, false)
-                }
-            })
-        }
-
-        bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
-        bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
-            if (childFragmentManager.isStateSaved) {
-                false
-            } else {
-                childFragmentManager.beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .replace(R.id.container, when (menuItem.itemId) {
-                            R.id.manage_child_tab_categories -> ManageChildCategoriesFragment.newInstance(params)
-                            R.id.manage_child_tab_apps -> ChildAppsFragment.newInstance(params.childId)
-                            R.id.manage_child_tab_manage -> ManageChildAdvancedFragment.newInstance(params.childId)
-                            else -> throw IllegalStateException()
-                        })
-                        .commit()
-
-                true
-            }
-        }
-
-        if (childFragmentManager.findFragmentById(R.id.container) == null) {
-            childFragmentManager.beginTransaction()
-                    .replace(R.id.container, ManageChildCategoriesFragment.newInstance(params))
-                    .commit()
-        }
-
         if (savedInstanceState == null && params.fromRedirect) {
             Snackbar.make(coordinator, R.string.manage_child_redirected_toast, Snackbar.LENGTH_LONG).show()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.fragment_manage_child_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.menu_manage_child_apps -> {
+            navigation.safeNavigate(
+                    ManageChildFragmentDirections.actionManageChildFragmentToChildAppsFragmentWrapper(childId = childId),
+                    R.id.manageChildFragment
+            )
+
+            true
+        }
+        R.id.menu_manage_child_advanced -> {
+            navigation.safeNavigate(
+                    ManageChildFragmentDirections.actionManageChildFragmentToChildAdvancedFragmentWrapper(childId = childId),
+                    R.id.manageChildFragment
+            )
+
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun getCustomTitle() = child.map { "${it?.name} < ${getString(R.string.main_tab_overview)}" as String? }
