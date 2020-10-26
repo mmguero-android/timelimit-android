@@ -17,6 +17,8 @@
 package io.timelimit.android.data.model
 
 data class UsedTimeListItem(
+        val categoryId: String,
+        val categoryTitle: String,
         val startMinuteOfDay: Int,
         val endMinuteOfDay: Int,
         val duration: Long,

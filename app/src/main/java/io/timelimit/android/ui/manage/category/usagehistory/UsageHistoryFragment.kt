@@ -47,6 +47,8 @@ class UsageHistoryFragment : Fragment() {
         val userId = requireArguments().getString(USER_ID)!!
         val categoryId = requireArguments().getString(CATEGORY_ID)
 
+        adapter.showCategoryTitle = categoryId == null
+
         LivePagedListBuilder(
                 categoryId?.let { database.usedTimes().getUsedTimeListItemsByCategoryId(it) }
                         ?: database.usedTimes().getUsedTimeListItemsByUserId(userId),
