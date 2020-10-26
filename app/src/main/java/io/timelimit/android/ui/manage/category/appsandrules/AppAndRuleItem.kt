@@ -26,4 +26,5 @@ sealed class AppAndRuleItem {
     object ExpandRulesItem: AppAndRuleItem()
     object RulesIntro: AppAndRuleItem()
     object AddRuleItem: AppAndRuleItem()
+    data class Headline(val stringRessource: Int): AppAndRuleItem()
 }

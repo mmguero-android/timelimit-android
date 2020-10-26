@@ -19,6 +19,7 @@ package io.timelimit.android.ui.manage.category.appsandrules
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import io.timelimit.android.R
 import io.timelimit.android.data.extensions.getDateLive
 import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.extensions.takeDistributedElements
@@ -83,7 +84,7 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
 
     private val hasHiddenRuleIntro = database.config().wereHintsShown(HintsToShow.TIME_LIMIT_RULE_INTRODUCTION)
 
-    val fullRuleScreenContent = visibleRuleItems.switchMap { visibleRuleItems ->
+    private val fullRuleScreenContent = visibleRuleItems.switchMap { visibleRuleItems ->
         hasHiddenRuleIntro.map { hasHiddenRuleIntro ->
             if (hasHiddenRuleIntro) {
                 visibleRuleItems
@@ -115,7 +116,7 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
         }.sortedBy { it.title.toLowerCase(Locale.US) }
     }
 
-    val fullAppScreenContent = showAllAppsLive.switchMap { showAllApps ->
+    private val fullAppScreenContent = showAllAppsLive.switchMap { showAllApps ->
         if (showAllApps)
             appEntries.map { it + listOf(AppAndRuleItem.AddAppItem) }
         else
@@ -127,6 +128,13 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
                 else
                     entries + listOf(AppAndRuleItem.AddAppItem)
             }
+    }
+
+    val combinedList = fullAppScreenContent.switchMap { apps ->
+        fullRuleScreenContent.map { rules ->
+            listOf(AppAndRuleItem.Headline(R.string.category_apps_title)) + apps +
+                    listOf(AppAndRuleItem.Headline(R.string.category_time_limit_rules)) + rules
+        }
     }
 
     fun init(userId: String, categoryId: String) {

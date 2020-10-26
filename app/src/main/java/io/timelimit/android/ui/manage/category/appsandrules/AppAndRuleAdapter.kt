@@ -40,6 +40,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
         private const val EXPAND_RULES_ITEM = 5
         private const val RULES_INTRO = 6
         private const val ADD_RULE_ITEM = 7
+        private const val HEADLINE = 8
     }
 
     var items: List<AppAndRuleItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
@@ -69,6 +70,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
         AppAndRuleItem.ExpandRulesItem -> EXPAND_RULES_ITEM
         AppAndRuleItem.RulesIntro -> RULES_INTRO
         AppAndRuleItem.AddRuleItem -> ADD_RULE_ITEM
+        is AppAndRuleItem.Headline -> HEADLINE
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder = Holder(
@@ -84,7 +86,6 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                         false
                 ).apply {
                     label = parent.context.getString(R.string.category_apps_add_dialog_btn_positive)
-                    wide = true
 
                     root.setOnClickListener { handlers?.onAddAppsClicked() }
                 }.root
@@ -114,10 +115,14 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                         false
                 ).apply {
                     label = parent.context.getString(R.string.category_time_limit_rule_dialog_new)
-                    wide = true
 
                     root.setOnClickListener { handlers?.onAddTimeLimitRuleClicked() }
                 }.root
+                HEADLINE -> GenericListHeaderBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                ).also { it.root.tag = it }.root
                 else -> throw IllegalArgumentException()
             }
     )
@@ -186,6 +191,11 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
             AppAndRuleItem.ExpandRulesItem -> {/* nothing to do */}
             AppAndRuleItem.RulesIntro -> {/* nothing to do */}
             AppAndRuleItem.AddRuleItem -> {/* nothing to do */}
+            is AppAndRuleItem.Headline -> {
+                val binding = holder.itemView.tag as GenericListHeaderBinding
+
+                binding.text = holder.itemView.context.getString(item.stringRessource)
+            }
         }.let {  }
     }
 

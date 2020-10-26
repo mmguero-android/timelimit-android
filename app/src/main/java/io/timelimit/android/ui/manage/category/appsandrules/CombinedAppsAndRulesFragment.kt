@@ -13,27 +13,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.manage.category.apps
+package io.timelimit.android.ui.manage.category.appsandrules
 
 import android.os.Bundle
 import android.view.View
-import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
-import io.timelimit.android.ui.manage.category.appsandrules.CategoryAppsAndRulesFragment
 
-class CategoryAppsFragment : CategoryAppsAndRulesFragment() {
+class CombinedAppsAndRulesFragment : CategoryAppsAndRulesFragment() {
     companion object {
-        fun newInstance(params: ManageCategoryFragmentArgs): CategoryAppsFragment = CategoryAppsFragment().apply {
-            arguments = params.toBundle()
+        private const val CHILD_ID = "childId"
+        private const val CATEGORY_ID = "categoryId"
+
+        fun newInstance(childId: String, categoryId: String): CombinedAppsAndRulesFragment = CombinedAppsAndRulesFragment().apply {
+            arguments = Bundle().apply {
+                putString(CHILD_ID, childId)
+                putString(CATEGORY_ID, categoryId)
+            }
         }
     }
 
-    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(requireArguments()) }
-    override val categoryId: String get() = params.categoryId
-    override val childId: String get() = params.childId
+    override val categoryId: String get() = requireArguments().getString(CATEGORY_ID)!!
+    override val childId: String get() = requireArguments().getString(CHILD_ID)!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        model.fullAppScreenContent.observe(viewLifecycleOwner) { setListContent(it) }
+        model.combinedList.observe(viewLifecycleOwner) { setListContent(it) }
     }
 }
