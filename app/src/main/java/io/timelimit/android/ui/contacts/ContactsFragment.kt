@@ -29,9 +29,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +45,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.util.PhoneNumberUtils
 import kotlinx.coroutines.delay
@@ -58,9 +58,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
         private const val REQ_CALL_PERMISSION = 2
     }
 
-    private val model: ContactsModel by lazy {
-        ViewModelProviders.of(this).get(ContactsModel::class.java)
-    }
+    private val model: ContactsModel by viewModels()
 
     private val activityModelHolder: ActivityViewModelHolder by lazy { activity as ActivityViewModelHolder }
     private val auth: ActivityViewModel by lazy { activityModelHolder.getActivityViewModel() }
@@ -72,7 +70,17 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
         val binding = ContactsFragmentBinding.inflate(inflater, container, false)
         val adapter = ContactsAdapter()
 
-        model.listItems.observe(this, Observer { adapter.items = it })
+        AuthenticationFab.manageAuthenticationFab(
+                fab = binding.fab,
+                fragment = this,
+                shouldHighlight = activityModelHolder.getActivityViewModel().shouldHighlightAuthenticationButton,
+                authenticatedUser = activityModelHolder.getActivityViewModel().authenticatedUser,
+                doesSupportAuth = liveDataFromValue(true)
+        )
+
+        binding.fab.setOnClickListener { activityModelHolder.showAuthenticationScreen() }
+
+        model.listItems.observe(viewLifecycleOwner) { adapter.items = it }
 
         binding.recycler.layoutManager = LinearLayoutManager(context)
         binding.recycler.adapter = adapter
@@ -138,7 +146,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
                     REQ_SELECT_CONTACT
             )
         } catch (ex: Exception) {
-            Snackbar.make(view!!, R.string.error_general, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(requireView(), R.string.error_general, Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -146,24 +154,24 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
         if (auth.isParentAuthenticated()) {
             model.removeContact(item.id)
 
-            Snackbar.make(view!!, getString(R.string.contacts_snackbar_removed, item.title), Snackbar.LENGTH_SHORT)
+            Snackbar.make(requireView(), getString(R.string.contacts_snackbar_removed, item.title), Snackbar.LENGTH_SHORT)
                     .setAction(R.string.generic_undo) {
                         model.addContact(item)
                     }
                     .show()
         } else {
-            Snackbar.make(view!!, R.string.contacts_snackbar_remove_auth, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(requireView(), R.string.contacts_snackbar_remove_auth, Snackbar.LENGTH_SHORT).show()
         }
     }
 
     private fun startCall(number: String) {
-        if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
             try {
                 val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:" + PhoneNumberUtils.normalizeNumber(number)))
-                val resolveInfo = context!!.packageManager.queryIntentActivities(intent, 0)
+                val resolveInfo = requireContext().packageManager.queryIntentActivities(intent, 0)
 
                 if (resolveInfo.size > 1) {
-                    SelectDialerDialogFragment.newInstance(intent, this).show(fragmentManager!!)
+                    SelectDialerDialogFragment.newInstance(intent, this).show(parentFragmentManager)
                 } else {
                     startCall(intent)
                 }
@@ -172,7 +180,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
                     Log.w(LOG_TAG, "could not start call", ex)
                 }
 
-                Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(requireView(), R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
             }
         } else {
             numberToCallWithPermission = number
@@ -181,8 +189,8 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
     }
 
     fun startCall(intent: Intent) {
-        if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-            val logic = DefaultAppLogic.with(context!!)
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            val logic = DefaultAppLogic.with(requireContext())
 
             try {
                 logic.backgroundTaskLogic.pauseForegroundAppBackgroundLoop = true
@@ -193,7 +201,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
                     delay(500)
 
                     startActivity(
-                            Intent(context!!, MainActivity::class.java)
+                            Intent(requireContext(), MainActivity::class.java)
                                     .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
                     )
 
@@ -201,7 +209,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
 
                     logic.backgroundTaskLogic.pauseForegroundAppBackgroundLoop = false
 
-                    Snackbar.make(view!!, R.string.contacts_snackbar_call_started, Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(requireView(), R.string.contacts_snackbar_call_started, Snackbar.LENGTH_LONG).show()
                 }
             } catch (ex: Exception) {
                 if (BuildConfig.DEBUG) {
@@ -210,10 +218,10 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
 
                 logic.backgroundTaskLogic.pauseForegroundAppBackgroundLoop = false
 
-                Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(requireView(), R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
             }
         } else {
-            Snackbar.make(view!!, R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(requireView(), R.string.contacts_snackbar_call_failed, Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -225,7 +233,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
 
             if (resultCode == Activity.RESULT_OK) {
                 data?.data?.let { contactData ->
-                    val cursor = context!!.contentResolver.query(contactData, null, null, null, null)
+                    val cursor = requireContext().contentResolver.query(contactData, null, null, null, null)
 
                     cursor?.use {
                         if (cursor.moveToFirst()) {
@@ -234,7 +242,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
 
                             model.addContact(title = title, phoneNumber = phoneNumber)
 
-                            Snackbar.make(view!!, R.string.contacts_snackbar_added, Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(requireView(), R.string.contacts_snackbar_added, Snackbar.LENGTH_LONG).show()
                         }
                     }
                 }
