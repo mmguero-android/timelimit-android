@@ -16,9 +16,7 @@
 package io.timelimit.android.ui.overview.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
@@ -59,6 +57,12 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
     private var wereViewsCreated = false
     private var didRedirectToUserScreen = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         navigation = Navigation.findNavController(container!!)
@@ -231,4 +235,22 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
     }
 
     override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.main_tab_overview)} (${getString(R.string.app_name)})")
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.fragment_main_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.menu_main_about -> {
+            navigation.safeNavigate(
+                    MainFragmentDirections.actionOverviewFragmentToAboutFragmentWrapped(),
+                    R.id.overviewFragment
+            )
+
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }
 }
