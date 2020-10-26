@@ -123,8 +123,22 @@ class OverviewFragmentModel(application: Application): AndroidViewModel(applicat
                         addAll(introEntries)
 
                         add(OverviewFragmentHeaderDevices)
-                        addAll(deviceEntries)
-                        add(OverviewFragmentActionAddDevice)
+                        val shownDevices = when (itemVisibility.devices) {
+                            DeviceListItemVisibility.BareMinimum -> deviceEntries.filter { it.isCurrentDevice || it.isImportant }
+                            DeviceListItemVisibility.AllChildDevices -> deviceEntries.filter { it.isCurrentDevice || it.isImportant || it.deviceUser?.type == UserType.Child }
+                            DeviceListItemVisibility.AllDevices -> deviceEntries
+                        }
+                        addAll(shownDevices)
+                        if (shownDevices.size == deviceEntries.size) {
+                            add(OverviewFragmentActionAddDevice)
+                        } else {
+                            add(ShowMoreOverviewFragmentItem.ShowMoreDevices(when (itemVisibility.devices) {
+                                DeviceListItemVisibility.BareMinimum -> if (deviceEntries.find { it.deviceUser?.type == UserType.Child } != null)
+                                    DeviceListItemVisibility.AllChildDevices else DeviceListItemVisibility.AllDevices
+                                DeviceListItemVisibility.AllChildDevices -> DeviceListItemVisibility.AllDevices
+                                DeviceListItemVisibility.AllDevices -> DeviceListItemVisibility.AllDevices
+                            }))
+                        }
 
                         add(OverviewFragmentHeaderUsers)
                         if (itemVisibility.showParentUsers) {
@@ -142,5 +156,9 @@ class OverviewFragmentModel(application: Application): AndroidViewModel(applicat
 
     fun showAllUsers() {
         itemVisibility.value = itemVisibility.value!!.copy(showParentUsers = true)
+    }
+
+    fun showMoreDevices(level: DeviceListItemVisibility) {
+        itemVisibility.value = itemVisibility.value!!.copy(devices = level)
     }
 }

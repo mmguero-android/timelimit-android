@@ -27,6 +27,8 @@ data class OverviewFragmentItemDevice(val device: Device, val deviceUser: User?,
     val isMissingRequiredPermission = deviceUser?.type == UserType.Child && (
             device.currentUsageStatsPermission == RuntimePermissionStatus.NotGranted || device.missingPermissionAtQOrLater
             )
+
+    val isImportant get() = device.isImportant
 }
 data class OverviewFragmentItemUser(val user: User, val temporarilyBlocked: Boolean, val limitsTemporarilyDisabled: Boolean): OverviewFragmentItem()
 object OverviewFragmentActionAddUser: OverviewFragmentItem()
@@ -36,4 +38,5 @@ object OverviewFragmentHeaderFinishSetup: OverviewFragmentItem()
 data class OverviewFragmentItemMessage(val message: String): OverviewFragmentItem()
 sealed class ShowMoreOverviewFragmentItem: OverviewFragmentItem() {
     object ShowAllUsers: ShowMoreOverviewFragmentItem()
+    data class ShowMoreDevices(val level: DeviceListItemVisibility): ShowMoreOverviewFragmentItem()
 }

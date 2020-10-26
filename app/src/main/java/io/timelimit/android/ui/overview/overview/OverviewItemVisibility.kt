@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,19 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class OverviewItemVisibility(
-        val showParentUsers: Boolean
+        val showParentUsers: Boolean,
+        val devices: DeviceListItemVisibility
 ) : Parcelable {
     companion object {
         val default = OverviewItemVisibility(
-                showParentUsers = false
+                showParentUsers = false,
+                devices = DeviceListItemVisibility.BareMinimum
         )
     }
+}
+
+enum class DeviceListItemVisibility {
+    BareMinimum,    // current device + devices with warnings
+    AllChildDevices,
+    AllDevices
 }

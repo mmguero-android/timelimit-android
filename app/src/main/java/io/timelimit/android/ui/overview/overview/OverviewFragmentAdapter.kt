@@ -236,6 +236,9 @@ class OverviewFragmentAdapter : RecyclerView.Adapter<OverviewFragmentViewHolder>
                     is ShowMoreOverviewFragmentItem.ShowAllUsers -> {
                         holder.itemView.setOnClickListener { handlers?.onShowAllUsersClicked() }
                     }
+                    is ShowMoreOverviewFragmentItem.ShowMoreDevices -> {
+                        holder.itemView.setOnClickListener { handlers?.onSetDeviceListVisibility(item.level) }
+                    }
                 }.let {  }
             }
         }.let {  }
@@ -272,4 +275,5 @@ interface OverviewFragmentHandlers {
     fun onDeviceClicked(device: Device)
     fun onFinishSetupClicked()
     fun onShowAllUsersClicked()
+    fun onSetDeviceListVisibility(level: DeviceListItemVisibility)
 }

@@ -102,6 +102,10 @@ class OverviewFragment : CoroutineFragment() {
             override fun onShowAllUsersClicked() {
                 model.showAllUsers()
             }
+
+            override fun onSetDeviceListVisibility(level: DeviceListItemVisibility) {
+                model.showMoreDevices(level)
+            }
         }
 
         model.listEntries.observe(this, Observer { adapter.data = it })

@@ -338,6 +338,9 @@ data class Device(
             (!accessibilityServiceEnabled) &&
             (currentOverlayPermission != RuntimePermissionStatus.Granted) &&
             (currentProtectionLevel != ProtectionLevel.DeviceOwner)
+
+    @Transient
+    val isImportant = hasAnyManipulation || missingPermissionAtQOrLater || didReportUninstall
 }
 
 enum class NetworkTime {
