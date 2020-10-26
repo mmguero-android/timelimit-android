@@ -53,9 +53,7 @@ import kotlinx.android.synthetic.main.fragment_main.*
 class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers, FragmentWithCustomTitle {
     private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
     private lateinit var navigation: NavController
-    private val showAuthButtonLive = MutableLiveData<Boolean>()
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
-    private var wereViewsCreated = false
     private var didRedirectToUserScreen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,7 +76,7 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                 fragment = this,
                 shouldHighlight = activity.getActivityViewModel().shouldHighlightAuthenticationButton,
                 authenticatedUser = activity.getActivityViewModel().authenticatedUser,
-                doesSupportAuth = showAuthButtonLive
+                doesSupportAuth = liveDataFromValue(true)
         )
 
         fab.setOnClickListener { activity.showAuthenticationScreen() }
@@ -94,7 +92,7 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                 runAsync {
                     val hasParentKey = Threads.database.executeAndWait { logic.database.config().getParentModeKeySync() != null }
 
-                    if (isAdded && parentFragmentManager.isStateSaved == false) {
+                    if (isAdded && !parentFragmentManager.isStateSaved) {
                         if (hasParentKey) {
                             navigation.safeNavigate(
                                     MainFragmentDirections.actionOverviewFragmentToParentModeFragment(),
@@ -131,16 +129,6 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
             }
         })
 
-        fun updateShowFab(selectedItemId: Int) {
-            showAuthButtonLive.value = when (selectedItemId) {
-                R.id.main_tab_overview -> true
-                R.id.main_tab_contacts -> true
-                R.id.main_tab_uninstall -> !BuildConfig.storeCompilant
-                R.id.main_tab_about -> false
-                else -> throw IllegalStateException()
-            }
-        }
-
         bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
         bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
             if (childFragmentManager.isStateSaved) {
@@ -151,13 +139,9 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                         .replace(R.id.container, when (menuItem.itemId) {
                             R.id.main_tab_overview -> OverviewFragment()
                             R.id.main_tab_contacts -> ContactsFragment()
-                            R.id.main_tab_uninstall -> UninstallFragment()
-                            R.id.main_tab_about -> AboutFragment()
                             else -> throw IllegalStateException()
                         })
                         .commit()
-
-                updateShowFab(menuItem.itemId)
 
                 true
             }
@@ -168,8 +152,6 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
                     .replace(R.id.container, OverviewFragment())
                     .commit()
         }
-
-        updateShowFab(bottom_navigation_view.selectedItemId)
     }
 
     override fun openAddDeviceScreen() {
@@ -246,6 +228,14 @@ class MainFragment : Fragment(), OverviewFragmentParentHandlers, AboutFragmentPa
         R.id.menu_main_about -> {
             navigation.safeNavigate(
                     MainFragmentDirections.actionOverviewFragmentToAboutFragmentWrapped(),
+                    R.id.overviewFragment
+            )
+
+            true
+        }
+        R.id.menu_main_uninstall -> {
+            navigation.safeNavigate(
+                    MainFragmentDirections.actionOverviewFragmentToUninstallFragment(),
                     R.id.overviewFragment
             )
 

@@ -26,17 +26,19 @@
             type="boolean" />
     </data>
 
-    <ScrollView
-        android:id="@+id/scroll"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/coordinator">
+
         <LinearLayout
-            android:padding="8dp"
+            android:padding="16dp"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <androidx.cardview.widget.CardView
+                android:layout_marginBottom="8dp"
                 android:visibility="@{BuildConfig.storeCompilant ? View.VISIBLE : View.GONE}"
                 app:cardUseCompatPadding="true"
                 android:layout_width="match_parent"
@@ -65,57 +67,49 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                app:cardUseCompatPadding="true"
+            <TextView
+                android:layout_marginBottom="8dp"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:text="@string/uninstall_reset_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:padding="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                android:layout_height="wrap_content" />
 
-                    <TextView
-                        android:textAppearance="?android:textAppearanceLarge"
-                        android:text="@string/uninstall_reset_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+            <CheckBox
+                android:id="@+id/check_confirm"
+                android:text="@string/uninstall_reset_check_conirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-                    <TextView
-                        android:layout_marginBottom="8dp"
-                        android:textAppearance="?android:textAppearanceSmall"
-                        android:text="@string/uninstall_reset_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+            <Button
+                style="@style/DangerButton"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_gravity="end"
+                android:id="@+id/uninstall"
+                android:text="@string/generic_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-                    <CheckBox
-                        android:id="@+id/check_confirm"
-                        android:text="@string/uninstall_reset_check_conirm"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+            <Button
+                android:visibility="@{showBackdoorButton ? View.VISIBLE : View.GONE}"
+                android:id="@+id/backdoor_button"
+                style="?materialButtonOutlinedStyle"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/backdoor_start_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-                    <Button
-                        style="@style/DangerButton"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_gravity="end"
-                        android:id="@+id/uninstall"
-                        android:text="@string/generic_ok"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <Button
-                        android:visibility="@{showBackdoorButton ? View.VISIBLE : View.GONE}"
-                        android:id="@+id/backdoor_button"
-                        style="?materialButtonOutlinedStyle"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/backdoor_start_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </ScrollView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            app:fabSize="normal"
+            android:src="@drawable/ic_lock_open_white_24dp"
+            android:layout_margin="16dp"
+            android:layout_gravity="end|bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

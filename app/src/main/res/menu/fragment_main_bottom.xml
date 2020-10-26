@@ -23,14 +23,4 @@
         android:icon="@drawable/ic_phone_black_24dp"
         android:title="@string/contacts_title"
         android:id="@+id/main_tab_contacts" />
-
-    <item
-        android:icon="@drawable/ic_delete_black_24dp"
-        android:title="@string/main_tab_uninstall"
-        android:id="@+id/main_tab_uninstall" />
-
-    <item
-        android:icon="@drawable/ic_info_outline_black_24dp"
-        android:title="@string/main_tab_about"
-        android:id="@+id/main_tab_about" />
 </menu>
