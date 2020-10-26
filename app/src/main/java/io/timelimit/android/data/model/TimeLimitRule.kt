@@ -140,6 +140,9 @@ data class TimeLimitRule(
     val sessionDurationLimitEnabled: Boolean
         get() = sessionPauseMilliseconds > 0 && sessionDurationMilliseconds > 0
 
+    val appliesToMultipleDays: Boolean
+        get() = dayMask.toInt().countOneBits() > 1
+
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 

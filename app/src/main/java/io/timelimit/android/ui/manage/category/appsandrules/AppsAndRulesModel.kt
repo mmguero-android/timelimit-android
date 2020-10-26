@@ -59,7 +59,20 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
     private val allRules = categoryIdLive.switchMap { categoryId ->
         database.timeLimitRules().getTimeLimitRulesByCategory(categoryId)
     }.map { rules ->
-        rules.sortedBy { it.dayMask }.map { AppAndRuleItem.RuleEntry(it) }
+        rules.sortedWith { a, b ->
+            if (a.appliesToMultipleDays != b.appliesToMultipleDays) {
+                if (a.appliesToMultipleDays) -1 else 1
+            } else {
+                if (a.dayMask < b.dayMask) -1
+                else if (a.dayMask > b.dayMask) 1 else {
+                    if (a.appliesToWholeDay != b.appliesToWholeDay) {
+                        if (a.appliesToWholeDay) -1 else 1
+                    } else {
+                        0
+                    }
+                }
+            }
+        }.map { AppAndRuleItem.RuleEntry(it) }
     }
 
     private val todayRulesAndHasHiddenItems = allRules.switchMap { allRules ->
