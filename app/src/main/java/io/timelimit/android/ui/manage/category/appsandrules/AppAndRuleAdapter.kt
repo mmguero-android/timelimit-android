@@ -39,6 +39,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
         private const val RULE_ENTRY = 4
         private const val EXPAND_RULES_ITEM = 5
         private const val RULES_INTRO = 6
+        private const val ADD_RULE_ITEM = 7
     }
 
     var items: List<AppAndRuleItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
@@ -67,6 +68,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
         is AppAndRuleItem.RuleEntry -> RULE_ENTRY
         AppAndRuleItem.ExpandRulesItem -> EXPAND_RULES_ITEM
         AppAndRuleItem.RulesIntro -> RULES_INTRO
+        AppAndRuleItem.AddRuleItem -> ADD_RULE_ITEM
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder = Holder(
@@ -106,6 +108,16 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                         parent,
                         false
                 ).root
+                ADD_RULE_ITEM -> AddItemViewBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                ).apply {
+                    label = parent.context.getString(R.string.category_time_limit_rule_dialog_new)
+                    wide = true
+
+                    root.setOnClickListener { handlers?.onAddTimeLimitRuleClicked() }
+                }.root
                 else -> throw IllegalArgumentException()
             }
     )
@@ -173,6 +185,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
             }
             AppAndRuleItem.ExpandRulesItem -> {/* nothing to do */}
             AppAndRuleItem.RulesIntro -> {/* nothing to do */}
+            AppAndRuleItem.AddRuleItem -> {/* nothing to do */}
         }.let {  }
     }
 

@@ -25,4 +25,5 @@ sealed class AppAndRuleItem {
     data class RuleEntry(val rule: TimeLimitRule): AppAndRuleItem()
     object ExpandRulesItem: AppAndRuleItem()
     object RulesIntro: AppAndRuleItem()
+    object AddRuleItem: AppAndRuleItem()
 }
