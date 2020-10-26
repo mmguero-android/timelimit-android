@@ -63,5 +63,5 @@ class ChildUsageHistoryFragmentWrapper: ChildFragmentWrapper(), FragmentWithCust
     override val showAuthButton: Boolean = false
 
     override fun createChildFragment(): Fragment = UsageHistoryFragment.newInstance(userId = childId, categoryId = null)
-    override fun getCustomTitle() = child.map { it?.name }
+    override fun getCustomTitle() = child.map { it?.let { "${it.name} - ${getString(R.string.usage_history_title)}" } }
 }
