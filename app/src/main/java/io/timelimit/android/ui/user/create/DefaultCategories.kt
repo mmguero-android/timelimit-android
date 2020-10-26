@@ -18,8 +18,8 @@ package io.timelimit.android.ui.user.create
 import android.content.Context
 import io.timelimit.android.R
 import io.timelimit.android.data.IdGenerator
-import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.model.TimeLimitRule
+import io.timelimit.android.extensions.MinuteOfDay
 import java.util.*
 
 class DefaultCategories private constructor(private val context: Context) {
@@ -37,21 +37,6 @@ class DefaultCategories private constructor(private val context: Context) {
 
     val allowedAppsTitle get() = context.getString(R.string.setup_category_allowed)
     val allowedGamesTitle get() = context.getString(R.string.setup_category_games)
-    val allowedGamesBlockedTimes: ImmutableBitmask by lazy {
-        ImmutableBitmask(
-                BitSet().apply {
-                    for (i in 0..6) {
-                        val startOfDay = i * 60 * 24
-
-                        // to 6 AM
-                        set(startOfDay, startOfDay + 6 * 60)
-
-                        // from 6 PM
-                        set(startOfDay + 18 * 60, startOfDay + 24 * 60)
-                    }
-                }
-        )
-    }
 
     fun generateGamesTimeLimitRules(categoryId: String): List<TimeLimitRule> {
         val rules = mutableListOf<TimeLimitRule>()
@@ -104,6 +89,64 @@ class DefaultCategories private constructor(private val context: Context) {
                         maximumTimeInMillis = 1000 * 60 * 60 * 6,    // 6 hours
                         startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
                         endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
+                        sessionPauseMilliseconds = 0,
+                        sessionDurationMilliseconds = 0
+                )
+        )
+
+        // blocked time areas for weekdays
+        rules.add(
+                TimeLimitRule(
+                        id = IdGenerator.generateId(),
+                        categoryId = categoryId,
+                        applyToExtraTimeUsage = true,
+                        dayMask = 1 + 2 + 4 + 8 + 16,
+                        maximumTimeInMillis = 0,
+                        startMinuteOfDay = 0,
+                        endMinuteOfDay = 6 * 60,
+                        sessionPauseMilliseconds = 0,
+                        sessionDurationMilliseconds = 0
+                )
+        )
+
+        rules.add(
+                TimeLimitRule(
+                        id = IdGenerator.generateId(),
+                        categoryId = categoryId,
+                        applyToExtraTimeUsage = true,
+                        dayMask = 1 + 2 + 4 + 8 + 16,
+                        maximumTimeInMillis = 0,
+                        startMinuteOfDay = 18 * 60,
+                        endMinuteOfDay = MinuteOfDay.MAX,
+                        sessionPauseMilliseconds = 0,
+                        sessionDurationMilliseconds = 0
+                )
+        )
+
+        // blocked time areas for the weekend
+        rules.add(
+                TimeLimitRule(
+                        id = IdGenerator.generateId(),
+                        categoryId = categoryId,
+                        applyToExtraTimeUsage = true,
+                        dayMask = 32 + 64,
+                        maximumTimeInMillis = 0,
+                        startMinuteOfDay = 0,
+                        endMinuteOfDay = 9 * 60,
+                        sessionPauseMilliseconds = 0,
+                        sessionDurationMilliseconds = 0
+                )
+        )
+
+        rules.add(
+                TimeLimitRule(
+                        id = IdGenerator.generateId(),
+                        categoryId = categoryId,
+                        applyToExtraTimeUsage = true,
+                        dayMask = 32 + 64,
+                        maximumTimeInMillis = 0,
+                        startMinuteOfDay = 20 * 60,
+                        endMinuteOfDay = MinuteOfDay.MAX,
                         sessionPauseMilliseconds = 0,
                         sessionDurationMilliseconds = 0
                 )

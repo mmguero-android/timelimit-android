@@ -105,11 +105,6 @@ class SetupDeviceModel(application: Application): AndroidViewModel(application) 
                             title = defaultCategories.allowedGamesTitle
                     ))
 
-                    actions.add(UpdateCategoryBlockedTimesAction(
-                            categoryId = allowedGamesCategory,
-                            blockedTimes = defaultCategories.allowedGamesBlockedTimes
-                    ))
-
                     defaultCategories.generateGamesTimeLimitRules(allowedGamesCategory).forEach { rule ->
                         actions.add(CreateTimeLimitRuleAction(rule))
                     }

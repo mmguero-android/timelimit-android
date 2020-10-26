@@ -191,7 +191,7 @@ class AppSetupLogic(private val appLogic: AppLogic) {
                             id = allowedGamesCategoryId,
                             childId = childUserId,
                             title = defaultCategories.allowedGamesTitle,
-                            blockedMinutesInWeek = defaultCategories.allowedGamesBlockedTimes,
+                            blockedMinutesInWeek = ImmutableBitmask(BitSet()),
                             extraTimeInMillis = 0,
                             extraTimeDay = -1,
                             temporarilyBlocked = false,

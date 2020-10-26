@@ -88,10 +88,6 @@ class AddUserModel(application: Application): AndroidViewModel(application) {
                                         childId = childId,
                                         categoryId = allowedGamesCategory,
                                         title = defaultCategories.allowedGamesTitle
-                                ),
-                                UpdateCategoryBlockedTimesAction(
-                                        categoryId = allowedGamesCategory,
-                                        blockedTimes = defaultCategories.allowedGamesBlockedTimes
                                 )
                         ))
 
