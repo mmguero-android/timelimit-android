@@ -48,10 +48,8 @@ class UninstallFragment : Fragment() {
         binding.checkConfirm.setOnCheckedChangeListener { _, isChecked -> binding.uninstall.isEnabled = isChecked }
 
         binding.uninstall.setOnClickListener {
-            val revokePermissions = binding.checkPermissions.isChecked
-
             if (BuildConfig.storeCompilant || auth.requestAuthenticationOrReturnTrue()) {
-                DefaultAppLogic.with(context!!).appSetupLogic.resetAppCompletely(revokePermissions)
+                DefaultAppLogic.with(context!!).appSetupLogic.resetAppCompletely()
             } else {
                 showBackdoorButton = true
                 binding.showBackdoorButton = true

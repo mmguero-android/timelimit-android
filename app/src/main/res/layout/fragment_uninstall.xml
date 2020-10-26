@@ -89,12 +89,6 @@
                         android:layout_height="wrap_content" />
 
                     <CheckBox
-                        android:id="@+id/check_permissions"
-                        android:text="@string/uninstall_reset_check_permissions"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <CheckBox
                         android:id="@+id/check_confirm"
                         android:text="@string/uninstall_reset_check_conirm"
                         android:layout_width="match_parent"

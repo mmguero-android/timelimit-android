@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -25,9 +25,6 @@
     <string name="uninstall_reset_text">
         All settings of TimeLimit are deleted from this device.
         After this, you can reconfigure TimeLimit or uninstall it.
-    </string>
-    <string name="uninstall_reset_check_permissions">
-        Disable (some) permissions to allow uninstalling TimeLimit.
     </string>
     <string name="uninstall_reset_check_conirm">I am sure that I want to remove TimeLimit from this device</string>
 </resources>

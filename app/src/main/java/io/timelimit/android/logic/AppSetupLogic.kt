@@ -231,12 +231,8 @@ class AppSetupLogic(private val appLogic: AppLogic) {
         DatabaseBackup.with(appLogic.context).tryCreateDatabaseBackupAsync()
     }
 
-    fun resetAppCompletely(revokePermissions: Boolean = false) {
+    fun resetAppCompletely() {
         appLogic.platformIntegration.setEnableSystemLockdown(false)
-
-        if (revokePermissions) {
-            appLogic.platformIntegration.disableDeviceAdmin()
-        }
 
         runAsync {
             val server = appLogic.serverLogic.getServerConfigCoroutine()
