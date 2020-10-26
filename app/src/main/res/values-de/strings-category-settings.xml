@@ -14,7 +14,7 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="category_settings">Verwaltung</string>
+    <string name="category_settings">erweiterte Einstellungen</string>
     <string name="category_settings_rename">Kategorie umbenennen</string>
     <string name="category_settings_rename_empty">Der neue Name darf nicht leer sein</string>
     <string name="category_settings_delete">Kategorie löschen</string>

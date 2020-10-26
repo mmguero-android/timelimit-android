@@ -38,7 +38,7 @@
         android:id="@+id/menu_manage_child_usage_history" />
 
     <item
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         app:iconTint="?colorOnPrimary"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/manage_child_tab_other"

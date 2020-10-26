@@ -13,8 +13,8 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
-    <string name="category_settings">Management</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="category_settings" tools:ignore="MissingTranslation">Advanced Settings</string>
     <string name="category_settings_rename">Rename category</string>
     <string name="category_settings_rename_empty">The new name must not be empty</string>
     <string name="category_settings_delete">Delete category</string>

@@ -14,7 +14,6 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
-    <string name="category_settings">Gerenciamento</string>
     <string name="category_settings_rename">Renomear categoria</string>
     <string name="category_settings_rename_empty">O novo nome não deve estar vazio</string>
     <string name="category_settings_delete">Excluir categoria</string>
