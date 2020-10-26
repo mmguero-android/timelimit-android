@@ -28,7 +28,7 @@ abstract class BottomSheetSelectionListDialog: BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetSelectionListBinding
     private var didClearList = false
 
-    abstract val title: String
+    abstract val title: String?
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = BottomSheetSelectionListBinding.inflate(inflater, container, false)

@@ -13,7 +13,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="usage_history_title">Usage history</string>
     <string name="usage_history_empty_title">There is no usage history</string>
     <string name="usage_history_empty_text">
@@ -24,4 +24,5 @@
     <string name="usage_history_time_area">from %s until %s</string>
     <string name="usage_history_item_session_duration_limit">Session duration limit of %s with %s break</string>
     <string name="usage_history_item_last_usage">Last usage: %s</string>
+    <string name="usage_history_filter_all_categories" tools:ignore="MissingTranslation">All Categories</string>
 </resources>

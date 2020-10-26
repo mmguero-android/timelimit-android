@@ -27,6 +27,7 @@
             type="boolean" />
 
         <import type="android.view.View" />
+        <import type="android.text.TextUtils" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -40,6 +41,7 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:visibility="@{TextUtils.isEmpty(title) ? View.GONE : View.VISIBLE}"
                 android:textAppearance="?android:textAppearanceLarge"
                 android:padding="8dp"
                 android:text="@{title}"

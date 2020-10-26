@@ -1,5 +1,5 @@
 <!--
-  TimeLimit Copyright <C> 2019 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -24,44 +24,58 @@
         <import type="android.view.View" />
     </data>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
+        <Button
+            android:id="@+id/select_category_button"
+            tools:text="Alle Kategorien"
+            android:drawableEnd="@drawable/ic_baseline_expand_more_24"
+            style="?borderlessButtonStyle"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
 
-        <RelativeLayout
-            android:visibility="@{safeUnbox(isEmpty) ? View.VISIBLE : View.GONE}"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <LinearLayout
-                android:padding="16dp"
-                android:layout_centerVertical="true"
-                android:orientation="vertical"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent" />
 
-                <TextView
-                    android:textAppearance="?android:textAppearanceLarge"
-                    android:gravity="center_horizontal"
-                    android:text="@string/usage_history_empty_title"
+            <RelativeLayout
+                android:visibility="@{safeUnbox(isEmpty) ? View.VISIBLE : View.GONE}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:padding="16dp"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:gravity="center_horizontal"
-                    android:text="@string/usage_history_empty_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:gravity="center_horizontal"
+                        android:text="@string/usage_history_empty_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-            </LinearLayout>
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:gravity="center_horizontal"
+                        android:text="@string/usage_history_empty_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-        </RelativeLayout>
+                </LinearLayout>
 
-    </FrameLayout>
+            </RelativeLayout>
+
+        </FrameLayout>
+    </LinearLayout>
 </layout>
