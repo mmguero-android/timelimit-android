@@ -88,12 +88,6 @@ class ChildAppsModel(application: Application): AndroidViewModel(application) {
                                                 .distinctBy { it.packageName }
                                                 .sortedBy { it.title.toLowerCase() }
 
-                                        if (categoryId == null) {
-                                            result.add(ChildAppsAssignAll(
-                                                    packageNames = sortedApps.map { it.packageName }
-                                            ))
-                                        }
-
                                         result.addAll(
                                                 sortedApps.map { app ->
                                                     ChildAppsApp(
@@ -152,4 +146,3 @@ sealed class ChildAppsEntry
 data class ChildAppsCategoryHeader(val title: String, val categoryId: String?): ChildAppsEntry()
 data class ChildAppsApp(val app: App, val shownCategoryName: String?): ChildAppsEntry()
 data class ChildAppsEmptyCategory(val categoryId: String?): ChildAppsEntry()
-data class ChildAppsAssignAll(val packageNames: List<String>): ChildAppsEntry()

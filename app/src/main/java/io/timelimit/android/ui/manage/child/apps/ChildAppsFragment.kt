@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ import io.timelimit.android.databinding.ChildAppsFragmentBinding
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
-import io.timelimit.android.ui.manage.child.apps.assign.AssignAllAppsCategoryDialogFragment
 import io.timelimit.android.ui.manage.child.apps.assign.AssignAppCategoryDialogFragment
 import io.timelimit.android.ui.view.AppFilterView
 
@@ -85,15 +84,6 @@ class ChildAppsFragment : Fragment() {
                     AssignAppCategoryDialogFragment.newInstance(
                             childId = args.childId,
                             appPackageName = app.packageName
-                    ).show(fragmentManager!!)
-                }
-            }
-
-            override fun onAssignAppsClicked(packageNames: List<String>) {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    AssignAllAppsCategoryDialogFragment.newInstance(
-                            childId = args.childId,
-                            appPackageNames = packageNames
                     ).show(fragmentManager!!)
                 }
             }

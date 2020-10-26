@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
         private const val TYPE_CATEGORY_HEADER = 0
         private const val TYPE_APP = 1
         private const val TYPE_EMPTY = 2
-        private const val TYPE_ASSIGN_ALL = 3
     }
 
     var data: List<ChildAppsEntry> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
@@ -48,7 +47,6 @@ class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
         is ChildAppsCategoryHeader -> TYPE_CATEGORY_HEADER
         is ChildAppsApp -> TYPE_APP
         is ChildAppsEmptyCategory -> TYPE_EMPTY
-        is ChildAppsAssignAll -> TYPE_ASSIGN_ALL
     }
 
     override fun getItemId(position: Int): Long {
@@ -58,7 +56,6 @@ class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
             is ChildAppsCategoryHeader -> (item.categoryId ?: "no category").hashCode().toLong()
             is ChildAppsApp -> item.app.packageName.hashCode().toLong()
             is ChildAppsEmptyCategory -> (item.categoryId ?: "no category").hashCode().toLong()
-            is ChildAppsAssignAll -> "assign all".hashCode().toLong()
         }
     }
 
@@ -87,13 +84,6 @@ class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
                     executePendingBindings()
                 }.root
         )
-        TYPE_ASSIGN_ALL -> {
-            AssignAllAppsViewHolder(
-                    Button(parent.context).apply {
-                        setText(R.string.child_apps_assign_all)
-                    }
-            )
-        }
         else -> throw IllegalArgumentException()
     }
 
@@ -127,15 +117,6 @@ class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
 
                 // nothing to do
             }
-            is ChildAppsAssignAll -> {
-                holder as AssignAllAppsViewHolder
-
-                holder.itemView.setOnClickListener {
-                    handlers?.onAssignAppsClicked(item.packageNames)
-                }
-
-                null
-            }
         }.let { /* require handling all paths */ }
     }
 }
@@ -148,5 +129,4 @@ class AssignAllAppsViewHolder(view: View): ChildAppsHolder(view)
 
 interface Handlers {
     fun onAppClicked(app: App)
-    fun onAssignAppsClicked(packageNames: List<String>)
 }
