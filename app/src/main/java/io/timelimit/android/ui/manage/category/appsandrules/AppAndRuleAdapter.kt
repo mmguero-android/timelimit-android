@@ -157,11 +157,10 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                 }.map { it.usedMillis }.sum().toInt()
 
                 binding.maxTimeString = TimeTextUtil.time(rule.maximumTimeInMillis, context)
-                binding.usageAsText = TimeTextUtil.used(usedTime, context)
+                binding.usageAsText = if (rule.maximumTimeInMillis > 0) TimeTextUtil.used(usedTime, context) else null
                 binding.usageProgressInPercent = if (rule.maximumTimeInMillis > 0)
                     (usedTime * 100 / rule.maximumTimeInMillis)
-                else
-                    100
+                else null
                 binding.daysString = JoinUtil.join(
                         dayNames.filterIndexed { index, _ -> (rule.dayMask.toInt() and (1 shl index)) != 0 },
                         context
