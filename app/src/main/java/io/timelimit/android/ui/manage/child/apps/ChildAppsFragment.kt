@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.timelimit.android.R
@@ -29,21 +28,19 @@ import io.timelimit.android.data.model.App
 import io.timelimit.android.databinding.ChildAppsFragmentBinding
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
-import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.manage.child.apps.assign.AssignAppCategoryDialogFragment
 import io.timelimit.android.ui.view.AppFilterView
 
 class ChildAppsFragment : Fragment() {
     companion object {
-        fun newInstance(args: ManageChildFragmentArgs) = ChildAppsFragment().apply {
-            arguments = args.toBundle()
+        private const val CHILD_ID = "childId"
+
+        fun newInstance(childId: String) = ChildAppsFragment().apply {
+            arguments = Bundle().apply { putString(CHILD_ID, childId) }
         }
     }
 
-    val args: ManageChildFragmentArgs by lazy {
-        ManageChildFragmentArgs.fromBundle(arguments!!)
-    }
-
+    val childId: String get() = arguments!!.getString(CHILD_ID)!!
     val auth: ActivityViewModel by lazy { (activity as ActivityViewModelHolder).getActivityViewModel() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -57,8 +54,8 @@ class ChildAppsFragment : Fragment() {
             else -> throw IllegalArgumentException()
         }
 
-        model.childIdLive.value = args.childId
-        AppFilterView.getFilterLive(binding.appFilter).observe(this, Observer { model.appFilterLive.value = it })
+        model.childIdLive.value = childId
+        AppFilterView.getFilterLive(binding.appFilter).observe(viewLifecycleOwner) { model.appFilterLive.value = it }
         model.modeLive.value = getMode()
         binding.sortSetting.setOnCheckedChangeListener { _, _ -> model.modeLive.value = getMode() }
 
@@ -67,13 +64,11 @@ class ChildAppsFragment : Fragment() {
             model.showAppsFromOtherDevicesChecked.value = isChecked
         }
 
-        model.listContentLive.observe(this, Observer {
-            adapter.data = it
-        })
+        model.listContentLive.observe(viewLifecycleOwner) { adapter.data = it }
 
-        model.isLocalMode.observe(this, Observer {
+        model.isLocalMode.observe(viewLifecycleOwner) {
             binding.showAppsFromUnassignedDevices.visibility = if (it) View.GONE else View.VISIBLE
-        })
+        }
 
         binding.recycler.layoutManager = LinearLayoutManager(context)
         binding.recycler.adapter = adapter
@@ -82,9 +77,9 @@ class ChildAppsFragment : Fragment() {
             override fun onAppClicked(app: App) {
                 if (auth.requestAuthenticationOrReturnTrue()) {
                     AssignAppCategoryDialogFragment.newInstance(
-                            childId = args.childId,
+                            childId = childId,
                             appPackageName = app.packageName
-                    ).show(fragmentManager!!)
+                    ).show(parentFragmentManager)
                 }
             }
         }

@@ -29,7 +29,7 @@ import io.timelimit.android.ui.main.AuthenticationFab
 import kotlinx.android.synthetic.main.fragment_main.*
 
 abstract class SingleFragmentWrapper: Fragment() {
-    private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
+    val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
     private lateinit var navController: NavController
 
     protected val navigation get() = navController

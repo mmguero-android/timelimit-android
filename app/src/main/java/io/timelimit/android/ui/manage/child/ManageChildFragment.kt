@@ -86,8 +86,8 @@ class ManageChildFragment : Fragment(), FragmentWithCustomTitle {
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .replace(R.id.container, when (menuItem.itemId) {
                             R.id.manage_child_tab_categories -> ManageChildCategoriesFragment.newInstance(params)
-                            R.id.manage_child_tab_apps -> ChildAppsFragment.newInstance(params)
-                            R.id.manage_child_tab_manage -> ManageChildAdvancedFragment.newInstance(params)
+                            R.id.manage_child_tab_apps -> ChildAppsFragment.newInstance(params.childId)
+                            R.id.manage_child_tab_manage -> ManageChildAdvancedFragment.newInstance(params.childId)
                             else -> throw IllegalStateException()
                         })
                         .commit()
