@@ -36,7 +36,6 @@ import io.timelimit.android.sync.actions.SetCategoryExtraTimeAction
 import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 import io.timelimit.android.ui.manage.category.settings.addusedtime.AddUsedTimeDialogFragment
 import io.timelimit.android.ui.manage.category.settings.networks.ManageCategoryNetworksView
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
@@ -45,24 +44,28 @@ import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 class CategorySettingsFragment : Fragment() {
     companion object {
         private const val PERMISSION_REQUEST_CODE = 1
+        private const val CHILD_ID = "childId"
+        private const val CATEGORY_ID = "categoryId"
 
-        fun newInstance(params: ManageCategoryFragmentArgs): CategorySettingsFragment {
-            val result = CategorySettingsFragment()
-            result.arguments = params.toBundle()
-            return result
+        fun newInstance(childId: String, categoryId: String) = CategorySettingsFragment().apply {
+            arguments = Bundle().apply {
+                putString(CHILD_ID, childId)
+                putString(CATEGORY_ID, categoryId)
+            }
         }
     }
 
-    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(arguments!!) }
-    private val appLogic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
+    private val appLogic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
+    private val childId: String get() = requireArguments().getString(CHILD_ID)!!
+    private val categoryId: String get() = requireArguments().getString(CATEGORY_ID)!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentCategorySettingsBinding.inflate(inflater, container, false)
 
-        val categoryEntry = appLogic.database.category().getCategoryByChildIdAndId(params.childId, params.categoryId)
+        val categoryEntry = appLogic.database.category().getCategoryByChildIdAndId(childId, categoryId)
 
-        val childDate = appLogic.database.user().getChildUserByIdLive(params.childId).mapToTimezone().switchMap { timezone ->
+        val childDate = appLogic.database.user().getChildUserByIdLive(childId).mapToTimezone().switchMap { timezone ->
             liveDataFromFunction (1000 * 10L) { DateInTimezone.newInstance(appLogic.timeApi.getCurrentTimeInMillis(), timezone) }
         }.ignoreUnchanged()
 
@@ -79,8 +82,8 @@ class CategorySettingsFragment : Fragment() {
         ManageCategoryForUnassignedApps.bind(
                 binding = binding.categoryForUnassignedApps,
                 lifecycleOwner = this,
-                categoryId = params.categoryId,
-                childId = params.childId,
+                categoryId = categoryId,
+                childId = childId,
                 database = appLogic.database,
                 auth = auth,
                 fragmentManager = parentFragmentManager
@@ -91,15 +94,15 @@ class CategorySettingsFragment : Fragment() {
                 lifecycleOwner = this,
                 category = categoryEntry,
                 auth = auth,
-                categoryId = params.categoryId,
+                categoryId = categoryId,
                 fragmentManager = parentFragmentManager
         )
 
         ParentCategoryView.bind(
                 binding = binding.parentCategory,
                 lifecycleOwner = this,
-                categoryId = params.categoryId,
-                childId = params.childId,
+                categoryId = categoryId,
+                childId = childId,
                 database = appLogic.database,
                 fragmentManager = parentFragmentManager,
                 auth = auth
@@ -111,7 +114,7 @@ class CategorySettingsFragment : Fragment() {
                 fragmentManager = parentFragmentManager,
                 auth = auth,
                 categoryLive = categoryEntry,
-                childId = params.childId
+                childId = childId
         )
 
         CategoryTimeWarningView.bind(
@@ -129,7 +132,7 @@ class CategorySettingsFragment : Fragment() {
                 fragmentManager = parentFragmentManager,
                 fragment = this,
                 permissionRequestCode = PERMISSION_REQUEST_CODE,
-                categoryId = params.categoryId
+                categoryId = categoryId
         )
 
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }
@@ -187,7 +190,7 @@ class CategorySettingsFragment : Fragment() {
                     if (
                             auth.tryDispatchParentAction(
                                     SetCategoryExtraTimeAction(
-                                            categoryId = params.categoryId,
+                                            categoryId = categoryId,
                                             newExtraTime = newExtraTime,
                                             extraTimeDay = (if (binding.switchLimitExtraTimeToToday.isChecked) childDate.value?.dayOfEpoch else null) ?: -1
                                     )
@@ -228,21 +231,21 @@ class CategorySettingsFragment : Fragment() {
 
     private fun renameCategory() {
         if (auth.requestAuthenticationOrReturnTrue()) {
-            RenameCategoryDialogFragment.newInstance(params).show(parentFragmentManager)
+            RenameCategoryDialogFragment.newInstance(childId = childId, categoryId = categoryId).show(parentFragmentManager)
         }
     }
 
     private fun deleteCategory() {
         if (auth.requestAuthenticationOrReturnTrue()) {
-            DeleteCategoryDialogFragment.newInstance(params).show(parentFragmentManager)
+            DeleteCategoryDialogFragment.newInstance(childId = childId, categoryId = categoryId).show(parentFragmentManager)
         }
     }
 
     private fun addUsedTime() {
-        if (auth.requestAuthenticationOrReturnTrueAllowChild(childId = params.childId)) {
+        if (auth.requestAuthenticationOrReturnTrueAllowChild(childId = childId)) {
             AddUsedTimeDialogFragment.newInstance(
-                    childId = params.childId,
-                    categoryId = params.categoryId
+                    childId = childId,
+                    categoryId = categoryId
             ).show(parentFragmentManager)
         }
     }
@@ -250,7 +253,7 @@ class CategorySettingsFragment : Fragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.find { it != PackageManager.PERMISSION_GRANTED } != null) {
-                Toast.makeText(context!!, R.string.generic_runtime_permission_rejected, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), R.string.generic_runtime_permission_rejected, Toast.LENGTH_LONG).show()
             }
         }
     }

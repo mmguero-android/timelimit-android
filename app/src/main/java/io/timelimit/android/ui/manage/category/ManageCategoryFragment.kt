@@ -16,16 +16,16 @@
 package io.timelimit.android.ui.manage.category
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.LiveData
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.data.model.User
+import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
@@ -35,14 +35,12 @@ import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.category.apps.CategoryAppsFragment
-import io.timelimit.android.ui.manage.category.blocked_times.BlockedTimeAreasFragment
-import io.timelimit.android.ui.manage.category.settings.CategorySettingsFragment
 import io.timelimit.android.ui.manage.category.timelimit_rules.CategoryTimeLimitRulesFragment
 import kotlinx.android.synthetic.main.fragment_manage_category.*
 
 class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
-    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(arguments!!) }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    private val params: ManageCategoryFragmentArgs by lazy { ManageCategoryFragmentArgs.fromBundle(requireArguments()) }
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
     private val category: LiveData<Category?> by lazy {
         logic.database.category()
                 .getCategoryByChildIdAndId(params.childId, params.categoryId)
@@ -51,6 +49,13 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
         logic.database.user().getUserByIdLive(params.childId)
     }
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
+    lateinit var navigation: NavController
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_manage_category, container, false)
@@ -69,7 +74,7 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
 
         fab.setOnClickListener { activity.showAuthenticationScreen() }
 
-        val navigation = Navigation.findNavController(view)
+        navigation = Navigation.findNavController(view)
 
         bottom_navigation_view.setOnNavigationItemReselectedListener { /* ignore */ }
         bottom_navigation_view.setOnNavigationItemSelectedListener { menuItem ->
@@ -81,8 +86,6 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
                         .replace(R.id.container, when (menuItem.itemId) {
                             R.id.manage_category_tab_apps -> CategoryAppsFragment.newInstance(params)
                             R.id.manage_category_tab_time_limit_rules -> CategoryTimeLimitRulesFragment.newInstance(params)
-                            R.id.manage_category_tab_blocked_time_areas -> BlockedTimeAreasFragment.newInstance(params)
-                            R.id.manage_category_tab_settings -> CategorySettingsFragment.newInstance(params)
                             else -> throw IllegalStateException()
                         })
                         .commit()
@@ -108,5 +111,37 @@ class ManageCategoryFragment : Fragment(), FragmentWithCustomTitle {
         category.map { category ->
             "${category?.title} < ${user?.name} < ${getString(R.string.main_tab_overview)}" as String?
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.fragment_manage_category_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.menu_manage_category_blocked_time_areas -> {
+            navigation.safeNavigate(
+                    ManageCategoryFragmentDirections.actionManageCategoryFragmentToBlockedTimeAreasFragmentWrapper(
+                            childId = params.childId,
+                            categoryId = params.categoryId
+                    ),
+                    R.id.manageCategoryFragment
+            )
+
+            true
+        }
+        R.id.menu_manage_category_settings -> {
+            navigation.safeNavigate(
+                    ManageCategoryFragmentDirections.actionManageCategoryFragmentToCategoryAdvancedFragmentWrapper(
+                            childId = params.childId,
+                            categoryId = params.categoryId
+                    ),
+                    R.id.manageCategoryFragment
+            )
+
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 }
