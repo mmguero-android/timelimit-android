@@ -24,15 +24,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
+import io.timelimit.android.async.Threads
+import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.Database
 import io.timelimit.android.data.customtypes.ImmutableBitmask
 import io.timelimit.android.data.model.Category
+import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.data.model.withConfigCopiedToOtherDates
 import io.timelimit.android.livedata.map
+import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.UpdateCategoryBlockedTimesAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.mustread.MustReadFragment
 import kotlinx.android.synthetic.main.fragment_blocked_time_areas.*
 
 class BlockedTimeAreasFragment : Fragment(), CopyBlockedTimeAreasDialogFragmentListener {
@@ -59,6 +64,22 @@ class BlockedTimeAreasFragment : Fragment(), CopyBlockedTimeAreasDialogFragmentL
         super.onCreate(savedInstanceState)
 
         items.value = MinuteOfWeekItems
+
+        if (savedInstanceState == null) {
+            database.let { database ->
+                runAsync {
+                    val wasShown = database.config().wereHintsShown(HintsToShow.BLOCKED_TIME_AREAS_OBSOLETE).waitForNonNullValue()
+
+                    if (!wasShown) {
+                        MustReadFragment.newInstance(R.string.must_read_blocked_time_areas_obsolete).show(parentFragmentManager)
+
+                        Threads.database.execute {
+                            database.config().setHintsShownSync(HintsToShow.BLOCKED_TIME_AREAS_OBSOLETE)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

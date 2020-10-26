@@ -13,7 +13,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="must_read_child_manipulation">
         Because some users do not realize it:
         \n1st: In the default settings, TimeLimit can be removed easily, even by children.
@@ -31,5 +31,10 @@
     <string name="must_read_add_already_assigned_apps">
         Apps with category are removed from the previous category when they are added to a new category -
         use parent and child categories to \"add\" an App to multiple categories
+    </string>
+    <string name="must_read_blocked_time_areas_obsolete" tools:ignore="MissingTranslation">
+        The blocked time areas are deprecated. You can use time limit rules for parts
+        of a day with zero minutes usage duration instead. The blocked time areas will be
+        removed in the future.
     </string>
 </resources>
