@@ -197,6 +197,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.HIDE_MANIPULATION_WARNING,
                         disableFlags = ExperimentalFlags.HIDE_MANIPULATION_WARNING,
                         enable = { true }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_esb,
+                        enableFlags = ExperimentalFlags.ENABLE_SOFT_BLOCKING,
+                        disableFlags = ExperimentalFlags.ENABLE_SOFT_BLOCKING,
+                        enable = { true }
                 )
         )
     }

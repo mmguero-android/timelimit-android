@@ -125,8 +125,12 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
     private val isChromeOs = appLogic.context.packageManager.hasSystemFeature(PackageManager.FEATURE_PC)
 
-    private suspend fun openLockscreen(blockedAppPackageName: String, blockedAppActivityName: String?) {
-        appLogic.platformIntegration.setShowBlockingOverlay(true, "$blockedAppPackageName:${blockedAppActivityName?.removePrefix(blockedAppPackageName)}")
+    private suspend fun openLockscreen(blockedAppPackageName: String, blockedAppActivityName: String?, enableSoftBlocking: Boolean) {
+        if (enableSoftBlocking) {
+            appLogic.platformIntegration.setShowBlockingOverlay(false)
+        } else {
+            appLogic.platformIntegration.setShowBlockingOverlay(true, "$blockedAppPackageName:${blockedAppActivityName?.removePrefix(blockedAppPackageName)}")
+        }
 
         if (isChromeOs) {
             LockActivity.currentInstances.forEach { it.finish() }
@@ -139,7 +143,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
             }
         }
 
-        if (appLogic.platformIntegration.isAccessibilityServiceEnabled()) {
+        if (appLogic.platformIntegration.isAccessibilityServiceEnabled() && !enableSoftBlocking) {
             if (blockedAppPackageName != appLogic.platformIntegration.getLauncherAppPackageName()) {
                 AccessibilityService.instance?.showHomescreen()
                 delay(100)
@@ -602,7 +606,11 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
                 // handle blocking
                 if (blockedForegroundApp != null) {
-                    openLockscreen(blockedForegroundApp.packageName, blockedForegroundApp.activityName)
+                    openLockscreen(
+                            blockedAppPackageName = blockedForegroundApp.packageName,
+                            blockedAppActivityName = blockedForegroundApp.activityName,
+                            enableSoftBlocking = deviceRelatedData.experimentalFlags and ExperimentalFlags.ENABLE_SOFT_BLOCKING == ExperimentalFlags.ENABLE_SOFT_BLOCKING
+                    )
                 } else {
                     appLogic.platformIntegration.setShowBlockingOverlay(false)
                 }
