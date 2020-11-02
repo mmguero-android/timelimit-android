@@ -27,7 +27,7 @@ object Dns {
     val instance = object: Dns {
         val system = Dns.SYSTEM
 
-        override fun lookup(hostname: String): MutableList<InetAddress> {
+        override fun lookup(hostname: String): List<InetAddress> {
             if (BuildConfig.DEBUG) {
                 Log.d(LOG_TAG, "looking up $hostname")
             }

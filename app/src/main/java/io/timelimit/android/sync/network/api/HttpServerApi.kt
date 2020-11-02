@@ -21,12 +21,12 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.waitForResponse
 import io.timelimit.android.sync.network.*
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
 import okhttp3.RequestBody
 import okio.BufferedSink
 import okio.GzipSink
-import okio.Okio
+import okio.buffer
 import java.io.OutputStreamWriter
 
 class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
@@ -55,16 +55,15 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         private const val MAIL_LOGIN_TOKEN = "mailLoginToken"
         private const val RECEIVED_CODE = "receivedCode"
 
-        private val JSON = MediaType.parse("application/json; charset=utf-8")
+        private val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
 
         private fun createJsonRequestBody(serialize: (writer: JsonWriter) -> Unit) = object: RequestBody() {
             override fun contentType() = JSON
             override fun writeTo(sink: BufferedSink) {
                 val writer = JsonWriter(
                         OutputStreamWriter(
-                                Okio.buffer(
-                                        GzipSink(sink)
-                                ).outputStream()
+                                GzipSink(sink)
+                                        .buffer().outputStream()
                         )
                 )
 
@@ -86,7 +85,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
             it.assertSuccess()
 
             return Threads.network.executeAndWait {
-                val body = it.body()!!
+                val body = it.body!!
                 val reader = JsonReader(body.charStream())
                 var result: Long? = null
 
@@ -121,7 +120,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 var response: String? = null
@@ -171,7 +170,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 var response: String? = null
@@ -210,7 +209,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 StatusOfMailAddressResponse.parse(JsonReader(body.charStream()))
@@ -245,7 +244,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 AddDeviceResponse.parse(JsonReader(body.charStream()))
@@ -275,7 +274,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 AddDeviceResponse.parse(JsonReader(body.charStream()))
@@ -329,7 +328,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 AddDeviceResponse.parse(JsonReader(body.charStream()))
@@ -347,7 +346,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 ActionUploadResponse.parse(JsonReader(body.charStream()))
@@ -376,7 +375,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 ServerDataStatus.parse(JsonReader(body.charStream()))
@@ -404,7 +403,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
         ).waitForResponse().use {
             it.assertSuccess()
 
-            val body = it.body()!!
+            val body = it.body!!
 
             return Threads.network.executeAndWait {
                 CreateAddDeviceTokenResponse.parse(JsonReader(body.charStream()))
@@ -434,7 +433,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
             response.assertSuccess()
 
             return Threads.network.executeAndWait {
-                val reader = JsonReader(response.body()!!.charStream())
+                val reader = JsonReader(response.body!!.charStream())
 
                 CanDoPurchaseParser.parse(reader)
             }
@@ -505,7 +504,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
             response.assertSuccess()
 
             return Threads.network.executeAndWait {
-                val reader = JsonReader(response.body()!!.charStream())
+                val reader = JsonReader(response.body!!.charStream())
 
                 UpdatePrimaryDeviceResponse.parse(reader)
             }
@@ -529,7 +528,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
             response.assertSuccess()
 
             return Threads.network.executeAndWait {
-                val reader = JsonReader(response.body()!!.charStream())
+                val reader = JsonReader(response.body!!.charStream())
 
                 reader.skipValue()
             }
@@ -592,7 +591,7 @@ class HttpServerApi(private val endpointWithoutSlashAtEnd: String): ServerApi {
             response.assertSuccess()
 
             return Threads.network.executeAndWait {
-                val reader = JsonReader(response.body()!!.charStream())
+                val reader = JsonReader(response.body!!.charStream())
                 var result: Boolean? = null
 
                 reader.beginObject()

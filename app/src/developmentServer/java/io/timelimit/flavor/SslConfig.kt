@@ -16,8 +16,13 @@
 package io.timelimit.flavor
 
 import okhttp3.CertificatePinner
+import okhttp3.tls.HandshakeCertificates
 
-object CertificatePinning {
-    val configuration = CertificatePinner.Builder()
+object SslConfig {
+    val certificatePinner: CertificatePinner = CertificatePinner.Builder()
+            .build()
+
+    val certificates: HandshakeCertificates = HandshakeCertificates.Builder()
+            .addPlatformTrustedCertificates()
             .build()
 }

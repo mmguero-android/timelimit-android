@@ -29,7 +29,7 @@ class TooManyRequestsHttpError(): HttpError()
 
 fun Response.assertSuccess() {
     if (!this.isSuccessful) {
-        val code = this.code()
+        val code = this.code
 
         when (code) {
             400 -> throw BadRequestHttpError()

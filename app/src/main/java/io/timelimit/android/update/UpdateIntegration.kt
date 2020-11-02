@@ -38,7 +38,9 @@ import io.timelimit.android.sync.network.api.assertSuccess
 import io.timelimit.android.sync.network.api.httpClient
 import io.timelimit.android.ui.update.InstallUpdateDialogFragment
 import okhttp3.Request
-import okio.Okio
+import okio.buffer
+import okio.sink
+import okio.source
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
@@ -147,7 +149,7 @@ object UpdateIntegration {
             response.assertSuccess()
 
             return Threads.update.executeAndWait {
-                JsonReader(response.body()!!.charStream()).use { reader ->
+                JsonReader(response.body!!.charStream()).use { reader ->
                     UpdateStatus.parse(reader)
                 }
             }
@@ -165,8 +167,8 @@ object UpdateIntegration {
             response.assertSuccess()
 
             Threads.update.executeAndWait {
-                response.body()!!.source().use { source ->
-                    Okio.buffer(Okio.sink(updateSaveFile(context))).use { sink ->
+                response.body!!.source().use { source ->
+                    updateSaveFile(context).sink().buffer().use { sink ->
                         sink.writeAll(source)
                     }
                 }
@@ -204,8 +206,8 @@ object UpdateIntegration {
 
             Threads.update.submit {
                 try {
-                    Okio.buffer(Okio.sink(externalFile)).use { sink ->
-                        Okio.source(updateSaveFile(context)).use { source ->
+                    externalFile.sink().buffer().use { sink ->
+                        updateSaveFile(context).source().use { source ->
                             sink.writeAll(source)
                         }
                     }

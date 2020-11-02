@@ -17,14 +17,15 @@ package io.timelimit.android.sync.network.api
 
 import android.util.Log
 import io.timelimit.android.BuildConfig
-import io.timelimit.flavor.CertificatePinning
+import io.timelimit.flavor.SslConfig
 import io.timelimit.flavor.Dns
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 val httpClient: OkHttpClient by lazy {
     val builder = OkHttpClient.Builder()
-            .certificatePinner(CertificatePinning.configuration)
+            .certificatePinner(SslConfig.certificatePinner)
+            .sslSocketFactory(SslConfig.certificates.sslSocketFactory(), SslConfig.certificates.trustManager)
             .dns(Dns.instance)
 
     if (BuildConfig.DEBUG) {

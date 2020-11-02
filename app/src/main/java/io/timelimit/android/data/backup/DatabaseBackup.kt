@@ -25,7 +25,9 @@ import io.timelimit.android.data.RoomDatabase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okio.Okio
+import okio.buffer
+import okio.sink
+import okio.source
 import java.util.concurrent.Executors
 
 class DatabaseBackup(private val context: Context) {
@@ -113,7 +115,7 @@ class DatabaseBackup(private val context: Context) {
                 try {
                     // create a temp copy of the database
                     databaseBackupFile.delete()
-                    Okio.buffer(Okio.source(databaseFile)).readAll(Okio.sink(databaseBackupFile))
+                    databaseFile.source().buffer().readAll(databaseBackupFile.sink())
 
                     // open the temp copy
                     val database = RoomDatabase.createOrOpenLocalStorageInstance(context, RoomDatabase.BACKUP_DB_NAME)
