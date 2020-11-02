@@ -13,17 +13,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package io.timelimit.android.ui.manage.child.advanced.manageblocktemporarily
+package io.timelimit.android.ui.manage.child.category.specialmode
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.timelimit.android.ui.list.TextViewHolder
-import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.DisableTimelimitsOption
 import kotlin.properties.Delegates
 
-class BlockTemporarilyEndTimeAdapter: RecyclerView.Adapter<TextViewHolder>() {
-    var items: List<DisableTimelimitsOption> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
-    var listener: BlockTemporarilyEndTimeAdapterListener? = null
+class SpecialModeOptionAdapter: RecyclerView.Adapter<TextViewHolder>() {
+    var items: List<SpecialModeOption> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
+    var listener: SpecialModeOptionListener? = null
 
     init {
         setHasStableIds(true)
@@ -42,6 +41,6 @@ class BlockTemporarilyEndTimeAdapter: RecyclerView.Adapter<TextViewHolder>() {
     }
 }
 
-interface BlockTemporarilyEndTimeAdapterListener {
-    fun onItemClicked(item: DisableTimelimitsOption)
+interface SpecialModeOptionListener {
+    fun onItemClicked(item: SpecialModeOption)
 }

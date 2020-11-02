@@ -27,6 +27,7 @@
     <string name="manage_disable_time_limits_btn_today">für Heute</string>
     <string name="manage_disable_time_limits_btn_time">bis zu einer Uhrzeit</string>
     <string name="manage_disable_time_limits_btn_date">bis zu einem Datum</string>
+    <string name="manage_disable_time_limits_btn_no_end_time">ohne geplante Endzeit</string>
 
     <string name="manage_disable_time_limits_dialog_until">Zeitbegrenzungen deaktivieren bis ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">Der gewählte Zeitpunkt liegt in der Vergangenheit</string>

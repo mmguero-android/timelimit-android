@@ -28,5 +28,11 @@ data class CategoryItem(
         val usedTimeToday: Long,
         val usedForNotAssignedApps: Boolean,
         val parentCategoryId: String?,
-        val categoryNestingLevel: Int
+        val categoryNestingLevel: Int,
+        val mode: CategorySpecialMode
 ): ManageChildCategoriesListItem()
+
+sealed class CategorySpecialMode {
+    object None: CategorySpecialMode()
+    data class TemporarilyBlocked(val endTime: Long?): CategorySpecialMode()
+}

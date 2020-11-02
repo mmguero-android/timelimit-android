@@ -34,7 +34,7 @@ import io.timelimit.android.logic.RealTime
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
-import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.*
+import io.timelimit.android.ui.manage.child.category.specialmode.*
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -138,7 +138,7 @@ class BlockTemporarilyDialogFragment: DialogFragment() {
             binding.flipper.displayedChild = savedInstanceState.getInt(STATE_PAGE)
         }
 
-        val endOptionAdapter = BlockTemporarilyEndTimeAdapter()
+        val endOptionAdapter = SpecialModeOptionAdapter()
 
         childCategories.observe(viewLifecycleOwner, Observer { categories ->
             val now = now()
@@ -151,8 +151,8 @@ class BlockTemporarilyDialogFragment: DialogFragment() {
                     .sorted()
 
             endOptionAdapter.items =  endTimes.map {
-                DisableTimelimitsDurationItemFixedEndTime(timestamp = it)
-            } + DisableTimelimitsDuration.items
+                SpecialModeOption.Duration.FixedEndTime(timestamp = it)
+            } + SpecialModeDuration.items
         })
 
         database.user().getChildUserByIdLive(childId).observe(viewLifecycleOwner, Observer { child ->
@@ -161,26 +161,27 @@ class BlockTemporarilyDialogFragment: DialogFragment() {
                 return@Observer
             }
 
-            endOptionAdapter.listener = object: BlockTemporarilyEndTimeAdapterListener {
-                override fun onItemClicked(item: DisableTimelimitsOption) {
+            endOptionAdapter.listener = object: SpecialModeOptionListener {
+                override fun onItemClicked(item: SpecialModeOption) {
                     when (item) {
-                        is DisableTimelimitsUntilTimeOption -> {
+                        is SpecialModeOption.UntilTimeOption -> {
                             binding.flipper.setInAnimation(context!!, R.anim.wizard_open_step_in)
                             binding.flipper.setOutAnimation(context!!, R.anim.wizard_open_step_out)
                             binding.flipper.displayedChild = PAGE_TIME
                         }
-                        is DisableTimelimitsUntilDateOption -> {
+                        is SpecialModeOption.UntilDateOption -> {
                             binding.flipper.setInAnimation(context!!, R.anim.wizard_open_step_in)
                             binding.flipper.setOutAnimation(context!!, R.anim.wizard_open_step_out)
                             binding.flipper.displayedChild = PAGE_DATE
                         }
-                        is DisableTimelimitsDurationItem -> {
+                        is SpecialModeOption.Duration -> {
                             applyTimestamp(item.getTime(
                                     currentTimestamp = now(),
                                     timezone = child.timeZone
                             )
                             )
                         }
+                        SpecialModeOption.NoEndTimeOption -> throw IllegalArgumentException()
                     }.let {/* require handling all paths */}
                 }
             }

@@ -38,6 +38,7 @@
     <string name="overview_device_item_older_version">verwendet eine ältere TimeLimit-Version</string>
 
     <string name="overview_user_item_temporarily_blocked">vorübergehend gesperrt</string>
+    <string name="overview_user_item_temporarily_blocked_until">gesperrt bis %s</string>
     <string name="overview_user_item_temporarily_disabled">Zeitbegrenzungen vorübergehend deaktiviert</string>
     <string name="overview_user_item_role_child">wird eingeschränkt</string>
     <string name="overview_user_item_role_parent">kann Einstellungen ändern</string>

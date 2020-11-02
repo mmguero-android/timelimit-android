@@ -23,10 +23,6 @@
             type="String" />
 
         <variable
-            name="isBlockedTimeNow"
-            type="Boolean" />
-
-        <variable
             name="usedTimeToday"
             type="String" />
 
@@ -37,6 +33,14 @@
         <variable
             name="usedForAppsWithoutCategory"
             type="boolean" />
+
+        <variable
+            name="isTemporarilyBlocked"
+            type="boolean" />
+
+        <variable
+            name="temporarilyBlockedUntil"
+            type="String" />
 
         <import type="android.text.TextUtils" />
         <import type="android.view.View" />
@@ -62,45 +66,71 @@
             android:layout_height="wrap_content">
             <LinearLayout
                 android:padding="8dp"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:textAppearance="?android:textAppearanceLarge"
-                    android:text="@{title}"
-                    tools:text="Erlaubte Apps"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:visibility="@{usedForAppsWithoutCategory ? View.VISIBLE : View.GONE}"
-                    android:text="@string/manage_child_category_for_unassigned_apps"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:text="@{title}"
+                        tools:text="Erlaubte Apps"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                <TextView
-                    android:visibility="@{TextUtils.isEmpty(usedTimeToday) ? View.GONE : View.VISIBLE}"
-                    android:text="@{usedTimeToday}"
-                    tools:text="2 Minuten benutzt"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:visibility="@{usedForAppsWithoutCategory ? View.VISIBLE : View.GONE}"
+                        android:text="@string/manage_child_category_for_unassigned_apps"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                <TextView
-                    android:visibility="@{TextUtils.isEmpty(remainingTimeToday) ? View.GONE : View.VISIBLE}"
-                    android:text="@{remainingTimeToday}"
-                    tools:text="5 Minuten verbleibend"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:visibility="@{TextUtils.isEmpty(usedTimeToday) ? View.GONE : View.VISIBLE}"
+                        android:text="@{usedTimeToday}"
+                        tools:text="2 Minuten benutzt"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                <TextView
-                    android:visibility="@{TextUtils.isEmpty(remainingTimeToday) ? View.VISIBLE : View.GONE}"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:text="@string/manage_child_category_no_time_limits"
-                    android:layout_width="match_parent"
+                    <TextView
+                        android:visibility="@{TextUtils.isEmpty(remainingTimeToday) ? View.GONE : View.VISIBLE}"
+                        android:text="@{remainingTimeToday}"
+                        tools:text="5 Minuten verbleibend"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:visibility="@{TextUtils.isEmpty(remainingTimeToday) ? View.VISIBLE : View.GONE}"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:text="@string/manage_child_category_no_time_limits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        tools:ignore="UnusedAttribute"
+                        android:drawableTint="?colorOnSurface"
+                        android:drawablePadding="8dp"
+                        android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                        android:visibility="@{isTemporarilyBlocked ? View.VISIBLE : View.GONE}"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        tools:text="@string/overview_user_item_temporarily_blocked"
+                        android:text="@{TextUtils.isEmpty(temporarilyBlockedUntil) ? @string/overview_user_item_temporarily_blocked : @string/overview_user_item_temporarily_blocked_until(temporarilyBlockedUntil)}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/category_switch"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
             </LinearLayout>

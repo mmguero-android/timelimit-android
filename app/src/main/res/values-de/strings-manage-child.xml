@@ -57,4 +57,6 @@
     <string name="manage_child_password_btn_change">Passwort ändern (als das Kind selbst)</string>
 
     <string name="manage_child_redirected_toast">Mit der Zurück-Taste geht es zur Übersicht von TimeLimit</string>
+
+    <string name="manage_child_special_mode_wizard_block_title">%s vorübergehend sperren</string>
 </resources>

@@ -17,6 +17,7 @@ package io.timelimit.android.ui.manage.child.category
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.ExperimentalFlags
@@ -59,42 +60,83 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
         liveDataFromFunction { DateInTimezone.newInstance(logic.realTimeLogic.getCurrentTimeInMillis(), timeZone) }
     }.ignoreUnchanged()
 
-    private val categoryItems = childRelatedData.switchMap { userRelatedData ->
-        childDate.switchMap { childDate ->
-            childMinuteOfWeek.map { childMinuteOfWeek ->
-                if (userRelatedData != null) {
-                    val firstDayOfWeek = childDate.dayOfEpoch - childDate.dayOfWeek
+    private val categoryItems = object: MediatorLiveData<List<CategoryItem>>() {
+        private var didLoadUserRelatedData = false
+        private val timeModificationListener: () -> Unit = { update() }
+        private val scheduledUpdateListener: Runnable = Runnable { update() }
 
-                    userRelatedData.sortedCategories().map { (level, category) ->
-                        val rules = category.rules
-                        val usedTimeItemsForCategory = category.usedTimes
-
-                        CategoryItem(
-                                category = category.category,
-                                isBlockedTimeNow = category.category.blockedMinutesInWeek.read(childMinuteOfWeek),
-                                remainingTimeToday = RemainingTime.getRemainingTime(
-                                        dayOfWeek = childDate.dayOfWeek,
-                                        usedTimes = usedTimeItemsForCategory,
-                                        rules = rules,
-                                        extraTime = category.category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
-                                        minuteOfDay = childMinuteOfWeek % MinuteOfDay.LENGTH,
-                                        firstDayOfWeekAsEpochDay = firstDayOfWeek
-                                )?.includingExtraTime,
-                                usedTimeToday = usedTimeItemsForCategory.find { item ->
-                                    item.dayOfEpoch == childDate.dayOfEpoch && item.startTimeOfDay == MinuteOfDay.MIN &&
-                                            item.endTimeOfDay == MinuteOfDay.MAX
-                                }?.usedMillis ?: 0,
-                                usedForNotAssignedApps = category.category.id == userRelatedData.user.categoryForNotAssignedApps,
-                                parentCategoryId = if (level == 0) null else category.category.parentCategoryId,
-                                categoryNestingLevel = level
-                        )
-                    }
-                } else {
-                    emptyList()
-                }
-            }
+        init {
+            addSource(childDate) { update() }
+            addSource(childMinuteOfWeek) { update() }
+            addSource(childRelatedData) { didLoadUserRelatedData = true; update() }
         }
-    }.ignoreUnchanged()
+
+        fun update() {
+            if (!didLoadUserRelatedData) return
+
+            val userRelatedData = childRelatedData.value
+            val childDate = childDate.value ?: return
+            val childMinuteOfWeek = childMinuteOfWeek.value ?: return
+            val timeInMillis = logic.realTimeLogic.getCurrentTimeInMillis()
+            var validForDuration = Long.MAX_VALUE
+
+            value = if (userRelatedData != null) {
+                val firstDayOfWeek = childDate.dayOfEpoch - childDate.dayOfWeek
+
+                userRelatedData.sortedCategories().map { (level, category) ->
+                    val rules = category.rules
+                    val usedTimeItemsForCategory = category.usedTimes
+
+                    CategoryItem(
+                            category = category.category,
+                            isBlockedTimeNow = category.category.blockedMinutesInWeek.read(childMinuteOfWeek),
+                            remainingTimeToday = RemainingTime.getRemainingTime(
+                                    dayOfWeek = childDate.dayOfWeek,
+                                    usedTimes = usedTimeItemsForCategory,
+                                    rules = rules,
+                                    extraTime = category.category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
+                                    minuteOfDay = childMinuteOfWeek % MinuteOfDay.LENGTH,
+                                    firstDayOfWeekAsEpochDay = firstDayOfWeek
+                            )?.includingExtraTime,
+                            usedTimeToday = usedTimeItemsForCategory.find { item ->
+                                item.dayOfEpoch == childDate.dayOfEpoch && item.startTimeOfDay == MinuteOfDay.MIN &&
+                                        item.endTimeOfDay == MinuteOfDay.MAX
+                            }?.usedMillis ?: 0,
+                            usedForNotAssignedApps = category.category.id == userRelatedData.user.categoryForNotAssignedApps,
+                            parentCategoryId = if (level == 0) null else category.category.parentCategoryId,
+                            categoryNestingLevel = level,
+                            mode = category.category.let {
+                                if (it.temporarilyBlocked && it.temporarilyBlockedEndTime == 0L) {
+                                    CategorySpecialMode.TemporarilyBlocked(endTime = null)
+                                } else if (it.temporarilyBlocked && it.temporarilyBlockedEndTime != 0L && it.temporarilyBlockedEndTime >= timeInMillis) {
+                                    validForDuration = it.temporarilyBlockedEndTime + 1 - timeInMillis
+
+                                    CategorySpecialMode.TemporarilyBlocked(endTime = it.temporarilyBlockedEndTime)
+                                } else CategorySpecialMode.None
+                            }
+                    )
+                }
+            } else {
+                emptyList()
+            }
+
+            logic.timeApi.cancelScheduledAction(scheduledUpdateListener)
+            if (validForDuration != Long.MAX_VALUE) logic.timeApi.runDelayed(scheduledUpdateListener, validForDuration.coerceAtLeast(100))
+        }
+
+        override fun onActive() {
+            super.onActive()
+
+            logic.realTimeLogic.registerTimeModificationListener(timeModificationListener)
+        }
+
+        override fun onInactive() {
+            super.onInactive()
+
+            logic.realTimeLogic.unregisterTimeModificationListener(timeModificationListener)
+            logic.timeApi.cancelScheduledAction(scheduledUpdateListener)
+        }
+    }
 
     private val hasShownHint = logic.database.config().wereHintsShown(HintsToShow.CATEGORIES_INTRODUCTION)
 

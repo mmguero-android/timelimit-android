@@ -13,7 +13,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="manage_disable_time_limits_title">Disable time limits</string>
     <string name="manage_disable_time_limits_text">Using this, all time limits and blocked time areas can be disabled</string>
     <string name="manage_disable_time_limits_info_enabled">Time limits are disabled until %s</string>
@@ -27,6 +27,7 @@
     <string name="manage_disable_time_limits_btn_today">for today</string>
     <string name="manage_disable_time_limits_btn_time">until a time</string>
     <string name="manage_disable_time_limits_btn_date">until a date</string>
+    <string name="manage_disable_time_limits_btn_no_end_time" tools:ignore="MissingTranslation">no scheduled end time</string>
 
     <string name="manage_disable_time_limits_dialog_until">Disable time limits until ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">The selected time is in the past</string>

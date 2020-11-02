@@ -20,8 +20,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,11 +34,13 @@ import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.UpdateCategorySortingAction
+import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.manage.child.ManageChildFragmentDirections
 import io.timelimit.android.ui.manage.child.category.create.CreateCategoryDialogFragment
+import io.timelimit.android.ui.manage.child.category.specialmode.SetCategorySpecialModeFragment
 import kotlinx.android.synthetic.main.fragment_manage_child_categories.*
 
 class ManageChildCategoriesFragment : Fragment() {
@@ -48,12 +50,10 @@ class ManageChildCategoriesFragment : Fragment() {
         }
     }
 
-    private val params: ManageChildFragmentArgs by lazy { ManageChildFragmentArgs.fromBundle(arguments!!) }
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
-    private val model: ManageChildCategoriesModel by lazy {
-        ViewModelProviders.of(this).get(ManageChildCategoriesModel::class.java)
-    }
+    private val params: ManageChildFragmentArgs by lazy { ManageChildFragmentArgs.fromBundle(requireArguments()) }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
+    private val model: ManageChildCategoriesModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_manage_child_categories, container, false)
@@ -80,6 +80,41 @@ class ManageChildCategoriesFragment : Fragment() {
                 if (auth.requestAuthenticationOrReturnTrueAllowChild(childId = params.childId)) {
                     CreateCategoryDialogFragment.newInstance(childId = params.childId)
                             .show(parentFragmentManager)
+                }
+            }
+
+            override fun onCategorySwitched(category: CategoryItem, isChecked: Boolean): Boolean {
+                return if (isChecked) {
+                    if (auth.isParentAuthenticated()) {
+                        auth.tryDispatchParentAction(
+                                UpdateCategoryTemporarilyBlockedAction(
+                                        categoryId = category.category.id,
+                                        endTime = null,
+                                        blocked = false
+                                )
+                        )
+                    } else if (
+                            auth.isParentOrChildAuthenticated(params.childId) &&
+                            (!(category.mode is CategorySpecialMode.TemporarilyBlocked && category.mode.endTime == null))
+                    ) {
+                        SetCategorySpecialModeFragment.newInstance(
+                                childId = params.childId,
+                                categoryId = category.category.id,
+                                selfLimitMode = true
+                        ).show(parentFragmentManager)
+
+                        false
+                    } else { auth.requestAuthentication(); false }
+                } else /* if (!isChecked) */ {
+                    if (auth.requestAuthenticationOrReturnTrueAllowChild(childId = params.childId)) {
+                        SetCategorySpecialModeFragment.newInstance(
+                                childId = params.childId,
+                                categoryId = category.category.id,
+                                selfLimitMode = !auth.isParentAuthenticated()
+                        ).show(parentFragmentManager)
+                    }
+
+                    false
                 }
             }
         }

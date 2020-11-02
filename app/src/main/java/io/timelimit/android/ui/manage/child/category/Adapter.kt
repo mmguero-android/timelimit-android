@@ -15,6 +15,7 @@
  */
 package io.timelimit.android.ui.manage.child.category
 
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -116,7 +117,6 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
                 val context = binding.root.context
 
                 binding.title = item.category.title
-                binding.isBlockedTimeNow = item.isBlockedTimeNow
                 binding.remainingTimeToday = if (item.remainingTimeToday != null) {
                     TimeTextUtil.remaining(item.remainingTimeToday.toInt(), context)
                 } else {
@@ -132,8 +132,28 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
                         CategoryItemLeftPadding.calculate(item.categoryNestingLevel, context),
                         0
                 )
+                binding.isTemporarilyBlocked = item.mode is CategorySpecialMode.TemporarilyBlocked
+                binding.temporarilyBlockedUntil = if (item.mode is CategorySpecialMode.TemporarilyBlocked)
+                    item.mode.endTime?.let {
+                        DateUtils.formatDateTime(
+                                context,
+                                it,
+                                DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or
+                                        DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_WEEKDAY
+                        )
+                    } else null
 
                 binding.card.setOnClickListener { handlers?.onCategoryClicked(item.category) }
+
+                val shouldBeChecked = item.mode == CategorySpecialMode.None
+                binding.categorySwitch.setOnCheckedChangeListener { _, _ ->  }
+                binding.categorySwitch.isChecked = shouldBeChecked
+                binding.categorySwitch.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked != shouldBeChecked) {
+                        if (handlers?.onCategorySwitched(item, isChecked) != true)
+                            binding.categorySwitch.isChecked = shouldBeChecked
+                    }
+                }
 
                 binding.executePendingBindings()
             }
@@ -159,4 +179,5 @@ class ItemViewHolder(val binding: CategoryRichCardBinding): ViewHolder(binding.r
 interface Handlers {
     fun onCategoryClicked(category: Category)
     fun onCreateCategoryClicked()
+    fun onCategorySwitched(category: CategoryItem, isChecked: Boolean): Boolean
 }
