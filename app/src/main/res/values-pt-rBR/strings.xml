@@ -668,15 +668,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
     <string name="manage_category_section_all_apps">todos os Aplicativos</string>
 
     <string name="manage_child_tab_categories">Categorias</string>
-    <string name="manage_child_block_temporarily_title">bloqueio temporário</string>
-    <string name="manage_child_block_temporarily_text">
-        Selecionar categorias que devem ser bloqueadas temporariamente.
-        Você pode desativar o bloqueio automaticamente, mantendo uma categoria
-        e selecionando um tempo final.
-    </string>
-    <string name="manage_child_block_temporarily_no_end_time">%s (indefinidamente)</string>
-    <string name="manage_child_block_temporarily_until">%1$s (até %2$s)</string>
-    <string name="manage_child_block_temporarily_dialog_until">até %s</string>
 
     <string name="manage_child_category_no_time_limits">sem limite de tempo</string>
 

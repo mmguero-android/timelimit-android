@@ -19,6 +19,12 @@
         <variable
             name="title"
             type="String" />
+
+        <variable
+            name="isAddLimitMode"
+            type="boolean" />
+
+        <import type="android.view.View" />
     </data>
 
     <LinearLayout
@@ -44,7 +50,49 @@
                 android:id="@+id/type_selection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical">
+
+                <CheckedTextView
+                    android:text="@string/manage_child_special_mode_wizard_block_option"
+                    android:background="?selectableItemBackground"
+                    android:id="@+id/block_temporarily_option"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/listPreferredItemHeightSmall"
+                    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                    android:gravity="center_vertical"
+                    android:checkMark="?android:attr/listChoiceIndicatorSingle"
+                    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd" />
+
+                <CheckedTextView
+                    android:enabled="@{!isAddLimitMode}"
+                    android:text="@string/manage_child_special_mode_wizard_disable_limits_option"
+                    android:background="?selectableItemBackground"
+                    android:id="@+id/disable_limits_option"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/listPreferredItemHeightSmall"
+                    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+                    android:gravity="center_vertical"
+                    android:checkMark="?android:attr/listChoiceIndicatorSingle"
+                    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd" />
+
+                <TextView
+                    android:visibility="@{isAddLimitMode ? View.VISIBLE : View.GONE}"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:padding="8dp"
+                    android:text="@string/manage_disable_time_limits_toast_time_not_increased_but_child_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:padding="8dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:text="@string/purchase_required_info_local_mode_free"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/suggestion_list"

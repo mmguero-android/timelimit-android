@@ -35,4 +35,5 @@ data class CategoryItem(
 sealed class CategorySpecialMode {
     object None: CategorySpecialMode()
     data class TemporarilyBlocked(val endTime: Long?): CategorySpecialMode()
+    data class TemporarilyAllowed(val endTime: Long): CategorySpecialMode()
 }

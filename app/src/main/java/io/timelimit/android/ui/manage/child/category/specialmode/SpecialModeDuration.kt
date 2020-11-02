@@ -48,7 +48,7 @@ sealed class SpecialModeOption {
 
         class FixedEndTime(val timestamp: Long): Duration() {
             override fun getLabel(context: Context): String = context.getString(
-                    R.string.manage_child_block_temporarily_dialog_until,
+                    R.string.manage_disable_time_limits_btn_until,
                     DateUtils.formatDateTime(
                             context,
                             timestamp,

@@ -442,7 +442,8 @@ data class ServerUpdatedCategoryBaseData(
         val minBatteryLevelCharging: Int,
         val minBatteryLevelMobile: Int,
         val sort: Int,
-        val networks: List<ServerCategoryNetworkId>
+        val networks: List<ServerCategoryNetworkId>,
+        val disableLimitsUntil: Long
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -461,6 +462,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val MIN_BATTERY_LEVEL_CHARGING = "mblCharging"
         private const val SORT = "sort"
         private const val NETWORKS = "networks"
+        private const val DISABLE_LIMITS_UNTIL = "dlu"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -480,6 +482,7 @@ data class ServerUpdatedCategoryBaseData(
             var minBatteryLevelMobile = 0
             var sort = 0
             var networks: List<ServerCategoryNetworkId> = emptyList()
+            var disableLimitsUntil = 0L
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -500,6 +503,7 @@ data class ServerUpdatedCategoryBaseData(
                     MIN_BATTERY_LEVEL_MOBILE -> minBatteryLevelMobile = reader.nextInt()
                     SORT -> sort = reader.nextInt()
                     NETWORKS -> networks = ServerCategoryNetworkId.parseList(reader)
+                    DISABLE_LIMITS_UNTIL -> disableLimitsUntil = reader.nextLong()
                     else -> reader.skipValue()
                 }
             }
@@ -521,7 +525,8 @@ data class ServerUpdatedCategoryBaseData(
                     minBatteryLevelCharging = minBatteryLevelCharging,
                     minBatteryLevelMobile = minBatteryLevelMobile,
                     sort = sort,
-                    networks = networks
+                    networks = networks,
+                    disableLimitsUntil = disableLimitsUntil
             )
         }
 

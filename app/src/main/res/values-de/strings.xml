@@ -364,6 +364,7 @@
         \n- Apps zu einer Kategorie hinzufügen, sofern diese in einer Unterkategorie ihrer aktuellen Kategorie verschoben werden;
         Apps ohne Kategorie können zu einer Unterkategorie der Kategorie für Apps ohne Kategorie hinzugefügt werden
         \n- Kategorien vorübergehend Sperren/ vorübergehende Sperrung von Kategorien verlängern
+        \n- vorübergehende Deaktivierung der Begrenzungen einer Kategorie vorzeitig deaktivieren
     </string>
     <string name="child_self_limit_add_caused_missing_options_hint">
         Einige Optionen sind nicht verfügbar, weil kein Elternteil angemeldet ist
@@ -694,15 +695,6 @@
 
     <string name="manage_child_tab_categories">Kategorien</string>
     <string name="manage_child_tab_other">erweiterte Einstellungen</string>
-    <string name="manage_child_block_temporarily_title">Vorübergehend Sperren</string>
-    <string name="manage_child_block_temporarily_text">
-        Wählen Sie Kategorien, die vorübergehend gesperrt werden sollen.
-        Sie können die Sperre automatisch aufheben lassen, indem Sie lange auf eine Kategorie tippen
-        und dann eine Endzeit auswählen.
-    </string>
-    <string name="manage_child_block_temporarily_no_end_time">%s (dauerhaft)</string>
-    <string name="manage_child_block_temporarily_until">%1$s (bis %2$s)</string>
-    <string name="manage_child_block_temporarily_dialog_until">bis %s</string>
 
     <string name="manage_child_category_no_time_limits">Keine Zeitbegrenzung</string>
 
@@ -737,6 +729,9 @@
     <string name="manage_child_redirected_toast">Mit der Zurück-Taste geht es zur Übersicht von TimeLimit</string>
 
     <string name="manage_child_special_mode_wizard_block_title">%s vorübergehend sperren</string>
+    <string name="manage_child_special_mode_wizard_block_option">vorübergehend sperren</string>
+    <string name="manage_child_special_mode_wizard_disable_limits_title">Begrenzungen von %s deaktivieren</string>
+    <string name="manage_child_special_mode_wizard_disable_limits_option">Begrenzungen vorübergehend deaktivieren</string>
 
     <string name="manage_device_activity_level_blocking_title">Sperren auf Activity-Ebene</string>
     <string name="manage_device_activity_level_blocking_text">
@@ -947,10 +942,11 @@
     <string name="manage_disable_time_limits_btn_time">bis zu einer Uhrzeit</string>
     <string name="manage_disable_time_limits_btn_date">bis zu einem Datum</string>
     <string name="manage_disable_time_limits_btn_no_end_time">ohne geplante Endzeit</string>
+    <string name="manage_disable_time_limits_btn_until">bis %s</string>
 
     <string name="manage_disable_time_limits_dialog_until">Zeitbegrenzungen deaktivieren bis ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">Der gewählte Zeitpunkt liegt in der Vergangenheit</string>
-    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">Ohne Anmeldung als Elternteil darf die Zeit verlängert werden, aber nicht verkürzt werden</string>
+    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">Ohne Anmeldung als Elternteil darf die Sperrung verlängert werden, aber nicht verkürzt werden</string>
 
     <string name="manage_parent_change_password_title">Passwort ändern</string>
     <string name="manage_parent_change_password_text">Mit der Kentniss des aktuellen Passworts ein neues Passwort wählen</string>
@@ -1112,6 +1108,7 @@
     <string name="overview_user_item_temporarily_blocked">vorübergehend gesperrt</string>
     <string name="overview_user_item_temporarily_blocked_until">gesperrt bis %s</string>
     <string name="overview_user_item_temporarily_disabled">Zeitbegrenzungen vorübergehend deaktiviert</string>
+    <string name="overview_user_item_temporarily_disabled_until">Zeitbegrenzungen deaktiviert bis %s</string>
     <string name="overview_user_item_role_child">wird eingeschränkt</string>
     <string name="overview_user_item_role_parent">kann Einstellungen ändern</string>
 

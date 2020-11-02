@@ -32,6 +32,7 @@ import io.timelimit.android.databinding.SpecialModeDialogBinding
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
@@ -71,6 +72,26 @@ class SetCategorySpecialModeFragment: DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val childId = requireArguments().getString(CHILD_ID)!!
+        val categoryId = requireArguments().getString(CATEGORY_ID)!!
+        val selfLimitMode = requireArguments().getBoolean(SELF_LIMIT_MODE)
+
+        model.init(childId = childId, categoryId = categoryId, selfLimitAddMode = selfLimitMode)
+
+        if (selfLimitMode) {
+            auth.authenticatedUserOrChild.observe(viewLifecycleOwner) { if (it == null) dismissAllowingStateLoss() }
+        } else {
+            auth.authenticatedUser.observe(viewLifecycleOwner) { if (it == null) dismissAllowingStateLoss() }
+        }
+
+        model.hasPremium.observe(this) { hasPremium ->
+            if (!hasPremium) {
+                RequiresPurchaseDialogFragment().show(parentFragmentManager)
+
+                dismissAllowingStateLoss()
+            }
+        }
+
         val binding = SpecialModeDialogBinding.inflate(inflater, container, false)
         val flipper = binding.flipper
 
@@ -107,6 +128,7 @@ class SetCategorySpecialModeFragment: DialogFragment() {
                     binding.title = getString(
                             when (screen.type) {
                                 SetCategorySpecialModeModel.Type.BlockTemporarily -> R.string.manage_child_special_mode_wizard_block_title
+                                SetCategorySpecialModeModel.Type.DisableLimits -> R.string.manage_child_special_mode_wizard_disable_limits_title
                             },
                             content.categoryTitle
                     )
@@ -124,20 +146,10 @@ class SetCategorySpecialModeFragment: DialogFragment() {
             }.let {/* require handling all cases */}
         }
 
-        binding.typeSelection.let { list ->
-            fun buildSingleChoiceRow(): CheckedTextView = LayoutInflater.from(requireContext()).inflate(
-                    android.R.layout.simple_list_item_single_choice,
-                    list,
-                    false
-            ) as CheckedTextView
+        binding.blockTemporarilyOption.setOnClickListener { model.selectType(SetCategorySpecialModeModel.Type.BlockTemporarily) }
+        binding.disableLimitsOption.setOnClickListener { model.selectType(SetCategorySpecialModeModel.Type.DisableLimits) }
 
-            buildSingleChoiceRow().also { row ->
-                row.setText(R.string.manage_child_block_temporarily_title)
-                row.setOnClickListener { model.selectType(SetCategorySpecialModeModel.Type.BlockTemporarily) }
-
-                list.addView(row)
-            }
-        }
+        binding.isAddLimitMode = selfLimitMode
 
         binding.suggestionList.also {
             it.adapter = specialModeOptionAdapter
@@ -225,22 +237,6 @@ class SetCategorySpecialModeFragment: DialogFragment() {
         }
 
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val childId = requireArguments().getString(CHILD_ID)!!
-        val categoryId = requireArguments().getString(CATEGORY_ID)!!
-        val selfLimitMode = requireArguments().getBoolean(SELF_LIMIT_MODE)
-
-        model.init(childId = childId, categoryId = categoryId, selfLimitAddMode = selfLimitMode)
-
-        if (selfLimitMode) {
-            auth.authenticatedUserOrChild.observe(viewLifecycleOwner) { if (it == null) dismissAllowingStateLoss() }
-        } else {
-            auth.authenticatedUser.observe(viewLifecycleOwner) { if (it == null) dismissAllowingStateLoss() }
-        }
     }
 
     fun show(fragmentManager: FragmentManager) = showSafe(fragmentManager, DIALOG_TAG)

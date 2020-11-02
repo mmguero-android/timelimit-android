@@ -28,6 +28,7 @@ import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.actions.UpdateCategoryDisableLimitsAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
 import io.timelimit.android.ui.main.ActivityViewModel
 
@@ -43,6 +44,7 @@ class SetCategorySpecialModeModel(application: Application): AndroidViewModel(ap
     fun now() = logic.realTimeLogic.getCurrentTimeInMillis()
 
     val nowLive = liveDataFromFunction { now() }
+    val hasPremium = logic.fullVersion.shouldProvideFullVersionFunctions
 
     private val userRelatedData = childAndCategoryId.switchMap { (childId, categoryId) ->
         logic.database.derivedDataDao().getUserRelatedDataLive(childId).map {
@@ -106,6 +108,7 @@ class SetCategorySpecialModeModel(application: Application): AndroidViewModel(ap
                         if (selfLimitAddMode) SpecialModeDuration.items
                         else listOf(SpecialModeOption.NoEndTimeOption) + SpecialModeDuration.items
                     }
+                    Type.DisableLimits -> SpecialModeDuration.items
                 }.let { options ->
                     Screen.WithType.SuggestionList(
                             type = type,
@@ -178,6 +181,21 @@ class SetCategorySpecialModeModel(application: Application): AndroidViewModel(ap
 
                         requestClose.value = true
                     }
+                    Type.DisableLimits -> {
+                        val endTime = selection.getTime(
+                                currentTimestamp = now(),
+                                timezone = content.childTimezone
+                        )
+
+                        auth.tryDispatchParentAction(
+                                UpdateCategoryDisableLimitsAction(
+                                        categoryId = content.categoryId,
+                                        endTime = endTime
+                                )
+                        )
+
+                        requestClose.value = true
+                    }
                 }.let {/* require handling all paths */ }
                 SpecialModeOption.NoEndTimeOption -> when (screen.type) {
                     Type.BlockTemporarily -> {
@@ -192,6 +210,7 @@ class SetCategorySpecialModeModel(application: Application): AndroidViewModel(ap
 
                         requestClose.value = true
                     }
+                    Type.DisableLimits -> throw IllegalArgumentException()
                 }.let {/* require handling all paths */ }
             }.let {/* require handling all paths */ }
         }
@@ -212,7 +231,8 @@ class SetCategorySpecialModeModel(application: Application): AndroidViewModel(ap
     }
 
     enum class Type {
-        BlockTemporarily
+        BlockTemporarily,
+        DisableLimits
     }
 
     internal enum class DurationSelection {

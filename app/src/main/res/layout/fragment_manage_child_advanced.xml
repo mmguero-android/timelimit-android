@@ -36,57 +36,6 @@
                 android:id="@+id/primary_device_view"
                 layout="@layout/primary_device_view" />
 
-            <androidx.cardview.widget.CardView
-                app:cardUseCompatPadding="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <LinearLayout
-                    android:padding="8dp"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        tools:ignore="UnusedAttribute"
-                        android:drawableTint="?colorOnSurface"
-                        android:id="@+id/block_temporarily_title"
-                        android:background="?selectableItemBackground"
-                        android:drawableEnd="@drawable/ic_info_outline_black_24dp"
-                        android:text="@string/manage_child_block_temporarily_title"
-                        android:textAppearance="?android:textAppearanceLarge"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <LinearLayout
-                        android:id="@+id/blocked_categories_checkbox_container"
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <!-- filled at runtime -->
-
-                        <!--
-                        <CheckBox
-                            android:text="category A"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <CheckBox
-                            android:text="category B"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                        -->
-                    </LinearLayout>
-
-                    <TextView
-                        android:textAppearance="?android:textAppearanceSmall"
-                        android:text="@string/purchase_required_info_local_mode_free"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
             <io.timelimit.android.ui.view.ManageDisableTimelimitsView
                 android:id="@+id/disable_time_limits"
                 android:layout_width="match_parent"

@@ -33,6 +33,7 @@ import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.actions.UpdateCategoryDisableLimitsAction
 import io.timelimit.android.sync.actions.UpdateCategorySortingAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
 import io.timelimit.android.ui.main.ActivityViewModel
@@ -86,12 +87,26 @@ class ManageChildCategoriesFragment : Fragment() {
             override fun onCategorySwitched(category: CategoryItem, isChecked: Boolean): Boolean {
                 return if (isChecked) {
                     if (auth.isParentAuthenticated()) {
-                        auth.tryDispatchParentAction(
-                                UpdateCategoryTemporarilyBlockedAction(
-                                        categoryId = category.category.id,
-                                        endTime = null,
-                                        blocked = false
+                        auth.tryDispatchParentActions(
+                                listOf(
+                                        UpdateCategoryTemporarilyBlockedAction(
+                                                categoryId = category.category.id,
+                                                endTime = null,
+                                                blocked = false
+                                        ),
+                                        UpdateCategoryDisableLimitsAction(
+                                                categoryId = category.category.id,
+                                                endTime = 0
+                                        )
                                 )
+                        )
+                    } else if (auth.isParentOrChildAuthenticated(params.childId) && category.mode is CategorySpecialMode.TemporarilyAllowed) {
+                        auth.tryDispatchParentAction(
+                                action = UpdateCategoryDisableLimitsAction(
+                                        categoryId = category.category.id,
+                                        endTime = 0
+                                ),
+                                allowAsChild = true
                         )
                     } else if (
                             auth.isParentOrChildAuthenticated(params.childId) &&

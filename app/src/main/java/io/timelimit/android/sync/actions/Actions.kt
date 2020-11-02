@@ -904,6 +904,30 @@ data class ResetCategoryNetworkIds(val categoryId: String): ParentAction() {
     }
 }
 
+data class UpdateCategoryDisableLimitsAction(val categoryId: String, val endTime: Long): ParentAction() {
+    companion object {
+        const val TYPE_VALUE = "UPDATE_CATEGORY_DISABLE_LIMITS"
+        private const val CATEGORY_ID = "categoryId"
+        private const val END_TIME = "endTime"
+    }
+
+    init {
+        IdGenerator.assertIdValid(categoryId)
+
+        if (endTime < 0) { throw IllegalArgumentException() }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(END_TIME).value(endTime)
+
+        writer.endObject()
+    }
+}
+
 // DeviceDao
 
 data class UpdateDeviceStatusAction(

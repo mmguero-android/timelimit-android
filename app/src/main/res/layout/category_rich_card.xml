@@ -42,6 +42,10 @@
             name="temporarilyBlockedUntil"
             type="String" />
 
+        <variable
+            name="limitsDisabledUntil"
+            type="String" />
+
         <import type="android.text.TextUtils" />
         <import type="android.view.View" />
     </data>
@@ -122,6 +126,18 @@
                         android:textAppearance="?android:textAppearanceMedium"
                         tools:text="@string/overview_user_item_temporarily_blocked"
                         android:text="@{TextUtils.isEmpty(temporarilyBlockedUntil) ? @string/overview_user_item_temporarily_blocked : @string/overview_user_item_temporarily_blocked_until(temporarilyBlockedUntil)}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        tools:ignore="UnusedAttribute"
+                        android:drawableTint="?colorOnSurface"
+                        android:drawablePadding="8dp"
+                        android:drawableStart="@drawable/ic_alarm_off_black_24dp"
+                        android:visibility="@{TextUtils.isEmpty(limitsDisabledUntil) ? View.GONE : View.VISIBLE}"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        tools:text="@string/overview_user_item_temporarily_disabled_until"
+                        android:text="@{@string/overview_user_item_temporarily_disabled_until(limitsDisabledUntil)}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 

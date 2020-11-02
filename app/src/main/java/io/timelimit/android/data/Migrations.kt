@@ -237,4 +237,10 @@ object DatabaseMigrations {
             database.execSQL("CREATE TABLE IF NOT EXISTS `category_network_id` (`category_id` TEXT NOT NULL, `network_item_id` TEXT NOT NULL, `hashed_network_id` TEXT NOT NULL, PRIMARY KEY(`category_id`, `network_item_id`), FOREIGN KEY(`category_id`) REFERENCES `category`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
         }
     }
+
+    val MIGRATE_TO_V33 = object: Migration(32, 33) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `category` ADD COLUMN `disable_limits_until` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
 }

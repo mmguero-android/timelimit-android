@@ -22,7 +22,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import io.timelimit.android.R
 import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.FragmentManageChildAdvancedBinding
 import io.timelimit.android.livedata.liveDataFromFunction
@@ -30,11 +29,9 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
-import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.child.advanced.limituserviewing.LimitUserViewingView
-import io.timelimit.android.ui.manage.child.advanced.manageblocktemporarily.ManageBlockTemporarilyView
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.advanced.password.ManageChildPassword
 import io.timelimit.android.ui.manage.child.advanced.selflimitadd.ChildSelfLimitAddView
@@ -50,37 +47,13 @@ class ManageChildAdvancedFragment : Fragment() {
         }
     }
 
-    private val childId: String get() = arguments!!.getString(CHILD_ID)!!
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    private val childId: String get() = requireArguments().getString(CHILD_ID)!!
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
     private val childEntry: LiveData<User?> by lazy { logic.database.user().getChildUserByIdLive(childId) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentManageChildAdvancedBinding.inflate(layoutInflater, container, false)
-
-        val userRelatedData = logic.database.derivedDataDao().getUserRelatedDataLive(childId)
-        val shouldProvideFullVersionFunctions = logic.fullVersion.shouldProvideFullVersionFunctions
-
-        run {
-            // blocked categories
-
-            binding.blockTemporarilyTitle.setOnClickListener {
-                HelpDialogFragment.newInstance(
-                        title = R.string.manage_child_block_temporarily_title,
-                        text = R.string.manage_child_block_temporarily_text
-                ).show(parentFragmentManager)
-            }
-
-            ManageBlockTemporarilyView.bind(
-                    lifecycleOwner = this,
-                    fragmentManager = parentFragmentManager,
-                    userRelatedData = userRelatedData,
-                    shouldProvideFullVersionFunctions = shouldProvideFullVersionFunctions,
-                    container = binding.blockedCategoriesCheckboxContainer,
-                    auth = auth,
-                    childId = childId
-            )
-        }
 
         run {
             // disable time limits
@@ -92,7 +65,7 @@ class ManageChildAdvancedFragment : Fragment() {
                     binding.disableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
                             childId = childId,
                             childTimezone = child.timeZone,
-                            activity = activity!!,
+                            activity = requireActivity(),
                             hasFullVersion = hasFullVersion == true
                     )
                 }
@@ -104,7 +77,7 @@ class ManageChildAdvancedFragment : Fragment() {
                 if (time == null || child == null) {
                     null
                 } else {
-                    ManageDisableTimelimitsViewHelper.getDisabledUntilString(child, time, context!!)
+                    ManageDisableTimelimitsViewHelper.getDisabledUntilString(child, time, requireContext())
                 }
             }.observe(viewLifecycleOwner, Observer {
                 binding.disableTimeLimits.disableTimeLimitsUntilString = it
@@ -114,7 +87,7 @@ class ManageChildAdvancedFragment : Fragment() {
         UserTimezoneView.bind(
                 userEntry = childEntry,
                 view = binding.userTimezone,
-                fragmentManager = fragmentManager!!,
+                fragmentManager = parentFragmentManager,
                 lifecycleOwner = this,
                 userId = childId,
                 auth = auth

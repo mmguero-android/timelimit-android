@@ -405,6 +405,7 @@
         \n- adding Apps to categories if they are moved to a child category of their current category or
         if they are not part of any category and the target category is a child category of the category for not assigned Apps
         \n- block categories temporarily/ extend temporarily blocking of categories
+        \n- disable the temporarily disabling of the limitations for a category
     </string>
     <string name="child_self_limit_add_caused_missing_options_hint">
         Some options are unavailable because no parent user is signed in
@@ -754,15 +755,6 @@
 
     <string name="manage_child_tab_categories">Categories</string>
     <string name="manage_child_tab_other" tools:ignore="MissingTranslation">Advanced settings</string>
-    <string name="manage_child_block_temporarily_title">block temporarily</string>
-    <string name="manage_child_block_temporarily_text">
-        Select categories which should be blocked temporarily.
-        You can disable the blocking automatically by holding a category
-        and selecting an end time.
-    </string>
-    <string name="manage_child_block_temporarily_no_end_time">%s (indefinitely)</string>
-    <string name="manage_child_block_temporarily_until">%1$s (until %2$s)</string>
-    <string name="manage_child_block_temporarily_dialog_until">until %s</string>
 
     <string name="manage_child_category_no_time_limits">no time limit</string>
 
@@ -798,6 +790,9 @@
     <string name="manage_child_redirected_toast">Press back to show the overview screen of TimeLimit</string>
 
     <string name="manage_child_special_mode_wizard_block_title" tools:ignore="MissingTranslation">Block %s temporarily</string>
+    <string name="manage_child_special_mode_wizard_block_option" tools:ignore="MissingTranslation">block temporarily</string>
+    <string name="manage_child_special_mode_wizard_disable_limits_title" tools:ignore="MissingTranslation">Disable limits for %s</string>
+    <string name="manage_child_special_mode_wizard_disable_limits_option" tools:ignore="MissingTranslation">disable limits temporarily</string>
 
     <string name="manage_device_activity_level_blocking_title">Activity level blocking</string>
     <string name="manage_device_activity_level_blocking_text">
@@ -999,10 +994,11 @@
     <string name="manage_disable_time_limits_btn_time">until a time</string>
     <string name="manage_disable_time_limits_btn_date">until a date</string>
     <string name="manage_disable_time_limits_btn_no_end_time" tools:ignore="MissingTranslation">no scheduled end time</string>
+    <string name="manage_disable_time_limits_btn_until" tools:ignore="MissingTranslation">until %s</string>
 
     <string name="manage_disable_time_limits_dialog_until">Disable time limits until ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">The selected time is in the past</string>
-    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">The time may be increased but not decreased without a parent who signs in</string>
+    <string name="manage_disable_time_limits_toast_time_not_increased_but_child_mode">The blocked time may be increased but not decreased without a parent who signs in</string>
 
     <string name="manage_parent_change_password_title">Change password</string>
     <string name="manage_parent_change_password_text">Set a new password knowing the old one</string>
@@ -1164,6 +1160,7 @@
     <string name="overview_user_item_temporarily_blocked">temporarily blocked</string>
     <string name="overview_user_item_temporarily_blocked_until" tools:ignore="MissingTranslation">temporarily blocked until %s</string>
     <string name="overview_user_item_temporarily_disabled">Time limits temporarily disabled</string>
+    <string name="overview_user_item_temporarily_disabled_until" tools:ignore="MissingTranslation">Time limits temporarily disabled until %s</string>
     <string name="overview_user_item_role_child">is restricted</string>
     <string name="overview_user_item_role_parent">can change settings</string>
 

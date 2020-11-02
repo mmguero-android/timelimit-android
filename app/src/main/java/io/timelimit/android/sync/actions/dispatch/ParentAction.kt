@@ -29,7 +29,7 @@ object LocalDatabaseParentActionDispatcher {
             val isSupportedAction = action is CreateTimeLimitRuleAction || action is CreateCategoryAction ||
                     action is UpdateCategoryBlockAllNotificationsAction || action is SetParentCategory ||
                     action is AddCategoryAppsAction || action is UpdateCategoryTemporarilyBlockedAction ||
-                    action is UpdateCategoryBlockedTimesAction
+                    action is UpdateCategoryBlockedTimesAction || action is UpdateCategoryDisableLimitsAction
 
             if (!isSupportedAction) {
                 throw RuntimeException("unsupported action for the child limit self mode")
@@ -144,7 +144,8 @@ object LocalDatabaseParentActionDispatcher {
                             timeWarnings = 0,
                             minBatteryLevelWhileCharging = 0,
                             minBatteryLevelMobile = 0,
-                            sort = sort
+                            sort = sort,
+                            disableLimitsUntil = 0
                     ))
                 }
                 is DeleteCategoryAction -> {
@@ -749,6 +750,22 @@ object LocalDatabaseParentActionDispatcher {
                 }
                 is ResetCategoryNetworkIds -> {
                     database.categoryNetworkId().deleteByCategoryId(categoryId = action.categoryId)
+                }
+                is UpdateCategoryDisableLimitsAction -> {
+                    val category = database.category().getCategoryByIdSync(action.categoryId)
+                            ?: throw IllegalArgumentException("category with the specified id does not exist")
+
+                    if (fromChildSelfLimitAddChildUserId != null) {
+                        if (fromChildSelfLimitAddChildUserId != category.childId) {
+                            throw RuntimeException("can not modify settings for other child user")
+                        }
+
+                        if (action.endTime != 0L) {
+                            throw RuntimeException("child user can only disable limitation disabling")
+                        }
+                    }
+
+                    database.category().updateCategorySync(category.copy(disableLimitsUntil = action.endTime))
                 }
             }.let { }
         }

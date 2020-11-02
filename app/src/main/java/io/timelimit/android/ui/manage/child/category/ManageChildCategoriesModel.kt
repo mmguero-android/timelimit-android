@@ -112,6 +112,10 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
                                     validForDuration = it.temporarilyBlockedEndTime + 1 - timeInMillis
 
                                     CategorySpecialMode.TemporarilyBlocked(endTime = it.temporarilyBlockedEndTime)
+                                } else if (it.disableLimitsUntil != 0L && it.disableLimitsUntil >= timeInMillis) {
+                                    validForDuration = it.disableLimitsUntil + 1 - timeInMillis
+
+                                    CategorySpecialMode.TemporarilyAllowed(endTime = it.disableLimitsUntil)
                                 } else CategorySpecialMode.None
                             }
                     )
