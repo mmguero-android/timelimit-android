@@ -97,7 +97,7 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
 
         model.init(blockedPackageName, blockedActivityName)
 
-        pager.adapter = LockActivityAdapter(supportFragmentManager)
+        pager.adapter = LockActivityAdapter(supportFragmentManager, this)
 
         model.content.observe(this) {
             if (isResumed && it is LockscreenContent.Blocked.BlockedCategory && it.reason == BlockingReason.RequiresCurrentDevice && !model.didOpenSetCurrentDeviceScreen) {
@@ -126,6 +126,8 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
                 showAuth.value = position > 0
             }
         })
+
+        tabs.setupWithViewPager(pager)
     }
 
     override fun onDestroy() {

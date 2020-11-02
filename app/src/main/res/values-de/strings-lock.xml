@@ -14,11 +14,12 @@
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
 <resources>
+    <string name="lock_tab_reason">Grund</string>
+    <string name="lock_tab_action">Aktionen</string>
     <string name="lock_header_blocked">Gesperrt!</string>
 
     <string name="lock_header_what">Was wurde gesperrt?</string>
     <string name="lock_header_why">Warum wurde es gesperrt?</string>
-    <string name="lock_header_how_proceed">Wie geht es jetzt weiter?</string>
 
     <string name="lock_allow_temporarily_header">Vorübergehend erlauben</string>
     <string name="lock_allow_temporarily_text">

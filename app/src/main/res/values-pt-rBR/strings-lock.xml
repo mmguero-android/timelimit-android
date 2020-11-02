@@ -18,7 +18,6 @@
 
     <string name="lock_header_what">O que foi bloqueado?</string>
     <string name="lock_header_why">Por que foi bloqueado?</string>
-    <string name="lock_header_how_proceed">O que você pode fazer?</string>
 
     <string name="lock_allow_temporarily_header">permitir temporariamente</string>
     <string name="lock_allow_temporarily_text">

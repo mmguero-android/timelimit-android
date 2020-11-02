@@ -13,12 +13,13 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="lock_tab_reason" tools:ignore="MissingTranslation">Reason</string>
+    <string name="lock_tab_action" tools:ignore="MissingTranslation">Actions</string>
     <string name="lock_header_blocked">Blocked!</string>
 
     <string name="lock_header_what">What was blocked?</string>
     <string name="lock_header_why">Why was it blocked?</string>
-    <string name="lock_header_how_proceed">What can you do?</string>
 
     <string name="lock_allow_temporarily_header">allow temporarily</string>
     <string name="lock_allow_temporarily_text">
