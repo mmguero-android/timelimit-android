@@ -15,10 +15,8 @@
  */
 package io.timelimit.android.ui.lock
 
-import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.text.format.DateUtils
 import android.view.LayoutInflater
@@ -26,27 +24,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.fragment.app.activityViewModels
 import io.timelimit.android.R
-import io.timelimit.android.async.Threads
 import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.*
-import io.timelimit.android.data.model.derived.DeviceAndUserRelatedData
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
 import io.timelimit.android.date.DateInTimezone
-import io.timelimit.android.integration.platform.BatteryStatus
-import io.timelimit.android.integration.platform.NetworkId
-import io.timelimit.android.integration.platform.getNetworkIdOrNull
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
-import io.timelimit.android.logic.blockingreason.AppBaseHandling
-import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
-import io.timelimit.android.logic.blockingreason.needsNetworkId
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.sync.actions.IncrementCategoryExtraTimeAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
@@ -58,7 +46,6 @@ import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.settings.networks.RequestWifiPermission
-import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.category.create.CreateCategoryDialogFragment
 import io.timelimit.android.ui.manage.child.primarydevice.UpdatePrimaryDeviceDialogFragment
@@ -89,148 +76,16 @@ class LockFragment : Fragment() {
     }
 
     private var didOpenSetCurrentDeviceScreen = false
-    private val packageName: String by lazy { arguments!!.getString(EXTRA_PACKAGE_NAME)!! }
+    private val packageName: String by lazy { requireArguments().getString(EXTRA_PACKAGE_NAME)!! }
     private val activityName: String? by lazy {
-        if (arguments!!.containsKey(EXTRA_ACTIVITY))
-            arguments!!.getString(EXTRA_ACTIVITY)
+        if (requireArguments().containsKey(EXTRA_ACTIVITY))
+            requireArguments().getString(EXTRA_ACTIVITY)
         else
             null
     }
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
-    private val title: String? by lazy { logic.platformIntegration.getLocalAppTitle(packageName) }
-    private val deviceAndUserRelatedData: LiveData<DeviceAndUserRelatedData?> by lazy {
-        logic.database.derivedDataDao().getUserAndDeviceRelatedDataLive()
-    }
-    private val batteryStatus: LiveData<BatteryStatus> by lazy {
-        logic.platformIntegration.getBatteryStatusLive()
-    }
-    private val needsNetworkIdLive = MutableLiveData<Boolean>().apply { value = false }
-    private val realNetworkIdLive: LiveData<NetworkId> by lazy { liveDataFromFunction { logic.platformIntegration.getCurrentNetworkId() } }
-    private val networkIdLive: LiveData<NetworkId?> by lazy { needsNetworkIdLive.switchMap { needsNetworkId ->
-        if (needsNetworkId) realNetworkIdLive as LiveData<NetworkId?> else liveDataFromValue(null as NetworkId?)
-    } }
-    private val hasPremiumOrLocalMode: LiveData<Boolean> by lazy { logic.fullVersion.shouldProvideFullVersionFunctions }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
     private lateinit var binding: LockFragmentBinding
-    private val handlingCache = CategoryHandlingCache()
-    private val realTime = RealTime.newInstance()
-    private val timeModificationListener: () -> Unit = { update() }
-
-    private val updateRunnable = Runnable { update() }
-
-    fun scheduleUpdate(delay: Long) {
-        logic.timeApi.cancelScheduledAction(updateRunnable)
-        logic.timeApi.runDelayedByUptime(updateRunnable, delay)
-    }
-
-    fun unscheduleUpdate() {
-        logic.timeApi.cancelScheduledAction(updateRunnable)
-    }
-
-    private fun update() {
-        val deviceAndUserRelatedData = deviceAndUserRelatedData.value ?: return
-        val batteryStatus = batteryStatus.value ?: return
-        val hasPremiumOrLocalMode = hasPremiumOrLocalMode.value ?: return
-        val networkId = networkIdLive.value
-
-        logic.realTimeLogic.getRealTime(realTime)
-
-        if (deviceAndUserRelatedData.userRelatedData?.user?.type != UserType.Child) {
-            binding.reason = BlockingReason.None
-            binding.handlers = null
-            activity?.finish()
-            return
-        }
-
-        val appBaseHandling = AppBaseHandling.calculate(
-                foregroundAppPackageName = packageName,
-                foregroundAppActivityName = activityName,
-                deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
-                userRelatedData = deviceAndUserRelatedData.userRelatedData,
-                pauseForegroundAppBackgroundLoop = false,
-                pauseCounting = false
-        )
-
-        val needsNetworkId = appBaseHandling.needsNetworkId()
-
-        if (needsNetworkId != needsNetworkIdLive.value) {
-            needsNetworkIdLive.value = needsNetworkId
-        }
-
-        if (needsNetworkId && networkId == null) return
-
-        handlingCache.reportStatus(
-                user = deviceAndUserRelatedData.userRelatedData,
-                assumeCurrentDevice = CurrentDeviceLogic.handleDeviceAsCurrentDevice(deviceAndUserRelatedData.deviceRelatedData, deviceAndUserRelatedData.userRelatedData),
-                batteryStatus = batteryStatus,
-                timeInMillis = realTime.timeInMillis,
-                shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
-                currentNetworkId = networkId?.getNetworkIdOrNull(),
-                hasPremiumOrLocalMode = hasPremiumOrLocalMode
-        )
-
-        binding.activityName = if (deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking)
-            activityName?.removePrefix(packageName)
-        else
-            null
-
-        if (appBaseHandling is AppBaseHandling.UseCategories) {
-            val categoryHandlings = appBaseHandling.categoryIds.map { handlingCache.get(it) }
-            val blockingHandling = categoryHandlings.find { it.shouldBlockActivities }
-
-            if (blockingHandling == null) {
-                binding.reason = BlockingReason.None
-                binding.handlers = null
-                activity?.finish()
-                return
-            }
-
-            binding.appCategoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title
-            binding.reason = blockingHandling.activityBlockingReason
-            binding.blockedKindLabel = when (appBaseHandling.level) {
-                BlockingLevel.Activity -> "Activity"
-                BlockingLevel.App -> "App"
-            }
-            setupHandlers(
-                    deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id,
-                    blockedCategoryId = blockingHandling.createdWithCategoryRelatedData.category.id,
-                    userRelatedData = deviceAndUserRelatedData.userRelatedData
-            )
-            bindExtraTimeView(
-                    deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
-                    categoryId = blockingHandling.createdWithCategoryRelatedData.category.id,
-                    timeZone = deviceAndUserRelatedData.userRelatedData.timeZone
-            )
-            binding.manageDisableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
-                    childId = deviceAndUserRelatedData.userRelatedData.user.id,
-                    childTimezone = deviceAndUserRelatedData.userRelatedData.user.timeZone,
-                    activity = activity!!,
-                    hasFullVersion = deviceAndUserRelatedData.deviceRelatedData.isConnectedAndHasPremium || deviceAndUserRelatedData.deviceRelatedData.isLocalMode
-            )
-
-            if (blockingHandling.activityBlockingReason == BlockingReason.RequiresCurrentDevice && !didOpenSetCurrentDeviceScreen && isResumed) {
-                setThisDeviceAsCurrentDevice()
-            }
-
-            scheduleUpdate((blockingHandling.dependsOnMaxTime - realTime.timeInMillis))
-        } else if (appBaseHandling is AppBaseHandling.BlockDueToNoCategory) {
-            binding.appCategoryTitle = null
-            binding.reason = BlockingReason.NotPartOfAnCategory
-            binding.blockedKindLabel = "App"
-            setupHandlers(
-                    deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id,
-                    blockedCategoryId = null,
-                    userRelatedData = deviceAndUserRelatedData.userRelatedData
-            )
-
-            bindAddToCategoryOptions(deviceAndUserRelatedData.userRelatedData)
-        } else {
-            binding.reason = BlockingReason.None
-            binding.handlers = null
-            activity?.finish()
-            return
-        }
-    }
+    private val model: LockModel by activityViewModels()
 
     private fun setupHandlers(deviceId: String, userRelatedData: UserRelatedData, blockedCategoryId: String?) {
         binding.handlers = object: Handlers {
@@ -239,30 +94,11 @@ class LockFragment : Fragment() {
             }
 
             override fun allowTemporarily() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    val database = logic.database
-
-                    // this accesses the database directly because it is not synced
-                    Threads.database.submit {
-                        try {
-                            database.temporarilyAllowedApp().addTemporarilyAllowedAppSync(TemporarilyAllowedApp(
-                                    deviceId = deviceId,
-                                    packageName = packageName
-                            ))
-                        } catch (ex: SQLiteConstraintException) {
-                            // ignore this
-                            //
-                            // this happens when touching that option more than once very fast
-                            // or if the device is under load
-                        }
-                    }
-                }
+                if (auth.requestAuthenticationOrReturnTrue()) model.allowAppTemporarily()
             }
 
             override fun confirmLocalTime() {
-                if (auth.requestAuthenticationOrReturnTrue()) {
-                    logic.realTimeLogic.confirmLocalTime()
-                }
+                if (auth.requestAuthenticationOrReturnTrue()) model.confirmLocalTime()
             }
 
             override fun disableTimeVerification() {
@@ -343,7 +179,7 @@ class LockFragment : Fragment() {
                 if (auth.requestAuthenticationOrReturnTrue()) {
                     CreateCategoryDialogFragment
                             .newInstance(childId = userRelatedData.user.id)
-                            .show(fragmentManager!!)
+                            .show(parentFragmentManager)
                 }
             }
         }
@@ -387,27 +223,19 @@ class LockFragment : Fragment() {
             ).show(parentFragmentManager)
         }
 
-        logic.database.config().getEnableAlternativeDurationSelectionAsync().observe(viewLifecycleOwner, Observer {
-            binding.extraTimeSelection.enablePickerMode(it)
-        })
+        model.enableAlternativeDurationSelection.observe(viewLifecycleOwner) { binding.extraTimeSelection.enablePickerMode(it) }
 
         binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
             override fun onTimeSpanChanged(newTimeInMillis: Long) {
                 binding.extraTimeBtnOk.visibility = if (newTimeInMillis == 0L) View.GONE else View.VISIBLE
             }
 
-            override fun setEnablePickerMode(enable: Boolean) {
-                Threads.database.execute {
-                    logic.database.config().setEnableAlternativeDurationSelectionSync(enable)
-                }
-            }
+            override fun setEnablePickerMode(enable: Boolean) { model.setEnablePickerMode(enable) }
         }
     }
 
     private fun initGrantPermissionView() {
-        networkIdLive.observe(viewLifecycleOwner, Observer {
-            binding.missingNetworkIdPermission = it is NetworkId.MissingPermission
-        })
+        model.missingNetworkIdPermission.observe(viewLifecycleOwner) { binding.missingNetworkIdPermission = it }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -435,56 +263,85 @@ class LockFragment : Fragment() {
                 doesSupportAuth = liveDataFromValue(true)
         )
 
-        liveDataFromFunction { logic.timeApi.getCurrentTimeInMillis() }.observe(viewLifecycleOwner, Observer {
-            systemTime ->
-
+        model.osClockInMillis.observe(viewLifecycleOwner) { systemTime ->
             binding.currentTime = DateUtils.formatDateTime(
                     context,
                     systemTime!!,
                     DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME or
                             DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_WEEKDAY
             )
-        })
-
-        deviceAndUserRelatedData.observe(viewLifecycleOwner, Observer { update() })
-        batteryStatus.observe(viewLifecycleOwner, Observer { update() })
-        networkIdLive.observe(viewLifecycleOwner, Observer { update() })
-        hasPremiumOrLocalMode.observe(viewLifecycleOwner, Observer { update() })
+        }
 
         binding.packageName = packageName
 
-        binding.appTitle = title ?: "???"
-        binding.appIcon.setImageDrawable(logic.platformIntegration.getAppIcon(packageName))
+        binding.appTitle = model.title ?: "???"
+        binding.appIcon.setImageDrawable(model.icon)
 
         initExtraTimeView()
         initGrantPermissionView()
 
+        model.content.observe(viewLifecycleOwner) { content ->
+            when (content) {
+                LockscreenContent.Close -> {
+                    binding.reason = BlockingReason.None
+                    binding.handlers = null
+
+                    requireActivity().finish()
+                }
+                is LockscreenContent.BlockedCategory -> {
+                    binding.activityName = if (content.enableActivityLevelBlocking) activityName?.removePrefix(packageName) else null
+
+                    binding.appCategoryTitle = content.appCategoryTitle
+                    binding.reason = content.reason
+                    binding.blockedKindLabel = when (content.level) {
+                        BlockingLevel.Activity -> "Activity"
+                        BlockingLevel.App -> "App"
+                    }
+                    setupHandlers(
+                            deviceId = content.deviceId,
+                            blockedCategoryId = content.blockedCategoryId,
+                            userRelatedData = content.userRelatedData
+                    )
+                    bindExtraTimeView(
+                            deviceRelatedData = content.deviceRelatedData,
+                            categoryId = content.blockedCategoryId,
+                            timeZone = content.userRelatedData.timeZone
+                    )
+                    binding.manageDisableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
+                            childId = content.userId,
+                            childTimezone = content.timeZone,
+                            activity = requireActivity(),
+                            hasFullVersion = content.hasFullVersion
+                    )
+
+                    if (content.reason == BlockingReason.RequiresCurrentDevice && !didOpenSetCurrentDeviceScreen && isResumed) {
+                        setThisDeviceAsCurrentDevice()
+                    } else null
+                }
+                is LockscreenContent.BlockDueToNoCategory -> {
+                    binding.activityName = if (content.enableActivityLevelBlocking) activityName?.removePrefix(packageName) else null
+
+                    binding.appCategoryTitle = null
+                    binding.reason = BlockingReason.NotPartOfAnCategory
+                    binding.blockedKindLabel = "App"
+
+                    setupHandlers(
+                            deviceId = content.deviceId,
+                            blockedCategoryId = null,
+                            userRelatedData = content.userRelatedData
+                    )
+
+                    bindAddToCategoryOptions(content.userRelatedData)
+                }
+            }.let {/* require handling all paths */}
+        }
+
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        logic.realTimeLogic.registerTimeModificationListener(timeModificationListener)
-
-        update()
-    }
-
-    override fun onPause() {
-        super.onPause()
-
-        logic.realTimeLogic.unregisterTimeModificationListener(timeModificationListener)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        unscheduleUpdate()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (grantResults.find { it != PackageManager.PERMISSION_GRANTED } != null) {
-            Toast.makeText(context!!, R.string.generic_runtime_permission_rejected, Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), R.string.generic_runtime_permission_rejected, Toast.LENGTH_LONG).show()
         }
     }
 }

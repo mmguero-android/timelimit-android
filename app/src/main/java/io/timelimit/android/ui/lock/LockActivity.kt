@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -56,6 +57,8 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         }
     }
 
+    private val model: LockModel by viewModels()
+
     override var ignoreStop: Boolean = false
 
     private val blockedPackageName: String by lazy {
@@ -90,6 +93,8 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         })
 
         currentInstances.add(this)
+
+        model.init(blockedPackageName, blockedActivityName)
     }
 
     override fun onDestroy() {
