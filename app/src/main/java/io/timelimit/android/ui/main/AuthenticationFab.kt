@@ -15,9 +15,12 @@
  */
 package io.timelimit.android.ui.main
 
+import android.app.Activity
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -42,6 +45,37 @@ object AuthenticationFab {
             authenticatedUser: LiveData<Pair<ApplyActionParentAuthentication, User>?>,
             doesSupportAuth: LiveData<Boolean>,
             fragment: Fragment
+    ) = manageAuthenticationFab(
+            fab = fab,
+            shouldHighlight = shouldHighlight,
+            authenticatedUser = authenticatedUser,
+            doesSupportAuth = doesSupportAuth,
+            activity = fragment.requireActivity(),
+            viewLifecycleOwner = fragment
+    )
+
+    fun manageAuthenticationFab(
+            fab: FloatingActionButton,
+            shouldHighlight: MutableLiveData<Boolean>,
+            authenticatedUser: LiveData<Pair<ApplyActionParentAuthentication, User>?>,
+            doesSupportAuth: LiveData<Boolean>,
+            activity: FragmentActivity
+    ) = manageAuthenticationFab(
+            fab = fab,
+            shouldHighlight = shouldHighlight,
+            authenticatedUser = authenticatedUser,
+            doesSupportAuth = doesSupportAuth,
+            activity = activity,
+            viewLifecycleOwner = activity
+    )
+
+    private fun manageAuthenticationFab(
+            fab: FloatingActionButton,
+            shouldHighlight: MutableLiveData<Boolean>,
+            authenticatedUser: LiveData<Pair<ApplyActionParentAuthentication, User>?>,
+            doesSupportAuth: LiveData<Boolean>,
+            activity: Activity,
+            viewLifecycleOwner: LifecycleOwner
     ) {
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, "start managing FAB instance")
@@ -52,15 +86,15 @@ object AuthenticationFab {
         val highlightObserver = Observer<Boolean> {
             if (it == true) {
                 if (tapTargetView == null && fab.isAttachedToWindow) {
-                    tapTargetView = MyTapTargetView.showFor(fragment.activity!!,
-                            TapTarget.forView(fab, fragment.getString(R.string.authentication_required_overlay_title), fragment.getString(R.string.authentication_required_overlay_text))
+                    tapTargetView = MyTapTargetView.showFor(activity,
+                            TapTarget.forView(fab, activity.getString(R.string.authentication_required_overlay_title), activity.getString(R.string.authentication_required_overlay_text))
                                     .cancelable(true)
                                     .tintTarget(true)
                                     .transparentTarget(false)
                                     .outerCircleColor(R.color.colorAccent)
                                     .textColor(R.color.white)
                                     .targetCircleColor(R.color.white)
-                                    .icon(ContextCompat.getDrawable(fragment.context!!, R.drawable.ic_lock_open_white_24dp)),
+                                    .icon(ContextCompat.getDrawable(activity, R.drawable.ic_lock_open_white_24dp)),
                             object : TapTargetView.Listener() {
                                 override fun onTargetClick(view: TapTargetView) {
                                     super.onTargetClick(view)
@@ -111,7 +145,7 @@ object AuthenticationFab {
             }
         }
 
-        shouldHighlight.observe(fragment, highlightObserver)
-        shouldShowFab.observe(fragment, showFabObserver)
+        shouldHighlight.observe(viewLifecycleOwner, highlightObserver)
+        shouldShowFab.observe(viewLifecycleOwner, showFabObserver)
     }
 }

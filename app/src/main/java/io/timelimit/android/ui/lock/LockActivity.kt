@@ -22,7 +22,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.lifecycle.MutableLiveData
+import androidx.viewpager.widget.ViewPager
 import io.timelimit.android.R
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.logic.BlockingReason
@@ -32,6 +33,7 @@ import io.timelimit.android.ui.IsAppInForeground
 import io.timelimit.android.ui.login.NewLoginFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.manage.child.primarydevice.UpdatePrimaryDeviceDialogFragment
 import io.timelimit.android.ui.util.SyncStatusModel
 import kotlinx.android.synthetic.main.lock_activity.*
@@ -78,6 +80,8 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
             null
     }
 
+    private val showAuth = MutableLiveData<Boolean>().apply { value = false }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -104,6 +108,24 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
                         .show(supportFragmentManager)
             }
         }
+
+        AuthenticationFab.manageAuthenticationFab(
+                fab = fab,
+                shouldHighlight = activityModel.shouldHighlightAuthenticationButton,
+                authenticatedUser = activityModel.authenticatedUser,
+                activity = this,
+                doesSupportAuth = showAuth
+        )
+
+        fab.setOnClickListener { showAuthenticationScreen() }
+
+        pager.addOnPageChangeListener(object: ViewPager.SimpleOnPageChangeListener() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+                showAuth.value = position > 0
+            }
+        })
     }
 
     override fun onDestroy() {

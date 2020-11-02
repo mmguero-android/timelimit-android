@@ -111,10 +111,6 @@ class LockActionFragment : Fragment() {
                 )
             }
 
-            override fun showAuthenticationScreen() {
-                (activity as LockActivity).showAuthenticationScreen()
-            }
-
             override fun setThisDeviceAsCurrentDevice() = this@LockActionFragment.setThisDeviceAsCurrentDevice()
 
             override fun requestLocationPermission() {
@@ -216,14 +212,6 @@ class LockActionFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = LockActionFragmentBinding.inflate(layoutInflater, container, false)
 
-        AuthenticationFab.manageAuthenticationFab(
-                fab = binding.fab,
-                shouldHighlight = auth.shouldHighlightAuthenticationButton,
-                authenticatedUser = auth.authenticatedUser,
-                fragment = this,
-                doesSupportAuth = liveDataFromValue(true)
-        )
-
         model.osClockInMillis.observe(viewLifecycleOwner) { systemTime ->
             binding.currentTime = DateUtils.formatDateTime(
                     context,
@@ -309,7 +297,6 @@ interface Handlers {
     fun disableTimeVerification()
     fun disableTemporarilyLockForCurrentCategory()
     fun disableTemporarilyLockForAllCategories()
-    fun showAuthenticationScreen()
     fun setThisDeviceAsCurrentDevice()
     fun requestLocationPermission()
 }
