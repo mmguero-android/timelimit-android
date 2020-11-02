@@ -26,11 +26,6 @@
     <string name="generic_manage_card">Gerenciar</string>
     <string name="generic_enable">Ativar</string>
 
-    <plurals name="generic_plural_app">
-        <item quantity="one">%d App</item>
-        <item quantity="other">%d Apps</item>
-    </plurals>
-
     <string name="generic_swipe_to_dismiss">Deslize para o lado para remover esta mensagem</string>
     <string name="generic_runtime_permission_rejected">Permissão recusada; Você pode gerenciar as permissões nas configurações do sistema</string>
 
@@ -330,7 +325,6 @@ por exemplo, quando você quer adicionar o uso de tela
         Algumas opções não estão disponíveis porque nenhum usuário Pai está conectado
     </string>
 
-    <string name="contacts_title">Contatos</string>
     <string name="contacts_snackbar_added">O contato foi adicionado</string>
     <string name="contacts_title_long">Contatos permitidos</string>
     <string name="contacts_description">Esta é uma lista de números de telefone.
@@ -387,16 +381,6 @@ por exemplo, quando você quer adicionar o uso de tela
         <item>@string/day_of_week_friday</item>
         <item>@string/day_of_week_saturday</item>
         <item>@string/day_of_week_sunday</item>
-    </string-array>
-
-    <string-array name="days_of_week_array_short">
-        <item>@string/day_of_week_monday_short</item>
-        <item>@string/day_of_week_tuesday_short</item>
-        <item>@string/day_of_week_wednesday_short</item>
-        <item>@string/day_of_week_thursday_short</item>
-        <item>@string/day_of_week_friday_short</item>
-        <item>@string/day_of_week_saturday_short</item>
-        <item>@string/day_of_week_sunday_short</item>
     </string-array>
 
     <string name="delete_child_title">Excluir usuário</string>
@@ -538,7 +522,6 @@ por exemplo, quando você quer adicionar o uso de tela
 
     <string name="lock_disable_temporarily_lock_title">Desativar o bloqueio temporário</string>
     <string name="lock_disable_temporarily_all_categories">todas as categorias</string>
-    <string name="lock_disable_temporarily_all_categories_disabled">Somente a categoria %s é bloqueada</string>
 
     <string name="lock_confirm_time_title">Confirmar o tempo manualmente</string>
     <string name="lock_confirm_time_btn">Este tempo é correto</string>
@@ -606,7 +589,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
 
     <string name="login_user_selection_text">Escolha um usuário para autenticar</string>
     <string name="login_password_hint">Senha</string>
-    <string name="login_btn_do">Entrar</string>
     <string name="login_snackbar_wrong">A senha é inválida</string>
     <string name="login_dialog_password_text">Digite sua senha para entrar</string>
     <string name="login_assign_to_device">Definir-me como usuário atual deste dispositivo</string>
@@ -663,11 +645,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
     <string name="category_networks_toast_all_removed">Todas as redes excluídas</string>
 
     <string name="category_networks_toast_enable_location_service">Favor ativar o acesso ao localização</string>
-
-    <string name="manage_category_section_assigned_apps">Aplicativos atribuídos</string>
-    <string name="manage_category_section_all_apps">todos os Aplicativos</string>
-
-    <string name="manage_child_tab_categories">Categorias</string>
 
     <string name="manage_child_category_no_time_limits">sem limite de tempo</string>
 
@@ -853,10 +830,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
         Esta permissão só pode ser desativada por o TimeLimit/ um Pai que desinstala TimeLimit.
     </string>
 
-    <string name="manage_device_permission_tap_top_open_settings">
-        Toque nesta opção para abrir a seção correspondente nas configurações do sistema
-    </string>
-
     <string name="manage_device_permission_open_at_target_device">
         Abrir a tela no outro dispositivo para modificar as permissões
     </string>
@@ -963,7 +936,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
     <string name="manage_user_key_add">adicionar chave</string>
     <string name="manage_user_key_remove">excluir chave</string>
     <string name="manage_user_key_added">A chave foi adicionada</string>
-    <string name="manage_user_key_removed">A chave foi excluída</string>
     <string name="manage_user_key_invalid">Esta não foi uma chave válida de TimeLimit</string>
     <string name="manage_user_key_other_user">Esta chave já está vinculada a um outro usuário</string>
 
@@ -1040,7 +1012,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
         Você configurou o TimeLimit no modo local.
         Não há vínculo, por isso você não pode adicionar dispositivos.
     </string>
-    <string name="overview_add_device_migrate_to_connected">Migrar para o modo conectado</string>
 
     <string name="overview_intro_title">Bem-vindo ao TimeLimit</string>
     <string name="overview_intro_text">
@@ -1365,7 +1336,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
     <string name="update_unavailable">Não há atualização disponível no momento</string>
     <string name="update_available">TimeLimit %s está disponível. Modificações:\n%s</string>
     <string name="update_available_download">Atualizar</string>
-    <string name="update_permission_required_text">TimeLimit precisa de sua permissão para atualizar</string>
     <string name="update_privacy">TimeLimit pode verificar automaticamente se há atualizações.
         Para isso, ele consulta %s.
     </string>
@@ -1432,16 +1402,13 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
     <string name="util_time_unused">Não utilizado</string>
     <string name="util_time_used">Used <xliff:g example="4 minutes" id="used time">%1$s</xliff:g></string>
 
-    <string name="util_time_until">até <xliff:g id="value">%1$s</xliff:g>
-    </string>
-
     <string name="widget_empty_view">Se este dispositivo for atribuído a uma criança
         e esta criança possui categorias, então as categorias devem
         aparecem aqui.
     </string>
 
     <string name="wiazrd_next">Próximo</string>
-    
+
     <string name="admin_description_google">Isto permite TimeLimit a detectar se foi interrompido.</string>
     <string name="admin_description_direct">Isto permite TimeLimit a evitar que seja desativado.</string>
 

@@ -27,11 +27,6 @@
     <string name="generic_enable">Aktivieren</string>
     <string name="generic_show_more">Mehr anzeigen</string>
 
-    <plurals name="generic_plural_app">
-        <item quantity="one">%d App</item>
-        <item quantity="other">%d Apps</item>
-    </plurals>
-
     <string name="generic_swipe_to_dismiss">Se können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
     <string name="generic_runtime_permission_rejected">Berechtigung abgelehnt; Sie können die Berechtigungen in den Systemeinstellungen verwalten</string>
 
@@ -370,7 +365,6 @@
         Einige Optionen sind nicht verfügbar, weil kein Elternteil angemeldet ist
     </string>
 
-    <string name="contacts_title">Kontakte</string>
     <string name="contacts_snackbar_added">Kontakt wurde hinzugefügt</string>
     <string name="contacts_title_long">Erlaubte Kontakte</string>
     <string name="contacts_description">Das ist eine Liste von Telefonnummern.
@@ -562,7 +556,6 @@
 
     <string name="lock_disable_temporarily_lock_title">Vorübergehende Sperrung abschalten</string>
     <string name="lock_disable_temporarily_all_categories">Alle Kategorien</string>
-    <string name="lock_disable_temporarily_all_categories_disabled">Es wurde nur die Kategorie %s gesperrt</string>
 
     <string name="lock_confirm_time_title">Systemzeit manuell bestätigen</string>
     <string name="lock_confirm_time_btn">Diese Zeit ist richtig</string>
@@ -628,7 +621,6 @@
 
     <string name="login_user_selection_text">Wählen Sie einen Benutzer, um sich anzumelden</string>
     <string name="login_password_hint">Passwort</string>
-    <string name="login_btn_do">Anmelden</string>
     <string name="login_snackbar_wrong">Dieses Passwort ist nicht korrekt</string>
     <string name="login_dialog_password_text">Geben Sie Ihr Passwort ein, um sich anzumelden</string>
     <string name="login_assign_to_device">Mich als Benutzer dieses Gerätes festlegen</string>
@@ -690,10 +682,6 @@
 
     <string name="category_networks_toast_enable_location_service">Bitte den Standortzugriff aktivieren</string>
 
-    <string name="manage_category_section_assigned_apps">Zugeordnete Apps</string>
-    <string name="manage_category_section_all_apps">Alle Apps</string>
-
-    <string name="manage_child_tab_categories">Kategorien</string>
     <string name="manage_child_tab_other">erweiterte Einstellungen</string>
 
     <string name="manage_child_category_no_time_limits">Keine Zeitbegrenzung</string>
@@ -894,10 +882,6 @@
         Diese Berechtigung kann nur durch TimeLimit bzw. ein Elternteil, das TimeLimit deinstalliert, deaktiviert werden.
     </string>
 
-    <string name="manage_device_permission_tap_top_open_settings">
-        Berühren Sie diese Option, um den entsprechenden Bereich der Systemeinstellungen zu öffnen
-    </string>
-
     <string name="manage_device_permission_open_at_target_device">
         Öffnen Sie diesen Bildschirm am entsprechenden Gerät, um die Berechtigung festzulegen
     </string>
@@ -1007,7 +991,6 @@
     <string name="manage_user_key_add">Schlüssel hinzufügen</string>
     <string name="manage_user_key_remove">Schlüssel entfernen</string>
     <string name="manage_user_key_added">Der Schlüssel wurde hinzugefügt</string>
-    <string name="manage_user_key_removed">Der Schlüssel wurde entfernt</string>
     <string name="manage_user_key_invalid">Dies ist kein gültiger TimeLimit-Schlüssel</string>
     <string name="manage_user_key_other_user">Dieser Schlüssel ist schon bei einem anderen Benutzer hinterlegt</string>
 
@@ -1089,7 +1072,6 @@
         Sie haben TimeLimit im lokalen Modus eingerichtet.
         In diesem gibt es keine Vernetzung, sodass Sie kein Gerät hinzufügen können.
     </string>
-    <string name="overview_add_device_migrate_to_connected">Zum vernetzten Modus migrieren</string>
 
     <string name="overview_intro_title">Willkommen bei TimeLimit</string>
     <string name="overview_intro_text">
@@ -1419,7 +1401,6 @@
     <string name="update_unavailable">Momentan ist kein Update verfügbar</string>
     <string name="update_available">TimeLimit %s ist verfügbar. Änderungen:\n%s</string>
     <string name="update_available_download">Aktualisieren</string>
-    <string name="update_permission_required_text">TimeLimit benötigt Ihre Berechtigung, um sich zu aktualisieren</string>
     <string name="update_privacy">TimeLimit kann automatisch nach Updates suchen. Dafür
         wird regelmäßig %s abgefragt.
     </string>
@@ -1489,10 +1470,7 @@
     <string name="util_time_unused">Unbenutzt</string>
     <string name="util_time_used"><xliff:g example="4 minutes" id="used time">%1$s</xliff:g> benutzt</string>
 
-    <string name="util_time_until">bis <xliff:g id="value">%1$s</xliff:g>
-    </string>
-
-   <string name="widget_empty_view">Wenn dieses Gerät einem Kind zugeordnet
+    <string name="widget_empty_view">Wenn dieses Gerät einem Kind zugeordnet
         wird und dieses Kind Kategorien hat, dann sollten diese Kategorien
         hier angezeigt werden.
     </string>

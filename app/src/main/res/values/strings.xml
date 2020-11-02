@@ -27,11 +27,6 @@
     <string name="generic_enable">Enable</string>
     <string name="generic_show_more" tools:ignore="MissingTranslation">Show more</string>
 
-    <plurals name="generic_plural_app">
-        <item quantity="one">%d App</item>
-        <item quantity="other">%d Apps</item>
-    </plurals>
-
     <string name="generic_swipe_to_dismiss">Swipe to the side to remove this message</string>
     <string name="generic_runtime_permission_rejected">Permission rejected; You can manage permissions in the system settings</string>
 
@@ -411,7 +406,6 @@
         Some options are unavailable because no parent user is signed in
     </string>
 
-    <string name="contacts_title">Contacts</string>
     <string name="contacts_snackbar_added">Contact was added</string>
     <string name="contacts_title_long">Allowed contacts</string>
     <string name="contacts_description">This is a list of phone numbers.
@@ -468,16 +462,6 @@
         <item>@string/day_of_week_friday</item>
         <item>@string/day_of_week_saturday</item>
         <item>@string/day_of_week_sunday</item>
-    </string-array>
-
-    <string-array name="days_of_week_array_short">
-        <item>@string/day_of_week_monday_short</item>
-        <item>@string/day_of_week_tuesday_short</item>
-        <item>@string/day_of_week_wednesday_short</item>
-        <item>@string/day_of_week_thursday_short</item>
-        <item>@string/day_of_week_friday_short</item>
-        <item>@string/day_of_week_saturday_short</item>
-        <item>@string/day_of_week_sunday_short</item>
     </string-array>
 
     <string name="delete_child_title">Delete user</string>
@@ -624,7 +608,6 @@
 
     <string name="lock_disable_temporarily_lock_title">Disable temporary blocking</string>
     <string name="lock_disable_temporarily_all_categories">all categories</string>
-    <string name="lock_disable_temporarily_all_categories_disabled">Only the category %s is blocked</string>
 
     <string name="lock_confirm_time_title">Confirm time manually</string>
     <string name="lock_confirm_time_btn">This time is correct</string>
@@ -692,7 +675,6 @@
 
     <string name="login_user_selection_text">Choose an user to authenticate</string>
     <string name="login_password_hint">Password</string>
-    <string name="login_btn_do">Log in</string>
     <string name="login_snackbar_wrong">The password is invalid</string>
     <string name="login_dialog_password_text">Enter your password to sign in</string>
     <string name="login_assign_to_device">Set myself as current user of this device</string>
@@ -750,10 +732,6 @@
 
     <string name="category_networks_toast_enable_location_service">Please enable location access</string>
 
-    <string name="manage_category_section_assigned_apps">assigned Apps</string>
-    <string name="manage_category_section_all_apps">all Apps</string>
-
-    <string name="manage_child_tab_categories">Categories</string>
     <string name="manage_child_tab_other" tools:ignore="MissingTranslation">Advanced settings</string>
 
     <string name="manage_child_category_no_time_limits">no time limit</string>
@@ -946,10 +924,6 @@
         This permission can only be disabled by TimeLimit/ a parent which uninstalls TimeLimit.
     </string>
 
-    <string name="manage_device_permission_tap_top_open_settings">
-        Touch this option to open the corresponding section of the system settings
-    </string>
-
     <string name="manage_device_permission_open_at_target_device">
         Open the screen at the other device to modify the permissions
     </string>
@@ -1059,7 +1033,6 @@
     <string name="manage_user_key_add">add key</string>
     <string name="manage_user_key_remove">remove key</string>
     <string name="manage_user_key_added">The key was added</string>
-    <string name="manage_user_key_removed">The key was removed</string>
     <string name="manage_user_key_invalid">This was no valid TimeLimit key</string>
     <string name="manage_user_key_other_user">This key is already linked to an other user</string>
 
@@ -1141,7 +1114,6 @@
         You have set up TimeLimit in the local mode.
         There is no linking, therefore you can not add devices.
     </string>
-    <string name="overview_add_device_migrate_to_connected">Migrate to the connected mode</string>
 
     <string name="overview_intro_title">Welcome to TimeLimit</string>
     <string name="overview_intro_text">
@@ -1481,7 +1453,6 @@
     <string name="update_unavailable">There is currently no update available</string>
     <string name="update_available">TimeLimit %s is available. Changes:\n%s</string>
     <string name="update_available_download">Update</string>
-    <string name="update_permission_required_text">TimeLimit needs your permission to update itself</string>
     <string name="update_privacy">TimeLimit can automatically check for updates.
         For this, it queries %s.
     </string>
@@ -1548,9 +1519,6 @@
 
     <string name="util_time_unused">Unused</string>
     <string name="util_time_used">Used <xliff:g example="4 minutes" id="used time">%1$s</xliff:g></string>
-
-    <string name="util_time_until">until <xliff:g id="value">%1$s</xliff:g>
-    </string>
 
     <string name="widget_empty_view">If this device is assigned to a child
         and this child has got categories, then the categories should
