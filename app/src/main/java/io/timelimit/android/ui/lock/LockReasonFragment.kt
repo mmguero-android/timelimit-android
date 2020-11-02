@@ -30,8 +30,8 @@ import io.timelimit.android.data.extensions.sortedCategories
 import io.timelimit.android.data.model.*
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
-import io.timelimit.android.databinding.LockFragmentBinding
 import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
+import io.timelimit.android.databinding.LockReasonFragmentBinding
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
@@ -53,38 +53,13 @@ import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 import java.util.*
 
-class LockFragment : Fragment() {
+class LockReasonFragment : Fragment() {
     companion object {
-        private const val EXTRA_PACKAGE_NAME = "pkg"
-        private const val EXTRA_ACTIVITY = "activitiy"
-        private const val STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN = "didOpenSetCurrentDeviceScreen"
         private const val LOCATION_REQUEST_CODE = 1
-
-        fun newInstance(packageName: String, activity: String?): LockFragment {
-            val result = LockFragment()
-            val arguments = Bundle()
-
-            arguments.putString(EXTRA_PACKAGE_NAME, packageName)
-
-            if (activity != null) {
-                arguments.putString(EXTRA_ACTIVITY, activity)
-            }
-
-            result.arguments = arguments
-            return result
-        }
     }
 
-    private var didOpenSetCurrentDeviceScreen = false
-    private val packageName: String by lazy { requireArguments().getString(EXTRA_PACKAGE_NAME)!! }
-    private val activityName: String? by lazy {
-        if (requireArguments().containsKey(EXTRA_ACTIVITY))
-            requireArguments().getString(EXTRA_ACTIVITY)
-        else
-            null
-    }
     private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
-    private lateinit var binding: LockFragmentBinding
+    private lateinit var binding: LockReasonFragmentBinding
     private val model: LockModel by activityViewModels()
 
     private fun setupHandlers(deviceId: String, userRelatedData: UserRelatedData, blockedCategoryId: String?) {
@@ -140,23 +115,23 @@ class LockFragment : Fragment() {
                 (activity as LockActivity).showAuthenticationScreen()
             }
 
-            override fun setThisDeviceAsCurrentDevice() = this@LockFragment.setThisDeviceAsCurrentDevice()
+            override fun setThisDeviceAsCurrentDevice() = this@LockReasonFragment.setThisDeviceAsCurrentDevice()
 
             override fun requestLocationPermission() {
-                RequestWifiPermission.doRequest(this@LockFragment, LOCATION_REQUEST_CODE)
+                RequestWifiPermission.doRequest(this@LockReasonFragment, LOCATION_REQUEST_CODE)
             }
         }
     }
 
     private fun setThisDeviceAsCurrentDevice() {
-        didOpenSetCurrentDeviceScreen = true
+        model.didOpenSetCurrentDeviceScreen = true
 
         UpdatePrimaryDeviceDialogFragment
                 .newInstance(UpdatePrimaryDeviceRequestType.SetThisDevice)
                 .show(parentFragmentManager)
     }
 
-    private fun bindAddToCategoryOptions(userRelatedData: UserRelatedData) {
+    private fun bindAddToCategoryOptions(userRelatedData: UserRelatedData, blockedPackageName: String) {
         binding.addToCategoryOptions.removeAllViews()
 
         userRelatedData.sortedCategories().forEach { (_, category) ->
@@ -166,7 +141,7 @@ class LockFragment : Fragment() {
                     auth.tryDispatchParentAction(
                             AddCategoryAppsAction(
                                     categoryId = category.category.id,
-                                    packageNames = listOf(packageName)
+                                    packageNames = listOf(blockedPackageName)
                             )
                     )
                 }
@@ -238,22 +213,8 @@ class LockFragment : Fragment() {
         model.missingNetworkIdPermission.observe(viewLifecycleOwner) { binding.missingNetworkIdPermission = it }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (savedInstanceState != null) {
-            didOpenSetCurrentDeviceScreen = savedInstanceState.getBoolean(STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN)
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putBoolean(STATUS_DID_OPEN_SET_CURRENT_DEVICE_SCREEN, didOpenSetCurrentDeviceScreen)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = LockFragmentBinding.inflate(layoutInflater, container, false)
+        binding = LockReasonFragmentBinding.inflate(layoutInflater, container, false)
 
         AuthenticationFab.manageAuthenticationFab(
                 fab = binding.fab,
@@ -272,7 +233,7 @@ class LockFragment : Fragment() {
             )
         }
 
-        binding.packageName = packageName
+        model.packageAndActivityNameLive.observe(viewLifecycleOwner) { binding.packageName = it.first }
 
         binding.appTitle = model.title ?: "???"
         binding.appIcon.setImageDrawable(model.icon)
@@ -288,50 +249,51 @@ class LockFragment : Fragment() {
 
                     requireActivity().finish()
                 }
-                is LockscreenContent.BlockedCategory -> {
-                    binding.activityName = if (content.enableActivityLevelBlocking) activityName?.removePrefix(packageName) else null
+                is LockscreenContent.Blocked -> {
+                    binding.activityName = if (content.enableActivityLevelBlocking) content.appActivityName?.removePrefix(content.appPackageName) else null
 
-                    binding.appCategoryTitle = content.appCategoryTitle
-                    binding.reason = content.reason
-                    binding.blockedKindLabel = when (content.level) {
-                        BlockingLevel.Activity -> "Activity"
-                        BlockingLevel.App -> "App"
-                    }
-                    setupHandlers(
-                            deviceId = content.deviceId,
-                            blockedCategoryId = content.blockedCategoryId,
-                            userRelatedData = content.userRelatedData
-                    )
-                    bindExtraTimeView(
-                            deviceRelatedData = content.deviceRelatedData,
-                            categoryId = content.blockedCategoryId,
-                            timeZone = content.userRelatedData.timeZone
-                    )
-                    binding.manageDisableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
-                            childId = content.userId,
-                            childTimezone = content.timeZone,
-                            activity = requireActivity(),
-                            hasFullVersion = content.hasFullVersion
-                    )
+                    when (content) {
+                        is LockscreenContent.Blocked.BlockedCategory -> {
+                            binding.appCategoryTitle = content.appCategoryTitle
+                            binding.reason = content.reason
+                            binding.blockedKindLabel = when (content.level) {
+                                BlockingLevel.Activity -> "Activity"
+                                BlockingLevel.App -> "App"
+                            }
+                            setupHandlers(
+                                    deviceId = content.deviceId,
+                                    blockedCategoryId = content.blockedCategoryId,
+                                    userRelatedData = content.userRelatedData
+                            )
+                            bindExtraTimeView(
+                                    deviceRelatedData = content.deviceRelatedData,
+                                    categoryId = content.blockedCategoryId,
+                                    timeZone = content.userRelatedData.timeZone
+                            )
+                            binding.manageDisableTimeLimits.handlers = ManageDisableTimelimitsViewHelper.createHandlers(
+                                    childId = content.userId,
+                                    childTimezone = content.timeZone,
+                                    activity = requireActivity(),
+                                    hasFullVersion = content.hasFullVersion
+                            )
+                        }
+                        is LockscreenContent.Blocked.BlockDueToNoCategory -> {
+                            binding.appCategoryTitle = null
+                            binding.reason = BlockingReason.NotPartOfAnCategory
+                            binding.blockedKindLabel = "App"
 
-                    if (content.reason == BlockingReason.RequiresCurrentDevice && !didOpenSetCurrentDeviceScreen && isResumed) {
-                        setThisDeviceAsCurrentDevice()
-                    } else null
-                }
-                is LockscreenContent.BlockDueToNoCategory -> {
-                    binding.activityName = if (content.enableActivityLevelBlocking) activityName?.removePrefix(packageName) else null
+                            setupHandlers(
+                                    deviceId = content.deviceId,
+                                    blockedCategoryId = null,
+                                    userRelatedData = content.userRelatedData
+                            )
 
-                    binding.appCategoryTitle = null
-                    binding.reason = BlockingReason.NotPartOfAnCategory
-                    binding.blockedKindLabel = "App"
-
-                    setupHandlers(
-                            deviceId = content.deviceId,
-                            blockedCategoryId = null,
-                            userRelatedData = content.userRelatedData
-                    )
-
-                    bindAddToCategoryOptions(content.userRelatedData)
+                            bindAddToCategoryOptions(
+                                    userRelatedData = content.userRelatedData,
+                                    blockedPackageName = content.appPackageName
+                            )
+                        }
+                    }.let {/* require handling all paths */}
                 }
             }.let {/* require handling all paths */}
         }

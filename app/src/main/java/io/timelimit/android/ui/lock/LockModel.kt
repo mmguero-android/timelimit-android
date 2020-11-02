@@ -54,6 +54,8 @@ class LockModel(application: Application): AndroidViewModel(application) {
 
     val title: String? get() = logic.platformIntegration.getLocalAppTitle(packageAndActivityNameLiveInternal.value!!.first)
     val icon: Drawable? get() = logic.platformIntegration.getAppIcon(packageAndActivityNameLiveInternal.value!!.first)
+    val packageAndActivityNameLive: LiveData<Pair<String, String?>> = packageAndActivityNameLiveInternal
+    var didOpenSetCurrentDeviceScreen = false
 
     fun init(packageName: String, activityName: String?) {
         if (didInit) return
@@ -119,18 +121,21 @@ class LockModel(application: Application): AndroidViewModel(application) {
                 val categoryHandlings = appBaseHandling.categoryIds.map { handlingCache.get(it) }
                 val blockingHandling = categoryHandlings.find { it.shouldBlockActivities }
 
-                value = if (blockingHandling == null) LockscreenContent.Close else LockscreenContent.BlockedCategory(
+                value = if (blockingHandling == null) LockscreenContent.Close else LockscreenContent.Blocked.BlockedCategory(
                         deviceAndUserRelatedData = deviceAndUserRelatedData,
                         blockingHandling = blockingHandling,
                         level = appBaseHandling.level,
                         userRelatedData = deviceAndUserRelatedData.userRelatedData,
-                        appBaseHandling = appBaseHandling
+                        appPackageName = packageName,
+                        appActivityName = activityName
                 ).also { scheduleUpdate((blockingHandling.dependsOnMaxTime - realTime.timeInMillis)) }
             } else if (appBaseHandling is AppBaseHandling.BlockDueToNoCategory) {
-                value = LockscreenContent.BlockDueToNoCategory(
+                value = LockscreenContent.Blocked.BlockDueToNoCategory(
                         userRelatedData = deviceAndUserRelatedData.userRelatedData,
                         deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id,
-                        enableActivityLevelBlocking = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking
+                        enableActivityLevelBlocking = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking,
+                        appPackageName = packageName,
+                        appActivityName = activityName
                 )
             } else {
                 value = LockscreenContent.Close; return
@@ -201,27 +206,37 @@ class LockModel(application: Application): AndroidViewModel(application) {
 sealed class LockscreenContent {
     object Close: LockscreenContent()
 
-    data class BlockedCategory(
-            val deviceAndUserRelatedData: DeviceAndUserRelatedData,
-            val blockingHandling: CategoryItselfHandling,
-            val appBaseHandling: AppBaseHandling,
-            val level: BlockingLevel,
-            val userRelatedData: UserRelatedData
-    ): LockscreenContent() {
-        val appCategoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title
-        val reason = blockingHandling.activityBlockingReason
-        val deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id
-        val userId = userRelatedData.user.id
-        val timeZone = userRelatedData.user.timeZone
-        val blockedCategoryId = blockingHandling.createdWithCategoryRelatedData.category.id
-        val deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData
-        val hasFullVersion = deviceRelatedData.isConnectedAndHasPremium || deviceRelatedData.isLocalMode
-        val enableActivityLevelBlocking = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking
-    }
+    sealed class Blocked: LockscreenContent() {
+        abstract val userRelatedData: UserRelatedData
+        abstract val appPackageName: String
+        abstract val appActivityName: String?
+        abstract val enableActivityLevelBlocking: Boolean
 
-    data class BlockDueToNoCategory(
-            val userRelatedData: UserRelatedData,
-            val deviceId: String,
-            val enableActivityLevelBlocking: Boolean
-    ): LockscreenContent()
+        class BlockedCategory(
+                val deviceAndUserRelatedData: DeviceAndUserRelatedData,
+                val blockingHandling: CategoryItselfHandling,
+                val level: BlockingLevel,
+                override val userRelatedData: UserRelatedData,
+                override val appPackageName: String,
+                override val appActivityName: String?
+        ): Blocked() {
+            val appCategoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title
+            val reason = blockingHandling.activityBlockingReason
+            val deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id
+            val userId = userRelatedData.user.id
+            val timeZone = userRelatedData.user.timeZone
+            val blockedCategoryId = blockingHandling.createdWithCategoryRelatedData.category.id
+            val deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData
+            val hasFullVersion = deviceRelatedData.isConnectedAndHasPremium || deviceRelatedData.isLocalMode
+            override val enableActivityLevelBlocking = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.enableActivityLevelBlocking
+        }
+
+        class BlockDueToNoCategory(
+                override val userRelatedData: UserRelatedData,
+                val deviceId: String,
+                override val enableActivityLevelBlocking: Boolean,
+                override val appPackageName: String,
+                override val appActivityName: String?
+        ): Blocked()
+    }
 }

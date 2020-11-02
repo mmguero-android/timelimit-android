@@ -23,15 +23,18 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
 import io.timelimit.android.extensions.showSafe
+import io.timelimit.android.logic.BlockingReason
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.sync.network.UpdatePrimaryDeviceRequestType
 import io.timelimit.android.ui.IsAppInForeground
 import io.timelimit.android.ui.login.NewLoginFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.manage.child.primarydevice.UpdatePrimaryDeviceDialogFragment
 import io.timelimit.android.ui.util.SyncStatusModel
+import kotlinx.android.synthetic.main.lock_activity.*
 
 class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
     companion object {
@@ -58,6 +61,9 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
     }
 
     private val model: LockModel by viewModels()
+    private val syncModel: SyncStatusModel by viewModels()
+    private val activityModel: ActivityViewModel by viewModels()
+    private var isResumed = false
 
     override var ignoreStop: Boolean = false
 
@@ -74,27 +80,30 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.lock_activity)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, LockFragment.newInstance(blockedPackageName, blockedActivityName))
-                    .commitNow()
-        }
+        setContentView(R.layout.lock_activity)
 
         if (savedInstanceState == null) {
             stopMediaPlayback()
         }
 
-        val syncModel = ViewModelProviders.of(this).get(SyncStatusModel::class.java)
-
-        syncModel.statusText.observe(this, Observer {
-            supportActionBar?.subtitle = it
-        })
+        syncModel.statusText.observe(this) { supportActionBar?.subtitle = it }
 
         currentInstances.add(this)
 
         model.init(blockedPackageName, blockedActivityName)
+
+        pager.adapter = LockActivityAdapter(supportFragmentManager)
+
+        model.content.observe(this) {
+            if (isResumed && it is LockscreenContent.Blocked.BlockedCategory && it.reason == BlockingReason.RequiresCurrentDevice && !model.didOpenSetCurrentDeviceScreen) {
+                model.didOpenSetCurrentDeviceScreen = true
+
+                UpdatePrimaryDeviceDialogFragment
+                        .newInstance(UpdatePrimaryDeviceRequestType.SetThisDevice)
+                        .show(supportFragmentManager)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -103,9 +112,7 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         currentInstances.remove(this)
     }
 
-    override fun getActivityViewModel(): ActivityViewModel {
-        return ViewModelProviders.of(this).get(ActivityViewModel::class.java)
-    }
+    override fun getActivityViewModel(): ActivityViewModel = activityModel
 
     override fun showAuthenticationScreen() {
         NewLoginFragment().showSafe(supportFragmentManager, LOGIN_DIALOG_TAG)
@@ -115,12 +122,14 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         super.onResume()
 
         lockTaskModeWorkaround()
+        isResumed = true
     }
 
     override fun onPause() {
         super.onPause()
 
         lockTaskModeWorkaround()
+        isResumed = false
     }
 
     override fun onStart() {
