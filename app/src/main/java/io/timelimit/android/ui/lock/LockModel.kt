@@ -211,17 +211,19 @@ sealed class LockscreenContent {
         abstract val appPackageName: String
         abstract val appActivityName: String?
         abstract val enableActivityLevelBlocking: Boolean
+        abstract val reason: BlockingReason
+        abstract val level: BlockingLevel
 
         class BlockedCategory(
                 val deviceAndUserRelatedData: DeviceAndUserRelatedData,
                 val blockingHandling: CategoryItselfHandling,
-                val level: BlockingLevel,
+                override val level: BlockingLevel,
                 override val userRelatedData: UserRelatedData,
                 override val appPackageName: String,
                 override val appActivityName: String?
         ): Blocked() {
             val appCategoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title
-            val reason = blockingHandling.activityBlockingReason
+            override val reason = blockingHandling.activityBlockingReason
             val deviceId = deviceAndUserRelatedData.deviceRelatedData.deviceEntry.id
             val userId = userRelatedData.user.id
             val timeZone = userRelatedData.user.timeZone
@@ -237,6 +239,9 @@ sealed class LockscreenContent {
                 override val enableActivityLevelBlocking: Boolean,
                 override val appPackageName: String,
                 override val appActivityName: String?
-        ): Blocked()
+        ): Blocked() {
+            override val level: BlockingLevel = BlockingLevel.App
+            override val reason: BlockingReason = BlockingReason.NotPartOfAnCategory
+        }
     }
 }

@@ -21,10 +21,11 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 
 class LockActivityAdapter(fragmentManager: FragmentManager): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    override fun getCount(): Int = 1
+    override fun getCount(): Int = 2
 
     override fun getItem(position: Int): Fragment = when (position) {
         0 -> LockReasonFragment()
+        1 -> LockActionFragment()
         else -> throw IllegalArgumentException()
     }
 }
