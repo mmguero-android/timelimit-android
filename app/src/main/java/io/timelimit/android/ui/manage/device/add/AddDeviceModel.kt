@@ -30,7 +30,6 @@ import io.timelimit.android.ui.main.ActivityViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import java.lang.RuntimeException
 
 class AddDeviceModel(application: Application): AndroidViewModel(application) {
     private val statusInternal = MutableLiveData<Status>()

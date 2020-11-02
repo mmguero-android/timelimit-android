@@ -22,12 +22,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import io.timelimit.android.R
-import io.timelimit.android.async.Threads
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.update.UpdateIntegration
-import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.update.UpdateUtil
-import io.timelimit.android.work.CheckUpdateWorker
 
 class EnableUpdatesDialogFragment: DialogFragment() {
     companion object {

@@ -18,7 +18,9 @@ package io.timelimit.android.logic
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
-import io.timelimit.android.livedata.*
+import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.map
+import io.timelimit.android.livedata.switchMap
 
 class CurrentDeviceLogic(private val appLogic: AppLogic) {
     companion object {

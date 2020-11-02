@@ -29,11 +29,8 @@ import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.data.Database
-import io.timelimit.android.data.extensions.getDateLive
 import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.data.model.TimeLimitRule
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.sync.actions.CreateTimeLimitRuleAction

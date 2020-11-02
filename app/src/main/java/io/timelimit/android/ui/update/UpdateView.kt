@@ -21,10 +21,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.databinding.UpdateViewBinding
-import io.timelimit.android.update.UpdateIntegration
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
+import io.timelimit.android.update.UpdateIntegration
 
 object UpdateView {
     fun bind(

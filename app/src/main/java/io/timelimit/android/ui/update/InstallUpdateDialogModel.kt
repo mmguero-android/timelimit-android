@@ -32,10 +32,10 @@ import io.timelimit.android.BuildConfig
 import io.timelimit.android.async.Threads
 import io.timelimit.android.crypto.HexString
 import io.timelimit.android.data.IdGenerator
-import io.timelimit.android.update.UpdateIntegration
 import io.timelimit.android.integration.platform.android.PendingIntentIds
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.update.UpdateIntegration
 import java.io.IOException
 import java.security.MessageDigest
 

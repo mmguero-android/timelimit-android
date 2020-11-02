@@ -22,13 +22,11 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.data.extensions.getCategoryWithParentCategories
 import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.data.model.derived.CompleteUserLoginRelatedData
-import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.integration.platform.BatteryStatus
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.BlockingReason
 import io.timelimit.android.logic.RealTime
 import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
-import java.util.*
 import java.util.concurrent.CountDownLatch
 
 sealed class AllowUserLoginStatus {

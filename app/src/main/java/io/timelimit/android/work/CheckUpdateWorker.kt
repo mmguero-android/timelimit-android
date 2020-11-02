@@ -18,8 +18,8 @@ package io.timelimit.android.work
 
 import android.content.Context
 import androidx.work.*
-import io.timelimit.android.update.UpdateIntegration
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.update.UpdateIntegration
 import io.timelimit.android.update.UpdateUtil
 import java.util.concurrent.TimeUnit
 

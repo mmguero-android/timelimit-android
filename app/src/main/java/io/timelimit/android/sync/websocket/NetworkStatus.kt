@@ -21,8 +21,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
-import android.util.Log
-import androidx.core.net.ConnectivityManagerCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig

@@ -32,7 +32,6 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.UpdateCategoryTitleAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 import io.timelimit.android.ui.util.EditTextBottomSheetDialog
 
 class RenameCategoryDialogFragment: EditTextBottomSheetDialog() {

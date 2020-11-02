@@ -16,9 +16,8 @@
 package io.timelimit.android.logic
 
 import androidx.lifecycle.LiveData
-import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
-import io.timelimit.android.livedata.*
+import io.timelimit.android.livedata.ignoreUnchanged
 import java.util.*
 
 enum class BlockingReason {

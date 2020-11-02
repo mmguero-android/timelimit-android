@@ -27,7 +27,6 @@ import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseMainBinding
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.livedata.liveDataFromValue
-import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 

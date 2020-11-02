@@ -45,7 +45,6 @@ import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.AppActivity
 import io.timelimit.android.integration.platform.*
 import io.timelimit.android.integration.platform.android.foregroundapp.ForegroundAppHelper
-import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.homescreen.HomescreenActivity
 import io.timelimit.android.ui.lock.LockActivity
 import io.timelimit.android.ui.manipulation.AnnoyActivity

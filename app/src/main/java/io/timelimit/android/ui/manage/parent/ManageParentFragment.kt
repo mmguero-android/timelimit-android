@@ -28,7 +28,6 @@ import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.FragmentManageParentBinding
-import io.timelimit.android.databinding.ParentLimitLoginViewBinding
 import io.timelimit.android.extensions.safeNavigate
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map

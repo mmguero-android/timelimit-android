@@ -15,7 +15,6 @@
  */
 package io.timelimit.android.ui.manage.category.settings.networks
 
-import android.Manifest
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner

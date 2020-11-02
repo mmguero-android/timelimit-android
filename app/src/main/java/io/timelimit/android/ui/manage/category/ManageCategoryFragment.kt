@@ -16,7 +16,9 @@
 package io.timelimit.android.ui.manage.category
 
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import io.timelimit.android.R
 import io.timelimit.android.extensions.safeNavigate

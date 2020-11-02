@@ -21,12 +21,12 @@ import androidx.lifecycle.ViewModel
 import io.timelimit.android.barcode.BarcodeConstants
 import io.timelimit.android.barcode.BarcodeMask
 import io.timelimit.android.barcode.DataMatrix
+import io.timelimit.android.crypto.Curve25519
 import io.timelimit.android.data.Database
 import io.timelimit.android.livedata.liveDataFromFunction
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
-import io.timelimit.android.crypto.Curve25519
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

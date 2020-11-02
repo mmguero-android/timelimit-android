@@ -19,16 +19,11 @@ package io.timelimit.android.ui.manage.child.advanced.limituserviewing
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.data.model.User
 import io.timelimit.android.data.model.UserFlags
 import io.timelimit.android.databinding.LimitUserViewingViewBinding
-import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.map
-import io.timelimit.android.sync.actions.UpdateUserFlagsAction
 import io.timelimit.android.ui.extension.bindHelpDialog
-import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.manage.child.advanced.userflagswitch.UserFlagSwitch
 

@@ -22,8 +22,8 @@ import androidx.lifecycle.ViewModel
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.data.Database
 import io.timelimit.android.crypto.Curve25519
+import io.timelimit.android.data.Database
 
 class SetupParentmodeDialogModel: ViewModel() {
     private var didInit = false

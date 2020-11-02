@@ -17,7 +17,6 @@ package io.timelimit.android.date
 
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
-import org.threeten.bp.temporal.ChronoUnit
 import java.util.*
 
 data class DateInTimezone(val dayOfWeek: Int, val dayOfEpoch: Int, val localDate: LocalDate) {

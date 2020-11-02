@@ -28,7 +28,6 @@ import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.NetworkTime
-import io.timelimit.android.databinding.HelpDialogFragmentBinding
 import io.timelimit.android.databinding.ManageDeviceFeaturesFragmentBinding
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map

@@ -27,14 +27,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import io.timelimit.android.R
 import io.timelimit.android.data.extensions.sortedCategories
-import io.timelimit.android.data.model.*
+import io.timelimit.android.data.model.NetworkTime
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.databinding.LockActionFragmentBinding
 import io.timelimit.android.databinding.LockFragmentCategoryButtonBinding
 import io.timelimit.android.date.DateInTimezone
-import io.timelimit.android.livedata.*
-import io.timelimit.android.logic.*
+import io.timelimit.android.logic.BlockingLevel
+import io.timelimit.android.logic.BlockingReason
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.sync.actions.IncrementCategoryExtraTimeAction
 import io.timelimit.android.sync.actions.UpdateCategoryTemporarilyBlockedAction
@@ -43,7 +43,6 @@ import io.timelimit.android.sync.network.UpdatePrimaryDeviceRequestType
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
-import io.timelimit.android.ui.main.AuthenticationFab
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.settings.networks.RequestWifiPermission
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper

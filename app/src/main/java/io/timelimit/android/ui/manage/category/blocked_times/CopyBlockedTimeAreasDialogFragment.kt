@@ -31,7 +31,6 @@ import io.timelimit.android.databinding.CopyBlockedTimeAreasDialogFragmentBindin
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
-import io.timelimit.android.ui.manage.category.ManageCategoryFragmentArgs
 
 class CopyBlockedTimeAreasDialogFragment : BottomSheetDialogFragment() {
     companion object {

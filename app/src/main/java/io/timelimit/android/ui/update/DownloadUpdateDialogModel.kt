@@ -24,9 +24,9 @@ import io.timelimit.android.BuildConfig
 import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.update.UpdateIntegration
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.update.UpdateIntegration
 
 class DownloadUpdateDialogModel(application: Application): AndroidViewModel(application) {
     companion object {

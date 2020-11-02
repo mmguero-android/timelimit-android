@@ -16,9 +16,8 @@
 
 package io.timelimit.android.extensions
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 

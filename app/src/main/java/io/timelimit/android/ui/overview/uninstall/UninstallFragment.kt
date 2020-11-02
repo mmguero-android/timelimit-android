@@ -29,7 +29,10 @@ import io.timelimit.android.databinding.FragmentUninstallBinding
 import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
-import io.timelimit.android.ui.main.*
+import io.timelimit.android.ui.main.ActivityViewModel
+import io.timelimit.android.ui.main.ActivityViewModelHolder
+import io.timelimit.android.ui.main.AuthenticationFab
+import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import kotlinx.android.synthetic.main.single_fragment_wrapper.*
 
 class UninstallFragment : Fragment(), FragmentWithCustomTitle {
