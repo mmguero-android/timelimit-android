@@ -44,6 +44,7 @@ class LockReasonFragment: Fragment() {
 
         model.packageAndActivityNameLive.observe(viewLifecycleOwner) { binding.packageName = it.first }
         binding.appIcon.setImageDrawable(model.icon)
+        binding.appTitle = model.title
 
         return binding.root
     }
