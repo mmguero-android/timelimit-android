@@ -27,7 +27,7 @@
     <string name="generic_enable">Aktivieren</string>
     <string name="generic_show_more">Mehr anzeigen</string>
 
-    <string name="generic_swipe_to_dismiss">Se können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
+    <string name="generic_swipe_to_dismiss">Sie können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
     <string name="generic_runtime_permission_rejected">Berechtigung abgelehnt; Sie können die Berechtigungen in den Systemeinstellungen verwalten</string>
 
     <string name="about_version">Version %s</string>
