@@ -1030,9 +1030,8 @@
         Apps mit Kategorie werden beim Hinzufügen aus der vorherigen Kategorie entfernt - für mehrere Kategorien gleichzeitig können Sie Ober- und Unter-Kategorien verwenden
     </string>
     <string name="must_read_blocked_time_areas_obsolete">
-        Die Sperzeiten sind veraltet. Sie können stattdessen Zeitbegrenzungsregeln für
-        Teile eines Tages mit 0 Minuten Dauer verwenden. Die Sperrzeiten werden in der Zukunft
-        entfernt werden.
+        Die Sperrzeiten sind alt. Die meisten Fälle werden durch
+        die Zeitbegrenzungsregeln für Teile eines Tages mit 0 Minuten Dauer besser abgedeckt.
     </string>
 
     <string name="notification_channel_app_status_title">App-Status</string>
