@@ -59,13 +59,15 @@ class SelectCustomServerModel(application: Application): AndroidViewModel(applic
                     Log.w(LOG_TAG, "can not set custom server", ex)
                 }
 
-                if (ex is HttpError) {
-                    Toast.makeText(getApplication(), R.string.custom_server_select_test_failed, Toast.LENGTH_SHORT).show()
-                } else if (ex is IOException) {
-                    Toast.makeText(getApplication(), R.string.error_network, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
+                val messageResource = when (ex) {
+                    is HttpError -> R.string.custom_server_select_test_failed
+                    is IOException -> R.string.error_network
+                    else -> R.string.error_general
                 }
+
+                val message = getApplication<Application>().getString(messageResource)
+
+                Toast.makeText(getApplication(), message + "\n" + ex.toString(), Toast.LENGTH_SHORT).show()
             }
         }
     }
