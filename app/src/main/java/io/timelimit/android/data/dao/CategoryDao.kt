@@ -65,7 +65,7 @@ abstract class CategoryDao {
     @Query("UPDATE category SET temporarily_blocked = :blocked, temporarily_blocked_end_time = :endTime WHERE id = :categoryId")
     abstract fun updateCategoryTemporarilyBlocked(categoryId: String, blocked: Boolean, endTime: Long)
 
-    @Query("SELECT id, base_version, apps_version, rules_version, usedtimes_version FROM category")
+    @Query("SELECT id, base_version, apps_version, rules_version, usedtimes_version, tasks_version FROM category")
     abstract fun getCategoriesWithVersionNumbers(): LiveData<List<CategoryWithVersionNumbers>>
 
     @Query("UPDATE category SET apps_version = :assignedAppsVersion WHERE id = :categoryId")
@@ -77,10 +77,13 @@ abstract class CategoryDao {
     @Query("UPDATE category SET usedtimes_version = :usedTimesVersion WHERE id = :categoryId")
     abstract fun updateCategoryUsedTimesVersion(categoryId: String, usedTimesVersion: String)
 
+    @Query("UPDATE category SET tasks_version = :tasksVersion WHERE id = :categoryId")
+    abstract fun updateCategoryTasksVersion(categoryId: String, tasksVersion: String)
+
     @Update
     abstract fun updateCategorySync(category: Category)
 
-    @Query("UPDATE category SET apps_version = \"\", rules_version = \"\", usedtimes_version = \"\", base_version = \"\"")
+    @Query("UPDATE category SET apps_version = '', rules_version = '', usedtimes_version = '', base_version = '', tasks_version = ''")
     abstract fun deleteAllCategoriesVersionNumbers()
 
     @Query("SELECT * FROM category LIMIT :pageSize OFFSET :offset")
@@ -114,7 +117,9 @@ data class CategoryWithVersionNumbers(
         @ColumnInfo(name = "rules_version")
         val timeLimitRulesVersion: String,
         @ColumnInfo(name = "usedtimes_version")
-        val usedTimeItemsVersion: String
+        val usedTimeItemsVersion: String,
+        @ColumnInfo(name = "tasks_version")
+        val taskListVersion: String
 )
 
 data class CategoryShortInfo(

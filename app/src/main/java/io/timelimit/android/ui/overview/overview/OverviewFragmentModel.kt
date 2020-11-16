@@ -115,42 +115,63 @@ class OverviewFragmentModel(application: Application): AndroidViewModel(applicat
         }
     }
 
+    private val hiddenTaskIdsLive = MutableLiveData<Set<String>>().apply { value = emptySet() }
+    private val tasksWithPendingReviewLive = logic.database.childTasks().getPendingTasks()
+    private val pendingTasksToShowLive = hiddenTaskIdsLive.switchMap { hiddenTaskIds ->
+        tasksWithPendingReviewLive.map { tasksWithPendingReview ->
+            tasksWithPendingReview.filterNot { hiddenTaskIds.contains(it.childTask.taskId) }
+        }
+    }
+    private val pendingTaskItemLive = pendingTasksToShowLive.map { tasks ->
+        tasks.firstOrNull()?.let {
+            TaskReviewOverviewItem(task = it.childTask, childTitle = it.childName, categoryTitle = it.categoryTitle)
+        }
+    }
+
+    fun hideTask(taskId: String) {
+        hiddenTaskIdsLive.value = (hiddenTaskIdsLive.value ?: emptySet()) + setOf(taskId)
+    }
+
     val listEntries = introEntries.switchMap { introEntries ->
         deviceEntries.switchMap { deviceEntries ->
             userEntries.switchMap { userEntries ->
-                itemVisibility.map { itemVisibility ->
-                    mutableListOf<OverviewFragmentItem>().apply {
-                        addAll(introEntries)
+                pendingTaskItemLive.switchMap { pendingTaskItem ->
+                    itemVisibility.map { itemVisibility ->
+                        mutableListOf<OverviewFragmentItem>().apply {
+                            addAll(introEntries)
 
-                        add(OverviewFragmentHeaderDevices)
-                        val shownDevices = when (itemVisibility.devices) {
-                            DeviceListItemVisibility.BareMinimum -> deviceEntries.filter { it.isCurrentDevice || it.isImportant }
-                            DeviceListItemVisibility.AllChildDevices -> deviceEntries.filter { it.isCurrentDevice || it.isImportant || it.deviceUser?.type == UserType.Child }
-                            DeviceListItemVisibility.AllDevices -> deviceEntries
-                        }
-                        addAll(shownDevices)
-                        if (shownDevices.size == deviceEntries.size) {
-                            add(OverviewFragmentActionAddDevice)
-                        } else {
-                            add(ShowMoreOverviewFragmentItem.ShowMoreDevices(when (itemVisibility.devices) {
-                                DeviceListItemVisibility.BareMinimum -> if (deviceEntries.find { it.deviceUser?.type == UserType.Child } != null)
-                                    DeviceListItemVisibility.AllChildDevices else DeviceListItemVisibility.AllDevices
-                                DeviceListItemVisibility.AllChildDevices -> DeviceListItemVisibility.AllDevices
-                                DeviceListItemVisibility.AllDevices -> DeviceListItemVisibility.AllDevices
-                            }))
-                        }
+                            if (pendingTaskItem != null) add(pendingTaskItem)
 
-                        add(OverviewFragmentHeaderUsers)
-                        if (itemVisibility.showParentUsers) {
-                            addAll(userEntries)
-                            add(OverviewFragmentActionAddUser)
-                        } else {
-                            userEntries.forEach { if (it.user.type != UserType.Parent) add(it) }
-                            add(ShowMoreOverviewFragmentItem.ShowAllUsers)
-                        }
-                    }.toList()
-                }
-            } as LiveData<List<OverviewFragmentItem>>
+                            add(OverviewFragmentHeaderDevices)
+                            val shownDevices = when (itemVisibility.devices) {
+                                DeviceListItemVisibility.BareMinimum -> deviceEntries.filter { it.isCurrentDevice || it.isImportant }
+                                DeviceListItemVisibility.AllChildDevices -> deviceEntries.filter { it.isCurrentDevice || it.isImportant || it.deviceUser?.type == UserType.Child }
+                                DeviceListItemVisibility.AllDevices -> deviceEntries
+                            }
+                            addAll(shownDevices)
+                            if (shownDevices.size == deviceEntries.size) {
+                                add(OverviewFragmentActionAddDevice)
+                            } else {
+                                add(ShowMoreOverviewFragmentItem.ShowMoreDevices(when (itemVisibility.devices) {
+                                    DeviceListItemVisibility.BareMinimum -> if (deviceEntries.find { it.deviceUser?.type == UserType.Child } != null)
+                                        DeviceListItemVisibility.AllChildDevices else DeviceListItemVisibility.AllDevices
+                                    DeviceListItemVisibility.AllChildDevices -> DeviceListItemVisibility.AllDevices
+                                    DeviceListItemVisibility.AllDevices -> DeviceListItemVisibility.AllDevices
+                                }))
+                            }
+
+                            add(OverviewFragmentHeaderUsers)
+                            if (itemVisibility.showParentUsers) {
+                                addAll(userEntries)
+                                add(OverviewFragmentActionAddUser)
+                            } else {
+                                userEntries.forEach { if (it.user.type != UserType.Parent) add(it) }
+                                add(ShowMoreOverviewFragmentItem.ShowAllUsers)
+                            }
+                        }.toList()
+                    }
+                } as LiveData<List<OverviewFragmentItem>>
+            }
         }
     }
 

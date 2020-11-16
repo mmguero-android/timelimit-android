@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,33 +19,44 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.SeekBar
+import android.widget.*
 import io.timelimit.android.R
-import io.timelimit.android.databinding.ViewSelectTimeSpanBinding
 import io.timelimit.android.util.TimeTextUtil
 import kotlin.properties.Delegates
 
 class SelectTimeSpanView(context: Context, attributeSet: AttributeSet? = null): FrameLayout(context, attributeSet) {
-    private val binding = ViewSelectTimeSpanBinding.inflate(LayoutInflater.from(context), this, false)
-
     init {
-        addView(binding.root)
+        LayoutInflater.from(context).inflate(R.layout.view_select_time_span, this, true)
     }
+
+    private val seekbarContainer = findViewById<View>(R.id.seekbar_container)
+    private val pickerContainer = findViewById<View>(R.id.picker_container)
+
+    private val switchToPickerButton = findViewById<ImageButton>(R.id.switch_to_picker_button)
+    private val switchToSeekbarButton = findViewById<ImageButton>(R.id.switch_to_seekbar_button)
+
+    private val daysText = findViewById<TextView>(R.id.days_text)
+    private val dayPickerContainer = findViewById<View>(R.id.day_picker_container)
+    private val dayPicker = findViewById<NumberPicker>(R.id.day_picker)
+    private val daySeekbar = findViewById<SeekBar>(R.id.days_seek)
+
+    private val hoursText = findViewById<TextView>(R.id.hours_text)
+    private val hourPicker = findViewById<NumberPicker>(R.id.hour_picker)
+    private val hourSeekbar = findViewById<SeekBar>(R.id.hours_seek)
+
+    private val minutesText = findViewById<TextView>(R.id.minutes_text)
+    private val minutePicker = findViewById<NumberPicker>(R.id.minute_picker)
+    private val minuteSeekbar = findViewById<SeekBar>(R.id.minutes_seek)
 
     var listener: SelectTimeSpanViewListener? = null
 
-    var timeInMillis: Long by Delegates.observable(0L) { _, _, _ ->
-        bindTime()
+    var timeInMillis: Long by Delegates.observable(0L) { _, oldValue, newValue ->
+        if (oldValue != newValue) { bindTime() }
+
         listener?.onTimeSpanChanged(timeInMillis)
     }
 
-    var maxDays: Int by Delegates.observable(0) { _, _, _ ->
-        binding.maxDays = maxDays
-
-        binding.dayPicker.maxValue = maxDays
-        binding.dayPickerContainer.visibility = if (maxDays > 0) View.VISIBLE else View.GONE
-    }
+    var maxDays: Int by Delegates.observable(0) { _, _, newValue -> bindMaxDays(newValue) }
 
     init {
         val attributes = context.obtainStyledAttributes(attributeSet, R.styleable.SelectTimeSpanView)
@@ -56,77 +67,76 @@ class SelectTimeSpanView(context: Context, attributeSet: AttributeSet? = null): 
         attributes.recycle()
 
         bindTime()
+        enablePickerMode(false)
+    }
+
+    private fun bindMaxDays(newValue: Int) {
+        val multipleDays = newValue > 0
+        val vis = if (multipleDays) View.VISIBLE else View.GONE
+
+        dayPicker.maxValue = newValue
+        daySeekbar.max = newValue
+
+        dayPickerContainer.visibility = vis
+        daysText.visibility = vis
+        daySeekbar.visibility = vis
+
     }
 
     private fun bindTime() {
-        val totalMinutes = (timeInMillis / (1000 * 60)).toInt()
-        val totalHours = totalMinutes  / 60
-        val totalDays = totalHours / 24
-        val minutes = totalMinutes % 60
-        val hours = totalHours % 24
+        val duration = Duration.decode(timeInMillis)
 
-        binding.days = totalDays
-        binding.minutes = minutes
-        binding.hours = hours
+        daysText.text = TimeTextUtil.days(duration.days, context!!)
+        minutesText.text = TimeTextUtil.minutes(duration.minutes, context!!)
+        hoursText.text = TimeTextUtil.hours(duration.hours, context!!)
 
-        binding.daysText = TimeTextUtil.days(totalDays, context!!)
-        binding.minutesText = TimeTextUtil.minutes(minutes, context!!)
-        binding.hoursText = TimeTextUtil.hours(hours, context!!)
+        minutePicker.value = duration.minutes
+        minuteSeekbar.progress = duration.minutes
 
-        binding.minutePicker.value = binding.minutes ?: 0
-        binding.hourPicker.value = binding.hours ?: 0
-        binding.dayPicker.value = binding.days ?: 0
-    }
+        hourPicker.value = duration.hours
+        hourSeekbar.progress = duration.hours
 
-    private fun readStatusFromBinding() {
-        val days = binding.days!!.toLong()
-        val hours = binding.hours!!.toLong()
-        val minutes = binding.minutes!!.toLong()
-
-        timeInMillis = (((days * 24) + hours) * 60 + minutes) * 1000 * 60
+        dayPicker.value = duration.days
+        daySeekbar.progress = duration.days
     }
 
     fun clearNumberPickerFocus() {
-        binding.minutePicker.clearFocus()
-        binding.hourPicker.clearFocus()
-        binding.dayPicker.clearFocus()
+        minutePicker.clearFocus()
+        hourPicker.clearFocus()
+        dayPicker.clearFocus()
     }
 
     fun enablePickerMode(enable: Boolean) {
-        binding.seekbarContainer.visibility = if (enable) View.GONE else View.VISIBLE
-        binding.pickerContainer.visibility = if (enable) View.VISIBLE else View.GONE
+        seekbarContainer.visibility = if (enable) View.GONE else View.VISIBLE
+        pickerContainer.visibility = if (enable) View.VISIBLE else View.GONE
     }
 
     init {
-        binding.minutePicker.minValue = 0
-        binding.minutePicker.maxValue = 59
+        minutePicker.minValue = 0
+        minutePicker.maxValue = 59
 
-        binding.hourPicker.minValue = 0
-        binding.hourPicker.maxValue = 23
+        hourPicker.minValue = 0
+        hourPicker.maxValue = 23
 
-        binding.dayPicker.minValue = 0
-        binding.dayPicker.maxValue = 1
-        binding.dayPickerContainer.visibility = View.GONE
+        dayPicker.minValue = 0
+        dayPicker.maxValue = 1
+        dayPickerContainer.visibility = View.GONE
 
-        binding.minutePicker.setOnValueChangedListener { _, _, newValue ->
-            binding.minutes = newValue
-            readStatusFromBinding()
+        minutePicker.setOnValueChangedListener { _, _, newValue ->
+            timeInMillis = Duration.decode(timeInMillis).copy(minutes = newValue).timeInMillis
         }
 
-        binding.hourPicker.setOnValueChangedListener { _, _, newValue ->
-            binding.hours = newValue
-            readStatusFromBinding()
+        hourPicker.setOnValueChangedListener { _, _, newValue ->
+            timeInMillis = Duration.decode(timeInMillis).copy(hours = newValue).timeInMillis
         }
 
-        binding.dayPicker.setOnValueChangedListener { _, _, newValue ->
-            binding.days = newValue
-            readStatusFromBinding()
+        dayPicker.setOnValueChangedListener { _, _, newValue ->
+            timeInMillis = Duration.decode(timeInMillis).copy(days = newValue).timeInMillis
         }
 
-        binding.daysSeek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        daySeekbar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.days = progress
-                readStatusFromBinding()
+                timeInMillis = Duration.decode(timeInMillis).copy(days = progress).timeInMillis
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -138,10 +148,9 @@ class SelectTimeSpanView(context: Context, attributeSet: AttributeSet? = null): 
             }
         })
 
-        binding.hoursSeek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        hourSeekbar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.hours = progress
-                readStatusFromBinding()
+                timeInMillis = Duration.decode(timeInMillis).copy(hours = progress).timeInMillis
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -153,10 +162,9 @@ class SelectTimeSpanView(context: Context, attributeSet: AttributeSet? = null): 
             }
         })
 
-        binding.minutesSeek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+        minuteSeekbar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.minutes = progress
-                readStatusFromBinding()
+                timeInMillis = Duration.decode(timeInMillis).copy(minutes = progress).timeInMillis
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -168,10 +176,26 @@ class SelectTimeSpanView(context: Context, attributeSet: AttributeSet? = null): 
             }
         })
 
-        binding.pickerContainer.visibility = GONE
+        pickerContainer.visibility = GONE
 
-        binding.switchToPickerButton.setOnClickListener { listener?.setEnablePickerMode(true) }
-        binding.switchToSeekbarButton.setOnClickListener { listener?.setEnablePickerMode(false) }
+        switchToPickerButton.setOnClickListener { listener?.setEnablePickerMode(true) }
+        switchToSeekbarButton.setOnClickListener { listener?.setEnablePickerMode(false) }
+    }
+
+    internal data class Duration (val days: Int, val hours: Int, val minutes: Int) {
+        companion object {
+            fun decode(timeInMillis: Long): Duration {
+                val totalMinutes = (timeInMillis / (1000 * 60)).toInt()
+                val totalHours = totalMinutes  / 60
+                val totalDays = totalHours / 24
+                val minutes = totalMinutes % 60
+                val hours = totalHours % 24
+
+                return Duration(days = totalDays, hours = hours, minutes = minutes)
+            }
+        }
+
+        val timeInMillis = ((((days * 24L) + hours) * 60 + minutes) * 1000 * 60)
     }
 }
 

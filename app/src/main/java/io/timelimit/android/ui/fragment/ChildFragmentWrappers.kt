@@ -25,6 +25,7 @@ import io.timelimit.android.ui.main.FragmentWithCustomTitle
 import io.timelimit.android.ui.manage.category.usagehistory.UsageHistoryFragment
 import io.timelimit.android.ui.manage.child.advanced.ManageChildAdvancedFragment
 import io.timelimit.android.ui.manage.child.apps.ChildAppsFragment
+import io.timelimit.android.ui.manage.child.tasks.ManageChildTasksFragment
 
 abstract class ChildFragmentWrapper: SingleFragmentWrapper() {
     abstract val childId: String
@@ -64,4 +65,13 @@ class ChildUsageHistoryFragmentWrapper: ChildFragmentWrapper(), FragmentWithCust
 
     override fun createChildFragment(): Fragment = UsageHistoryFragment.newInstance(userId = childId, categoryId = null)
     override fun getCustomTitle() = child.map { it?.let { "${it.name} - ${getString(R.string.usage_history_title)}" } }
+}
+
+class ChildTasksFragmentWrapper: ChildFragmentWrapper(), FragmentWithCustomTitle {
+    private val params by lazy { ChildTasksFragmentWrapperArgs.fromBundle(requireArguments()) }
+    override val childId: String get() = params.childId
+    override val showAuthButton: Boolean = true
+
+    override fun createChildFragment(): Fragment = ManageChildTasksFragment.newInstance(childId = childId)
+    override fun getCustomTitle() = child.map { it?.let { "${it.name} - ${getString(R.string.manage_child_tasks)}" } }
 }

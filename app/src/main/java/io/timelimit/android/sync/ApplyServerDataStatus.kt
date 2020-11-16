@@ -325,6 +325,7 @@ object ApplyServerDataStatus {
                                     assignedAppsVersion = "",
                                     timeLimitRulesVersion = "",
                                     usedTimesVersion = "",
+                                    tasksVersion = "",
                                     parentCategoryId = newCategory.parentCategoryId,
                                     timeWarnings = newCategory.timeWarnings,
                                     minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
@@ -493,6 +494,25 @@ object ApplyServerDataStatus {
                             rulesVersion = newTimeLimitRulesItem.version
                     )
                 }
+            }
+
+            status.newCategoryTasks.forEach { tasks ->
+                database.childTasks().removeTasksByCategoryId(tasks.categoryId)
+
+                database.childTasks().forceInsertItemsSync(
+                        tasks.tasks.map { task ->
+                            ChildTask(
+                                    taskId = task.taskId,
+                                    categoryId = tasks.categoryId,
+                                    taskTitle = task.taskTitle,
+                                    extraTimeDuration = task.extraTimeDuration,
+                                    pendingRequest = task.pendingRequest,
+                                    lastGrantTimestamp = task.lastGrantTimestamp
+                            )
+                        }
+                )
+
+                database.category().updateCategoryTasksVersion(categoryId = tasks.categoryId, tasksVersion = tasks.version)
             }
 
             status.newUserList?.data?.forEach { user ->

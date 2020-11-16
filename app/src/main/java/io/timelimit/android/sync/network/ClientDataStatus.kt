@@ -34,7 +34,7 @@ data class ClientDataStatus(
         private const val CATEGORIES = "categories"
         private const val USERS = "users"
         private const val CLIENT_LEVEL = "clientLevel"
-        private const val CLIENT_LEVEL_VALUE = 2
+        private const val CLIENT_LEVEL_VALUE = 3
 
         val empty = ClientDataStatus(
                 deviceListVersion = "",
@@ -63,7 +63,8 @@ data class ClientDataStatus(
                                 baseVersion = it.baseVersion,
                                     assignedAppsVersion = it.assignedAppsVersion,
                                     timeLimitRulesVersion = it.timeLimitRulesVersion,
-                                    usedTimeItemsVersion = it.usedTimeItemsVersion
+                                    usedTimeItemsVersion = it.usedTimeItemsVersion,
+                                    taskListVersion = it.taskListVersion
                             )
                         }
 
@@ -104,13 +105,15 @@ data class CategoryDataStatus(
         val baseVersion: String,
         val assignedAppsVersion: String,
         val timeLimitRulesVersion: String,
-        val usedTimeItemsVersion: String
+        val usedTimeItemsVersion: String,
+        val taskListVersion: String
 ) {
     companion object {
         private const val BASE_VERSION = "base"
         private const val ASSIGNED_APPS_VERSION = "apps"
         private const val TIME_LIMIT_RULES_VERSION = "rules"
         private const val USED_TIME_ITEMS_VERSION = "usedTime"
+        private const val TASK_LIST_VERSION = "tasks"
     }
 
     fun serialize(writer: JsonWriter) {
@@ -120,6 +123,8 @@ data class CategoryDataStatus(
         writer.name(ASSIGNED_APPS_VERSION).value(assignedAppsVersion)
         writer.name(TIME_LIMIT_RULES_VERSION).value(timeLimitRulesVersion)
         writer.name(USED_TIME_ITEMS_VERSION).value(usedTimeItemsVersion)
+
+        if (taskListVersion.isNotEmpty()) writer.name(TASK_LIST_VERSION).value(taskListVersion)
 
         writer.endObject()
     }

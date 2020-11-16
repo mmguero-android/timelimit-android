@@ -40,6 +40,7 @@ data class ServerDataStatus(
         val newCategoryAssignedApps: List<ServerUpdatedCategoryAssignedApps>,
         val newCategoryUsedTimes: List<ServerUpdatedCategoryUsedTimes>,
         val newCategoryTimeLimitRules: List<ServerUpdatedTimeLimitRules>,
+        val newCategoryTasks: List<ServerUpdatedCategoryTasks>,
         val newUserList: ServerUserList?,
         val fullVersionUntil: Long,
         val message: String?
@@ -52,6 +53,7 @@ data class ServerDataStatus(
         private const val NEW_CATEGORY_ASSIGNED_APPS = "categoryApp"
         private const val NEW_CATEGORY_USED_TIMES = "usedTimes"
         private const val NEW_CATEGORY_TIME_LIMIT_RULES = "rules"
+        private const val NEW_CATEGORY_TASKS = "tasks"
         private const val NEW_USER_LIST = "users"
         private const val FULL_VERSION_UNTIL = "fullVersion"
         private const val MESSAGE = "message"
@@ -64,6 +66,7 @@ data class ServerDataStatus(
             var newCategoryAssignedApps: List<ServerUpdatedCategoryAssignedApps> = Collections.emptyList()
             var newCategoryUsedTimes: List<ServerUpdatedCategoryUsedTimes> = Collections.emptyList()
             var newCategoryTimeLimitRules: List<ServerUpdatedTimeLimitRules> = Collections.emptyList()
+            var newCategoryTasks: List<ServerUpdatedCategoryTasks> = emptyList()
             var newUserList: ServerUserList? = null
             var fullVersionUntil: Long? = null
             var message: String? = null
@@ -78,6 +81,7 @@ data class ServerDataStatus(
                     NEW_CATEGORY_ASSIGNED_APPS -> newCategoryAssignedApps = ServerUpdatedCategoryAssignedApps.parseList(reader)
                     NEW_CATEGORY_USED_TIMES -> newCategoryUsedTimes = ServerUpdatedCategoryUsedTimes.parseList(reader)
                     NEW_CATEGORY_TIME_LIMIT_RULES -> newCategoryTimeLimitRules = ServerUpdatedTimeLimitRules.parseList(reader)
+                    NEW_CATEGORY_TASKS -> newCategoryTasks = ServerUpdatedCategoryTasks.parseList(reader)
                     NEW_USER_LIST -> newUserList = ServerUserList.parse(reader)
                     FULL_VERSION_UNTIL -> fullVersionUntil = reader.nextLong()
                     MESSAGE -> message = reader.nextString()
@@ -94,6 +98,7 @@ data class ServerDataStatus(
                     newCategoryAssignedApps = newCategoryAssignedApps,
                     newCategoryUsedTimes = newCategoryUsedTimes,
                     newCategoryTimeLimitRules = newCategoryTimeLimitRules,
+                    newCategoryTasks = newCategoryTasks,
                     newUserList = newUserList,
                     fullVersionUntil = fullVersionUntil!!,
                     message = message
@@ -890,6 +895,90 @@ data class ServerTimeLimitRule(
             sessionDurationMilliseconds = sessionDurationMilliseconds,
             sessionPauseMilliseconds = sessionPauseMilliseconds
     )
+}
+
+data class ServerUpdatedCategoryTasks (
+        val categoryId: String,
+        val version: String,
+        val tasks: List<ServerUpdatedCategoryTask>
+) {
+    companion object {
+        private const val CATEGORY_ID = "categoryId"
+        private const val VERSION = "version"
+        private const val TASKS = "tasks"
+
+        fun parse(reader: JsonReader): ServerUpdatedCategoryTasks {
+            var categoryId: String? = null
+            var version: String? = null
+            var tasks: List<ServerUpdatedCategoryTask>? = null
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    CATEGORY_ID -> categoryId = reader.nextString()
+                    VERSION -> version = reader.nextString()
+                    TASKS -> tasks = ServerUpdatedCategoryTask.parseList(reader)
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+
+            return ServerUpdatedCategoryTasks(
+                    categoryId = categoryId!!,
+                    version = version!!,
+                    tasks = tasks!!
+            )
+        }
+
+        fun parseList(reader: JsonReader): List<ServerUpdatedCategoryTasks> = parseJsonArray(reader) { parse(reader) }
+    }
+}
+
+data class ServerUpdatedCategoryTask (
+        val taskId: String,
+        val taskTitle: String,
+        val extraTimeDuration: Int,
+        val pendingRequest: Boolean,
+        val lastGrantTimestamp: Long
+) {
+    companion object {
+        private const val TASK_ID = "i"
+        private const val TASK_TITLE = "t"
+        private const val EXTRA_TIME_DURATION = "d"
+        private const val PENDING_REQUEST = "p"
+        private const val LAST_GRANT_TIMESTAMP = "l"
+
+        fun parse(reader: JsonReader): ServerUpdatedCategoryTask {
+            var taskId: String? = null
+            var taskTitle: String? = null
+            var extraTimeDuration: Int? = null
+            var pendingRequest: Boolean? = null
+            var lastGrantTimestamp: Long? = null
+
+            reader.beginObject()
+            while (reader.hasNext()) {
+                when (reader.nextName()) {
+                    TASK_ID -> taskId = reader.nextString()
+                    TASK_TITLE -> taskTitle = reader.nextString()
+                    EXTRA_TIME_DURATION -> extraTimeDuration = reader.nextInt()
+                    PENDING_REQUEST -> pendingRequest = reader.nextBoolean()
+                    LAST_GRANT_TIMESTAMP -> lastGrantTimestamp = reader.nextLong()
+                    else -> reader.skipValue()
+                }
+            }
+            reader.endObject()
+
+            return ServerUpdatedCategoryTask(
+                    taskId = taskId!!,
+                    taskTitle = taskTitle!!,
+                    extraTimeDuration = extraTimeDuration!!,
+                    pendingRequest = pendingRequest!!,
+                    lastGrantTimestamp = lastGrantTimestamp!!
+            )
+        }
+
+        fun parseList(reader: JsonReader): List<ServerUpdatedCategoryTask> = parseJsonArray(reader) { parse(reader) }
+    }
 }
 
 data class ServerInstalledAppsData(

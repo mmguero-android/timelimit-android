@@ -56,6 +56,8 @@ data class Category(
         val timeLimitRulesVersion: String,
         @ColumnInfo(name = "usedtimes_version")
         val usedTimesVersion: String,
+        @ColumnInfo(name = "tasks_version", defaultValue = "")
+        val tasksVersion: String,
         @ColumnInfo(name = "parent_category_id")
         val parentCategoryId: String,
         @ColumnInfo(name = "block_all_notifications")
@@ -95,6 +97,7 @@ data class Category(
         private const val SORT = "sort"
         private const val EXTRA_TIME_DAY = "extraTimeDay"
         private const val DISABLE_LIMIITS_UNTIL = "dlu"
+        private const val TASKS_VERSION = "tv"
 
         fun parse(reader: JsonReader): Category {
             var id: String? = null
@@ -117,6 +120,7 @@ data class Category(
             var sort = 0
             var extraTimeDay = -1
             var disableLimitsUntil = 0L
+            var tasksVersion = ""
 
             reader.beginObject()
 
@@ -141,6 +145,7 @@ data class Category(
                     SORT -> sort = reader.nextInt()
                     EXTRA_TIME_DAY -> extraTimeDay = reader.nextInt()
                     DISABLE_LIMIITS_UNTIL -> disableLimitsUntil = reader.nextLong()
+                    TASKS_VERSION -> tasksVersion = reader.nextString()
                     else -> reader.skipValue()
                 }
             }
@@ -159,6 +164,7 @@ data class Category(
                     assignedAppsVersion = assignedAppsVersion!!,
                     timeLimitRulesVersion = timeLimitRulesVersion!!,
                     usedTimesVersion = usedTimesVersion!!,
+                    tasksVersion = tasksVersion,
                     parentCategoryId = parentCategoryId,
                     blockAllNotifications = blockAllNotifications,
                     timeWarnings = timeWarnings,
@@ -214,6 +220,7 @@ data class Category(
         writer.name(ASSIGNED_APPS_VERSION).value(assignedAppsVersion)
         writer.name(RULES_VERSION).value(timeLimitRulesVersion)
         writer.name(USED_TIMES_VERSION).value(usedTimesVersion)
+        writer.name(TASKS_VERSION).value(tasksVersion)
         writer.name(PARENT_CATEGORY_ID).value(parentCategoryId)
         writer.name(BlOCK_ALL_NOTIFICATIONS).value(blockAllNotifications)
         writer.name(TIME_WARNINGS).value(timeWarnings)

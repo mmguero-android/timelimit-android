@@ -89,6 +89,14 @@ class ManageChildFragment : ChildFragmentWrapper(), FragmentWithCustomTitle {
 
             true
         }
+        R.id.menu_manage_child_tasks -> {
+            navigation.safeNavigate(
+                    ManageChildFragmentDirections.actionManageChildFragmentToManageChildTasksFragment(childId = childId),
+                    R.id.manageChildFragment
+            )
+
+            true
+        }
         else -> super.onOptionsItemSelected(item)
     }
 

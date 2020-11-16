@@ -243,4 +243,11 @@ object DatabaseMigrations {
             database.execSQL("ALTER TABLE `category` ADD COLUMN `disable_limits_until` INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    val MIGRATE_TO_V34 = object: Migration(33, 34) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `child_task` (`task_id` TEXT NOT NULL, `category_id` TEXT NOT NULL, `task_title` TEXT NOT NULL, `extra_time_duration` INTEGER NOT NULL, `pending_request` INTEGER NOT NULL, `last_grant_timestamp` INTEGER NOT NULL, PRIMARY KEY(`task_id`), FOREIGN KEY(`category_id`) REFERENCES `category`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )")
+            database.execSQL("ALTER TABLE `category` ADD COLUMN `tasks_version` TEXT NOT NULL DEFAULT ''")
+        }
+    }
 }

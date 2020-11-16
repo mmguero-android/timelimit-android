@@ -42,7 +42,7 @@ import io.timelimit.android.ui.manage.child.ManageChildFragmentArgs
 import io.timelimit.android.ui.manage.child.ManageChildFragmentDirections
 import io.timelimit.android.ui.manage.child.category.create.CreateCategoryDialogFragment
 import io.timelimit.android.ui.manage.child.category.specialmode.SetCategorySpecialModeFragment
-import kotlinx.android.synthetic.main.fragment_manage_child_categories.*
+import kotlinx.android.synthetic.main.recycler_fragment.*
 
 class ManageChildCategoriesFragment : Fragment() {
     companion object {
@@ -57,7 +57,7 @@ class ManageChildCategoriesFragment : Fragment() {
     private val model: ManageChildCategoriesModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_manage_child_categories, container, false)
+        return inflater.inflate(R.layout.recycler_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

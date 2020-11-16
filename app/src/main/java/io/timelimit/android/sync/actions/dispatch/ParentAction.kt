@@ -139,6 +139,7 @@ object LocalDatabaseParentActionDispatcher {
                             assignedAppsVersion = "",
                             timeLimitRulesVersion = "",
                             usedTimesVersion = "",
+                            tasksVersion = "",
                             parentCategoryId = "",
                             blockAllNotifications = false,
                             timeWarnings = 0,
@@ -766,6 +767,64 @@ object LocalDatabaseParentActionDispatcher {
                     }
 
                     database.category().updateCategorySync(category.copy(disableLimitsUntil = action.endTime))
+                }
+                is UpdateChildTaskAction -> {
+                    val task = database.childTasks().getTaskByTaskId(taskId = action.taskId)
+                    val notFound = task == null
+
+                    if (notFound != action.isNew) {
+                        if (action.isNew) {
+                            throw IllegalArgumentException("task exists already")
+                        } else {
+                            throw IllegalArgumentException("task not found")
+                        }
+                    }
+
+                    if (task == null) {
+                        database.childTasks().insertItemSync(
+                                ChildTask(
+                                        taskId = action.taskId,
+                                        taskTitle = action.taskTitle,
+                                        categoryId = action.categoryId,
+                                        extraTimeDuration = action.extraTimeDuration,
+                                        lastGrantTimestamp = 0,
+                                        pendingRequest = false
+                                )
+                        )
+                    } else {
+                        database.childTasks().updateItemSync(
+                                task.copy(
+                                        taskTitle = action.taskTitle,
+                                        categoryId = action.categoryId,
+                                        extraTimeDuration = action.extraTimeDuration,
+                                )
+                        )
+                    }
+                }
+                is DeleteChildTaskAction -> {
+                    val task = database.childTasks().getTaskByTaskId(taskId = action.taskId) ?: throw IllegalArgumentException("task not found")
+
+                    database.childTasks().removeTaskById(taskId = task.taskId)
+                }
+                is ReviewChildTaskAction -> {
+                    val task = database.childTasks().getTaskByTaskId(taskId = action.taskId) ?: throw IllegalArgumentException("task not found")
+
+                    if (!task.pendingRequest) throw IllegalArgumentException("did review of a task which is not pending")
+
+                    if (action.ok) {
+                        val category = database.category().getCategoryByIdSync(task.categoryId)!!
+
+                        if (category.extraTimeDay != 0 && category.extraTimeInMillis > 0) {
+                            // if the current time is daily, then extend the daily time only
+                            database.category().updateCategoryExtraTime(categoryId = category.id, extraTimeDay = category.extraTimeDay, newExtraTime = category.extraTimeInMillis + task.extraTimeDuration)
+                        } else {
+                            database.category().updateCategoryExtraTime(categoryId = category.id, extraTimeDay = -1, newExtraTime = category.extraTimeInMillis + task.extraTimeDuration)
+                        }
+
+                        database.childTasks().updateItemSync(task.copy(pendingRequest = false, lastGrantTimestamp = action.time))
+                    } else {
+                        database.childTasks().updateItemSync(task.copy(pendingRequest = false))
+                    }
                 }
             }.let { }
         }

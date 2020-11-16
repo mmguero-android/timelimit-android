@@ -25,7 +25,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
-import io.timelimit.android.async.Threads
 import io.timelimit.android.data.extensions.mapToTimezone
 import io.timelimit.android.databinding.FragmentCategorySettingsBinding
 import io.timelimit.android.date.DateInTimezone
@@ -39,7 +38,7 @@ import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.settings.addusedtime.AddUsedTimeDialogFragment
 import io.timelimit.android.ui.manage.category.settings.networks.ManageCategoryNetworksView
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
-import io.timelimit.android.ui.view.SelectTimeSpanViewListener
+import io.timelimit.android.ui.util.bind
 
 class CategorySettingsFragment : Fragment() {
     companion object {
@@ -210,16 +209,8 @@ class CategorySettingsFragment : Fragment() {
             binding.extraTimeSelection.enablePickerMode(it)
         })
 
-        binding.extraTimeSelection.listener = object: SelectTimeSpanViewListener {
-            override fun onTimeSpanChanged(newTimeInMillis: Long) {
-                updateEditExtraTimeConfirmButtonVisibility()
-            }
-
-            override fun setEnablePickerMode(enable: Boolean) {
-                Threads.database.execute {
-                    appLogic.database.config().setEnableAlternativeDurationSelectionSync(enable)
-                }
-            }
+        binding.extraTimeSelection.bind(appLogic.database, viewLifecycleOwner) {
+            updateEditExtraTimeConfirmButtonVisibility()
         }
 
         binding.switchLimitExtraTimeToToday.setOnCheckedChangeListener { _, _ ->

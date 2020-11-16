@@ -26,6 +26,9 @@
     <string name="generic_manage_card">Verwaltung</string>
     <string name="generic_enable">Aktivieren</string>
     <string name="generic_show_more">Mehr anzeigen</string>
+    <string name="generic_no">Nein</string>
+    <string name="generic_yes">Ja</string>
+    <string name="generic_skip">Überspringen</string>
 
     <string name="generic_swipe_to_dismiss">Sie können diesen Hinweis entfernen, indem Sie ihn zur Seite wischen</string>
     <string name="generic_runtime_permission_rejected">Berechtigung abgelehnt; Sie können die Berechtigungen in den Systemeinstellungen verwalten</string>
@@ -526,6 +529,7 @@
 
     <string name="lock_tab_reason">Grund</string>
     <string name="lock_tab_action">Aktionen</string>
+    <string name="lock_tab_task">Aufgaben</string>
     <string name="lock_header_blocked">Gesperrt!</string>
 
     <string name="lock_header_what">Was wurde gesperrt?</string>
@@ -618,6 +622,18 @@
         Versuche es, den Home- oder Anwendungslisten-Button zu verwenden, um diesen Bildschirm zu verlassen.
     </string>
     <string name="lock_overlay_text">Sperre %s</string>
+
+    <string name="lock_task_introduction">Aufgaben ermöglichen eine Zeitverlängerung.
+        Dafür muss ein Elternteil Aufgaben für die entsprechende Kategorie hinterlegen.
+        Ein Kind kann angeben, eine Aufgabe erledigt zu haben und nach der Bestätigung eines
+        Elternteils wird eine entsprechende Extrazeit vergeben.
+    </string>
+    <string name="lock_task_confirm_dialog">Hast Du diese Aufgabe erledigt? Die Zeit gibt es
+        sowieso erst, wenn ein Elternteil das bestätigt hat.</string>
+    <string name="lock_task_review_pending_dialog">Die Erledigung der Aufgabe wurde markiert.
+        Jetzt muss nur noch ein Elternteil das auf der Startseite von TimeLimit besätigen.
+    </string>
+    <string name="lock_task_review_pending_hint">warte auf Bestätigung</string>
 
     <string name="login_user_selection_text">Wählen Sie einen Benutzer, um sich anzumelden</string>
     <string name="login_password_hint">Passwort</string>
@@ -1480,4 +1496,22 @@
     <string name="admin_description_direct">Dies ermöglicht es TimeLimit zu verhindern, ausgeschaltet zu werden</string>
 
     <string name="admin_disable_warning">Soll der Geräteadministrator wirklich deaktiviert werden?</string>
+
+    <string name="manage_child_tasks">Aufgaben</string>
+    <string name="manage_child_tasks_add">Aufgabe erstellen</string>
+    <string name="manage_child_tasks_edit">Aufgabe bearbeiten</string>
+    <string name="manage_child_tasks_intro">Aufgaben sind Tätigkeiten, die ein Kind machen kann,
+        um Extrazeit zu bekommen. Ein Elternteil muss die Erledigung bestätigen, bevor die Extrazeit
+        wirksam wird.
+    </string>
+    <string name="manage_child_task_last_grant">Letzte Bestätigung: %s</string>
+    <string name="manage_child_tasks_select_category">Kategorie wählen</string>
+    <string name="manage_child_tasks_title_hint">Aufgabentitel</string>
+    <string name="manage_child_tasks_toast_saved">Aufgabe gespeichert</string>
+    <string name="manage_child_tasks_toast_removed">Aufgabe wurde gelöscht</string>
+
+    <string name="task_review_title">Aufgabenbestätigung</string>
+    <string name="task_review_text">%1$s hat angegeben, %2$s erledigt zu haben. Ist das richtig?</string>
+    <string name="task_review_category">Dafür wird es %1$s Extrazeit für %2$s geben</string>
+    <string name="task_review_last_grant">Diese Aufgabe wurde zuletzt bestätigt am %s</string>
 </resources>

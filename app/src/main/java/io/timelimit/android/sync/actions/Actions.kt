@@ -492,6 +492,24 @@ object ForceSyncAction: AppLogicAction() {
 }
 
 
+data class MarkTaskPendingAction(val taskId: String): AppLogicAction() {
+    companion object {
+        const val TYPE_VALUE = "MARK_TASK_PENDING"
+        private const val TASK_ID = "taskId"
+    }
+
+    init { IdGenerator.assertIdValid(taskId) }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(TASK_ID).value(taskId)
+
+        writer.endObject()
+    }
+}
+
 data class AddCategoryAppsAction(val categoryId: String, val packageNames: List<String>): ParentAction() {
     companion object {
         const val TYPE_VALUE = "ADD_CATEGORY_APPS"
@@ -923,6 +941,81 @@ data class UpdateCategoryDisableLimitsAction(val categoryId: String, val endTime
         writer.name(TYPE).value(TYPE_VALUE)
         writer.name(CATEGORY_ID).value(categoryId)
         writer.name(END_TIME).value(endTime)
+
+        writer.endObject()
+    }
+}
+
+data class UpdateChildTaskAction(val isNew: Boolean, val taskId: String, val categoryId: String, val taskTitle: String, val extraTimeDuration: Int): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_CHILD_TASK"
+        private const val IS_NEW = "isNew"
+        private const val TASK_ID = "taskId"
+        private const val CATEGORY_ID = "categoryId"
+        private const val TASK_TITLE = "taskTitle"
+        private const val EXTRA_TIME_DURATION = "extraTimeDuration"
+    }
+
+    init {
+        IdGenerator.assertIdValid(taskId)
+        IdGenerator.assertIdValid(categoryId)
+
+        if (taskTitle.isEmpty() || taskTitle.length > ChildTask.MAX_TASK_TITLE_LENGTH) throw IllegalArgumentException()
+        if (extraTimeDuration <= 0 || extraTimeDuration > ChildTask.MAX_EXTRA_TIME) throw IllegalArgumentException()
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(IS_NEW).value(isNew)
+        writer.name(TASK_ID).value(taskId)
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(TASK_TITLE).value(taskTitle)
+        writer.name(EXTRA_TIME_DURATION).value(extraTimeDuration)
+
+        writer.endObject()
+    }
+}
+
+data class DeleteChildTaskAction(val taskId: String): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "DELETE_CHILD_TASK"
+        private const val TASK_ID = "taskId"
+    }
+
+    init { IdGenerator.assertIdValid(taskId) }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(TASK_ID).value(taskId)
+
+        writer.endObject()
+    }
+}
+
+data class ReviewChildTaskAction(val taskId: String, val ok: Boolean, val time: Long): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "REVIEW_CHILD_TASK"
+        private const val TASK_ID = "taskId"
+        private const val OK = "ok"
+        private const val TIME = "time"
+    }
+
+    init {
+        if (time <= 0) throw IllegalArgumentException()
+        IdGenerator.assertIdValid(taskId)
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(TASK_ID).value(taskId)
+        writer.name(OK).value(ok)
+        writer.name(TIME).value(time)
 
         writer.endObject()
     }

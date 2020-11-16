@@ -107,8 +107,7 @@
     <fragment
         android:id="@+id/manageChildFragment"
         android:name="io.timelimit.android.ui.manage.child.ManageChildFragment"
-        android:label="fragment_manage_child"
-        tools:layout="@layout/fragment_manage_child" >
+        android:label="fragment_manage_child">
         <action
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -150,12 +149,18 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_manageChildFragment_to_manageChildTasksFragment"
+            app:destination="@id/manageChildTasksFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/manageCategoryFragment"
         android:name="io.timelimit.android.ui.manage.category.ManageCategoryFragment"
-        android:label="fragment_manage_category"
-        tools:layout="@layout/fragment_manage_category" >
+        android:label="fragment_manage_category">
         <argument
             android:name="childId"
             app:argType="string" />
@@ -569,6 +574,14 @@
             app:argType="string" />
         <argument
             android:name="categoryId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/manageChildTasksFragment"
+        android:name="io.timelimit.android.ui.fragment.ChildTasksFragmentWrapper"
+        android:label="ManageChildTasksFragment" >
+        <argument
+            android:name="childId"
             app:argType="string" />
     </fragment>
 </navigation>

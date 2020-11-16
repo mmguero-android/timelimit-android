@@ -213,6 +213,7 @@ object HintsToShow {
     const val CONTACTS_INTRO = 16L
     const val TIMELIMIT_RULE_MUSTREAD = 32L
     const val BLOCKED_TIME_AREAS_OBSOLETE = 64L
+    const val TASKS_INTRODUCTION = 128L
 }
 
 object ExperimentalFlags {

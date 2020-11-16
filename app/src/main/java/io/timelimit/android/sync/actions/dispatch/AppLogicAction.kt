@@ -381,6 +381,15 @@ object LocalDatabaseAppLogicActionDispatcher {
 
                     null
                 }
+                is MarkTaskPendingAction -> {
+                    val task = database.childTasks().getTaskByTaskId(action.taskId) ?: throw RuntimeException()
+                    val category = database.category().getCategoryByIdSync(task.categoryId)!!
+                    val device = database.device().getDeviceByIdSync(deviceId)!!
+
+                    if (category.childId != device.currentUserId) throw IllegalStateException()
+
+                    database.childTasks().updateItemSync(task.copy(pendingRequest = true))
+                }
             }.let {  }
         }
     }

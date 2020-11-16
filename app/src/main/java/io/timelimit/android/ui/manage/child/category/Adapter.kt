@@ -24,6 +24,7 @@ import io.timelimit.android.R
 import io.timelimit.android.data.model.Category
 import io.timelimit.android.databinding.AddItemViewBinding
 import io.timelimit.android.databinding.CategoryRichCardBinding
+import io.timelimit.android.databinding.IntroCardBinding
 import io.timelimit.android.ui.util.DateUtil
 import io.timelimit.android.util.TimeTextUtil
 import kotlin.properties.Delegates
@@ -91,8 +92,10 @@ class Adapter: RecyclerView.Adapter<ViewHolder>() {
 
         TYPE_INTRO ->
             IntroViewHolder(
-                    LayoutInflater.from(parent.context)
-                            .inflate(R.layout.category_list_intro, parent, false)
+                    IntroCardBinding.inflate(LayoutInflater.from(parent.context), parent, false).also {
+                        it.title = parent.context.getString(R.string.manage_child_categories_intro_title)
+                        it.text = parent.context.getString(R.string.manage_child_categories_intro_text)
+                    }.root
             )
 
         TYPE_MANIPULATION_WARNING ->

@@ -13,7 +13,10 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <https://www.gnu.org/licenses/>.
 -->
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"
+    tools:ignore="MissingTranslation">
     <string name="generic_ok">OK</string>
     <string name="generic_cancel">Cancel</string>
     <string name="generic_help">Help</string>
@@ -25,7 +28,10 @@
     <string name="generic_go">Go</string>
     <string name="generic_manage_card">Manage</string>
     <string name="generic_enable">Enable</string>
-    <string name="generic_show_more" tools:ignore="MissingTranslation">Show more</string>
+    <string name="generic_show_more">Show more</string>
+    <string name="generic_no">No</string>
+    <string name="generic_yes">Yes</string>
+    <string name="generic_skip">Skip</string>
 
     <string name="generic_swipe_to_dismiss">Swipe to the side to remove this message</string>
     <string name="generic_runtime_permission_rejected">Permission rejected; You can manage permissions in the system settings</string>
@@ -211,42 +217,42 @@
 
     <string name="background_logic_toast_sync_apps">TimeLimit: Failure while trying to update the app list</string>
 
-    <string name="blocked_time_areas" tools:ignore="MissingTranslation">
+    <string name="blocked_time_areas">
         Blocked time areas
     </string>
 
-    <string name="blocked_time_areas_help_about" tools:ignore="MissingTranslation">
+    <string name="blocked_time_areas_help_about">
         You can set blocked time areas here.
         During a blocked time area, no Apps of the category can be used.
         You can define the time area to the minute.
     </string>
 
-    <string name="blocked_time_areas_help_colors" tools:ignore="MissingTranslation">
+    <string name="blocked_time_areas_help_colors">
         There are 2 colors in this view: green means allowed, red means blocked.
     </string>
 
-    <string name="blocked_time_areas_help_structure" tools:ignore="MissingTranslation">
+    <string name="blocked_time_areas_help_structure">
         The days and hour are displayed as headlines, the minutes as tiles.
         You can jump to a day using the day dropdown.
     </string>
 
-    <string name="blocked_time_areas_help_modify" tools:ignore="MissingTranslation">
+    <string name="blocked_time_areas_help_modify">
         To change one area, tap on the start time. It will become blue.
         Then select the end time.
         Now, the area colors will be inverted.
     </string>
 
-    <string name="blocked_time_areas_snackbar_modified" tools:ignore="MissingTranslation">
+    <string name="blocked_time_areas_snackbar_modified">
         The blocked time areas were changed
     </string>
 
-    <string name="blocked_time_areas_snackbar_child_hint" tools:ignore="MissingTranslation">You can only add limits without parent; Undoing is not possible</string>
+    <string name="blocked_time_areas_snackbar_child_hint">You can only add limits without parent; Undoing is not possible</string>
 
-    <string name="blocked_time_areas_checkbox_detailed" tools:ignore="MissingTranslation">show detailed settings</string>
+    <string name="blocked_time_areas_checkbox_detailed">show detailed settings</string>
 
-    <string name="blocked_time_areas_copy_to_other_days" tools:ignore="MissingTranslation">Copy settings from one day to other days</string>
-    <string name="blocked_time_areas_copy_from" tools:ignore="MissingTranslation">Copy from</string>
-    <string name="blocked_time_areas_copy_to" tools:ignore="MissingTranslation">Copy from %s to</string>
+    <string name="blocked_time_areas_copy_to_other_days">Copy settings from one day to other days</string>
+    <string name="blocked_time_areas_copy_from">Copy from</string>
+    <string name="blocked_time_areas_copy_to">Copy from %s to</string>
 
     <string name="category_apps_title">assigned Apps</string>
 
@@ -312,7 +318,7 @@
         when the Apps itself are blocked AND when the Apps itself are not blocked
     </string>
 
-    <string name="category_settings" tools:ignore="MissingTranslation">Advanced Settings</string>
+    <string name="category_settings">Advanced Settings</string>
     <string name="category_settings_rename">Rename category</string>
     <string name="category_settings_rename_empty">The new name must not be empty</string>
     <string name="category_settings_delete">Delete category</string>
@@ -528,8 +534,8 @@
     <string name="diagnose_exf_mad">Try to detect multiple active Apps (splitscreen support)</string>
     <string name="diagnose_exf_rsl">Only allow login of parent users with limit login category after syncing</string>
     <string name="diagnose_exf_bss">Automatically disable splitscreen using the accessibility service</string>
-    <string name="diagnose_exf_hmw" tools:ignore="MissingTranslation">Hide manipulation warning in the category list</string>
-    <string name="diagnose_exf_esb" tools:ignore="MissingTranslation">Do not use a overlay or the home button for blocking</string>
+    <string name="diagnose_exf_hmw">Hide manipulation warning in the category list</string>
+    <string name="diagnose_exf_esb">Do not use a overlay or the home button for blocking</string>
 
     <string name="diagnose_bg_task_loop_ex">Background task loop exception</string>
 
@@ -574,8 +580,9 @@
         and it is not one - using an older version is enough to circumvent this.
     </string>
 
-    <string name="lock_tab_reason" tools:ignore="MissingTranslation">Reason</string>
-    <string name="lock_tab_action" tools:ignore="MissingTranslation">Actions</string>
+    <string name="lock_tab_reason">Reason</string>
+    <string name="lock_tab_action">Actions</string>
+    <string name="lock_tab_task">Tasks</string>
     <string name="lock_header_blocked">Blocked!</string>
 
     <string name="lock_header_what">What was blocked?</string>
@@ -673,6 +680,17 @@
     </string>
     <string name="lock_overlay_text">Blocking %s</string>
 
+    <string name="lock_task_introduction">Doing tasks allows getting extra time.
+        Parent users must add tasks and they must confirm that a task was done
+        before the extra time is granted.
+    </string>
+    <string name="lock_task_confirm_dialog">Have you finished this task? The time
+        will only be granted if a parent confirms it.</string>
+    <string name="lock_task_review_pending_dialog">It is noted that this task is finished.
+        The only missing part is a parent which confirms this at the start screen of TimeLimit.
+    </string>
+    <string name="lock_task_review_pending_hint">waiting for confirmation</string>
+
     <string name="login_user_selection_text">Choose an user to authenticate</string>
     <string name="login_password_hint">Password</string>
     <string name="login_snackbar_wrong">The password is invalid</string>
@@ -732,7 +750,7 @@
 
     <string name="category_networks_toast_enable_location_service">Please enable location access</string>
 
-    <string name="manage_child_tab_other" tools:ignore="MissingTranslation">Advanced settings</string>
+    <string name="manage_child_tab_other">Advanced settings</string>
 
     <string name="manage_child_category_no_time_limits">no time limit</string>
 
@@ -767,10 +785,10 @@
 
     <string name="manage_child_redirected_toast">Press back to show the overview screen of TimeLimit</string>
 
-    <string name="manage_child_special_mode_wizard_block_title" tools:ignore="MissingTranslation">Block %s temporarily</string>
-    <string name="manage_child_special_mode_wizard_block_option" tools:ignore="MissingTranslation">block temporarily</string>
-    <string name="manage_child_special_mode_wizard_disable_limits_title" tools:ignore="MissingTranslation">Disable limits for %s</string>
-    <string name="manage_child_special_mode_wizard_disable_limits_option" tools:ignore="MissingTranslation">disable limits temporarily</string>
+    <string name="manage_child_special_mode_wizard_block_title">Block %s temporarily</string>
+    <string name="manage_child_special_mode_wizard_block_option">block temporarily</string>
+    <string name="manage_child_special_mode_wizard_disable_limits_title">Disable limits for %s</string>
+    <string name="manage_child_special_mode_wizard_disable_limits_option">disable limits temporarily</string>
 
     <string name="manage_device_activity_level_blocking_title">Activity level blocking</string>
     <string name="manage_device_activity_level_blocking_text">
@@ -967,8 +985,8 @@
     <string name="manage_disable_time_limits_btn_today">for today</string>
     <string name="manage_disable_time_limits_btn_time">until a time</string>
     <string name="manage_disable_time_limits_btn_date">until a date</string>
-    <string name="manage_disable_time_limits_btn_no_end_time" tools:ignore="MissingTranslation">no scheduled end time</string>
-    <string name="manage_disable_time_limits_btn_until" tools:ignore="MissingTranslation">until %s</string>
+    <string name="manage_disable_time_limits_btn_no_end_time">no scheduled end time</string>
+    <string name="manage_disable_time_limits_btn_until">until %s</string>
 
     <string name="manage_disable_time_limits_dialog_until">Disable time limits until ...</string>
     <string name="manage_disable_time_limits_toast_time_in_past">The selected time is in the past</string>
@@ -1071,7 +1089,7 @@
         Apps with category are removed from the previous category when they are added to a new category -
         use parent and child categories to \"add\" an App to multiple categories
     </string>
-    <string name="must_read_blocked_time_areas_obsolete" tools:ignore="MissingTranslation">
+    <string name="must_read_blocked_time_areas_obsolete">
         The blocked time areas are old. For most cases, using time limit rules with 0 minutes duration
         for a part of a day is a better solution.
     </string>
@@ -1129,9 +1147,9 @@
     <string name="overview_device_item_older_version">uses an older TimeLimit version</string>
 
     <string name="overview_user_item_temporarily_blocked">temporarily blocked</string>
-    <string name="overview_user_item_temporarily_blocked_until" tools:ignore="MissingTranslation">temporarily blocked until %s</string>
+    <string name="overview_user_item_temporarily_blocked_until">temporarily blocked until %s</string>
     <string name="overview_user_item_temporarily_disabled">Time limits temporarily disabled</string>
-    <string name="overview_user_item_temporarily_disabled_until" tools:ignore="MissingTranslation">Time limits temporarily disabled until %s</string>
+    <string name="overview_user_item_temporarily_disabled_until">Time limits temporarily disabled until %s</string>
     <string name="overview_user_item_role_child">is restricted</string>
     <string name="overview_user_item_role_parent">can change settings</string>
 
@@ -1479,7 +1497,7 @@
     <string name="usage_history_time_area">from %s until %s</string>
     <string name="usage_history_item_session_duration_limit">Session duration limit of %s with %s break</string>
     <string name="usage_history_item_last_usage">Last usage: %s</string>
-    <string name="usage_history_filter_all_categories" tools:ignore="MissingTranslation">All Categories</string>
+    <string name="usage_history_filter_all_categories">All Categories</string>
 
     <string name="usage_stats_permission_required_and_missing_title">Usage stats access is required</string>
     <string name="usage_stats_permission_required_and_missing_text">TimeLimit needs this permission to work correctly. Select \"permissions\" below to enable it.</string>
@@ -1532,4 +1550,21 @@
     <string name="admin_description_direct">This allows TimeLimit to prevent it from being disabled.</string>
 
     <string name="admin_disable_warning">Do you want to disable the device admin?</string>
+
+    <string name="manage_child_tasks">Tasks</string>
+    <string name="manage_child_tasks_add">Add Task</string>
+    <string name="manage_child_tasks_edit">Edit Task</string>
+    <string name="manage_child_tasks_intro">Tasks are things which a child can do to get extra time.
+        A parent must confirm the completion before the extra time is granted.
+    </string>
+    <string name="manage_child_task_last_grant">Last confirmation: %s</string>
+    <string name="manage_child_tasks_select_category">Select a category</string>
+    <string name="manage_child_tasks_title_hint">Task title</string>
+    <string name="manage_child_tasks_toast_saved">Task saved</string>
+    <string name="manage_child_tasks_toast_removed">Task removed</string>
+
+    <string name="task_review_title">Task confirmation</string>
+    <string name="task_review_text">%1$s said that %2$s was finished. Is this correct?</string>
+    <string name="task_review_category">This will grant %1$s extra time for %2$s</string>
+    <string name="task_review_last_grant">This task was confirmed last time at %s</string>
 </resources>

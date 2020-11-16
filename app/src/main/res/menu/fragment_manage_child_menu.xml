@@ -19,6 +19,13 @@
     <item
         app:showAsAction="ifRoom"
         app:iconTint="?colorOnPrimary"
+        android:icon="@drawable/ic_baseline_directions_bike_24"
+        android:title="@string/manage_child_tasks"
+        android:id="@+id/menu_manage_child_tasks" />
+
+    <item
+        app:showAsAction="never"
+        app:iconTint="?colorOnPrimary"
         android:icon="@drawable/ic_phone_black_24dp"
         android:title="@string/contacts_title_long"
         android:id="@+id/menu_manage_child_phone" />
