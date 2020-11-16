@@ -265,6 +265,7 @@ class AppSetupLogic(private val appLogic: AppLogic) {
     }
 
     suspend fun dangerousRemoteReset() {
+        appLogic.platformIntegration.setEnableSystemLockdown(false)
         appLogic.platformIntegration.showRemoteResetNotification()
         dangerousResetApp()
     }
