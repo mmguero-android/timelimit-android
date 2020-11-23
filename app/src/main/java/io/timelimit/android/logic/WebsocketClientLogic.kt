@@ -52,7 +52,7 @@ class WebsocketClientLogic(
                 }
             }
 
-            val okFromNetworkStatus = appLogic.networkStatus.map { networkStatus ->
+            val okFromNetworkStatus = appLogic.networkStatus.status.map { networkStatus ->
                 networkStatus == NetworkStatus.Online
             }.or(appLogic.database.config().isExperimentalFlagsSetAsync(ExperimentalFlags.IGNORE_SYSTEM_CONNECTION_STATUS))
 

@@ -29,6 +29,7 @@ import io.timelimit.android.livedata.*
 import io.timelimit.android.sync.SyncUtil
 import io.timelimit.android.sync.network.api.ServerApi
 import io.timelimit.android.sync.websocket.NetworkStatus
+import io.timelimit.android.sync.websocket.NetworkStatusInterface
 import io.timelimit.android.sync.websocket.WebsocketClientCreator
 
 class AppLogic(
@@ -36,7 +37,7 @@ class AppLogic(
         val timeApi: TimeApi,
         val database: Database,
         val serverCreator: (serverUrl: String) -> ServerApi,
-        val networkStatus: LiveData<NetworkStatus>,
+        val networkStatus: NetworkStatusInterface,
         websocketClientCreator: WebsocketClientCreator,
         val context: Context,
         val isInitialized: LiveData<Boolean>

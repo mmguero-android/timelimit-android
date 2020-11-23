@@ -70,4 +70,6 @@ class SyncStatusModel(application: Application): AndroidViewModel(application) {
             liveDataFromValue(null as String?)
         }
     }
+
+    fun handleStart() { logic.networkStatus.forceRefresh() }
 }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,36 +25,57 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.async.Threads
+import io.timelimit.android.livedata.castDown
+import io.timelimit.android.livedata.ignoreUnchanged
 
-object NetworkStatusUtil {
-    fun getSystemNetworkStatusLive(context: Context): LiveData<NetworkStatus> {
-        val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val status = MutableLiveData<NetworkStatus>()
+class NetworkStatusUtil (context: Context): NetworkStatusInterface {
+    companion object {
+        private val handler = Threads.mainThreadHandler
+    }
 
-        status.value = NetworkStatus.Offline
+    private val context = context.applicationContext
+    private val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val statusInternal = MutableLiveData<NetworkStatus>().apply { value = NetworkStatus.Offline }
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            handler.post {
+                val networkInfo = connectivityManager.activeNetworkInfo
+
+                if (networkInfo == null) {
+                    statusInternal.value = NetworkStatus.Offline
+                } else if (networkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED) {
+                    statusInternal.value = NetworkStatus.Online
+                } else {
+                    statusInternal.value = NetworkStatus.Offline
+                }
+            }
+        }
+    }
+    private val refreshRunnable = Runnable { forceRefresh() }
+    private var didRegister = false
+
+    override val status = statusInternal.ignoreUnchanged()
+
+    override fun forceRefresh() {
+        handler.removeCallbacks(refreshRunnable)
 
         if (BuildConfig.hasServer) {
-            context.applicationContext.registerReceiver(object : BroadcastReceiver() {
-                override fun onReceive(context: Context?, intent: Intent) {
-                    Threads.mainThreadHandler.post {
-                        val networkInfo = connectivityManager.activeNetworkInfo
+            if (didRegister) context.applicationContext.unregisterReceiver(receiver)
+            context.applicationContext.registerReceiver(receiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)); didRegister = true
 
-                        if (networkInfo == null) {
-                            status.value = NetworkStatus.Offline
-                        } else if (networkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED) {
-                            status.value = NetworkStatus.Online
-                        } else {
-                            status.value = NetworkStatus.Offline
-                        }
-                    }
-                }
-            }, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+            handler.postDelayed(refreshRunnable, 15 * 1000 /* 15 seconds */)
         }
-
-        return status
     }
+
+    init { forceRefresh() }
 }
 
 enum class NetworkStatus {
     Offline, Online
+}
+
+interface NetworkStatusInterface {
+    fun forceRefresh()
+
+    val status: LiveData<NetworkStatus>
 }

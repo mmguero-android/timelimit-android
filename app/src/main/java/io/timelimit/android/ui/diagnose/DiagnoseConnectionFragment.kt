@@ -33,11 +33,11 @@ import io.timelimit.android.sync.websocket.NetworkStatus
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
 class DiagnoseConnectionFragment : Fragment(), FragmentWithCustomTitle {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentDiagnoseConnectionBinding.inflate(inflater, container, false)
-        val logic = DefaultAppLogic.with(context!!)
+        val logic = DefaultAppLogic.with(requireContext())
 
-        logic.networkStatus.observe(viewLifecycleOwner, Observer {
+        logic.networkStatus.status.observe(viewLifecycleOwner, Observer {
             binding.generalStatus = getString(when (it!!) {
                 NetworkStatus.Online -> R.string.diagnose_connection_yes
                 NetworkStatus.Offline -> R.string.diagnose_connection_no

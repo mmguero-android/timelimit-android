@@ -154,6 +154,8 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         purchaseModel.queryAndProcessPurchasesAsync()
 
         IsAppInForeground.reportStart()
+
+        syncModel.handleStart()
     }
 
     override fun onStop() {

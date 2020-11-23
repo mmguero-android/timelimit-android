@@ -55,7 +55,7 @@ object AndroidAppLogic {
                                     }
                             )
                         },
-                        networkStatus = NetworkStatusUtil.getSystemNetworkStatusLive(safeContext),
+                        networkStatus = NetworkStatusUtil(safeContext),
                         websocketClientCreator = SocketIoWebsocketClient.creator,
                         context = safeContext,
                         isInitialized = isInitialized
