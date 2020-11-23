@@ -1476,6 +1476,8 @@
     <string name="util_time_unused">Unbenutzt</string>
     <string name="util_time_used"><xliff:g example="4 minutes" id="used time">%1$s</xliff:g> benutzt</string>
 
+    <string name="util_day_from_to">%s bis %s</string>
+
     <string name="widget_empty_view">Wenn dieses Gerät einem Kind zugeordnet
         wird und dieses Kind Kategorien hat, dann sollten diese Kategorien
         hier angezeigt werden.

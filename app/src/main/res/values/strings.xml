@@ -1528,6 +1528,8 @@
     <string name="util_time_unused">Unused</string>
     <string name="util_time_used">Used <xliff:g example="4 minutes" id="used time">%1$s</xliff:g></string>
 
+    <string name="util_day_from_to">%s to %s</string>
+
     <string name="widget_empty_view">If this device is assigned to a child
         and this child has got categories, then the categories should
         appear here.

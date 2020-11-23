@@ -29,6 +29,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.DummyApps
 import io.timelimit.android.ui.manage.category.apps.AppAdapterHandlers
 import io.timelimit.android.ui.manage.category.timelimit_rules.TimeLimitRulesHandlers
+import io.timelimit.android.util.DayNameUtil
 import io.timelimit.android.util.JoinUtil
 import io.timelimit.android.util.TimeTextUtil
 import kotlin.properties.Delegates
@@ -153,7 +154,6 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                 val rule = item.rule
                 val binding = holder.itemView.tag as FragmentCategoryTimeLimitRuleItemBinding
                 val context = binding.root.context
-                val dayNames = binding.root.resources.getStringArray(R.array.days_of_week_array)
                 val usedTime = date?.let { date ->
                     usedTimes.filter { usedTime ->
                         val dayOfWeek = usedTime.dayOfEpoch - date.firstDayOfWeekAsEpochDay
@@ -181,10 +181,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                 binding.usageProgressInPercent = if (rule.maximumTimeInMillis > 0)
                     (usedTime * 100 / rule.maximumTimeInMillis)
                 else null
-                binding.daysString = JoinUtil.join(
-                        dayNames.filterIndexed { index, _ -> (rule.dayMask.toInt() and (1 shl index)) != 0 },
-                        context
-                )
+                binding.daysString = DayNameUtil.formatDayNameMask(rule.dayMask, context)
                 binding.timeAreaString = if (rule.appliesToWholeDay)
                     null
                 else
