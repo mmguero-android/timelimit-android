@@ -1075,6 +1075,7 @@
     <string name="notification_update_title">Fehlendes Update bei %s</string>
     <string name="notification_generic_text">Tippen, um TimeLimit zu öffnen</string>
     <string name="notification_premium_expires_title">Die Vollversion wird bald ablaufen</string>
+    <string name="notification_premium_expires_text">Es erfolgt keine automatische Verlängerung</string>
 
     <string name="obsolete_message">Sie verwenden TimeLimit auf einer älteren Android-Version.
         Das kann funktionieren, aber es wird nicht empfohlen.

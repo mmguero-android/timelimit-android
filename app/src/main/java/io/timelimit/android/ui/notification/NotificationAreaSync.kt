@@ -130,7 +130,7 @@ object NotificationAreaSync {
                     NotificationCompat.Builder(context, NotificationChannels.PREMIUM_EXPIRES_NOTIFICATION)
                             .setSmallIcon(R.drawable.ic_stat_timelapse)
                             .setContentTitle(context.getString(R.string.notification_premium_expires_title))
-                            .setContentText(context.getString(R.string.notification_generic_text))
+                            .setContentText(context.getString(R.string.notification_premium_expires_text))
                             .setContentIntent(openAppIntent)
                             .setDeleteIntent(markReadIntent)
                             .setWhen(0)

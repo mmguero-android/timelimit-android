@@ -1119,6 +1119,7 @@
     <string name="notification_update_title">Update missing at %s</string>
     <string name="notification_generic_text">Tap to open TimeLimit</string>
     <string name="notification_premium_expires_title">The premium version will expire soon</string>
+    <string name="notification_premium_expires_text">It will not renew automatically</string>
 
     <string name="obsolete_message">You are using TimeLimit at a obsolete Android version.
         Although this can work, it is not recommend.
