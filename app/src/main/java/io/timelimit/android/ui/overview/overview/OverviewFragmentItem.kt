@@ -41,4 +41,4 @@ sealed class ShowMoreOverviewFragmentItem: OverviewFragmentItem() {
     object ShowAllUsers: ShowMoreOverviewFragmentItem()
     data class ShowMoreDevices(val level: DeviceListItemVisibility): ShowMoreOverviewFragmentItem()
 }
-data class TaskReviewOverviewItem(val task: ChildTask, val childTitle: String, val categoryTitle: String): OverviewFragmentItem()
+data class TaskReviewOverviewItem(val task: ChildTask, val childTitle: String, val categoryTitle: String, val hasPremium: Boolean): OverviewFragmentItem()

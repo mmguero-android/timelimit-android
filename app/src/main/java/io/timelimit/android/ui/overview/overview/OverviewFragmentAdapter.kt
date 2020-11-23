@@ -260,7 +260,7 @@ class OverviewFragmentAdapter : RecyclerView.Adapter<OverviewFragmentViewHolder>
                     it.lastGrant = if (item.task.lastGrantTimestamp == 0L) null else DateUtil.formatAbsoluteDate(it.root.context, item.task.lastGrantTimestamp)
                     it.taskTitle = item.task.taskTitle
 
-                    it.yesButton.setOnClickListener { handlers?.onTaskConfirmed(item.task) }
+                    it.yesButton.setOnClickListener { handlers?.onTaskConfirmed(task = item.task, hasPremium = item.hasPremium) }
                     it.noButton.setOnClickListener { handlers?.onTaskRejected(item.task) }
                     it.skipButton.setOnClickListener { handlers?.onSkipTaskReviewClicked(item.task) }
                 }
@@ -305,6 +305,6 @@ interface OverviewFragmentHandlers {
     fun onShowAllUsersClicked()
     fun onSetDeviceListVisibility(level: DeviceListItemVisibility)
     fun onSkipTaskReviewClicked(task: ChildTask)
-    fun onTaskConfirmed(task: ChildTask)
+    fun onTaskConfirmed(task: ChildTask, hasPremium: Boolean)
     fun onTaskRejected(task: ChildTask)
 }

@@ -33,6 +33,7 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.ReviewChildTaskAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
 import kotlinx.android.synthetic.main.fragment_overview.*
 import kotlinx.coroutines.launch
 
@@ -102,14 +103,16 @@ class OverviewFragment : CoroutineFragment() {
                 model.showMoreDevices(level)
             }
 
-            override fun onTaskConfirmed(task: ChildTask) {
-                auth.tryDispatchParentAction(
-                        ReviewChildTaskAction(
-                                taskId = task.taskId,
-                                ok = true,
-                                time = logic.timeApi.getCurrentTimeInMillis()
-                        )
-                )
+            override fun onTaskConfirmed(task: ChildTask, hasPremium: Boolean) {
+                if (hasPremium) {
+                    auth.tryDispatchParentAction(
+                            ReviewChildTaskAction(
+                                    taskId = task.taskId,
+                                    ok = true,
+                                    time = logic.timeApi.getCurrentTimeInMillis()
+                            )
+                    )
+                } else RequiresPurchaseDialogFragment().show(parentFragmentManager)
             }
 
             override fun onTaskRejected(task: ChildTask) {

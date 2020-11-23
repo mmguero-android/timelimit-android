@@ -122,9 +122,12 @@ class OverviewFragmentModel(application: Application): AndroidViewModel(applicat
             tasksWithPendingReview.filterNot { hiddenTaskIds.contains(it.childTask.taskId) }
         }
     }
-    private val pendingTaskItemLive = pendingTasksToShowLive.map { tasks ->
-        tasks.firstOrNull()?.let {
-            TaskReviewOverviewItem(task = it.childTask, childTitle = it.childName, categoryTitle = it.categoryTitle)
+    private val hasPremiumLive = logic.fullVersion.shouldProvideFullVersionFunctions
+    private val pendingTaskItemLive = hasPremiumLive.switchMap { hasPremium ->
+        pendingTasksToShowLive.map { tasks ->
+            tasks.firstOrNull()?.let {
+                TaskReviewOverviewItem(task = it.childTask, childTitle = it.childName, categoryTitle = it.categoryTitle, hasPremium = hasPremium)
+            }
         }
     }
 

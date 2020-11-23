@@ -122,6 +122,12 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:text="@string/purchase_required_info_local_mode_free"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </FrameLayout>
