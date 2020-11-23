@@ -44,6 +44,7 @@ import io.timelimit.android.livedata.liveDataFromValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.logic.DummyApps
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
@@ -147,6 +148,8 @@ class AddCategoryAppsFragment : DialogFragment() {
 
         val installedApps = realShowAppsFromAllDevices.switchMap { appsFromAllDevices ->
             if (appsFromAllDevices) appsAtAllDevices else appsAtAssignedDevices
+        }.map { list ->
+            if (list.isEmpty()) list else list + DummyApps.getApps(deviceId = list.first().deviceId, context = requireContext())
         }.map { apps -> apps.distinctBy { app -> app.packageName } }
 
         val userRelatedDataLive = database.derivedDataDao().getUserRelatedDataLive(childId)

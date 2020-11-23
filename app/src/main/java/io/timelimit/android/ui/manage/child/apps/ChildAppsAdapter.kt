@@ -25,6 +25,7 @@ import io.timelimit.android.databinding.FragmentChildAppsItemBinding
 import io.timelimit.android.databinding.GenericBigListHeaderBinding
 import io.timelimit.android.databinding.GenericListHeaderBinding
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.logic.DummyApps
 import kotlin.properties.Delegates
 
 class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
@@ -101,10 +102,13 @@ class ChildAppsAdapter: RecyclerView.Adapter<ChildAppsHolder>() {
             is ChildAppsApp -> {
                 holder as AppHolder
 
+                val context = holder.binding.root.context
+
                 holder.binding.item = item.app
                 holder.binding.currentCategoryTitle = item.shownCategoryName
                 holder.binding.icon.setImageDrawable(
-                        DefaultAppLogic.with(holder.binding.root.context).platformIntegration.getAppIcon(item.app.packageName)
+                        DummyApps.getIcon(item.app.packageName, context) ?:
+                        DefaultAppLogic.with(context).platformIntegration.getAppIcon(item.app.packageName)
                 )
                 holder.binding.handlers = handlers
                 holder.binding.executePendingBindings()

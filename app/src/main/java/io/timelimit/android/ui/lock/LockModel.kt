@@ -96,7 +96,8 @@ class LockModel(application: Application): AndroidViewModel(application) {
                     deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
                     userRelatedData = deviceAndUserRelatedData.userRelatedData,
                     pauseForegroundAppBackgroundLoop = false,
-                    pauseCounting = false
+                    pauseCounting = false,
+                    isSystemImageApp = logic.platformIntegration.isSystemImageApp(packageName)
             )
 
             val needsNetworkId = appBaseHandling.needsNetworkId()

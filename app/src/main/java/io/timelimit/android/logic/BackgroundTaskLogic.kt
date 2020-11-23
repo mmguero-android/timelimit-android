@@ -294,7 +294,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                             pauseForegroundAppBackgroundLoop = pauseForegroundAppBackgroundLoop,
                             userRelatedData = userRelatedData,
                             deviceRelatedData = deviceRelatedData,
-                            pauseCounting = !isScreenOn
+                            pauseCounting = !isScreenOn,
+                            isSystemImageApp = appLogic.platformIntegration.isSystemImageApp(app.packageName)
                     )
                 }
 
@@ -304,7 +305,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         pauseForegroundAppBackgroundLoop = false,
                         userRelatedData = userRelatedData,
                         deviceRelatedData = deviceRelatedData,
-                        pauseCounting = false
+                        pauseCounting = false,
+                        isSystemImageApp = audioPlaybackPackageName?.let { appLogic.platformIntegration.isSystemImageApp(it) } ?: false
                 )
 
                 val allAppsBaseHandlings = foregroundAppWithBaseHandlings.map { it.second } + listOf(backgroundAppBaseHandling)

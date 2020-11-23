@@ -55,6 +55,8 @@ class DummyIntegration(
         return null
     }
 
+    override fun isSystemImageApp(packageName: String): Boolean = false
+
     override fun getLauncherAppPackageName(): String? = null
 
     override fun getCurrentProtectionLevel(): ProtectionLevel {

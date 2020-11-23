@@ -18,8 +18,6 @@ package io.timelimit.android.integration.platform.android
 import android.annotation.TargetApi
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -153,16 +151,19 @@ class NotificationListener: NotificationListenerService() {
         return if (deviceAndUserRelatedData?.userRelatedData?.user?.type != UserType.Child) {
             BlockingReason.None
         } else {
+            val isSystemImageApp = appLogic.platformIntegration.isSystemImageApp(sbn.packageName)
+
             val appHandling = AppBaseHandling.calculate(
                     foregroundAppPackageName = sbn.packageName,
                     foregroundAppActivityName = null,
                     pauseCounting = false,
                     pauseForegroundAppBackgroundLoop = false,
                     userRelatedData = deviceAndUserRelatedData.userRelatedData,
-                    deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData
+                    deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
+                    isSystemImageApp = isSystemImageApp
             )
 
-            if (appHandling is AppBaseHandling.BlockDueToNoCategory && !isSystemApp(sbn.packageName)) {
+            if (appHandling is AppBaseHandling.BlockDueToNoCategory && !isSystemImageApp) {
                 BlockingReason.NotPartOfAnCategory
             } else if (appHandling is AppBaseHandling.UseCategories) {
                 val time = RealTime.newInstance()
@@ -199,16 +200,6 @@ class NotificationListener: NotificationListenerService() {
             } else {
                 BlockingReason.None
             }
-        }
-    }
-
-    private fun isSystemApp(packageName: String): Boolean {
-        try {
-            val appInfo = packageManager.getApplicationInfo(packageName, 0)
-
-            return appInfo.flags and ApplicationInfo.FLAG_SYSTEM == ApplicationInfo.FLAG_SYSTEM
-        } catch (ex: PackageManager.NameNotFoundException) {
-            return false
         }
     }
 }

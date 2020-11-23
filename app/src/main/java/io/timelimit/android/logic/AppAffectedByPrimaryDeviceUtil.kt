@@ -55,7 +55,8 @@ object AppAffectedByPrimaryDeviceUtil {
                     deviceRelatedData = deviceAndUserRelatedData.deviceRelatedData,
                     userRelatedData = deviceAndUserRelatedData.userRelatedData,
                     pauseCounting = false,
-                    pauseForegroundAppBackgroundLoop = false
+                    pauseForegroundAppBackgroundLoop = false,
+                    isSystemImageApp = logic.platformIntegration.isSystemImageApp(currentApp.packageName)
             )
 
             if (!(handling is AppBaseHandling.UseCategories)) {

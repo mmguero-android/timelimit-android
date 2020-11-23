@@ -34,6 +34,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.collection.LruCache
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LiveData
@@ -115,6 +116,18 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     override fun getAppIcon(packageName: String): Drawable? {
         return AndroidIntegrationApps.getAppIcon(packageName, context)
     }
+
+    private val isSystemImageAppCache = object: LruCache<String, Boolean>(8) {
+        override fun create(key: String): Boolean? = try {
+            val appInfo: ApplicationInfo = context.packageManager.getApplicationInfo(key, 0)
+
+            appInfo.flags and ApplicationInfo.FLAG_SYSTEM == ApplicationInfo.FLAG_SYSTEM
+        } catch (ex: PackageManager.NameNotFoundException) {
+            null
+        }
+    }
+
+    override fun isSystemImageApp(packageName: String): Boolean = isSystemImageAppCache.get(packageName) ?: false
 
     override fun getLauncherAppPackageName(): String? {
         return Intent(Intent.ACTION_MAIN)

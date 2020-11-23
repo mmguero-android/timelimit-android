@@ -26,6 +26,7 @@ import io.timelimit.android.extensions.takeDistributedElements
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.logic.DummyApps
 import java.util.*
 
 class AppsAndRulesModel(application: Application): AndroidViewModel(application) {
@@ -114,15 +115,18 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
     private val appsOfCategoryWithNames = installedApps.switchMap { allApps ->
         appsOfThisCategory.map { apps ->
             apps.map { categoryApp ->
-                categoryApp to allApps.find { app -> app.packageName == categoryApp.packageNameWithoutActivityName }
+                val title = DummyApps.getTitle(categoryApp.packageNameWithoutActivityName, getApplication()) ?:
+                    allApps.find { app -> app.packageName == categoryApp.packageNameWithoutActivityName }?.title
+
+                categoryApp to title
             }
         }
     }
 
     private val appEntries = appsOfCategoryWithNames.map { apps ->
-        apps.map { (app, appEntry) ->
-            if (appEntry != null) {
-                AppAndRuleItem.AppEntry(appEntry.title, app.packageName, app.packageNameWithoutActivityName)
+        apps.map { (app, title) ->
+            if (title != null) {
+                AppAndRuleItem.AppEntry(title, app.packageName, app.packageNameWithoutActivityName)
             } else {
                 AppAndRuleItem.AppEntry("app not found", app.packageName, app.packageNameWithoutActivityName)
             }

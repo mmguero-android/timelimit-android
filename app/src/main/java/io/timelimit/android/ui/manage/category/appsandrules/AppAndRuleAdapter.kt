@@ -25,6 +25,7 @@ import io.timelimit.android.data.model.UsedTimeItem
 import io.timelimit.android.databinding.*
 import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.logic.DefaultAppLogic
+import io.timelimit.android.logic.DummyApps
 import io.timelimit.android.ui.manage.category.apps.AppAdapterHandlers
 import io.timelimit.android.ui.manage.category.timelimit_rules.TimeLimitRulesHandlers
 import io.timelimit.android.util.JoinUtil
@@ -133,13 +134,15 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
         when (item) {
             is AppAndRuleItem.AppEntry -> {
                 val binding = holder.itemView.tag as FragmentCategoryAppsItemBinding
+                val context = binding.root.context
 
                 binding.item = item
                 binding.handlers = handlers
                 binding.executePendingBindings()
 
                 binding.icon.setImageDrawable(
-                        DefaultAppLogic.with(binding.root.context)
+                        DummyApps.getIcon(item.packageNameWithoutActivityName, context) ?:
+                        DefaultAppLogic.with(context)
                                 .platformIntegration.getAppIcon(item.packageNameWithoutActivityName)
                 )
             }

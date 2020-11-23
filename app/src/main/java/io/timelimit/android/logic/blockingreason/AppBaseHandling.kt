@@ -22,6 +22,7 @@ import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.integration.platform.android.AndroidIntegrationApps
 import io.timelimit.android.logic.BlockingLevel
+import io.timelimit.android.logic.DummyApps
 
 sealed class AppBaseHandling {
     object Idle: AppBaseHandling()
@@ -49,7 +50,8 @@ sealed class AppBaseHandling {
                 pauseForegroundAppBackgroundLoop: Boolean,
                 pauseCounting: Boolean,
                 userRelatedData: UserRelatedData,
-                deviceRelatedData: DeviceRelatedData
+                deviceRelatedData: DeviceRelatedData,
+                isSystemImageApp: Boolean
         ): AppBaseHandling {
             if (pauseForegroundAppBackgroundLoop) {
                 return PauseLogic
@@ -71,7 +73,9 @@ sealed class AppBaseHandling {
             } else if (foregroundAppPackageName != null) {
                 val appCategory = run {
                     val tryActivityLevelBlocking = deviceRelatedData.deviceEntry.enableActivityLevelBlocking && foregroundAppActivityName != null
-                    val appLevelCategory = userRelatedData.findCategoryApp(foregroundAppPackageName)
+                    val appLevelCategory = userRelatedData.findCategoryApp(foregroundAppPackageName) ?: run {
+                        if (isSystemImageApp) userRelatedData.findCategoryApp(DummyApps.NOT_ASSIGNED_SYSTEM_IMAGE_APP) else null
+                    }
 
                     (if (tryActivityLevelBlocking) {
                         userRelatedData.findCategoryApp("$foregroundAppPackageName:$foregroundAppActivityName")

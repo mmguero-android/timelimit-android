@@ -1514,4 +1514,6 @@
     <string name="task_review_text">%1$s hat angegeben, %2$s erledigt zu haben. Ist das richtig?</string>
     <string name="task_review_category">Dafür wird es %1$s Extrazeit für %2$s geben</string>
     <string name="task_review_last_grant">Diese Aufgabe wurde zuletzt bestätigt am %s</string>
+
+    <string name="dummy_app_unassigned_system_image_app">nicht zugeordnete Apps von der Systempartition</string>
 </resources>

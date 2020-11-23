@@ -1567,4 +1567,6 @@
     <string name="task_review_text">%1$s said that %2$s was finished. Is this correct?</string>
     <string name="task_review_category">This will grant %1$s extra time for %2$s</string>
     <string name="task_review_last_grant">This task was confirmed last time at %s</string>
+
+    <string name="dummy_app_unassigned_system_image_app">not assigned Apps from the system image</string>
 </resources>
