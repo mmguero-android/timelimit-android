@@ -1,1 +1,3 @@
-- added option to disable limitations of a single category
+- added task system
+- added dummy App to assign all preinstalled Apps
+- fixed wrong icon colors in the dark mode
