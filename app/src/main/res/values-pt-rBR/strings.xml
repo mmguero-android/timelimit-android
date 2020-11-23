@@ -962,14 +962,6 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
         \n2nd: Se \"não funciona\" então isto é muito provavelmente causado por recursos de economia da bateria.
         Estos recursos são freqüentemente ativadas mesmo que você não o tenha feito.
     </string>
-    <string name="must_read_timelimit_rules">
-        Isso acontece às vezes porque é configurado de forma errada :
-        Uma regra limita a duração total de uso de uma categoria nos dias selecionados da semana.
-        Se houver uma regra de segunda-feira a sexta-feira com 3 horas,
-        então há um limite total de 3 horas por semana, de segunda a sexta.
-        Se houver uma regra por dia com 3 horas,
-        então há um limite de 3 horas por dia.
-    </string>
     <string name="must_read_add_already_assigned_apps">
         Os aplicativos com categoria são excluídos da categoria anterior quando são adicionados a uma nova categoria -
         usar categorias de Pais e filhos para \"adicionar\" um aplicativo a múltiplas categorias

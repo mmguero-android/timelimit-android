@@ -57,8 +57,8 @@ data class RemainingTime(val includingExtraTime: Long, val default: Long) {
             }
 
             val relatedRules = getRulesRelatedToDay(dayOfWeek, minuteOfDay, rules)
-            val withoutExtraTime = getRemainingTime(usedTimes, relatedRules, false, firstDayOfWeekAsEpochDay)
-            val withExtraTime = getRemainingTime(usedTimes, relatedRules, true, firstDayOfWeekAsEpochDay)
+            val withoutExtraTime = getRemainingTime(usedTimes, relatedRules, false, firstDayOfWeekAsEpochDay, dayOfWeek)
+            val withExtraTime = getRemainingTime(usedTimes, relatedRules, true, firstDayOfWeekAsEpochDay, dayOfWeek)
 
             if (withoutExtraTime == null && withExtraTime == null) {
                 // no rules
@@ -86,15 +86,21 @@ data class RemainingTime(val includingExtraTime: Long, val default: Long) {
             }
         }
 
-        private fun getRemainingTime(usedTimes: List<UsedTimeItem>, relatedRules: List<TimeLimitRule>, assumeMaximalExtraTime: Boolean, firstDayOfWeekAsEpochDay: Int): Long? {
+        private fun getRemainingTime(usedTimes: List<UsedTimeItem>, relatedRules: List<TimeLimitRule>, assumeMaximalExtraTime: Boolean, firstDayOfWeekAsEpochDay: Int, dayOfWeek: Int): Long? {
             return relatedRules.filter { (!assumeMaximalExtraTime) || it.applyToExtraTimeUsage }.map { rule ->
                 var usedTime = 0L
 
                 usedTimes.forEach { usedTimeItem ->
-                    if (usedTimeItem.dayOfEpoch >= firstDayOfWeekAsEpochDay && usedTimeItem.dayOfEpoch <= firstDayOfWeekAsEpochDay + 6) {
-                        val usedTimeItemDayOfWeek = usedTimeItem.dayOfEpoch - firstDayOfWeekAsEpochDay
+                    val doesWeekMatch = usedTimeItem.dayOfEpoch >= firstDayOfWeekAsEpochDay && usedTimeItem.dayOfEpoch <= firstDayOfWeekAsEpochDay + 6
 
-                        if ((rule.dayMask.toInt() and (1 shl usedTimeItemDayOfWeek)) != 0) {
+                    if (doesWeekMatch) {
+                        val usedTimeItemDayOfWeek = usedTimeItem.dayOfEpoch - firstDayOfWeekAsEpochDay
+                        val doesDayMaskMatch = (rule.dayMask.toInt() and (1 shl usedTimeItemDayOfWeek)) != 0
+                        val doesCurrentDayMatch = dayOfWeek == usedTimeItemDayOfWeek
+
+                        val usedTimeItemMatching = if (rule.perDay) doesCurrentDayMatch else doesDayMaskMatch
+
+                        if (usedTimeItemMatching) {
                             if (rule.startMinuteOfDay == usedTimeItem.startTimeOfDay && rule.endMinuteOfDay == usedTimeItem.endTimeOfDay) {
                                 usedTime += usedTimeItem.usedMillis
                             }
@@ -106,7 +112,7 @@ data class RemainingTime(val includingExtraTime: Long, val default: Long) {
                 val remaining = Math.max(0, maxTime - usedTime)
 
                 remaining
-            }.min()
+            }.minOrNull()
         }
     }
 }

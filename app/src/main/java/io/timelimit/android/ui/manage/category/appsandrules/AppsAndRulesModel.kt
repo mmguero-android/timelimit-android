@@ -44,16 +44,14 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
 
     private val userDayOfWeek = userDate.map { it.dayOfWeek }
 
-    val firstDayOfWeekAndUsedTimes = userDate.switchMap { date ->
-        val firstDayOfWeekAsEpochDay = date.dayOfEpoch - date.dayOfWeek
-
+    val dateAndUsedTimes = userDate.switchMap { date ->
         categoryIdLive.switchMap { categoryId ->
             database.usedTimes().getUsedTimesOfWeek(
                     categoryId = categoryId,
-                    firstDayOfWeekAsEpochDay = firstDayOfWeekAsEpochDay
+                    firstDayOfWeekAsEpochDay = date.firstDayOfWeekAsEpochDay
             )
         }.map { usedTimes ->
-            firstDayOfWeekAsEpochDay to usedTimes
+            date to usedTimes
         }
     }
 

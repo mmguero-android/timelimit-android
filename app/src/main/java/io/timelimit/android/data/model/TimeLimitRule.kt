@@ -53,7 +53,9 @@ data class TimeLimitRule(
         @ColumnInfo(name = "session_duration_milliseconds")
         val sessionDurationMilliseconds: Int,
         @ColumnInfo(name = "session_pause_milliseconds")
-        val sessionPauseMilliseconds: Int
+        val sessionPauseMilliseconds: Int,
+        @ColumnInfo(name = "per_day")
+        val perDay: Boolean
 ): Parcelable, JsonSerializable {
     companion object {
         private const val RULE_ID = "ruleId"
@@ -65,6 +67,7 @@ data class TimeLimitRule(
         private const val END_MINUTE_OF_DAY = "end"
         private const val SESSION_DURATION_MILLISECONDS = "dur"
         private const val SESSION_PAUSE_MILLISECONDS = "pause"
+        private const val PER_DAY = "perDay"
 
         const val MIN_START_MINUTE = MinuteOfDay.MIN
         const val MAX_END_MINUTE = MinuteOfDay.MAX
@@ -79,6 +82,7 @@ data class TimeLimitRule(
             var endMinuteOfDay = MAX_END_MINUTE
             var sessionDurationMilliseconds = 0
             var sessionPauseMilliseconds = 0
+            var perDay = false
 
             reader.beginObject()
 
@@ -93,6 +97,7 @@ data class TimeLimitRule(
                     END_MINUTE_OF_DAY -> endMinuteOfDay = reader.nextInt()
                     SESSION_DURATION_MILLISECONDS -> sessionDurationMilliseconds = reader.nextInt()
                     SESSION_PAUSE_MILLISECONDS -> sessionPauseMilliseconds = reader.nextInt()
+                    PER_DAY -> perDay = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -108,7 +113,8 @@ data class TimeLimitRule(
                     startMinuteOfDay = startMinuteOfDay,
                     endMinuteOfDay = endMinuteOfDay,
                     sessionDurationMilliseconds = sessionDurationMilliseconds,
-                    sessionPauseMilliseconds = sessionPauseMilliseconds
+                    sessionPauseMilliseconds = sessionPauseMilliseconds,
+                    perDay = perDay
             )
         }
     }
@@ -158,6 +164,8 @@ data class TimeLimitRule(
             writer.name(SESSION_DURATION_MILLISECONDS).value(sessionDurationMilliseconds)
             writer.name(SESSION_PAUSE_MILLISECONDS).value(sessionPauseMilliseconds)
         }
+
+        if (perDay) writer.name(PER_DAY).value(true)
 
         writer.endObject()
     }

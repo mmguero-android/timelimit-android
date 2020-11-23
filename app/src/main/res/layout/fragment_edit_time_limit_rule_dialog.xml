@@ -39,6 +39,10 @@
             type="boolean" />
 
         <variable
+            name="showWeeklyDailyOption"
+            type="boolean" />
+
+        <variable
             name="startTime"
             type="String" />
 
@@ -80,6 +84,27 @@
 
             <include layout="@layout/view_select_days" android:id="@+id/day_selection" />
 
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:visibility="@{showWeeklyDailyOption ? View.VISIBLE : View.GONE}"
+                android:id="@+id/per_day_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/type_per_day"
+                    style="?materialButtonOutlinedStyle"
+                    android:text="@string/category_time_limit_rules_per_day"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/type_per_week"
+                    style="?materialButtonOutlinedStyle"
+                    android:text="@string/category_time_limit_rules_per_week"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
             <io.timelimit.android.ui.view.SelectTimeSpanView
                 android:id="@+id/time_span"
                 android:layout_width="match_parent"
@@ -107,8 +132,9 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:padding="8dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="8dp"
                     android:text="@string/category_time_limit_rules_apply_to_part_day_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -122,7 +148,7 @@
                     android:layout_height="wrap_content" />
 
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearanceSmall"
                     android:padding="8dp"
                     android:text="@string/category_time_limit_rules_apply_to_part_day_2"
                     android:layout_width="wrap_content"
@@ -161,10 +187,10 @@
                     app:layout_gravity="fill_vertical|fill_horizontal"
                     android:gravity="center_vertical"
                     android:paddingEnd="8dp"
-                    android:paddingStart="8dp"
+                    android:paddingStart="0dp"
                     app:layout_row="1"
                     app:layout_column="1"
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearanceSmall"
                     android:text="@string/category_time_limit_rules_session_limit_duration"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />
@@ -187,8 +213,8 @@
                     app:layout_gravity="fill_vertical|fill_horizontal"
                     android:gravity="center_vertical"
                     android:paddingEnd="8dp"
-                    android:paddingStart="8dp"
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:paddingStart="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
                     app:layout_row="2"
                     app:layout_column="1"
                     android:text="@string/category_time_limit_rules_session_limit_pause"
@@ -214,13 +240,6 @@
                 android:visibility="@{safeUnbox(applyToWholeDay) ? View.GONE : View.VISIBLE}"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:text="@string/category_time_limit_rules_warning_day_part"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:visibility="@{safeUnbox(affectsMultipleDays) ? View.VISIBLE : View.GONE}"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:text="@string/category_time_limit_rules_warning_multiple_days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

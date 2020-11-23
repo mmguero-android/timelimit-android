@@ -367,15 +367,13 @@
     <string name="category_time_limit_rules_enable_session_limit">Limit session duration</string>
     <string name="category_time_limit_rules_session_limit_duration">Maximum session duration</string>
     <string name="category_time_limit_rules_session_limit_pause">Break duration after session</string>
+    <string name="category_time_limit_rules_per_day">daily</string>
+    <string name="category_time_limit_rules_per_week">weekly</string>
 
     <string name="category_time_limit_rules_snackbar_created">Rule was created</string>
     <string name="category_time_limit_rules_snackbar_updated">Rule was modified</string>
     <string name="category_time_limit_rules_snackbar_deleted">Rule was deleted</string>
 
-    <string name="category_time_limit_rules_warning_multiple_days">This rule
-        will limit the total usage duration during one week at the selected days.
-        If you want it per day, create one rule per day.
-    </string>
     <string name="category_time_limit_rules_warning_day_part">This rule
         will limit the usage duration only in the specified interval.
         Without rules for other times or blocked time areas, there will
@@ -1076,14 +1074,6 @@
         \n1st: In the default settings, TimeLimit can be removed easily, even by children.
         \n2nd: If \"it does not work\" then this is most likely caused by power saving features.
         This features are often enabled even if you did not enable it actively.
-    </string>
-    <string name="must_read_timelimit_rules">
-        Because it happens sometimes that it is configured wrongly:
-        A rule limits the total usage duration of a category at the selected days of the week.
-        If there is a rule from monday to friday with 3 hours,
-        then there is a limit of total 3 hours per week from monday to friday.
-        If there is one rule per day with 3 hours,
-        then there is a limit of 3 hours per day.
     </string>
     <string name="must_read_add_already_assigned_apps">
         Apps with category are removed from the previous category when they are added to a new category -

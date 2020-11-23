@@ -28,22 +28,18 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
-import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.IdGenerator
-import io.timelimit.android.data.model.HintsToShow
 import io.timelimit.android.data.model.TimeLimitRule
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.FragmentEditTimeLimitRuleDialogBinding
 import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.extensions.showSafe
-import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.actions.CreateTimeLimitRuleAction
 import io.timelimit.android.sync.actions.DeleteTimeLimitRuleAction
 import io.timelimit.android.sync.actions.UpdateTimeLimitRuleAction
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
-import io.timelimit.android.ui.mustread.MustReadFragment
 import io.timelimit.android.ui.view.SelectDayViewHandlers
 import io.timelimit.android.ui.view.SelectTimeSpanViewListener
 import io.timelimit.android.util.TimeTextUtil
@@ -86,29 +82,13 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
         if (existingRule != null) {
             existingRule!!.categoryId
         } else {
-            arguments!!.getString(PARAM_CATEGORY_ID)!!
+            requireArguments().getString(PARAM_CATEGORY_ID)!!
         }
     }
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (savedInstanceState == null) {
-            val database = DefaultAppLogic.with(context!!).database
-
-            runAsync {
-                val wasShown = database.config().wereHintsShown(HintsToShow.TIMELIMIT_RULE_MUSTREAD).waitForNonNullValue()
-
-                if (!wasShown) {
-                    MustReadFragment.newInstance(io.timelimit.android.R.string.must_read_timelimit_rules).show(fragmentManager!!)
-
-                    Threads.database.execute {
-                        database.config().setHintsShownSync(HintsToShow.TIMELIMIT_RULE_MUSTREAD)
-                    }
-                }
-            }
-        }
 
         existingRule = savedInstanceState?.getParcelable(PARAM_EXISTING_RULE)
                 ?: arguments?.getParcelable<TimeLimitRule?>(PARAM_EXISTING_RULE)
@@ -124,23 +104,28 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
         )
         view.applyToExtraTime = newRule.applyToExtraTimeUsage
 
-        val affectedDays = Math.max(0, (0..6).map { (newRule.dayMask.toInt() shr it) and 1 }.sum())
-        view.timeSpan.maxDays = Math.max(0, affectedDays - 1)   // max prevents crash
+        val affectedDays = (0..6).map { (newRule.dayMask.toInt() shr it) and 1 }.sum()
+        val maxDayDuration = if (newRule.perDay) 1 else affectedDays
+
+        view.timeSpan.maxDays = 0.coerceAtLeast(maxDayDuration - 1)
         view.timeSpan.timeInMillis = newRule.maximumTimeInMillis.toLong()
-        view.affectsMultipleDays = affectedDays >= 2
+        view.showWeeklyDailyOption = affectedDays >= 2 && newRule.maximumTimeInMillis > 0
 
         view.applyToWholeDay = newRule.appliesToWholeDay
         view.startTime = MinuteOfDay.format(newRule.startMinuteOfDay)
         view.endTime = MinuteOfDay.format(newRule.endMinuteOfDay)
 
         view.enableSessionDurationLimit = newRule.sessionDurationLimitEnabled
-        view.sessionBreakText = TimeTextUtil.minutes(newRule.sessionPauseMilliseconds / (1000 * 60), context!!)
-        view.sessionLengthText = TimeTextUtil.minutes(newRule.sessionDurationMilliseconds / (1000 * 60), context!!)
+        view.sessionBreakText = TimeTextUtil.minutes(newRule.sessionPauseMilliseconds / (1000 * 60), requireContext())
+        view.sessionLengthText = TimeTextUtil.minutes(newRule.sessionDurationMilliseconds / (1000 * 60), requireContext())
+
+        view.typePerDay.isChecked = newRule.perDay
+        view.typePerWeek.isChecked = !newRule.perDay
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val listener = targetFragment as EditTimeLimitRuleDialogFragmentListener
-        val database = DefaultAppLogic.with(context!!).database
+        val database = DefaultAppLogic.with(requireContext()).database
 
         view = FragmentEditTimeLimitRuleDialogBinding.inflate(layoutInflater, container, false)
 
@@ -162,7 +147,8 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
                     startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
                     endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
                     sessionPauseMilliseconds = 0,
-                    sessionDurationMilliseconds = 0
+                    sessionDurationMilliseconds = 0,
+                    perDay = true
             )
         } else {
             view.isNewRule = false
@@ -278,7 +264,8 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
                                                 start = newRule.startMinuteOfDay,
                                                 end = newRule.endMinuteOfDay,
                                                 sessionDurationMilliseconds = newRule.sessionDurationMilliseconds,
-                                                sessionPauseMilliseconds = newRule.sessionPauseMilliseconds
+                                                sessionPauseMilliseconds = newRule.sessionPauseMilliseconds,
+                                                perDay = newRule.perDay
                                         )
                                 )) {
                             return
@@ -332,6 +319,9 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
                 }
             }
         }
+
+        view.typePerDay.setOnClickListener { newRule = newRule.copy(perDay = true); bindRule() }
+        view.typePerWeek.setOnClickListener { newRule = newRule.copy(perDay = false); bindRule() }
 
         database.config().getEnableAlternativeDurationSelectionAsync().observe(viewLifecycleOwner, Observer {
             view.timeSpan.enablePickerMode(it)

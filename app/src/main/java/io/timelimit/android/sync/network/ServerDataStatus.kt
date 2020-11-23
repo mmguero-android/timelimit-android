@@ -821,7 +821,8 @@ data class ServerTimeLimitRule(
         val startMinuteOfDay: Int,
         val endMinuteOfDay: Int,
         val sessionDurationMilliseconds: Int,
-        val sessionPauseMilliseconds: Int
+        val sessionPauseMilliseconds: Int,
+        val perDay: Boolean
 ) {
     companion object {
         private const val ID = "id"
@@ -832,6 +833,7 @@ data class ServerTimeLimitRule(
         private const val END_MINUTE_OF_DAY = "end"
         private const val SESSION_DURATION_MILLISECONDS = "session"
         private const val SESSION_PAUSE_MILLISECONDS = "pause"
+        private const val PER_DAY = "perDay"
 
         fun parse(reader: JsonReader): ServerTimeLimitRule {
             var id: String? = null
@@ -842,6 +844,7 @@ data class ServerTimeLimitRule(
             var endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE
             var sessionDurationMilliseconds: Int = 0
             var sessionPauseMilliseconds: Int = 0
+            var perDay = false
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -854,6 +857,7 @@ data class ServerTimeLimitRule(
                     END_MINUTE_OF_DAY -> endMinuteOfDay = reader.nextInt()
                     SESSION_DURATION_MILLISECONDS -> sessionDurationMilliseconds = reader.nextInt()
                     SESSION_PAUSE_MILLISECONDS -> sessionPauseMilliseconds = reader.nextInt()
+                    PER_DAY -> perDay = reader.nextBoolean()
                     else -> reader.skipValue()
                 }
             }
@@ -867,7 +871,8 @@ data class ServerTimeLimitRule(
                     startMinuteOfDay = startMinuteOfDay,
                     endMinuteOfDay = endMinuteOfDay,
                     sessionDurationMilliseconds = sessionDurationMilliseconds,
-                    sessionPauseMilliseconds = sessionPauseMilliseconds
+                    sessionPauseMilliseconds = sessionPauseMilliseconds,
+                    perDay = perDay
             )
         }
 
@@ -893,7 +898,8 @@ data class ServerTimeLimitRule(
             startMinuteOfDay = startMinuteOfDay,
             endMinuteOfDay = endMinuteOfDay,
             sessionDurationMilliseconds = sessionDurationMilliseconds,
-            sessionPauseMilliseconds = sessionPauseMilliseconds
+            sessionPauseMilliseconds = sessionPauseMilliseconds,
+            perDay = perDay
     )
 }
 

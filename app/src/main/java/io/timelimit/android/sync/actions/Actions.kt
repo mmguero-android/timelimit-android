@@ -1442,7 +1442,8 @@ data class CreateTimeLimitRuleAction(val rule: TimeLimitRule): ParentAction() {
 
 data class UpdateTimeLimitRuleAction(
         val ruleId: String, val dayMask: Byte, val maximumTimeInMillis: Int, val applyToExtraTimeUsage: Boolean,
-        val start: Int, val end: Int, val sessionDurationMilliseconds: Int, val sessionPauseMilliseconds: Int
+        val start: Int, val end: Int, val sessionDurationMilliseconds: Int, val sessionPauseMilliseconds: Int,
+        val perDay: Boolean
 ): ParentAction() {
     companion object {
         const val TYPE_VALUE = "UPDATE_TIMELIMIT_RULE"
@@ -1454,6 +1455,7 @@ data class UpdateTimeLimitRuleAction(
         private const val END = "end"
         private const val SESSION_DURATION_MILLISECONDS = "dur"
         private const val SESSION_PAUSE_MILLISECONDS = "pause"
+        private const val PER_DAY = "perDay"
     }
 
     init {
@@ -1491,6 +1493,8 @@ data class UpdateTimeLimitRuleAction(
             writer.name(SESSION_DURATION_MILLISECONDS).value(sessionDurationMilliseconds)
             writer.name(SESSION_PAUSE_MILLISECONDS).value(sessionPauseMilliseconds)
         }
+
+        if (perDay) writer.name(PER_DAY).value(true)
 
         writer.endObject()
     }

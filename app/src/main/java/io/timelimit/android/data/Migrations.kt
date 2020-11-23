@@ -250,4 +250,10 @@ object DatabaseMigrations {
             database.execSQL("ALTER TABLE `category` ADD COLUMN `tasks_version` TEXT NOT NULL DEFAULT ''")
         }
     }
+
+    val MIGRATE_TO_V35 = object: Migration(34, 35) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `time_limit_rule` ADD COLUMN `per_day` INTEGER NOT NULL DEFAULT 0")
+        }
+    }
 }

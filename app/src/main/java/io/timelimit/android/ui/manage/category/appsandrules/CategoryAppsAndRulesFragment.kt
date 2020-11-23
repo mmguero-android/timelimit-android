@@ -63,8 +63,8 @@ abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimit
         recycler.layoutManager = LinearLayoutManager(requireContext())
         recycler.adapter = adapter
 
-        model.firstDayOfWeekAndUsedTimes.observe(viewLifecycleOwner) { (firstDayOfWeek, usedTimes) ->
-            adapter.epochDayOfStartOfWeek = firstDayOfWeek
+        model.dateAndUsedTimes.observe(viewLifecycleOwner) { (date, usedTimes) ->
+            adapter.date = date
             adapter.usedTimes = usedTimes
         }
 
@@ -124,7 +124,8 @@ abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimit
                                     start = oldRule.startMinuteOfDay,
                                     end = oldRule.endMinuteOfDay,
                                     sessionDurationMilliseconds = oldRule.sessionDurationMilliseconds,
-                                    sessionPauseMilliseconds = oldRule.sessionPauseMilliseconds
+                                    sessionPauseMilliseconds = oldRule.sessionPauseMilliseconds,
+                                    perDay = oldRule.perDay
                             )
                     )
                 }

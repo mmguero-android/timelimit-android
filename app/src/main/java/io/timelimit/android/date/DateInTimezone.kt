@@ -20,6 +20,8 @@ import org.threeten.bp.LocalDate
 import java.util.*
 
 data class DateInTimezone(val dayOfWeek: Int, val dayOfEpoch: Int, val localDate: LocalDate) {
+    val firstDayOfWeekAsEpochDay get() = dayOfEpoch - dayOfWeek
+
     companion object {
         fun convertDayOfWeek(dayOfWeek: Int) = when(dayOfWeek) {
             Calendar.MONDAY -> 0

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.timelimit.android.R
 import io.timelimit.android.data.model.UsedTimeItem
 import io.timelimit.android.databinding.*
+import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.DummyApps
@@ -46,7 +47,7 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
 
     var items: List<AppAndRuleItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
     var usedTimes: List<UsedTimeItem> by Delegates.observable(emptyList()) { _, _, _ -> notifyDataSetChanged() }
-    var epochDayOfStartOfWeek: Int by Delegates.observable(0) { _, _, _ -> notifyDataSetChanged() }
+    var date: DateInTimezone? by Delegates.observable(null as DateInTimezone?) { _, _, _ -> notifyDataSetChanged() }
     var handlers: Handlers? = null
 
     init {
@@ -153,13 +154,29 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                 val binding = holder.itemView.tag as FragmentCategoryTimeLimitRuleItemBinding
                 val context = binding.root.context
                 val dayNames = binding.root.resources.getStringArray(R.array.days_of_week_array)
-                val usedTime = usedTimes.filter { usedTime ->
-                    val dayOfWeek = usedTime.dayOfEpoch - epochDayOfStartOfWeek
-                    usedTime.startTimeOfDay == rule.startMinuteOfDay && usedTime.endTimeOfDay == rule.endMinuteOfDay &&
-                            (rule.dayMask.toInt() and (1 shl dayOfWeek) != 0)
-                }.map { it.usedMillis }.sum().toInt()
+                val usedTime = date?.let { date ->
+                    usedTimes.filter { usedTime ->
+                        val dayOfWeek = usedTime.dayOfEpoch - date.firstDayOfWeekAsEpochDay
+                        val matchingSlot = usedTime.startTimeOfDay == rule.startMinuteOfDay && usedTime.endTimeOfDay == rule.endMinuteOfDay
+                        val matchingMask = (rule.dayMask.toInt() and (1 shl dayOfWeek) != 0)
+                        val matchingDay = dayOfWeek == date.dayOfWeek
 
-                binding.maxTimeString = TimeTextUtil.time(rule.maximumTimeInMillis, context)
+                        matchingSlot && (if (rule.perDay) matchingDay else matchingMask)
+                    }.map { it.usedMillis }.sum().toInt()
+                } ?: 0
+
+                binding.maxTimeString = rule.maximumTimeInMillis.let { time ->
+                    val timeString = TimeTextUtil.time(time, context)
+                    val weeklyDailyString = context.getString(
+                            if (rule.perDay) R.string.category_time_limit_rules_per_day
+                            else R.string.category_time_limit_rules_per_week
+                    )
+                    val zeroTime = time == 0
+                    val onlySingleDay = rule.dayMask.countOneBits() <= 1
+                    val hideDailyWeekly = zeroTime || onlySingleDay
+
+                    if (hideDailyWeekly) timeString else "$weeklyDailyString $timeString"
+                }
                 binding.usageAsText = if (rule.maximumTimeInMillis > 0) TimeTextUtil.used(usedTime, context) else null
                 binding.usageProgressInPercent = if (rule.maximumTimeInMillis > 0)
                     (usedTime * 100 / rule.maximumTimeInMillis)
