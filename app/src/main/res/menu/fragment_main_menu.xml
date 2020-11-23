@@ -17,14 +17,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         app:showAsAction="never"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_delete_black_24dp"
         android:title="@string/main_tab_uninstall"
         android:id="@+id/menu_main_uninstall" />
 
     <item
         app:showAsAction="always"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_info_outline_black_24dp"
         android:title="@string/main_tab_about"
         android:id="@+id/menu_main_about" />

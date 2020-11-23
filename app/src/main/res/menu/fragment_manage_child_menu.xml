@@ -18,35 +18,35 @@
 
     <item
         app:showAsAction="ifRoom"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_baseline_directions_bike_24"
         android:title="@string/manage_child_tasks"
         android:id="@+id/menu_manage_child_tasks" />
 
     <item
         app:showAsAction="never"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_phone_black_24dp"
         android:title="@string/contacts_title_long"
         android:id="@+id/menu_manage_child_phone" />
 
     <item
         app:showAsAction="never"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_apps_white_24dp"
         android:title="@string/child_apps_title"
         android:id="@+id/menu_manage_child_apps" />
 
     <item
         app:showAsAction="never"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_history_black_24dp"
         android:title="@string/usage_history_title"
         android:id="@+id/menu_manage_child_usage_history" />
 
     <item
         app:showAsAction="never"
-        app:iconTint="?colorOnPrimary"
+        app:iconTint="?colorOnPrimarySurface"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/manage_child_tab_other"
         android:id="@+id/menu_manage_child_advanced" />
