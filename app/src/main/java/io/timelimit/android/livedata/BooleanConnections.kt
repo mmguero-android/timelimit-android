@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,19 +16,46 @@
 package io.timelimit.android.livedata
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 
 fun LiveData<Boolean>.or(other: LiveData<Boolean>): LiveData<Boolean> {
-    return this.switchMap { v1 ->
-        other.map { v2 ->
-            v1 || v2
+    val l1 = this
+    val l2 = other
+
+    return object: MediatorLiveData<Boolean>() {
+        init {
+            addSource(l1) { update() }
+            addSource(l2) { update() }
+        }
+
+        fun update() {
+            val v1 = l1.value ?: return
+            val v2 = l2.value ?: return
+
+            val v = v1 || v2
+
+            if (v != value) value = v
         }
     }
 }
 
 fun LiveData<Boolean>.and(other: LiveData<Boolean>): LiveData<Boolean> {
-    return this.switchMap { v1 ->
-        other.map { v2 ->
-            v1 && v2
+    val l1 = this
+    val l2 = other
+
+    return object: MediatorLiveData<Boolean>() {
+        init {
+            addSource(l1) { update() }
+            addSource(l2) { update() }
+        }
+
+        fun update() {
+            val v1 = l1.value ?: return
+            val v2 = l2.value ?: return
+
+            val v = v1 && v2
+
+            if (v != value) value = v
         }
     }
 }
