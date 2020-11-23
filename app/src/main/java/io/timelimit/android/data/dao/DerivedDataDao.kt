@@ -173,6 +173,14 @@ class DerivedDataDao (private val database: Database) {
         return result
     }
 
+    fun getUserRelatedDataSync(userId: String): UserRelatedData? {
+        val result = usableUserRelatedData.openSync(userId, null)
+
+        usableUserRelatedData.close(userId, null)
+
+        return result
+    }
+
     fun getUserAndDeviceRelatedDataLive(): LiveData<DeviceAndUserRelatedData?> = deviceAndUserRelatedDataLive
 
     fun getUserRelatedDataLive(userId: String): LiveData<UserRelatedData?> = usableUserRelatedData.openLiveAtDatabaseThread(userId)

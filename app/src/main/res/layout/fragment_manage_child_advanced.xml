@@ -78,6 +78,13 @@
 
                     <Button
                         style="?materialButtonOutlinedStyle"
+                        android:id="@+id/duplicate_child_button"
+                        android:text="@string/duplicate_child_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        style="?materialButtonOutlinedStyle"
                         android:id="@+id/delete_user_button"
                         android:text="@string/delete_child_title"
                         android:layout_width="match_parent"

@@ -31,6 +31,7 @@ import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.getActivityViewModel
+import io.timelimit.android.ui.manage.child.advanced.duplicate.DuplicateChildDialogFragment
 import io.timelimit.android.ui.manage.child.advanced.limituserviewing.LimitUserViewingView
 import io.timelimit.android.ui.manage.child.advanced.managedisabletimelimits.ManageDisableTimelimitsViewHelper
 import io.timelimit.android.ui.manage.child.advanced.password.ManageChildPassword
@@ -96,6 +97,12 @@ class ManageChildAdvancedFragment : Fragment() {
         binding.renameChildButton.setOnClickListener {
             if (auth.requestAuthenticationOrReturnTrue()) {
                 UpdateChildNameDialogFragment.newInstance(childId).show(parentFragmentManager)
+            }
+        }
+
+        binding.duplicateChildButton.setOnClickListener {
+            if (auth.requestAuthenticationOrReturnTrue()) {
+                DuplicateChildDialogFragment.newInstance(childId).show(parentFragmentManager)
             }
         }
 

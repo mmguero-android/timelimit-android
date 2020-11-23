@@ -42,6 +42,9 @@ interface ChildTaskDao {
     @Query("SELECT child_task.*, category.title as category_title FROM child_task JOIN category ON (child_task.category_id = category.id) WHERE category.child_id = :userId")
     fun getTasksByUserIdWithCategoryTitlesLive(userId: String): LiveData<List<ChildTaskWithCategoryTitle>>
 
+    @Query("SELECT child_task.* FROM child_task JOIN category ON (child_task.category_id = category.id) WHERE category.child_id = :userId")
+    fun getTasksByUserIdSync(userId: String): List<ChildTask>
+
     @Query("SELECT child_task.*, category.title as category_title, user.name as child_name FROM child_task JOIN category ON (child_task.category_id = category.id) JOIN user ON (category.child_id = user.id) WHERE child_task.pending_request = 1")
     fun getPendingTasks(): LiveData<List<FullChildTask>>
 

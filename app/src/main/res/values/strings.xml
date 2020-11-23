@@ -1257,6 +1257,11 @@
 
     <string name="rename_child_title">Rename child user</string>
 
+    <string name="duplicate_child_title">Duplicate user</string>
+    <string name="duplicate_child_message">Do you want to create a new user with the same settings?</string>
+    <string name="duplicate_child_done_toast">The user was duplicated</string>
+    <string name="duplicate_child_user_name">duplicated user</string>
+
     <string name="reset_hidden_hints_title">Reset hidden hints</string>
     <string name="reset_hidden_hints_description">You can chose to hide some messages. This allows to show these messages again.</string>
     <string name="reset_hidden_hints_not_possible">You did not hide any hints</string>
