@@ -32,11 +32,13 @@ class ConfirmTaskDialogFragment: DialogFragment() {
         private const val DIALOG_TAG = "ConfirmTaskDialogFragment"
         private const val TASK_TITLE = "taskTitle"
         private const val TASK_ID = "taskId"
+        private const val FROM_MANAGE_SCREEN = "fromManageScreen"
 
-        fun newInstance(taskId: String, taskTitle: String) = ConfirmTaskDialogFragment().apply {
+        fun newInstance(taskId: String, taskTitle: String, fromManageScreen: Boolean) = ConfirmTaskDialogFragment().apply {
             arguments = Bundle().apply {
                 putString(TASK_ID, taskId)
                 putString(TASK_TITLE, taskTitle)
+                putBoolean(FROM_MANAGE_SCREEN, fromManageScreen)
             }
         }
     }
@@ -44,11 +46,15 @@ class ConfirmTaskDialogFragment: DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val taskId = requireArguments().getString(TASK_ID)!!
         val taskTitle = requireArguments().getString(TASK_TITLE)!!
+        val fromManageScreen = requireArguments().getBoolean(FROM_MANAGE_SCREEN)
         val logic = getActivityViewModel(requireActivity()).logic
+
+        val messagePrefix = if (fromManageScreen) getString(R.string.lock_task_confirm_dialog_from_manage_screen) + " " else ""
+        val message = messagePrefix + getString(R.string.lock_task_confirm_dialog)
 
         return AlertDialog.Builder(requireContext(), theme)
                 .setTitle(taskTitle)
-                .setMessage(R.string.lock_task_confirm_dialog)
+                .setMessage(message)
                 .setNegativeButton(R.string.generic_no, null)
                 .setPositiveButton(R.string.generic_yes) { _, _ ->
                     runAsync {

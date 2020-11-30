@@ -52,7 +52,7 @@ class LockTaskFragment: Fragment() {
                 if (task.pendingRequest)
                     TaskReviewPendingDialogFragment.newInstance().show(parentFragmentManager)
                 else
-                    ConfirmTaskDialogFragment.newInstance(taskId = task.taskId, taskTitle = task.taskTitle).show(parentFragmentManager)
+                    ConfirmTaskDialogFragment.newInstance(taskId = task.taskId, taskTitle = task.taskTitle, fromManageScreen = false).show(parentFragmentManager)
             }
         }
     }

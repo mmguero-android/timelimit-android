@@ -66,6 +66,7 @@ class ManageChildTasksFragment: Fragment(), EditTaskDialogFragment.Listener {
         recycler.adapter = adapter
 
         model.listContent.observe(viewLifecycleOwner) { adapter.data = it }
+        model.isChildTheCurrentDeviceUser.observe(viewLifecycleOwner) {/* keep the value fresh */}
 
         adapter.listener = object: ChildTaskAdapter.Listener {
             override fun onAddClicked() {
@@ -75,9 +76,15 @@ class ManageChildTasksFragment: Fragment(), EditTaskDialogFragment.Listener {
             }
 
             override fun onTaskClicked(task: ChildTask) {
-                if (auth.requestAuthenticationOrReturnTrue()) {
+                if (auth.isParentAuthenticated()) {
                     EditTaskDialogFragment.newInstance(childId = childId, taskId = task.taskId, listener = this@ManageChildTasksFragment).show(parentFragmentManager)
-                }
+                } else if (model.isChildTheCurrentDeviceUser.value == true && !task.pendingRequest) {
+                    ConfirmTaskDialogFragment.newInstance(
+                            taskId = task.taskId,
+                            taskTitle = task.taskTitle,
+                            fromManageScreen = true
+                    ).show(parentFragmentManager)
+                } else auth.requestAuthentication()
             }
         }
 

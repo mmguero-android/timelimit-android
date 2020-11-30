@@ -684,6 +684,7 @@
     </string>
     <string name="lock_task_confirm_dialog">Have you finished this task? The time
         will only be granted if a parent confirms it.</string>
+    <string name="lock_task_confirm_dialog_from_manage_screen">A parent must sign in first to modify the task.</string>
     <string name="lock_task_review_pending_dialog">It is noted that this task is finished.
         The only missing part is a parent which confirms this at the start screen of TimeLimit.
     </string>

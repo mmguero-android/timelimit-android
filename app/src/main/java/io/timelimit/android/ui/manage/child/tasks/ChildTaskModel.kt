@@ -43,6 +43,10 @@ class ChildTaskModel (application: Application): AndroidViewModel(application) {
         }
     }
 
+    val isChildTheCurrentDeviceUser = logic.deviceUserId.switchMap { deviceUserId ->
+        childIdLive.map { selectedId -> deviceUserId == selectedId }
+    }
+
     fun init(childId: String) {
         if (didInit) return
 

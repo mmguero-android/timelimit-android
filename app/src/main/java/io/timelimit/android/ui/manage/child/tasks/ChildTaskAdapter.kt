@@ -83,6 +83,7 @@ class ChildTaskAdapter: RecyclerView.Adapter<ChildTaskAdapter.Holder>() {
             binding.lastGrant = item.taskItem.lastGrantTimestamp.let { time ->
                 if (time == 0L) null else DateUtil.formatAbsoluteDate(context, time)
             }
+            binding.pendingReview = item.taskItem.pendingRequest
 
             binding.executePendingBindings()
 

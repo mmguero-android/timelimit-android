@@ -628,6 +628,7 @@
     </string>
     <string name="lock_task_confirm_dialog">Hast Du diese Aufgabe erledigt? Die Zeit gibt es
         sowieso erst, wenn ein Elternteil das bestätigt hat.</string>
+    <string name="lock_task_confirm_dialog_from_manage_screen">Zum Verändern der Aufgabe muss sich erst ein Elternteil anmelden.</string>
     <string name="lock_task_review_pending_dialog">Die Erledigung der Aufgabe wurde markiert.
         Jetzt muss nur noch ein Elternteil das auf der Startseite von TimeLimit besätigen.
     </string>
