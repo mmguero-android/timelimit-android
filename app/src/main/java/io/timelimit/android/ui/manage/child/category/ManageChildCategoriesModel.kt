@@ -93,7 +93,7 @@ class ManageChildCategoriesModel(application: Application): AndroidViewModel(app
                             remainingTimeToday = RemainingTime.getRemainingTime(
                                     dayOfWeek = childDate.dayOfWeek,
                                     usedTimes = usedTimeItemsForCategory,
-                                    rules = rules.filter { it.maximumTimeInMillis > 0 } /* ignore "blocked" rules for this calculation */,
+                                    rules = rules.filterNot { it.likeBlockedTimeArea } /* ignore "blocked" rules for this calculation */,
                                     extraTime = category.category.getExtraTime(dayOfEpoch = childDate.dayOfEpoch),
                                     minuteOfDay = childMinuteOfWeek % MinuteOfDay.LENGTH,
                                     firstDayOfWeekAsEpochDay = firstDayOfWeek

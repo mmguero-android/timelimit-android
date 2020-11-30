@@ -47,6 +47,10 @@
             type="Boolean" />
 
         <variable
+            name="ignoredOnExtraTime"
+            type="Boolean" />
+
+        <variable
             name="handlers"
             type="io.timelimit.android.ui.manage.category.timelimit_rules.TimeLimitRulesHandlers" />
 
@@ -100,6 +104,13 @@
                 android:visibility="@{safeUnbox(appliesToExtraTime) ? View.VISIBLE : View.GONE}"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:text="@string/category_time_limit_rules_applied_to_extra_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:visibility="@{ignoredOnExtraTime ? View.VISIBLE : View.GONE}"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:text="@string/category_time_limit_rules_ignore_on_extra_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

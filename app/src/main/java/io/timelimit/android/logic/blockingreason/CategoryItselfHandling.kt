@@ -114,8 +114,8 @@ data class CategoryItselfHandling (
                         rules = categoryRelatedData.rules
                 )
 
-            val regularRelatedRules = allRelatedRules.filter { it.maximumTimeInMillis != 0 }
-            val hasBlockedTimeAreaRelatedRule = allRelatedRules.find { it.maximumTimeInMillis == 0 } != null
+            val regularRelatedRules = allRelatedRules.filterNot { it.likeBlockedTimeArea }
+            val hasBlockedTimeAreaRelatedRule = allRelatedRules.find { it.likeBlockedTimeArea } != null
 
             val missingNetworkTimeForBlockedTimeAreas = !categoryRelatedData.category.blockedMinutesInWeek.dataNotToModify.isEmpty
             val okByBlockedTimeAreas = areLimitsTemporarilyDisabled || (

@@ -310,6 +310,7 @@
         Regeln, bei denen nur ein Tag gewählt wurde, begrenzen nur diesen Tag.
     </string>
     <string name="category_time_limit_rules_applied_to_extra_time">gilt auch für ggf. vorhandene Extra-Zeit</string>
+    <string name="category_time_limit_rules_ignore_on_extra_time">gilt nicht bei ggf. vorhandener Extra-Zeit</string>
     <string name="category_time_limit_rules_time_area">nur von %s bis %s gültig</string>
     <string name="category_time_limit_rules_session_limit">%s Pause nach %s Nutzung</string>
     <string name="category_time_limit_rule_dialog_new">Regel erstellen</string>

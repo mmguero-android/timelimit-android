@@ -149,6 +149,9 @@ data class TimeLimitRule(
     val appliesToMultipleDays: Boolean
         get() = dayMask.toInt().countOneBits() > 1
 
+    val likeBlockedTimeArea: Boolean
+        get() = applyToExtraTimeUsage && maximumTimeInMillis == 0
+
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 

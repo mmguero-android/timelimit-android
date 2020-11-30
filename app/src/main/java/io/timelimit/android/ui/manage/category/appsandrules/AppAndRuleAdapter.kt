@@ -190,7 +190,8 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                             MinuteOfDay.format(rule.startMinuteOfDay),
                             MinuteOfDay.format(rule.endMinuteOfDay)
                     )
-                binding.appliesToExtraTime = rule.applyToExtraTimeUsage
+                binding.appliesToExtraTime = rule.applyToExtraTimeUsage && !rule.likeBlockedTimeArea
+                binding.ignoredOnExtraTime = rule.maximumTimeInMillis == 0 && !rule.applyToExtraTimeUsage
                 binding.sessionLimitString = if (rule.sessionDurationLimitEnabled)
                     context.getString(
                             R.string.category_time_limit_rules_session_limit,

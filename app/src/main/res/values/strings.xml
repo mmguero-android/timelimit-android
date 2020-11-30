@@ -354,6 +354,7 @@
         Rules at which only one day is checked only limit the selected day.
     </string>
     <string name="category_time_limit_rules_applied_to_extra_time">is applied to extra time, too</string>
+    <string name="category_time_limit_rules_ignore_on_extra_time">does not apply to extra time</string>
     <string name="category_time_limit_rules_time_area">only applied from %s to %s</string>
     <string name="category_time_limit_rules_session_limit">%s break after %s usage</string>
     <string name="category_time_limit_rule_dialog_new">Create rule</string>
