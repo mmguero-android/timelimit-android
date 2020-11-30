@@ -286,10 +286,6 @@ por exemplo, quando você quer adicionar o uso de tela
     1. <string name="category_time_limit_rules_snackbar_updated">A regra foi modificada</string>
     <string name="category_time_limit_rules_snackbar_deleted">A regra foi excluída</string>
 
-    <string name="category_time_limit_rules_warning_multiple_days">Esta regra
-        limitará a duração total de uso durante uma semana nos dias selecionados.
-        Se você quiser por dia, crie uma regra por dia.
-    </string>
     <string name="category_time_limit_rules_warning_day_part">Esta regra
         limitará a duração de uso somente no intervalo especificado.
         Sem regras para outros tempos ou áreas de tempo bloqueadas, não
