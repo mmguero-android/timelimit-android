@@ -217,7 +217,8 @@
                         android:drawableStart="@drawable/ic_timer_black_24dp"
                         android:visibility="@{reason == BlockingReason.TimeOverExtraTimeCanBeUsedLater ? View.VISIBLE : View.GONE}"
                         android:textAppearance="?android:textAppearanceMedium"
-                        android:text="@string/lock_reason_time_over_etra_time_can_be_used_later"
+                        android:text="@{@string/lock_reason_time_over_etra_time_can_be_used_later(blockedKindLabel)}"
+                        tools:text="@string/lock_reason_time_over_etra_time_can_be_used_later"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
