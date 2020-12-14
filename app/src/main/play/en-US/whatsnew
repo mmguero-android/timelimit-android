@@ -1,10 +1,1 @@
-New features:
-- option to select multiple days per rule and count the time per day
-- possibility to report task completion from the task list
-
-Changes:
-- only consider rules a blocked time area if the apply to the extra time and have got a duration of zero minutes
-- changed detection of the system connection status
-
-Fixes:
-- issues during detecting extra time which can be used later
+- Updated certificates and certificate pinning

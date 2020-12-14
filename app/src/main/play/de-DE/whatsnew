@@ -1,10 +1,1 @@
-Neue Funktionen:
-- Option, bei Zeitbegrenzungsregeln mehrere Tage zu wählen und die Zeit je Tag zu zählen
-- Möglichkeit, Aufgaben von der Aufgabenliste aus als erledigt zu markieren
-
-Änderungen:
-- Zeitbegrenzungsregeln zählen nur noch als Sperrzeit bei 0 Minuten Dauer und wenn diese auch für die Extra-Zeit gelten
-- Änderung bei der Ermittlung vom Systemverbindungsstatus
-
-Fehlerbehebung:
-- Probleme bei der Erkennung von Extrazeit, die erst später verwendet werden kann, behoben
+- Zertifikate und Zertifikatpinning aktualisiert
