@@ -84,9 +84,12 @@ data class UserRelatedData(
     private var sessionDurationsInvalidated = false
     private var categoryAppsInvalidated = false
     private var categoryNetworksInvalidated = false
+    private var limitLoginCategoriesInvalidated = false
 
     private val invalidated
-        get() = userInvalidated || categoriesInvalidated || rulesInvalidated || usedTimesInvalidated || sessionDurationsInvalidated || categoryAppsInvalidated || categoryNetworksInvalidated
+        get() = userInvalidated || categoriesInvalidated || rulesInvalidated || usedTimesInvalidated ||
+                sessionDurationsInvalidated || categoryAppsInvalidated || categoryNetworksInvalidated ||
+                limitLoginCategoriesInvalidated
 
     override fun onInvalidated(tables: Set<Table>) {
         tables.forEach {
@@ -98,6 +101,7 @@ data class UserRelatedData(
                 Table.SessionDuration -> sessionDurationsInvalidated = true
                 Table.CategoryApp -> categoryAppsInvalidated = true
                 Table.CategoryNetworkId -> categoryNetworksInvalidated = true
+                Table.UserLimitLoginCategory -> limitLoginCategoriesInvalidated = true
                 else -> {/* do nothing */}
             }
         }
@@ -121,13 +125,14 @@ data class UserRelatedData(
                         updateDurations = sessionDurationsInvalidated,
                         updateRules = rulesInvalidated,
                         updateTimes = usedTimesInvalidated,
-                        updateNetworks = categoryNetworksInvalidated
+                        updateNetworks = categoryNetworksInvalidated,
+                        updateLimitLoginCategories = limitLoginCategoriesInvalidated
                 ) ?: CategoryRelatedData.load(
                         category = category,
                         database = database
                 )
             }
-        } else if (sessionDurationsInvalidated || rulesInvalidated || usedTimesInvalidated || categoryNetworksInvalidated) {
+        } else if (sessionDurationsInvalidated || rulesInvalidated || usedTimesInvalidated || categoryNetworksInvalidated || limitLoginCategoriesInvalidated) {
             categories.map {
                 it.update(
                         category = it.category,
@@ -135,7 +140,8 @@ data class UserRelatedData(
                         updateDurations = sessionDurationsInvalidated,
                         updateRules = rulesInvalidated,
                         updateTimes = usedTimesInvalidated,
-                        updateNetworks = categoryNetworksInvalidated
+                        updateNetworks = categoryNetworksInvalidated,
+                        updateLimitLoginCategories = limitLoginCategoriesInvalidated
                 )
             }
         } else {

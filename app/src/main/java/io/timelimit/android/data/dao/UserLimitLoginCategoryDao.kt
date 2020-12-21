@@ -38,13 +38,16 @@ interface UserLimitLoginCategoryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertOrIgnoreItemSync(item: UserLimitLoginCategory)
 
-    @Query("SELECT child_user.id AS child_id, child_user.name AS child_title, category.id AS category_id, category.title AS category_title, 1 AS selected FROM user_limit_login_category JOIN category ON (user_limit_login_category.category_id = category.id) JOIN user child_user ON (category.child_id = child_user.id) WHERE user_limit_login_category.user_id = :parentUserId")
+    @Query("SELECT child_user.id AS child_id, child_user.name AS child_title, category.id AS category_id, category.title AS category_title, 1 AS selected, user_limit_login_category.pre_block_duration AS pre_block_duration FROM user_limit_login_category JOIN category ON (user_limit_login_category.category_id = category.id) JOIN user child_user ON (category.child_id = child_user.id) WHERE user_limit_login_category.user_id = :parentUserId")
     fun getByParentUserIdLive(parentUserId: String): LiveData<UserLimitLoginCategoryWithChildId?>
 
-    @Query("SELECT child_user.id AS child_id, child_user.name AS child_title, category.id AS category_id, category.title AS category_title, 1 AS selected FROM user_limit_login_category JOIN category ON (user_limit_login_category.category_id = category.id) JOIN user child_user ON (category.child_id = child_user.id) WHERE user_limit_login_category.user_id = :parentUserId")
+    @Query("SELECT child_user.id AS child_id, child_user.name AS child_title, category.id AS category_id, category.title AS category_title, 1 AS selected, user_limit_login_category.pre_block_duration AS pre_block_duration FROM user_limit_login_category JOIN category ON (user_limit_login_category.category_id = category.id) JOIN user child_user ON (category.child_id = child_user.id) WHERE user_limit_login_category.user_id = :parentUserId")
     fun getByParentUserIdSync(parentUserId: String): UserLimitLoginCategoryWithChildId?
 
-    @Query("SELECT child_user.id AS child_id, child_user.name AS child_title, category.id AS category_id, category.title AS category_title, CASE WHEN category.id IN (SELECT user_limit_login_category.category_id FROM user_limit_login_category WHERE user_limit_login_category.user_id = :parentUserId) THEN 1 ELSE 0 END AS selected FROM user child_user JOIN category category ON (category.child_id = child_user.id)")
+    @Query("SELECT * FROM user_limit_login_category WHERE category_id = :categoryId")
+    fun getByCategoryIdSync(categoryId: String): List<UserLimitLoginCategory>
+
+    @Query("SELECT child_user.id AS child_id, child_user.name AS child_title, category.id AS category_id, category.title AS category_title, CASE WHEN category.id IN (SELECT user_limit_login_category.category_id FROM user_limit_login_category WHERE user_limit_login_category.user_id = :parentUserId) THEN 1 ELSE 0 END AS selected, 0 as pre_block_duration FROM user child_user JOIN category category ON (category.child_id = child_user.id)")
     fun getLimitLoginCategoryOptions(parentUserId: String): LiveData<List<UserLimitLoginCategoryWithChildId>>
 
     @Query("SELECT COUNT(*) FROM user WHERE user.id != :userId AND user.type = 'parent' AND user.id NOT IN (SELECT user_id FROM user_limit_login_category)")

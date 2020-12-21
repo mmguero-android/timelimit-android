@@ -377,12 +377,45 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         continue
                     }
 
+                    val hasLimitLoginCategories = currentCategoryIds.find { userRelatedData.categoryById[it]?.limitLoginCategories?.isNotEmpty() ?: false } != null
+
+                    val previousCategoryHandlings = if (hasLimitLoginCategories) {
+                        currentCategoryIds.associateWith { categoryHandlingCache.get(it) }
+                    } else null
+
                     reportStatusToCategoryHandlingCache(userRelatedData = newDeviceAndUserRelatedData.userRelatedData)
+
+                    val triggerSyncByLimitLoginCategory = if (previousCategoryHandlings != null) {
+                        val switchPoints = mutableSetOf<Long>()
+
+                        currentCategoryIds.forEach {
+                            userRelatedData.categoryById[it]?.let { category ->
+                                category.limitLoginCategories.forEach {
+                                    if (it.preBlockDuration > 0) switchPoints.add(it.preBlockDuration)
+                                }
+                            }
+                        }
+
+                        currentCategoryIds.find { categoryId ->
+                            val oldHandling = previousCategoryHandlings[categoryId]!!
+                            val newHandling = categoryHandlingCache.get(categoryId)
+
+                            switchPoints.find { switchPoint ->
+                                (oldHandling.remainingTime != null && oldHandling.remainingTime.includingExtraTime >= switchPoint &&
+                                        (newHandling.remainingTime != null && newHandling.remainingTime.includingExtraTime < switchPoint)) ||
+                                        (oldHandling.remainingSessionDuration != null && oldHandling.remainingSessionDuration >= switchPoint &&
+                                                (newHandling.remainingSessionDuration != null && newHandling.remainingSessionDuration < switchPoint))
+                            } != null
+                        } != null
+                    } else false
 
                     // eventually trigger sync
                     val allCategoriesWithRemainingTimeAfterSubtractingTime = currentCategoryIds.filter { categoryHandlingCache.get(it).hasRemainingTime }
+                    val triggerSyncByTimeOver = allCategoriesWithRemainingTimeBeforeAddingUsedTime != allCategoriesWithRemainingTimeAfterSubtractingTime
 
-                    if (allCategoriesWithRemainingTimeBeforeAddingUsedTime != allCategoriesWithRemainingTimeAfterSubtractingTime) {
+                    val triggerSync = triggerSyncByLimitLoginCategory || triggerSyncByTimeOver
+
+                    if (triggerSync) {
                         ApplyActionUtil.applyAppLogicAction(
                                 action = ForceSyncAction,
                                 appLogic = appLogic,

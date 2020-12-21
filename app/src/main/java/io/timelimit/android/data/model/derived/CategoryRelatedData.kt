@@ -24,7 +24,8 @@ data class CategoryRelatedData(
         val rules: List<TimeLimitRule>,
         val usedTimes: List<UsedTimeItem>,
         val durations: List<SessionDuration>,
-        val networks: List<CategoryNetworkId>
+        val networks: List<CategoryNetworkId>,
+        val limitLoginCategories: List<UserLimitLoginCategory>
 ) {
     companion object {
         fun load(category: Category, database: Database): CategoryRelatedData = database.runInUnobservedTransaction {
@@ -32,13 +33,15 @@ data class CategoryRelatedData(
             val usedTimes = database.usedTimes().getUsedTimeItemsByCategoryId(category.id)
             val durations = database.sessionDuration().getSessionDurationItemsByCategoryIdSync(category.id)
             val networks = database.categoryNetworkId().getByCategoryIdSync(category.id)
+            val limitLoginCategories = database.userLimitLoginCategoryDao().getByCategoryIdSync(category.id)
 
             CategoryRelatedData(
                     category = category,
                     rules = rules,
                     usedTimes = usedTimes,
                     durations = durations,
-                    networks = networks
+                    networks = networks,
+                    limitLoginCategories = limitLoginCategories
             )
         }
     }
@@ -49,6 +52,7 @@ data class CategoryRelatedData(
             updateTimes: Boolean,
             updateDurations: Boolean,
             updateNetworks: Boolean,
+            updateLimitLoginCategories: Boolean,
             database: Database
     ): CategoryRelatedData = database.runInUnobservedTransaction {
         if (category.id != this.category.id) {
@@ -59,8 +63,12 @@ data class CategoryRelatedData(
         val usedTimes = if (updateTimes) database.usedTimes().getUsedTimeItemsByCategoryId(category.id) else usedTimes
         val durations = if (updateDurations) database.sessionDuration().getSessionDurationItemsByCategoryIdSync(category.id) else durations
         val networks = if (updateNetworks) database.categoryNetworkId().getByCategoryIdSync(category.id) else networks
+        val limitLoginCategories = if (updateLimitLoginCategories) database.userLimitLoginCategoryDao().getByCategoryIdSync(category.id) else limitLoginCategories
 
-        if (category == this.category && rules == this.rules && usedTimes == this.usedTimes && durations == this.durations && networks == this.networks) {
+        if (
+                category == this.category && rules == this.rules && usedTimes == this.usedTimes &&
+                durations == this.durations && networks == this.networks && limitLoginCategories == this.limitLoginCategories
+        ) {
             this
         } else {
             CategoryRelatedData(
@@ -68,7 +76,8 @@ data class CategoryRelatedData(
                     rules = rules,
                     usedTimes = usedTimes,
                     durations = durations,
-                    networks = networks
+                    networks = networks,
+                    limitLoginCategories = limitLoginCategories
             )
         }
     }

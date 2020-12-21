@@ -25,6 +25,7 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
+import io.timelimit.android.util.TimeTextUtil
 
 object ParentLimitLoginView {
     fun bind(
@@ -50,6 +51,12 @@ object ParentLimitLoginView {
             }
         }
 
+        view.preBlockButton.setOnClickListener {
+            if (auth.requestAuthenticationOrReturnTrue()) {
+                LimitLoginPreBlockDialogFragment.newInstance(userId = userId).show(fragmentManager)
+            }
+        }
+
         database.userLimitLoginCategoryDao().countOtherUsersWithoutLimitLoginCategoryLive(userId).switchMap { otherUsers ->
             database.userLimitLoginCategoryDao().getByParentUserIdLive(userId).map { config ->
                 otherUsers to config
@@ -58,12 +65,22 @@ object ParentLimitLoginView {
             if (otherUsers == 0L) {
                 view.canConfigure = false
                 view.status = context.getString(R.string.parent_limit_login_status_needs_other_user)
+                view.showPreBlock = false
             } else {
                 view.canConfigure = true
                 view.status = if (config == null)
                     context.getString(R.string.parent_limit_login_status_disabled)
                 else
                     context.getString(R.string.parent_limit_login_status_enabled, config.categoryTitle, config.childTitle)
+                view.showPreBlock = config != null
+                view.preBlockStatus = config?.let {
+                    val duration = it.preBlockDuration
+
+                    if (duration == 0L)
+                        context.getString(R.string.parent_limit_login_pre_block_disabled)
+                    else
+                        context.getString(R.string.parent_limit_login_pre_block_enabled, TimeTextUtil.time(duration.toInt(), context))
+                }
             }
         })
     }

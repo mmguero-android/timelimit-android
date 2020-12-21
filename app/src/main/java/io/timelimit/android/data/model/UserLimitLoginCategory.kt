@@ -52,21 +52,27 @@ data class UserLimitLoginCategory(
         @ColumnInfo(name = "user_id")
         val userId: String,
         @ColumnInfo(name = "category_id")
-        val categoryId: String
+        val categoryId: String,
+        @ColumnInfo(name = "pre_block_duration", defaultValue = "0")
+        val preBlockDuration: Long
 ): JsonSerializable {
     companion object {
         private const val USER_ID = "userId"
         private const val CATEGORY_ID = "categoryId"
+        private const val PRE_BLOCK_DURATION = "preBlockDuration"
+        const val MAX_PRE_BLOCK_DURATION = 1000 * 60 * 60 * 24 // 1 day
 
         fun parse(reader: JsonReader): UserLimitLoginCategory {
             var userId: String? = null
             var categoryId: String? = null
+            var preBlockDuration = 0L
 
             reader.beginObject()
             while (reader.hasNext()) {
                 when (reader.nextName()) {
                     USER_ID -> userId = reader.nextString()
                     CATEGORY_ID -> categoryId = reader.nextString()
+                    PRE_BLOCK_DURATION -> preBlockDuration = reader.nextLong()
                     else -> reader.skipValue()
                 }
             }
@@ -74,7 +80,8 @@ data class UserLimitLoginCategory(
 
             return UserLimitLoginCategory(
                     userId = userId!!,
-                    categoryId = categoryId!!
+                    categoryId = categoryId!!,
+                    preBlockDuration = preBlockDuration
             )
         }
     }
@@ -82,6 +89,9 @@ data class UserLimitLoginCategory(
     init {
         IdGenerator.assertIdValid(userId)
         IdGenerator.assertIdValid(categoryId)
+
+        if (preBlockDuration < 0L || preBlockDuration > MAX_PRE_BLOCK_DURATION)
+            throw IllegalArgumentException()
     }
 
     override fun serialize(writer: JsonWriter) {
@@ -89,6 +99,7 @@ data class UserLimitLoginCategory(
 
         writer.name(USER_ID).value(userId)
         writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(PRE_BLOCK_DURATION).value(preBlockDuration)
 
         writer.endObject()
     }
@@ -104,5 +115,7 @@ data class UserLimitLoginCategoryWithChildId(
         @ColumnInfo(name = "category_title")
         val categoryTitle: String,
         @ColumnInfo(name = "selected")
-        val selected: Boolean
+        val selected: Boolean,
+        @ColumnInfo(name = "pre_block_duration")
+        val preBlockDuration: Long
 )

@@ -24,7 +24,7 @@ import io.timelimit.android.sync.actions.*
 import java.util.*
 
 object LocalDatabaseParentActionDispatcher {
-    fun dispatchParentActionSync(action: ParentAction, database: Database, fromChildSelfLimitAddChildUserId: String?) {
+    fun dispatchParentActionSync(action: ParentAction, database: Database, fromChildSelfLimitAddChildUserId: String?, parentUserId: String?) {
         if (fromChildSelfLimitAddChildUserId != null) {
             val isSupportedAction = action is CreateTimeLimitRuleAction || action is CreateCategoryAction ||
                     action is UpdateCategoryBlockAllNotificationsAction || action is SetParentCategory ||
@@ -383,7 +383,8 @@ object LocalDatabaseParentActionDispatcher {
                                             categoryId = category.id
                                     ),
                                     database = database,
-                                    fromChildSelfLimitAddChildUserId = null
+                                    fromChildSelfLimitAddChildUserId = null,
+                                    parentUserId = parentUserId
                             )
                         }
                     }
@@ -717,7 +718,7 @@ object LocalDatabaseParentActionDispatcher {
                         database.userLimitLoginCategoryDao().removeItemSync(action.userId)
                     } else {
                         if (database.userLimitLoginCategoryDao().countOtherUsersWithoutLimitLoginCategorySync(action.userId) == 0L) {
-                            throw IllegalStateException("there must be one user withou such limits")
+                            throw IllegalStateException("there must be one user without such limits")
                         }
 
                         database.category().getCategoryByIdSync(action.categoryId)!!
@@ -725,9 +726,27 @@ object LocalDatabaseParentActionDispatcher {
                         database.userLimitLoginCategoryDao().insertOrReplaceItemSync(
                                 UserLimitLoginCategory(
                                         userId = action.userId,
-                                        categoryId = action.categoryId
+                                        categoryId = action.categoryId,
+                                        preBlockDuration = 0
                                 )
                         ) }
+                }
+                is UpdateUserLimitLoginPreBlockDuration -> {
+                    val limitUserLogin = database.userLimitLoginCategoryDao().getByParentUserIdSync(action.userId)
+                            ?: throw IllegalArgumentException()
+
+                    if (action.preBlockDuration != 0L) {
+                        if (action.userId != parentUserId)
+                            throw IllegalArgumentException()
+                    }
+
+                    database.userLimitLoginCategoryDao().insertOrReplaceItemSync(
+                            UserLimitLoginCategory(
+                                    userId = action.userId,
+                                    categoryId = limitUserLogin.categoryId,
+                                    preBlockDuration = action.preBlockDuration
+                            )
+                    )
                 }
                 is AddCategoryNetworkId -> {
                     DatabaseValidation.assertCategoryExists(database, action.categoryId)

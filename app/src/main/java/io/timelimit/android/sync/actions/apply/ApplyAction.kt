@@ -227,7 +227,12 @@ object ApplyActionUtil {
                 LocalDatabaseParentActionDispatcher.dispatchParentActionSync(
                         action = action,
                         database = database,
-                        fromChildSelfLimitAddChildUserId = if (authentication is ApplyActionChildAddLimitAuthentication) deviceUserIdBeforeDispatchingForDeviceAuth else null
+                        fromChildSelfLimitAddChildUserId = if (authentication is ApplyActionChildAddLimitAuthentication) deviceUserIdBeforeDispatchingForDeviceAuth else null,
+                        parentUserId = when (authentication) {
+                            is ApplyActionParentPasswordAuthentication -> authentication.parentUserId
+                            is ApplyActionParentDeviceAuthentication -> deviceUserIdBeforeDispatchingForDeviceAuth
+                            is ApplyActionChildAddLimitAuthentication -> null
+                        }
                 )
 
                 if (action is SetDeviceUserAction) {

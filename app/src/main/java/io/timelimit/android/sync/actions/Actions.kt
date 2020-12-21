@@ -1851,6 +1851,31 @@ data class UpdateUserLimitLoginCategory(val userId: String, val categoryId: Stri
     }
 }
 
+data class UpdateUserLimitLoginPreBlockDuration(val userId: String, val preBlockDuration: Long): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_USER_LIMIT_LOGIN_PRE_BLOCK_DURATION"
+        private const val USER_ID = "userId"
+        private const val PRE_BLOCK_DURATION = "preBlockDuration"
+    }
+
+    init {
+        IdGenerator.assertIdValid(userId)
+
+        if (preBlockDuration < 0 || preBlockDuration > UserLimitLoginCategory.MAX_PRE_BLOCK_DURATION)
+            throw IllegalArgumentException()
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(USER_ID).value(userId)
+        writer.name(PRE_BLOCK_DURATION).value(preBlockDuration)
+
+        writer.endObject()
+    }
+}
+
 // child actions
 object ChildSignInAction: ChildAction() {
     private const val TYPE_VALUE = "CHILD_SIGN_IN"

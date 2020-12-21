@@ -48,35 +48,61 @@ object AllowUserLoginStatusUtil {
             if (missingSyncForLimitLoginUser) {
                 AllowUserLoginStatus.ForbidByMissingSync
             } else {
-                cache.reportStatus(
-                        user = data.limitLoginCategoryUserRelatedData,
-                        assumeCurrentDevice = true,
-                        timeInMillis = time.timeInMillis,
-                        batteryStatus = batteryStatus,
-                        shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily,
-                        currentNetworkId = null, // only checks shouldBlockAtSystemLevel which ignores the network id
-                        hasPremiumOrLocalMode = data.deviceRelatedData.isLocalMode || data.deviceRelatedData.isConnectedAndHasPremium
-                )
-
+                var currentCheckedTime = time.timeInMillis
+                val preBlockDuration = data.loginRelatedData.limitLoginCategory.preBlockDuration
+                val maxCheckedTime = time.timeInMillis + preBlockDuration
                 val categoryIds = data.limitLoginCategoryUserRelatedData.getCategoryWithParentCategories(data.loginRelatedData.limitLoginCategory.categoryId)
-                val handlings = categoryIds.map { cache.get(it) }
 
-                val blockingHandling = handlings.find { it.shouldBlockAtSystemLevel }
-
-                if (blockingHandling != null) {
-                    AllowUserLoginStatus.ForbidByCategory(
-                            categoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title,
-                            blockingReason = blockingHandling.systemLevelBlockingReason,
-                            maxTime = blockingHandling.dependsOnMaxTime
+                while (true) {
+                    cache.reportStatus(
+                            user = data.limitLoginCategoryUserRelatedData,
+                            assumeCurrentDevice = true,
+                            timeInMillis = currentCheckedTime,
+                            shouldTrustTimeTemporarily = time.shouldTrustTimeTemporarily,
+                            batteryStatus = batteryStatus,
+                            currentNetworkId = null, // only checks shouldBlockAtSystemLevel which ignores the network id
+                            hasPremiumOrLocalMode = data.deviceRelatedData.isLocalMode || data.deviceRelatedData.isConnectedAndHasPremium
                     )
-                } else {
-                    val maxTimeByCategories = handlings.minBy { it.dependsOnMaxTime }?.dependsOnMaxTime
-                            ?: Long.MAX_VALUE
 
-                    AllowUserLoginStatus.Allow(
-                            maxTime = maxTimeByCategories
-                    )
+                    val handlings = categoryIds.map { cache.get(it) }
+                    val remainingTimeToCheck = maxCheckedTime - currentCheckedTime
+
+                    handlings.find { it.remainingSessionDuration != null && it.remainingSessionDuration < remainingTimeToCheck }?.let { blockingHandling ->
+                        return AllowUserLoginStatus.ForbidByCategory(
+                                categoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title,
+                                blockingReason = BlockingReason.SessionDurationLimit,
+                                maxTime = blockingHandling.dependsOnMaxTime
+                        )
+                    }
+
+                    handlings.find { it.remainingTime != null && it.remainingTime.includingExtraTime < remainingTimeToCheck }?.let { blockingHandling ->
+                        return AllowUserLoginStatus.ForbidByCategory(
+                                categoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title,
+                                blockingReason = BlockingReason.TimeOver,
+                                maxTime = blockingHandling.dependsOnMaxTime
+                        )
+                    }
+
+                    handlings.find { it.shouldBlockAtSystemLevel }?.let { blockingHandling ->
+                        return AllowUserLoginStatus.ForbidByCategory(
+                                categoryTitle = blockingHandling.createdWithCategoryRelatedData.category.title,
+                                blockingReason = blockingHandling.systemLevelBlockingReason,
+                                maxTime = blockingHandling.dependsOnMaxTime
+                        )
+                    }
+
+                    if (currentCheckedTime >= maxCheckedTime) break
+
+                    val maxTimeByCategories = categoryIds.map { cache.get(it) }.minByOrNull { it.dependsOnMaxTime }?.dependsOnMaxTime ?: Long.MAX_VALUE
+
+                    currentCheckedTime = maxTimeByCategories.coerceAtLeast(currentCheckedTime + 100).coerceAtMost(maxCheckedTime)
                 }
+
+                val maxTimeByCategories = categoryIds.map { cache.get(it) }.minByOrNull { it.dependsOnMaxTime }?.dependsOnMaxTime ?: Long.MAX_VALUE
+
+                AllowUserLoginStatus.Allow(
+                        maxTime = (maxTimeByCategories - preBlockDuration).coerceAtLeast(time.timeInMillis + 1000)
+                )
             }
         } else {
             AllowUserLoginStatus.Allow(

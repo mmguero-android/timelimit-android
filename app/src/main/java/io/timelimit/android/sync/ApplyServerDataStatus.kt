@@ -99,7 +99,8 @@ object ApplyServerDataStatus {
                             LocalDatabaseParentActionDispatcher.dispatchParentActionSync(
                                     action = RemoveUserAction(userId = oldUserId, authentication = null),
                                     database = database,
-                                    fromChildSelfLimitAddChildUserId = null
+                                    fromChildSelfLimitAddChildUserId = null,
+                                    parentUserId = null
                             )
                         }
                     }
@@ -291,7 +292,8 @@ object ApplyServerDataStatus {
                                         categoryId = categoryId
                                 ),
                                 database = database,
-                                fromChildSelfLimitAddChildUserId = null
+                                fromChildSelfLimitAddChildUserId = null,
+                                parentUserId = null
                         )
                     }
                 }
@@ -521,12 +523,13 @@ object ApplyServerDataStatus {
                 } else {
                     val oldItem = database.userLimitLoginCategoryDao().getByParentUserIdSync(user.id)
 
-                    if (oldItem == null || oldItem.categoryId != user.limitLoginCategory) {
+                    if (oldItem == null || oldItem.categoryId != user.limitLoginCategory || oldItem.preBlockDuration != user.preBlockDuration) {
                         database.userLimitLoginCategoryDao().removeItemSync(user.id)
                         database.userLimitLoginCategoryDao().insertOrIgnoreItemSync(
                                 UserLimitLoginCategory(
                                         userId = user.id,
-                                        categoryId = user.limitLoginCategory
+                                        categoryId = user.limitLoginCategory,
+                                        preBlockDuration = user.preBlockDuration
                                 )
                         )
                     }

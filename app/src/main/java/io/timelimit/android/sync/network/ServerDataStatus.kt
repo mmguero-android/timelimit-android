@@ -180,7 +180,8 @@ data class ServerUserData(
         val relaxPrimaryDevice: Boolean,
         val mailNotificationFlags: Int,
         val flags: Long,
-        val limitLoginCategory: String?
+        val limitLoginCategory: String?,
+        val preBlockDuration: Long
 ) {
     companion object {
         private const val ID = "id"
@@ -197,6 +198,7 @@ data class ServerUserData(
         private const val MAIL_NOTIFICATION_FLAGS = "mailNotificationFlags"
         private const val FLAGS = "flags"
         private const val USER_LIMIT_LOGIN_CATEGORY = "llc"
+        private const val PRE_BLOCK_DURATION = "pbd"
 
         fun parse(reader: JsonReader): ServerUserData {
             var id: String? = null
@@ -214,6 +216,7 @@ data class ServerUserData(
             var blockedTimes = ImmutableBitmask(BitSet())
             var flags = 0L
             var limitLoginCategory: String? = null
+            var preBlockDuration = 0L
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -232,6 +235,7 @@ data class ServerUserData(
                     MAIL_NOTIFICATION_FLAGS -> mailNotificationFlags = reader.nextInt()
                     FLAGS -> flags = reader.nextLong()
                     USER_LIMIT_LOGIN_CATEGORY -> if (reader.peek() == JsonToken.NULL) reader.nextNull() else limitLoginCategory = reader.nextString()
+                    PRE_BLOCK_DURATION -> preBlockDuration = reader.nextLong()
                     else -> reader.skipValue()
                 }
             }
@@ -251,7 +255,8 @@ data class ServerUserData(
                     relaxPrimaryDevice = relaxPrimaryDevice,
                     mailNotificationFlags = mailNotificationFlags,
                     flags = flags,
-                    limitLoginCategory = limitLoginCategory
+                    limitLoginCategory = limitLoginCategory,
+                    preBlockDuration = preBlockDuration
             )
         }
 

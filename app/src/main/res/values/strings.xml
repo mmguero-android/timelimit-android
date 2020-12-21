@@ -1172,6 +1172,11 @@
     <string name="parent_limit_login_error_user_itself">You must be signed in as the user
         to select a category. Other users can only disable this feature.
     </string>
+    <string name="parent_limit_login_pre_block_disabled">Preblocking is disabled</string>
+    <string name="parent_limit_login_pre_block_enabled">Logging in will be blocked %s before the category is blocked</string>
+    <string name="parent_limit_login_pre_block_button">Set preblock duration</string>
+    <string name="parent_limit_login_pre_block_dialog_title">Configure preblocking</string>
+    <string name="parent_limit_login_pre_block_dialog_other_user">Other users can only set the value to zero</string>
 
     <string name="parent_mode_key_title">Key</string>
     <string name="parent_mode_key_id">Key ID: %s</string>
