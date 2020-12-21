@@ -38,6 +38,7 @@ class UnlockAfterManipulationActivity : AppCompatActivity(), ActivityViewModelHo
     }
 
     override var ignoreStop: Boolean = false
+    override val showPasswordRecovery: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.timelimit.android.Application
 import io.timelimit.android.R
+import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.livedata.ignoreUnchanged
 import io.timelimit.android.livedata.liveDataFromValue
@@ -40,6 +41,7 @@ import io.timelimit.android.ui.login.NewLoginFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
+import io.timelimit.android.ui.manage.parent.ManageParentFragmentArgs
 import io.timelimit.android.ui.manage.parent.link.LinkParentMailFragment
 import io.timelimit.android.ui.manage.parent.password.restore.RestoreParentPasswordFragment
 import io.timelimit.android.ui.overview.main.MainFragment
@@ -54,6 +56,8 @@ import org.solovyev.android.checkout.Checkout
 class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
     companion object {
         private const val AUTH_DIALOG_TAG = "adt"
+        const val ACTION_USER_OPTIONS = "OPEN_USER_OPTIONS"
+        const val EXTRA_USER_ID = "userId"
     }
 
     private val currentNavigatorFragment = MutableLiveData<Fragment?>()
@@ -68,6 +72,7 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         }
     }
     override var ignoreStop: Boolean = false
+    override val showPasswordRecovery: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,6 +142,8 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
 
         title.observe(this, Observer { setTitle(it) })
         syncModel.statusText.observe(this, Observer { supportActionBar!!.subtitle = it })
+
+        handleParameters(intent)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when {
@@ -174,12 +181,37 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
         purchaseModel.forgetActivityCheckout()
     }
 
+    private fun handleParameters(intent: Intent?): Boolean {
+        if (intent?.action == ACTION_USER_OPTIONS) {
+            val userId = intent.getStringExtra(EXTRA_USER_ID)
+            val valid = userId != null && try { IdGenerator.assertIdValid(userId); true } catch (ex: IllegalArgumentException) {false}
+
+            if (userId != null && valid) {
+                getNavController().popBackStack(R.id.overviewFragment, true)
+                getNavController().handleDeepLink(
+                        getNavController().createDeepLink()
+                                .setDestination(R.id.manageParentFragment)
+                                .setArguments(ManageParentFragmentArgs(userId).toBundle())
+                                .createTaskStackBuilder()
+                                .intents
+                                .first()
+                )
+
+                return true
+            }
+        }
+
+        return false
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
         if ((intent?.flags ?: 0) and Intent.FLAG_ACTIVITY_REORDER_TO_FRONT == Intent.FLAG_ACTIVITY_REORDER_TO_FRONT) {
             return
         }
+
+        if (handleParameters(intent)) return
 
         val currentFragment = currentNavigatorFragment.value
 

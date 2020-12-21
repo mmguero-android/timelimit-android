@@ -68,6 +68,7 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
     private var isResumed = false
 
     override var ignoreStop: Boolean = false
+    override val showPasswordRecovery: Boolean = true
 
     private val blockedPackageName: String by lazy {
         intent.getStringExtra(EXTRA_PACKAGE_NAME)!!

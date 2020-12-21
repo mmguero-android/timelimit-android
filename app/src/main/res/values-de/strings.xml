@@ -655,6 +655,7 @@
     <string name="login_scan_code_err_expired">Dieser Code ist alt</string>
     <string name="login_scan_code_err_not_linked">Dieser Schlüssel ist nicht verknüpft</string>
     <string name="login_category_blocked">Die Kategorie %1$s ist momentan gesperrt (%2$s), sodass Sie sich nicht mit diesem Benutzer anmelden können</string>
+    <string name="login_password_forgot_button">Passwort vergessen</string>
 
     <string name="main_tab_overview">Übersicht</string>
     <string name="main_tab_uninstall">Deinstallieren</string>

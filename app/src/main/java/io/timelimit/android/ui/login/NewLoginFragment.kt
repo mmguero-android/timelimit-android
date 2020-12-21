@@ -16,6 +16,7 @@
 package io.timelimit.android.ui.login
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -34,6 +35,8 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.NewLoginFragmentBinding
 import io.timelimit.android.extensions.setOnEnterListenr
+import io.timelimit.android.ui.MainActivity
+import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.parent.key.ScannedKey
 import io.timelimit.android.ui.view.KeyboardViewListener
@@ -60,6 +63,8 @@ class NewLoginFragment: DialogFragment() {
     private val inputMethodManager: InputMethodManager by lazy {
         context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
+
+    private val activityModelHolder get() = requireActivity() as ActivityViewModelHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,6 +171,16 @@ class NewLoginFragment: DialogFragment() {
             }
 
             password.setOnEnterListenr { go() }
+
+            forgotPasswordButton.setOnClickListener {
+                startActivity(
+                        Intent(requireContext(), MainActivity::class.java)
+                                .setAction(MainActivity.ACTION_USER_OPTIONS)
+                                .putExtra(MainActivity.EXTRA_USER_ID, model.selectedUserId.value)
+                )
+
+                dismissAllowingStateLoss()
+            }
         }
 
         binding.childPassword.apply {
@@ -214,6 +229,7 @@ class NewLoginFragment: DialogFragment() {
                     }
 
                     binding.enterPassword.showKeepLoggedInOption = status.isConnectedMode
+                    binding.enterPassword.forgotPasswordButton.visibility = if (status.showForgotPassword && activityModelHolder.showPasswordRecovery) View.VISIBLE else View.GONE
 
                     if (status.isAlreadyCurrentDeviceUser) {
                         binding.enterPassword.canNotKeepLoggedIn = false

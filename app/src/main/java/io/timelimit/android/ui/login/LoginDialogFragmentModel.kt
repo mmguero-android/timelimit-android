@@ -105,7 +105,8 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                         isConnectedMode = isConnectedMode,
                                         isAlreadyCurrentDeviceUser = isAlreadyCurrentUser,
                                         isCheckingPassword = isCheckingPassword,
-                                        wasPasswordWrong = wasPasswordWrong
+                                        wasPasswordWrong = wasPasswordWrong,
+                                        showForgotPassword = isConnectedMode && selectedUser.mail.isNotEmpty()
                                 ) as LoginDialogStatus
                             }
                         }
@@ -455,7 +456,8 @@ data class ParentUserLogin(
         val isConnectedMode: Boolean,
         val isAlreadyCurrentDeviceUser: Boolean,
         val isCheckingPassword: Boolean,
-        val wasPasswordWrong: Boolean
+        val wasPasswordWrong: Boolean,
+        val showForgotPassword: Boolean
 ): LoginDialogStatus()
 object LoginDialogDone: LoginDialogStatus()
 data class CanNotSignInChildHasNoPassword(val childName: String): LoginDialogStatus()

@@ -21,6 +21,7 @@ interface ActivityViewModelHolder {
     fun getActivityViewModel(): ActivityViewModel
     fun showAuthenticationScreen()
     var ignoreStop: Boolean
+    val showPasswordRecovery: Boolean
 }
 
 fun getActivityViewModel(activity: Activity): ActivityViewModel {
