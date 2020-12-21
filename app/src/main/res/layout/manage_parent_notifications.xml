@@ -54,6 +54,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <CheckBox
+                android:enabled="@{hasMailAddress}"
+                android:id="@+id/task_checkbox"
+                android:text="@string/manage_parent_notifications_checkbox_task"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

@@ -992,6 +992,7 @@
     <string name="manage_parent_notifications_title">Benachrichtigungs-E-Mails</string>
     <string name="manage_parent_notifications_needs_linked_mail">Sie müssen eine E-Mail-Adresse hinterlegen, um diese Funktion zu benutzen</string>
     <string name="manage_parent_notifications_checkbox_manipulation">Manipulationswarnungen</string>
+    <string name="manage_parent_notifications_checkbox_task">Erledigung von Aufgaben</string>
 
     <string name="manage_send_device_connected_title">Verbindungsstatus anzeigen</string>
     <string name="manage_send_device_connected_title_short">@string/manage_send_device_connected_title</string>

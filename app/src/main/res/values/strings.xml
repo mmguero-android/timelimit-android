@@ -1037,6 +1037,7 @@
     <string name="manage_parent_notifications_title">Mail notifications</string>
     <string name="manage_parent_notifications_needs_linked_mail">You have to link a mail address to use this feature</string>
     <string name="manage_parent_notifications_checkbox_manipulation">Manipulation warnings</string>
+    <string name="manage_parent_notifications_checkbox_task">Task completions</string>
 
     <string name="manage_send_device_connected_title">Send if device is connected</string>
     <string name="manage_send_device_connected_title_short">Send device connected</string>

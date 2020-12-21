@@ -34,6 +34,7 @@ object ManageParentNotifications {
             view.hasMailAddress = user?.mail?.isNotEmpty() ?: false
 
             val manipulation = (user?.mailNotificationFlags ?: 0) and 1 == 1
+            val tasks = (user?.mailNotificationFlags ?: 0) and 2 == 2
 
             view.manipulationCheckbox.setOnCheckedChangeListener { _, _ ->  }
             view.manipulationCheckbox.isChecked = manipulation
@@ -51,6 +52,26 @@ object ManageParentNotifications {
                         // it worked
                     } else {
                         view.manipulationCheckbox.isChecked = manipulation
+                    }
+                }
+            }
+
+            view.taskCheckbox.setOnCheckedChangeListener { _, _ ->  }
+            view.taskCheckbox.isChecked = tasks
+            view.taskCheckbox.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked != tasks) {
+                    if (
+                            auth.tryDispatchParentAction(
+                                    UpdateParentNotificationFlagsAction(
+                                            parentId = user?.id!!,
+                                            flags = 2,
+                                            set = isChecked
+                                    )
+                            )
+                    ) {
+                        // it worked
+                    } else {
+                        view.manipulationCheckbox.isChecked = tasks
                     }
                 }
             }
