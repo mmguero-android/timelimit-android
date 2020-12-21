@@ -213,7 +213,6 @@ data class ServerUserData(
             var categoryForNotAssignedApps = ""
             var relaxPrimaryDevice = false
             var mailNotificationFlags = 0
-            var blockedTimes = ImmutableBitmask(BitSet())
             var flags = 0L
             var limitLoginCategory: String? = null
             var preBlockDuration = 0L
