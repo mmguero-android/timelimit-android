@@ -336,6 +336,9 @@
         oder Sperrzeiten wird es keine Begrenzung außerhalb dieses Intervalls
         geben.
     </string>
+    <string name="category_time_limit_rules_warning_zero_day_part">Sie haben keine Tage gewählt.
+        Diese Regel würde Nichts begrenzen.
+    </string>
 
     <string name="time_warning_title">Zeitwarnung</string>
     <string name="time_warning_desc">Wenn weniger Zeit als ausgewählt übrig ist, dann wird eine Benachrichtigung angezeigt</string>

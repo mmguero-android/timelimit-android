@@ -121,6 +121,8 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
 
         view.typePerDay.isChecked = newRule.perDay
         view.typePerWeek.isChecked = !newRule.perDay
+
+        view.applyToZeroDays = newRule.dayMask.toInt() == 0
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

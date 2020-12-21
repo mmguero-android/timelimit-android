@@ -380,6 +380,9 @@
         Without rules for other times or blocked time areas, there will
         be no limit outside of this interval.
     </string>
+    <string name="category_time_limit_rules_warning_zero_day_part">You did not select any days.
+        This rule would not limit anything.
+    </string>
 
     <string name="time_warning_title">Time warnings</string>
     <string name="time_warning_desc">If there is less time remaining than checked, then a notification will be shown</string>
