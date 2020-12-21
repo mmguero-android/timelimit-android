@@ -448,6 +448,8 @@
     <string name="diagnose_connection_yes">verbunden</string>
     <string name="diagnose_connection_no">nicht verbunden</string>
     <string name="diagnose_connection_network_id">Netzwerk-ID</string>
+    <string name="diagnose_connection_check_button">Testanfrage senden</string>
+    <string name="diagnose_connection_check_toast_good">Testanfrage war erfolgreich</string>
 
     <string name="diagnose_sync_title">Synchronisation</string>
     <string name="diagnose_sync_empty">Es gibt Nichts das synchronisiert werden müsste</string>

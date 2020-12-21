@@ -21,8 +21,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseConnectionBinding
 import io.timelimit.android.integration.platform.NetworkId
@@ -33,6 +35,8 @@ import io.timelimit.android.sync.websocket.NetworkStatus
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
 class DiagnoseConnectionFragment : Fragment(), FragmentWithCustomTitle {
+    private val model by viewModels<DiagnoseConnectionModel>()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentDiagnoseConnectionBinding.inflate(inflater, container, false)
         val logic = DefaultAppLogic.with(requireContext())
@@ -59,6 +63,29 @@ class DiagnoseConnectionFragment : Fragment(), FragmentWithCustomTitle {
                 is NetworkId.Network -> it.id
             }
         })
+
+        binding.testRequestButton.setOnClickListener { model.startConnectionTest() }
+
+        model.status.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                DiagnoseConnectionModel.ConnectionTestStatus.Idle -> {
+                    binding.testRequestButton.isEnabled = true
+                }
+                DiagnoseConnectionModel.ConnectionTestStatus.Running -> {
+                    binding.testRequestButton.isEnabled = false
+                }
+                DiagnoseConnectionModel.ConnectionTestStatus.Success -> {
+                    Snackbar.make(binding.root, R.string.diagnose_connection_check_toast_good, Snackbar.LENGTH_SHORT).show()
+
+                    model.confirmConnectionTestResult()
+                }
+                is DiagnoseConnectionModel.ConnectionTestStatus.Failure -> {
+                    DiagnoseExceptionDialogFragment.newInstance(status.ex).show(parentFragmentManager)
+
+                    model.confirmConnectionTestResult()
+                }
+            }.let {/* require handling all cases */}
+        }
 
         return binding.root
     }
