@@ -143,7 +143,7 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
                     categoryId = categoryId,
                     applyToExtraTimeUsage = false,
                     dayMask = 0,
-                    maximumTimeInMillis = 1000 * 60 * 60 * 5 / 2,   // 2,5 (5/2) hours
+                    maximumTimeInMillis = 1000 * 60 * 60,
                     startMinuteOfDay = TimeLimitRule.MIN_START_MINUTE,
                     endMinuteOfDay = TimeLimitRule.MAX_END_MINUTE,
                     sessionPauseMilliseconds = 0,
