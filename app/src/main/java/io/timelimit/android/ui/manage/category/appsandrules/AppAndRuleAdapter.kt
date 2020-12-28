@@ -30,7 +30,6 @@ import io.timelimit.android.logic.DummyApps
 import io.timelimit.android.ui.manage.category.apps.AppAdapterHandlers
 import io.timelimit.android.ui.manage.category.timelimit_rules.TimeLimitRulesHandlers
 import io.timelimit.android.util.DayNameUtil
-import io.timelimit.android.util.JoinUtil
 import io.timelimit.android.util.TimeTextUtil
 import kotlin.properties.Delegates
 
@@ -156,12 +155,18 @@ class AppAndRuleAdapter: RecyclerView.Adapter<AppAndRuleAdapter.Holder>() {
                 val context = binding.root.context
                 val usedTime = date?.let { date ->
                     usedTimes.filter { usedTime ->
-                        val dayOfWeek = usedTime.dayOfEpoch - date.firstDayOfWeekAsEpochDay
-                        val matchingSlot = usedTime.startTimeOfDay == rule.startMinuteOfDay && usedTime.endTimeOfDay == rule.endMinuteOfDay
-                        val matchingMask = (rule.dayMask.toInt() and (1 shl dayOfWeek) != 0)
-                        val matchingDay = dayOfWeek == date.dayOfWeek
+                        val usedTimeDayOfWeek = usedTime.dayOfEpoch - date.firstDayOfWeekAsEpochDay
+                        val matchingWeek = usedTimeDayOfWeek in 0..6
 
-                        matchingSlot && (if (rule.perDay) matchingDay else matchingMask)
+                        if (matchingWeek) {
+                            val matchingSlot = usedTime.startTimeOfDay == rule.startMinuteOfDay && usedTime.endTimeOfDay == rule.endMinuteOfDay
+                            val maskToCheck = if (rule.perDay && rule.appliesToMultipleDays) {
+                                rule.dayMask.takeHighestOneBit().toInt().coerceAtMost(1 shl date.dayOfWeek)
+                            } else rule.dayMask.toInt()
+                            val matchingMask = (maskToCheck and (1 shl usedTimeDayOfWeek) != 0)
+
+                            matchingSlot && matchingMask
+                        } else false
                     }.map { it.usedMillis }.sum().toInt()
                 } ?: 0
 
