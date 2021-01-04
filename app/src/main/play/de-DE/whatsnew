@@ -1,1 +1,3 @@
-- Zertifikate und Zertifikatpinning aktualisiert
+- Benachrichtigungen bei der Erledigung von Aufgaben hinzugefügt
+- falsche Darstellung von Nutzungsdauern bei den Zeitbegrenzungsregeln bei bestimmten Konfigurationen behoben
+- Sperren im voraus für Anmeldeverhinderungskategorien hinzugefügt

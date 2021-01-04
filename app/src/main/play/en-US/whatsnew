@@ -1,1 +1,3 @@
-- Updated certificates and certificate pinning
+- add task completion mails
+- fix wrong shown used time at the rule configuration for some configurations
+- added preblocking for limit login categories
