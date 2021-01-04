@@ -1131,10 +1131,10 @@
     <string name="parent_limit_login_error_user_itself">Sie müssen als der entsprechende Benutzer angemeldet sein, um eine Kategorie
         zu wählen. Andere Benutzer können diese Funktion nur wieder deaktivieren.
     </string>
-    <string name="parent_limit_login_pre_block_disabled">Das Sperren im vorraus ist deaktiviert</string>
+    <string name="parent_limit_login_pre_block_disabled">Das Sperren im voraus ist deaktiviert</string>
     <string name="parent_limit_login_pre_block_enabled">Das Anmelden wird %s vor der Kategorie gesperrt</string>
-    <string name="parent_limit_login_pre_block_button">Sperren im vorraus konfigurieren</string>
-    <string name="parent_limit_login_pre_block_dialog_title">Sperren im vorraus</string>
+    <string name="parent_limit_login_pre_block_button">Sperren im voraus konfigurieren</string>
+    <string name="parent_limit_login_pre_block_dialog_title">Sperren im voraus</string>
     <string name="parent_limit_login_pre_block_dialog_other_user">Andere Benutzer können den Wert nur auf 0 setzen</string>
 
     <string name="parent_mode_key_title">Schlüssel</string>
