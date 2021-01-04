@@ -139,7 +139,9 @@ class AppsAndRulesModel(application: Application): AndroidViewModel(application)
                 val maxSize = 3
 
                 if (entries.size > maxSize)
-                    entries.takeDistributedElements(maxSize) + listOf(AppAndRuleItem.ExpandAppsItem)
+                    entries.takeDistributedElements(maxSize) + listOf(
+                            AppAndRuleItem.ExpandAppsItem, AppAndRuleItem.AddAppItem
+                    )
                 else
                     entries + listOf(AppAndRuleItem.AddAppItem)
             }
