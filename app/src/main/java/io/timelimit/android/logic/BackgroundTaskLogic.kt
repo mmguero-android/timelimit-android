@@ -428,18 +428,35 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     triggerSync
                 }
 
-                if (
-                        usedTimeUpdateHelper.report(
-                                duration = timeToSubtract,
-                                dayOfEpoch = dayOfEpoch,
-                                trustedTimestamp = if (realTime.shouldTrustTimePermanently) realTime.timeInMillis else 0,
-                                handlings = categoryHandlingsToCount
-                        )
-                ) {
+                val didAutoCommitOfUsedTimes = usedTimeUpdateHelper.report(
+                        duration = timeToSubtract,
+                        dayOfEpoch = dayOfEpoch,
+                        trustedTimestamp = if (realTime.shouldTrustTimePermanently) realTime.timeInMillis else 0,
+                        handlings = categoryHandlingsToCount
+                )
+
+                if (didAutoCommitOfUsedTimes) {
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "auto commit used times")
                     }
+                }
 
+                // trigger sync when required
+                if (triggerSync) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "trigger sync")
+                    }
+
+                    commitUsedTimeUpdaters()
+
+                    ApplyActionUtil.applyAppLogicAction(
+                            action = ForceSyncAction,
+                            appLogic = appLogic,
+                            ignoreIfDeviceIsNotConfigured = true
+                    )
+                }
+
+                if (didAutoCommitOfUsedTimes || triggerSync) {
                     val newDeviceAndUserRelatedData = Threads.database.executeAndWait {
                         appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
                     }
@@ -457,21 +474,6 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                     }
 
                     reportStatusToCategoryHandlingCache(userRelatedData = newDeviceAndUserRelatedData.userRelatedData)
-                }
-
-                // trigger sync when required
-                if (triggerSync) {
-                    if (BuildConfig.DEBUG) {
-                        Log.d(LOG_TAG, "trigger sync")
-                    }
-
-                    commitUsedTimeUpdaters()
-
-                    ApplyActionUtil.applyAppLogicAction(
-                            action = ForceSyncAction,
-                            appLogic = appLogic,
-                            ignoreIfDeviceIsNotConfigured = true
-                    )
                 }
 
                 // show notification
