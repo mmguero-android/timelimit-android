@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,6 +84,10 @@ class UsedTimeUpdateHelper (private val appLogic: AppLogic) {
         val makeCommit = makeCommitByDifferntHandling || makeCommitByDifferentBaseData || makeCommitByCountedTime
 
         val madeCommit = if (makeCommit) {
+            if (BuildConfig.DEBUG) {
+                Log.d(LOG_TAG, "makeCommitByDifferntHandling = $makeCommitByDifferntHandling; makeCommitByDifferentBaseData = $makeCommitByDifferentBaseData; makeCommitByCountedTime = $makeCommitByCountedTime")
+            }
+
             doCommitPrivate()
         } else {
             false

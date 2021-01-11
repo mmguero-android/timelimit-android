@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,15 @@ data class UserRelatedData(
 
     val categoryById: Map<String, CategoryRelatedData> by lazy { categories.associateBy { it.category.id } }
     val timeZone: TimeZone by lazy { user.getTimezone() }
+    val preBlockSwitchPoints: Set<Long> by lazy {
+        mutableSetOf<Long>().also { result ->
+            categories.forEach { category ->
+                category.limitLoginCategories.forEach {
+                    if (it.preBlockDuration > 0) result.add(it.preBlockDuration)
+                }
+            }
+        }
+    }
 
     // O(n), but saves memory and index building time
     // additionally a cache

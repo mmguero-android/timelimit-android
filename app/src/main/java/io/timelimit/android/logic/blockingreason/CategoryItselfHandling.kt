@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -223,7 +223,11 @@ data class CategoryItselfHandling (
             else
                 remainingTime.default
             val maxTimeToAddBySessionDuration = remainingSessionDuration ?: Long.MAX_VALUE
-            val maxTimeToAdd = maxTimeToAddByRegularTime.coerceAtMost(maxTimeToAddBySessionDuration)
+            val maxTimeToAdd = maxTimeToAddByRegularTime.coerceAtMost(maxTimeToAddBySessionDuration).let {
+                // use Long.MAX_VALUE if there is nothing remaining for the case that the blocking does not work
+                // to prevent flushing as often as possible
+                if (it > 0) it else Long.MAX_VALUE
+            }
 
             val additionalTimeCountingSlots = if (shouldCountTime)
                 regularRelatedRules

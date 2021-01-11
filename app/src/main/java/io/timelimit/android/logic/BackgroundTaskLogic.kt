@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -357,6 +357,77 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         .map { categoryHandlingCache.get(it) }
                         .filter { it.shouldCountTime }
 
+                fun timeToSubtractForCategory(categoryId: String): Int {
+                    return if (usedTimeUpdateHelper.getCountedCategoryIds().contains(categoryId)) usedTimeUpdateHelper.getCountedTime() else 0
+                }
+
+                val triggerSync = kotlin.run {
+                    var triggerSyncByLimitLoginCategory = false
+                    var triggerSyncByTimeOver = false
+
+                    categoryHandlingsToCount.forEach { handling ->
+                        val category = handling.createdWithCategoryRelatedData.category
+                        val categoryId = category.id
+                        val timeToSubtractForCategory = timeToSubtractForCategory(categoryId)
+                        val nowRemaining = handling.remainingTime ?: return@forEach // category is not limited anymore
+
+                        val oldRemainingTime = nowRemaining.includingExtraTime - timeToSubtractForCategory
+                        val newRemainingTime = oldRemainingTime - timeToSubtract
+
+                        // trigger time warnings
+                        if (oldRemainingTime / (1000 * 60) != newRemainingTime / (1000 * 60)) {
+                            // eventually show remaining time warning
+                            val roundedNewTime = ((newRemainingTime / (1000 * 60)) + 1) * (1000 * 60)
+                            val flagIndex = CategoryTimeWarnings.durationToBitIndex[roundedNewTime]
+
+                            if (flagIndex != null && category.timeWarnings and (1 shl flagIndex) != 0) {
+                                appLogic.platformIntegration.showTimeWarningNotification(
+                                        title = appLogic.context.getString(R.string.time_warning_not_title, category.title),
+                                        text = TimeTextUtil.remaining(roundedNewTime.toInt(), appLogic.context)
+                                )
+                            }
+                        }
+
+                        // check if sync triggered by time over
+                        if (oldRemainingTime > 0 && newRemainingTime <= 0) {
+                            triggerSyncByTimeOver = true
+                        }
+
+                        // check if limit login triggered
+                        val triggerSyncByLimitLoginCategoryForThisCategory = userRelatedData.preBlockSwitchPoints.let { switchPoints ->
+                            if (switchPoints.isEmpty()) false else {
+                                val newSessionDuration = handling.remainingSessionDuration?.let { it - timeToSubtractForCategory }
+
+                                val limitLoginBySessionDuration = if (newSessionDuration != null) {
+                                    val oldSessionDuration = newSessionDuration + timeToSubtract
+
+                                    switchPoints.find { switchPoint -> oldSessionDuration >= switchPoint && newSessionDuration < switchPoint } != null
+                                } else false
+
+                                val limitLoginByRemainingTime = switchPoints.find { switchPoint -> oldRemainingTime >= switchPoint && newRemainingTime < switchPoint } != null
+
+                                limitLoginBySessionDuration || limitLoginByRemainingTime
+                            }
+                        }
+
+                        triggerSyncByLimitLoginCategory = triggerSyncByLimitLoginCategory || triggerSyncByLimitLoginCategoryForThisCategory
+                    }
+
+                    if (BuildConfig.DEBUG) {
+                        if (triggerSyncByTimeOver) {
+                            Log.d(LOG_TAG, "trigger sync because the time is over")
+                        }
+
+                        if (triggerSyncByLimitLoginCategory) {
+                            Log.d(LOG_TAG, "trigger sync by the limit login category")
+                        }
+                    }
+
+                    val triggerSync = triggerSyncByLimitLoginCategory || triggerSyncByTimeOver
+
+                    triggerSync
+                }
+
                 if (
                         usedTimeUpdateHelper.report(
                                 duration = timeToSubtract,
@@ -365,6 +436,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                                 handlings = categoryHandlingsToCount
                         )
                 ) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "auto commit used times")
+                    }
+
                     val newDeviceAndUserRelatedData = Threads.database.executeAndWait {
                         appLogic.database.derivedDataDao().getUserAndDeviceRelatedDataSync()
                     }
@@ -373,84 +448,30 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                             newDeviceAndUserRelatedData?.userRelatedData?.user?.id != deviceAndUSerRelatedData.userRelatedData.user.id ||
                             newDeviceAndUserRelatedData.userRelatedData.categoryById.keys != deviceAndUSerRelatedData.userRelatedData.categoryById.keys
                     ) {
+                        if (BuildConfig.DEBUG) {
+                            Log.d(LOG_TAG, "restart the loop")
+                        }
+
                         // start the loop directly again
                         continue
                     }
 
-                    val hasLimitLoginCategories = currentCategoryIds.find { userRelatedData.categoryById[it]?.limitLoginCategories?.isNotEmpty() ?: false } != null
-
-                    val previousCategoryHandlings = if (hasLimitLoginCategories) {
-                        currentCategoryIds.associateWith { categoryHandlingCache.get(it) }
-                    } else null
-
                     reportStatusToCategoryHandlingCache(userRelatedData = newDeviceAndUserRelatedData.userRelatedData)
-
-                    val triggerSyncByLimitLoginCategory = if (previousCategoryHandlings != null) {
-                        val switchPoints = mutableSetOf<Long>()
-
-                        currentCategoryIds.forEach {
-                            userRelatedData.categoryById[it]?.let { category ->
-                                category.limitLoginCategories.forEach {
-                                    if (it.preBlockDuration > 0) switchPoints.add(it.preBlockDuration)
-                                }
-                            }
-                        }
-
-                        currentCategoryIds.find { categoryId ->
-                            val oldHandling = previousCategoryHandlings[categoryId]!!
-                            val newHandling = categoryHandlingCache.get(categoryId)
-
-                            switchPoints.find { switchPoint ->
-                                (oldHandling.remainingTime != null && oldHandling.remainingTime.includingExtraTime >= switchPoint &&
-                                        (newHandling.remainingTime != null && newHandling.remainingTime.includingExtraTime < switchPoint)) ||
-                                        (oldHandling.remainingSessionDuration != null && oldHandling.remainingSessionDuration >= switchPoint &&
-                                                (newHandling.remainingSessionDuration != null && newHandling.remainingSessionDuration < switchPoint))
-                            } != null
-                        } != null
-                    } else false
-
-                    // eventually trigger sync
-                    val allCategoriesWithRemainingTimeAfterSubtractingTime = currentCategoryIds.filter { categoryHandlingCache.get(it).hasRemainingTime }
-                    val triggerSyncByTimeOver = allCategoriesWithRemainingTimeBeforeAddingUsedTime != allCategoriesWithRemainingTimeAfterSubtractingTime
-
-                    val triggerSync = triggerSyncByLimitLoginCategory || triggerSyncByTimeOver
-
-                    if (triggerSync) {
-                        ApplyActionUtil.applyAppLogicAction(
-                                action = ForceSyncAction,
-                                appLogic = appLogic,
-                                ignoreIfDeviceIsNotConfigured = true
-                        )
-                    }
                 }
 
-                val categoriesToCount = categoryHandlingsToCount.map { it.createdWithCategoryRelatedData.category.id }
-
-                fun timeToSubtractForCategory(categoryId: String): Int {
-                    return if (usedTimeUpdateHelper.getCountedCategoryIds().contains(categoryId)) usedTimeUpdateHelper.getCountedTime() else 0
-                }
-
-                // trigger time warnings
-                categoriesToCount.forEach { categoryId ->
-                    val category = userRelatedData.categoryById[categoryId]!!.category
-                    val handling = categoryHandlingCache.get(categoryId)
-                    val nowRemaining = handling.remainingTime ?: return@forEach // category is not limited anymore
-
-                    val newRemainingTime = nowRemaining.includingExtraTime - timeToSubtractForCategory(categoryId)
-                    val oldRemainingTime = newRemainingTime + timeToSubtract
-
-                    if (oldRemainingTime / (1000 * 60) != newRemainingTime / (1000 * 60)) {
-                        // eventually show remaining time warning
-                        val roundedNewTime = ((newRemainingTime / (1000 * 60)) + 1) * (1000 * 60)
-                        val flagIndex = CategoryTimeWarnings.durationToBitIndex[roundedNewTime]
-
-                        if (flagIndex != null && category.timeWarnings and (1 shl flagIndex) != 0) {
-                            appLogic.platformIntegration.showTimeWarningNotification(
-                                    title = appLogic.context.getString(R.string.time_warning_not_title, category.title),
-                                    text = TimeTextUtil.remaining(roundedNewTime.toInt(), appLogic.context)
-                            )
-                        }
+                // trigger sync when required
+                if (triggerSync) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "trigger sync")
                     }
+
+                    commitUsedTimeUpdaters()
+
+                    ApplyActionUtil.applyAppLogicAction(
+                            action = ForceSyncAction,
+                            appLogic = appLogic,
+                            ignoreIfDeviceIsNotConfigured = true
+                    )
                 }
 
                 // show notification
