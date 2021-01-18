@@ -375,6 +375,8 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         val oldRemainingTime = nowRemaining.includingExtraTime - timeToSubtractForCategory
                         val newRemainingTime = oldRemainingTime - timeToSubtract
 
+                        val oldSessionDuration = handling.remainingSessionDuration?.let { it - timeToSubtractForCategory }
+
                         // trigger time warnings
                         if (oldRemainingTime / (1000 * 60) != newRemainingTime / (1000 * 60)) {
                             // eventually show remaining time warning
@@ -394,10 +396,18 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                             triggerSyncByTimeOver = true
                         }
 
+                        // check if sync triggered by session duration reached
+                        if (oldSessionDuration != null) {
+                            val newSessionDuration = oldSessionDuration - timeToSubtract
+
+                            if (oldSessionDuration > 0 && newSessionDuration <= 0) {
+                                triggerSyncByTimeOver = true
+                            }
+                        }
+
                         // check if limit login triggered
                         val triggerSyncByLimitLoginCategoryForThisCategory = userRelatedData.preBlockSwitchPoints.let { switchPoints ->
                             if (switchPoints.isEmpty()) false else {
-                                val oldSessionDuration = handling.remainingSessionDuration?.let { it - timeToSubtractForCategory }
 
                                 val limitLoginBySessionDuration = if (oldSessionDuration != null) {
                                     val newSessionDuration = oldSessionDuration - timeToSubtract
