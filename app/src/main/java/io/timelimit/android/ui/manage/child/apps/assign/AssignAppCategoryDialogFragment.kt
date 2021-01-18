@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,12 +92,6 @@ class AssignAppCategoryDialogFragment: BottomSheetDialogFragment() {
 
         auth.authenticatedUser.observe(this, Observer {
             if (it?.second?.type != UserType.Parent) {
-                dismissAllowingStateLoss()
-            }
-        })
-
-        matchingAppEntries.observe(this, Observer {
-            if (it.isEmpty()) {
                 dismissAllowingStateLoss()
             }
         })

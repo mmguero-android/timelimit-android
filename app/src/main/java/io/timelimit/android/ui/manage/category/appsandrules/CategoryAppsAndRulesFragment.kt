@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import io.timelimit.android.ui.main.getActivityViewModel
 import io.timelimit.android.ui.manage.category.apps.add.AddCategoryAppsFragment
 import io.timelimit.android.ui.manage.category.timelimit_rules.edit.EditTimeLimitRuleDialogFragment
 import io.timelimit.android.ui.manage.category.timelimit_rules.edit.EditTimeLimitRuleDialogFragmentListener
+import io.timelimit.android.ui.manage.child.apps.assign.AssignAppCategoryDialogFragment
 import kotlinx.android.synthetic.main.fragment_category_apps_and_rules.*
 
 abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimitRuleDialogFragmentListener {
@@ -150,6 +151,17 @@ abstract class CategoryAppsAndRulesFragment: Fragment(), Handlers, EditTimeLimit
                     }
                     .show()
         }
+    }
+
+    override fun onAppLongClicked(app: AppAndRuleItem.AppEntry): Boolean {
+        return if (auth.requestAuthenticationOrReturnTrue()) {
+            AssignAppCategoryDialogFragment.newInstance(
+                    childId = childId,
+                    appPackageName = app.packageName
+            ).show(parentFragmentManager)
+
+            true
+        } else false
     }
 
     override fun onAddAppsClicked() {

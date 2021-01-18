@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,5 +19,6 @@ import io.timelimit.android.ui.manage.category.appsandrules.AppAndRuleItem
 
 interface AppAdapterHandlers {
     fun onAppClicked(app: AppAndRuleItem.AppEntry)
+    fun onAppLongClicked(app: AppAndRuleItem.AppEntry): Boolean
     fun onAddAppsClicked()
 }
