@@ -30,7 +30,6 @@ import io.timelimit.android.data.model.derived.DeviceAndUserRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.integration.platform.BatteryStatus
 import io.timelimit.android.integration.platform.NetworkId
-import io.timelimit.android.integration.platform.getNetworkIdOrNull
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
@@ -114,7 +113,7 @@ class LockModel(application: Application): AndroidViewModel(application) {
                     batteryStatus = batteryStatus,
                     timeInMillis = realTime.timeInMillis,
                     shouldTrustTimeTemporarily = realTime.shouldTrustTimeTemporarily,
-                    currentNetworkId = networkId?.getNetworkIdOrNull(),
+                    currentNetworkId = networkId,
                     hasPremiumOrLocalMode = hasPremiumOrLocalMode
             )
 

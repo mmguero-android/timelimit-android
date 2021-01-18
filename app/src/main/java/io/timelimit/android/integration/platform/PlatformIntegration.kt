@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -225,5 +225,3 @@ sealed class NetworkId {
     object MissingPermission: NetworkId()
     data class Network(val id: String): NetworkId()
 }
-
-fun NetworkId.getNetworkIdOrNull(): String? = if (this is NetworkId.Network) this.id else null

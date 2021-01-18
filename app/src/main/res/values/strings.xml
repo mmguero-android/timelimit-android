@@ -667,6 +667,13 @@
     <string name="lock_reason_missing_required_network">
         This %s is only allowed in some networks, but no connection to such network was found.
     </string>
+    <string name="lock_reason_missing_network_check_permission">
+        This %s is not allowed in some networks but the permission
+        to check the network was not granted.
+    </string>
+    <string name="lock_reason_forbidden_network">
+        This %s may not be used in the current network.
+    </string>
 
     <string name="lock_reason_short_no_category">no category</string>
     <string name="lock_reason_short_temporarily_blocked">temporarily blocked</string>
@@ -678,6 +685,8 @@
     <string name="lock_reason_short_battery_limit">battery limit reached</string>
     <string name="lock_reason_short_session_duration">session duration limit reached</string>
     <string name="lock_reason_short_missing_required_network">no allowed network</string>
+    <string name="lock_reason_short_missing_network_check_permission">missing network check permission</string>
+    <string name="lock_reason_short_forbidden_network">forbidden network</string>
 
     <string name="lock_overlay_warning">
         Failed to open the lock screen.
@@ -731,17 +740,16 @@
     <string name="manage_category_for_unassigned_apps_btn_disable">Stop using this category for unassigned Apps</string>
 
     <string name="category_networks_title">Networks</string>
-    <string name="category_networks_help">Here you can add WiFi networks. This category will be blocked
-        if there are WiFi networks added and there is no connection to a specified network.
-        A network is identified by an access point. In case of multiple access points/ repeaters,
+    <string name="category_networks_help">Here you can add WiFi networks. This can be used to
+        allow or block the category depending on the network.
+        A network is identified by an access point. In case of multiple access points/repeaters,
         you have to add all of them one by one.
         Disabling the time limits temporarily additionally disables limitations caused by this feature.
     </string>
-    <string name="category_networks_empty">You did not add any networks. This category is not limited to specific networks.</string>
-    <string name="category_networks_not_empty">You added %s. This category is limited to the specified networks.</string>
-    <plurals name="category_networks_counter">
-        <item quantity="one">%d network</item>
-        <item quantity="other">%d networks</item>
+    <string name="category_networks_empty">You did not add any networks. This category does not depend on specific networks.</string>
+    <plurals name="category_networks_not_empty">
+        <item quantity="one">You added %d network.</item>
+        <item quantity="other">You added %d networks.</item>
     </plurals>
     <string name="category_networks_status_missing_permission">The permission to get the connected network is missing</string>
     <string name="category_networks_status_none_connected">You are not connected to any WiFi network</string>
@@ -754,8 +762,9 @@
     <string name="category_networks_action_grant">Grant permission</string>
     <string name="category_networks_action_remove">Remove all networks</string>
     <string name="category_networks_toast_all_removed">All networks removed</string>
-
     <string name="category_networks_toast_enable_location_service">Please enable location access</string>
+    <string name="category_networks_type_allow_list">Block when not connected</string>
+    <string name="category_networks_type_block_list">Block when connected</string>
 
     <string name="manage_child_tab_other">Advanced settings</string>
 

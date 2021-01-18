@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import io.timelimit.android.async.Threads
 import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.UserType
-import io.timelimit.android.integration.platform.getNetworkIdOrNull
 import io.timelimit.android.livedata.waitForNonNullValue
 import io.timelimit.android.logic.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
@@ -118,6 +117,8 @@ class NotificationListener: NotificationListenerService() {
                                                     BlockingReason.BatteryLimit -> getString(R.string.lock_reason_short_battery_limit)
                                                     BlockingReason.SessionDurationLimit -> getString(R.string.lock_reason_short_session_duration)
                                                     BlockingReason.MissingRequiredNetwork -> getString(R.string.lock_reason_short_missing_required_network)
+                                                    BlockingReason.MissingNetworkCheckPermission -> getString(R.string.lock_reason_short_missing_network_check_permission)
+                                                    BlockingReason.ForbiddenNetwork -> getString(R.string.lock_reason_short_forbidden_network)
                                                     BlockingReason.None -> throw IllegalStateException()
                                                 }
                                 )
@@ -168,7 +169,7 @@ class NotificationListener: NotificationListenerService() {
             } else if (appHandling is AppBaseHandling.UseCategories) {
                 val time = RealTime.newInstance()
                 val battery = appLogic.platformIntegration.getBatteryStatus()
-                val networkId = if (appHandling.needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId().getNetworkIdOrNull() else null
+                val networkId = if (appHandling.needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId() else null
                 val hasPremiumOrLocalMode = appLogic.fullVersion.shouldProvideFullVersionFunctions.waitForNonNullValue()
 
                 appLogic.realTimeLogic.getRealTime(time)

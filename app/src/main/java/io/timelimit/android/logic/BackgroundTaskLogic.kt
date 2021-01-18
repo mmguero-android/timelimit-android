@@ -32,9 +32,9 @@ import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.extensions.flattenToSet
 import io.timelimit.android.integration.platform.AppStatusMessage
+import io.timelimit.android.integration.platform.NetworkId
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.android.AccessibilityService
-import io.timelimit.android.integration.platform.getNetworkIdOrNull
 import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.blockingreason.AppBaseHandling
 import io.timelimit.android.logic.blockingreason.CategoryHandlingCache
@@ -316,7 +316,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }.flattenToSet()
 
                 val needsNetworkId = allAppsBaseHandlings.find { it.needsNetworkId() } != null
-                val networkId: String? = if (needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId().getNetworkIdOrNull() else null
+                val networkId: NetworkId? = if (needsNetworkId) appLogic.platformIntegration.getCurrentNetworkId() else null
 
                 fun reportStatusToCategoryHandlingCache(userRelatedData: UserRelatedData) {
                     categoryHandlingCache.reportStatus(

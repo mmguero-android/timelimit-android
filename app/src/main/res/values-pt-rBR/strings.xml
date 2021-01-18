@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+  TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation version 3 of the License.
@@ -616,6 +616,7 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
     <string name="manage_category_for_unassigned_apps_btn_disable">Pare de usar esta categoria para Aplicativos não atribuídos</string>
 
     <string name="category_networks_title">Redes</string>
+    <!--
     <string name="category_networks_help">Aqui você pode adicionar redes WiFi. Esta categoria será bloqueada
         se houver redes WiFi adicionadas e não houver conexão com uma rede específica.
         Uma rede é identificada por um ponto de acesso. No caso de múltiplos pontos de acesso/ repetidores,
@@ -628,6 +629,7 @@ Esta %s só é permitida em algumas redes, mas nenhuma conexão com tal rede foi
         <item quantity="one">%d rede</item>
         <item quantity="other">%d redes</item>
     </plurals>
+    -->
     <string name="category_networks_status_missing_permission">Falta a permissão para obter a rede conectada</string>
     <string name="category_networks_status_none_connected">Você não está conectado a nenhuma rede WiFi</string>
     <string name="category_networks_status_connected_no_match">Você está conectado a uma rede que não foi adicionada</string>

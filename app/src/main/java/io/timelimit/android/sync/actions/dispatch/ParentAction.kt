@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -146,7 +146,8 @@ object LocalDatabaseParentActionDispatcher {
                             minBatteryLevelWhileCharging = 0,
                             minBatteryLevelMobile = 0,
                             sort = sort,
-                            disableLimitsUntil = 0
+                            disableLimitsUntil = 0,
+                            flags = 0
                     ))
                 }
                 is DeleteCategoryAction -> {
@@ -845,6 +846,15 @@ object LocalDatabaseParentActionDispatcher {
                     } else {
                         database.childTasks().updateItemSync(task.copy(pendingRequest = false))
                     }
+                }
+                is UpdateCategoryFlagsAction -> {
+                    val category = database.category().getCategoryByIdSync(action.categoryId)!!
+
+                    database.category().updateCategorySync(
+                            category.copy(
+                                    flags = (category.flags and action.modifiedBits.inv()) or action.newValues
+                            )
+                    )
                 }
             }.let { }
         }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,9 @@ data class Category(
         val sort: Int,
         // 0 = time limits enabled
         @ColumnInfo(name = "disable_limits_until")
-        val disableLimitsUntil: Long
+        val disableLimitsUntil: Long,
+        @ColumnInfo(name = "flags", defaultValue = "0")
+        val flags: Long
 ): JsonSerializable {
     companion object {
         const val MINUTES_PER_DAY = 60 * 24
@@ -98,6 +100,7 @@ data class Category(
         private const val EXTRA_TIME_DAY = "extraTimeDay"
         private const val DISABLE_LIMIITS_UNTIL = "dlu"
         private const val TASKS_VERSION = "tv"
+        private const val FLAGS = "flags"
 
         fun parse(reader: JsonReader): Category {
             var id: String? = null
@@ -121,6 +124,7 @@ data class Category(
             var extraTimeDay = -1
             var disableLimitsUntil = 0L
             var tasksVersion = ""
+            var flags = 0L
 
             reader.beginObject()
 
@@ -146,6 +150,7 @@ data class Category(
                     EXTRA_TIME_DAY -> extraTimeDay = reader.nextInt()
                     DISABLE_LIMIITS_UNTIL -> disableLimitsUntil = reader.nextLong()
                     TASKS_VERSION -> tasksVersion = reader.nextString()
+                    FLAGS -> flags = reader.nextLong()
                     else -> reader.skipValue()
                 }
             }
@@ -172,7 +177,8 @@ data class Category(
                     minBatteryLevelMobile = minBatteryMobile,
                     sort = sort,
                     extraTimeDay = extraTimeDay,
-                    disableLimitsUntil = disableLimitsUntil
+                    disableLimitsUntil = disableLimitsUntil,
+                    flags = flags
             )
         }
     }
@@ -206,6 +212,8 @@ data class Category(
         }
     }
 
+    val hasBlockedNetworkList get() = flags and CategoryFlags.HAS_BLOCKED_NETWROK_LIST == CategoryFlags.HAS_BLOCKED_NETWROK_LIST
+
     override fun serialize(writer: JsonWriter) {
         writer.beginObject()
 
@@ -229,6 +237,7 @@ data class Category(
         writer.name(SORT).value(sort)
         writer.name(EXTRA_TIME_DAY).value(extraTimeDay)
         writer.name(DISABLE_LIMIITS_UNTIL).value(disableLimitsUntil)
+        writer.name(FLAGS).value(flags)
 
         writer.endObject()
     }
@@ -250,6 +259,11 @@ object CategoryTimeWarnings {
     )
 
     val durations = durationToBitIndex.keys
+}
+
+object CategoryFlags {
+    const val HAS_BLOCKED_NETWROK_LIST = 1L
+    const val ALL = HAS_BLOCKED_NETWROK_LIST
 }
 
 fun ImmutableBitmask.withConfigCopiedToOtherDates(sourceDay: Int, targetDays: Set<Int>): ImmutableBitmask {

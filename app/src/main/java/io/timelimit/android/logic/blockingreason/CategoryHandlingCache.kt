@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ package io.timelimit.android.logic.blockingreason
 
 import io.timelimit.android.data.model.derived.UserRelatedData
 import io.timelimit.android.integration.platform.BatteryStatus
+import io.timelimit.android.integration.platform.NetworkId
 
 class CategoryHandlingCache {
     private val cachedItems = mutableMapOf<String, CategoryItselfHandling>()
@@ -27,7 +28,7 @@ class CategoryHandlingCache {
     private var shouldTrustTimeTemporarily: Boolean = false
     private var timeInMillis: Long = 0
     private var assumeCurrentDevice: Boolean = false
-    private var currentNetworkId: String? = null
+    private var currentNetworkId: NetworkId? = null
     private var hasPremiumOrLocalMode: Boolean = false
 
     fun reportStatus(
@@ -36,7 +37,7 @@ class CategoryHandlingCache {
             shouldTrustTimeTemporarily: Boolean,
             timeInMillis: Long,
             assumeCurrentDevice: Boolean,
-            currentNetworkId: String?,
+            currentNetworkId: NetworkId?,
             hasPremiumOrLocalMode: Boolean
     ) {
         this.user = user

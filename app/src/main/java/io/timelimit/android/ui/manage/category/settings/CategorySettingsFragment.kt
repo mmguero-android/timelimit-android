@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,8 @@ class CategorySettingsFragment : Fragment() {
                 fragmentManager = parentFragmentManager,
                 fragment = this,
                 permissionRequestCode = PERMISSION_REQUEST_CODE,
-                categoryId = categoryId
+                categoryId = categoryId,
+                categoryLive = categoryEntry
         )
 
         binding.btnDeleteCategory.setOnClickListener { deleteCategory() }

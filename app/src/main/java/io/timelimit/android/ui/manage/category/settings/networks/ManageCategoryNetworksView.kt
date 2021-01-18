@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,13 @@ package io.timelimit.android.ui.manage.category.settings.networks
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import io.timelimit.android.R
 import io.timelimit.android.data.IdGenerator
+import io.timelimit.android.data.model.Category
+import io.timelimit.android.data.model.CategoryFlags
 import io.timelimit.android.data.model.CategoryNetworkId
 import io.timelimit.android.databinding.ManageCategoryNetworksViewBinding
 import io.timelimit.android.integration.platform.NetworkId
@@ -30,6 +33,7 @@ import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.sync.actions.AddCategoryNetworkId
 import io.timelimit.android.sync.actions.ResetCategoryNetworkIds
+import io.timelimit.android.sync.actions.UpdateCategoryFlagsAction
 import io.timelimit.android.ui.help.HelpDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
 import io.timelimit.android.ui.payment.RequiresPurchaseDialogFragment
@@ -42,7 +46,8 @@ object ManageCategoryNetworksView {
             fragmentManager: FragmentManager,
             categoryId: String,
             fragment: Fragment,
-            permissionRequestCode: Int
+            permissionRequestCode: Int,
+            categoryLive: LiveData<Category?>
     ) {
         fun networkId(): NetworkId = auth.logic.platformIntegration.getCurrentNetworkId()
 
@@ -68,10 +73,7 @@ object ManageCategoryNetworksView {
             view.addedNetworksText = if (networks.isEmpty())
                 context.getString(R.string.category_networks_empty)
             else
-                context.getString(
-                        R.string.category_networks_not_empty,
-                        context.resources.getQuantityString(R.plurals.category_networks_counter, networks.size, networks.size)
-                )
+                context.resources.getQuantityString(R.plurals.category_networks_not_empty, networks.size, networks.size)
 
             view.status = when (networkId) {
                 NetworkId.MissingPermission -> NetworkStatus.MissingPermission
@@ -142,6 +144,49 @@ object ManageCategoryNetworksView {
                 }
             }
         })
+
+
+        categoryLive.observe(lifecycleOwner) { category ->
+            view.networkModeGroup.setOnCheckedChangeListener(null)
+
+            if (category != null) {
+                view.networkModeGroup.check(
+                        if (category.hasBlockedNetworkList) R.id.network_mode_block else R.id.network_mode_allow
+                )
+
+                view.networkModeGroup.setOnCheckedChangeListener { _, id ->
+                    if (id == R.id.network_mode_block) {
+                        if (!category.hasBlockedNetworkList) {
+                            if (
+                                    !auth.tryDispatchParentAction(
+                                            UpdateCategoryFlagsAction(
+                                                    categoryId = categoryId,
+                                                    modifiedBits = CategoryFlags.HAS_BLOCKED_NETWROK_LIST,
+                                                    newValues = CategoryFlags.HAS_BLOCKED_NETWROK_LIST
+                                            )
+                                    )
+                            ) {
+                                view.networkModeGroup.check(R.id.network_mode_allow)
+                            }
+                        }
+                    } else if (id == R.id.network_mode_allow) {
+                        if (category.hasBlockedNetworkList) {
+                            if (
+                                    !auth.tryDispatchParentAction(
+                                            UpdateCategoryFlagsAction(
+                                                    categoryId = categoryId,
+                                                    modifiedBits = CategoryFlags.HAS_BLOCKED_NETWROK_LIST,
+                                                    newValues = 0
+                                            )
+                                    )
+                            ) {
+                                view.networkModeGroup.check(R.id.network_mode_block)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     enum class NetworkStatus {

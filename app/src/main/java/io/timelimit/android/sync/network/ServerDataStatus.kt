@@ -452,7 +452,8 @@ data class ServerUpdatedCategoryBaseData(
         val minBatteryLevelMobile: Int,
         val sort: Int,
         val networks: List<ServerCategoryNetworkId>,
-        val disableLimitsUntil: Long
+        val disableLimitsUntil: Long,
+        val flags: Long
 ) {
     companion object {
         private const val CATEGORY_ID = "categoryId"
@@ -472,6 +473,7 @@ data class ServerUpdatedCategoryBaseData(
         private const val SORT = "sort"
         private const val NETWORKS = "networks"
         private const val DISABLE_LIMITS_UNTIL = "dlu"
+        private const val FLAGS = "flags"
 
         fun parse(reader: JsonReader): ServerUpdatedCategoryBaseData {
             var categoryId: String? = null
@@ -492,6 +494,7 @@ data class ServerUpdatedCategoryBaseData(
             var sort = 0
             var networks: List<ServerCategoryNetworkId> = emptyList()
             var disableLimitsUntil = 0L
+            var flags = 0L
 
             reader.beginObject()
             while (reader.hasNext()) {
@@ -513,6 +516,7 @@ data class ServerUpdatedCategoryBaseData(
                     SORT -> sort = reader.nextInt()
                     NETWORKS -> networks = ServerCategoryNetworkId.parseList(reader)
                     DISABLE_LIMITS_UNTIL -> disableLimitsUntil = reader.nextLong()
+                    FLAGS -> flags = reader.nextLong()
                     else -> reader.skipValue()
                 }
             }
@@ -535,7 +539,8 @@ data class ServerUpdatedCategoryBaseData(
                     minBatteryLevelMobile = minBatteryLevelMobile,
                     sort = sort,
                     networks = networks,
-                    disableLimitsUntil = disableLimitsUntil
+                    disableLimitsUntil = disableLimitsUntil,
+                    flags = flags
             )
         }
 

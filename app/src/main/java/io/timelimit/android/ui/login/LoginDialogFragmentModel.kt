@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +67,8 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
             BlockingReason.BatteryLimit -> context.getString(R.string.lock_reason_short_battery_limit)
             BlockingReason.SessionDurationLimit -> context.getString(R.string.lock_reason_short_session_duration)
             BlockingReason.MissingRequiredNetwork -> context.getString(R.string.lock_reason_short_missing_required_network)
+            BlockingReason.MissingNetworkCheckPermission -> context.getString(R.string.lock_reason_short_missing_network_check_permission)
+            BlockingReason.ForbiddenNetwork -> context.getString(R.string.lock_reason_short_forbidden_network)
             BlockingReason.NotPartOfAnCategory -> "???"
             BlockingReason.None -> "???"
         }

@@ -23,6 +23,7 @@ import io.timelimit.android.date.DateInTimezone
 import io.timelimit.android.date.getMinuteOfWeek
 import io.timelimit.android.extensions.MinuteOfDay
 import io.timelimit.android.integration.platform.BatteryStatus
+import io.timelimit.android.integration.platform.NetworkId
 import io.timelimit.android.logic.BlockingReason
 import io.timelimit.android.logic.RemainingSessionDuration
 import io.timelimit.android.logic.RemainingTime
@@ -60,7 +61,7 @@ data class CategoryItselfHandling (
         val createdWithBatteryStatus: BatteryStatus,
         val createdWithTemporarilyTrustTime: Boolean,
         val createdWithAssumeCurrentDevice: Boolean,
-        val createdWithNetworkId: String?,
+        val createdWithNetworkId: NetworkId?,
         val createdWithHasPremiumOrLocalMode: Boolean,
         val createdWithExtraTime: Long
 ) {
@@ -72,7 +73,7 @@ data class CategoryItselfHandling (
                 shouldTrustTimeTemporarily: Boolean,
                 timeInMillis: Long,
                 assumeCurrentDevice: Boolean,
-                currentNetworkId: String?,
+                currentNetworkId: NetworkId?,
                 hasPremiumOrLocalMode: Boolean
         ): CategoryItselfHandling {
             val dependsOnMinTime = timeInMillis
@@ -99,12 +100,22 @@ data class CategoryItselfHandling (
             val dependsOnMaxTimeByTemporarilyDisabledLimits = if (areLimitsTemporarilyDisabled) disableLimitsUntil else Long.MAX_VALUE
 
             val dependsOnNetworkId = categoryRelatedData.networks.isNotEmpty()
-            val okByNetworkId = if (categoryRelatedData.networks.isEmpty() || areLimitsTemporarilyDisabled || !hasPremiumOrLocalMode)
+            val okByNetworkId = if (categoryRelatedData.networks.isEmpty() || areLimitsTemporarilyDisabled)
                 true
-            else if (currentNetworkId == null)
-                false
-            else
-                categoryRelatedData.networks.find { CategoryNetworkId.anonymizeNetworkId(itemId = it.networkItemId, networkId = currentNetworkId) == it.hashedNetworkId } != null
+            else if (categoryRelatedData.category.hasBlockedNetworkList) {
+                when (currentNetworkId) {
+                    is NetworkId.MissingPermission -> false
+                    is NetworkId.NoNetworkConnected -> true
+                    is NetworkId.Network -> {
+                        categoryRelatedData.networks.find { CategoryNetworkId.anonymizeNetworkId(itemId = it.networkItemId, networkId = currentNetworkId.id) == it.hashedNetworkId } == null
+                    }
+                    else -> false
+                }
+            } else /* has allowed network list */ {
+                if (currentNetworkId is NetworkId.Network) {
+                    categoryRelatedData.networks.find { CategoryNetworkId.anonymizeNetworkId(itemId = it.networkItemId, networkId = currentNetworkId.id) == it.hashedNetworkId } != null
+                } else false
+            }
 
             val allRelatedRules = if (areLimitsTemporarilyDisabled)
                 emptyList()
@@ -282,9 +293,14 @@ data class CategoryItselfHandling (
         BlockingReason.BatteryLimit
     else if (!okByTempBlocking)
         BlockingReason.TemporarilyBlocked
-    else if (!okByNetworkId)
-        BlockingReason.MissingRequiredNetwork
-    else if (!okByBlockedTimeAreas)
+    else if (!okByNetworkId) {
+        if (createdWithCategoryRelatedData.category.hasBlockedNetworkList) {
+            if (createdWithNetworkId is NetworkId.Network)
+                BlockingReason.ForbiddenNetwork
+            else
+                BlockingReason.MissingNetworkCheckPermission
+        } else BlockingReason.MissingRequiredNetwork
+    } else if (!okByBlockedTimeAreas)
         BlockingReason.BlockedAtThisTime
     else if (!okByTimeLimitRules)
         if (createdWithExtraTime > 0)
@@ -330,7 +346,7 @@ data class CategoryItselfHandling (
             shouldTrustTimeTemporarily: Boolean,
             timeInMillis: Long,
             assumeCurrentDevice: Boolean,
-            currentNetworkId: String?,
+            currentNetworkId: NetworkId?,
             hasPremiumOrLocalMode: Boolean
     ): Boolean {
         if (

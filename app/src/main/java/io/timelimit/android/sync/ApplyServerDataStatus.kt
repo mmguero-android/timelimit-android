@@ -333,7 +333,8 @@ object ApplyServerDataStatus {
                                     minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
                                     minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging,
                                     sort = newCategory.sort,
-                                    disableLimitsUntil = newCategory.disableLimitsUntil
+                                    disableLimitsUntil = newCategory.disableLimitsUntil,
+                                    flags = newCategory.flags
                             ))
                         } else {
                             val updatedCategory = oldCategory.copy(
@@ -351,7 +352,8 @@ object ApplyServerDataStatus {
                                     minBatteryLevelMobile = newCategory.minBatteryLevelMobile,
                                     minBatteryLevelWhileCharging = newCategory.minBatteryLevelCharging,
                                     sort = newCategory.sort,
-                                    disableLimitsUntil = newCategory.disableLimitsUntil
+                                    disableLimitsUntil = newCategory.disableLimitsUntil,
+                                    flags = newCategory.flags
                             )
 
                             if (updatedCategory != oldCategory) {

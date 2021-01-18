@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -844,6 +844,34 @@ data class UpdateCategoryBatteryLimit(val categoryId: String, val chargingLimit:
         writer.endObject()
     }
 }
+data class UpdateCategoryFlagsAction(val categoryId: String, val modifiedBits: Long, val newValues: Long): ParentAction() {
+    companion object {
+        private const val TYPE_VALUE = "UPDATE_CATEGORY_FLAGS"
+        private const val CATEGORY_ID = "categoryId"
+        private const val MODIFIED_BITS = "modified"
+        private const val NEW_VALUES = "values"
+    }
+
+    init {
+        IdGenerator.assertIdValid(categoryId)
+
+        if (modifiedBits or CategoryFlags.ALL != CategoryFlags.ALL || modifiedBits or newValues != modifiedBits) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    override fun serialize(writer: JsonWriter) {
+        writer.beginObject()
+
+        writer.name(TYPE).value(TYPE_VALUE)
+        writer.name(CATEGORY_ID).value(categoryId)
+        writer.name(MODIFIED_BITS).value(modifiedBits)
+        writer.name(NEW_VALUES).value(newValues)
+
+        writer.endObject()
+    }
+}
+
 data class UpdateCategorySortingAction(val categoryIds: List<String>): ParentAction() {
     companion object {
         private const val TYPE_VALUE = "UPDATE_CATEGORY_SORTING"
