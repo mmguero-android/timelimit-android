@@ -486,6 +486,7 @@
     <string name="diagnose_exf_bss">Splitscreen automatisch beenden per Bedienhilfe</string>
     <string name="diagnose_exf_hmw">Manipulationswarnung in der Kategorienliste ausblenden</string>
     <string name="diagnose_exf_esb">Overlay und Home-Button nicht zum Sperren verwenden</string>
+    <string name="diagnose_exf_srn">Toasts zur Synchronisation anzeigen</string>
 
     <string name="diagnose_bg_task_loop_ex">Hintergrundaufgabenschleifenfehler</string>
 

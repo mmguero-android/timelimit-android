@@ -202,6 +202,12 @@ data class DiagnoseExperimentalFlagItem(
                         enableFlags = ExperimentalFlags.ENABLE_SOFT_BLOCKING,
                         disableFlags = ExperimentalFlags.ENABLE_SOFT_BLOCKING,
                         enable = { true }
+                ),
+                DiagnoseExperimentalFlagItem(
+                        label = R.string.diagnose_exf_srn,
+                        enableFlags = ExperimentalFlags.SYNC_RELATED_NOTIFICATIONS,
+                        disableFlags = ExperimentalFlags.SYNC_RELATED_NOTIFICATIONS,
+                        enable = { true }
                 )
         )
     }

@@ -540,6 +540,7 @@
     <string name="diagnose_exf_bss">Automatically disable splitscreen using the accessibility service</string>
     <string name="diagnose_exf_hmw">Hide manipulation warning in the category list</string>
     <string name="diagnose_exf_esb">Do not use a overlay or the home button for blocking</string>
+    <string name="diagnose_exf_srn">Show sync related toasts</string>
 
     <string name="diagnose_bg_task_loop_ex">Background task loop exception</string>
 

@@ -153,6 +153,19 @@ class WebsocketClientLogic(
                                     } else {
                                         appLogic.syncUtil.requestUnimportantSync()
                                     }
+
+                                    runAsync {
+                                        val showNotification = appLogic.database.config().isExperimentalFlagsSetAsync(
+                                                ExperimentalFlags.SYNC_RELATED_NOTIFICATIONS
+                                        ).waitForNonNullValue()
+
+                                        if (showNotification) {
+                                            appLogic.platformIntegration.showOverlayMessage(
+                                                    if (important) "server sent important push"
+                                                    else "server sent not important push"
+                                            )
+                                        }
+                                    }
                                 }
 
                                 override fun onConnectionLost() {

@@ -203,6 +203,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
 
             val deviceRelatedData = deviceAndUSerRelatedData?.deviceRelatedData
             val userRelatedData = deviceAndUSerRelatedData?.userRelatedData
+            val showSyncRelatedNotifications = deviceAndUSerRelatedData?.deviceRelatedData?.isExperimentalFlagSetSync(ExperimentalFlags.SYNC_RELATED_NOTIFICATIONS) ?: false
 
             setShowNotificationToRevokeTemporarilyAllowedApps(deviceRelatedData?.temporarilyAllowedApps?.isNotEmpty() ?: false)
 
@@ -423,6 +424,16 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         }
                     }
 
+                    if (showSyncRelatedNotifications) {
+                        if (triggerSyncByTimeOver) {
+                            appLogic.platformIntegration.showOverlayMessage("trigger sync because the time is over")
+                        }
+
+                        if (triggerSyncByLimitLoginCategory) {
+                            appLogic.platformIntegration.showOverlayMessage("trigger sync by the limit login category")
+                        }
+                    }
+
                     val triggerSync = triggerSyncByLimitLoginCategory || triggerSyncByTimeOver
 
                     triggerSync
@@ -445,6 +456,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 if (triggerSync) {
                     if (BuildConfig.DEBUG) {
                         Log.d(LOG_TAG, "trigger sync")
+                    }
+
+                    if (showSyncRelatedNotifications) {
+                        appLogic.platformIntegration.showOverlayMessage("sync forced")
                     }
 
                     commitUsedTimeUpdaters()

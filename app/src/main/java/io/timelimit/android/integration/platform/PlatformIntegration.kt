@@ -41,7 +41,6 @@ abstract class PlatformIntegration(
     abstract fun isAccessibilityServiceEnabled(): Boolean
     abstract fun disableDeviceAdmin()
     abstract fun trySetLockScreenPassword(password: String): Boolean
-    // this must have a fallback if the permission is not granted
     abstract fun showOverlayMessage(text: String)
 
     abstract fun showAppLockScreen(currentPackageName: String, currentActivityName: String?)
