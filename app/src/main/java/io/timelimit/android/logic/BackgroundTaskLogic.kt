@@ -397,10 +397,10 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                         // check if limit login triggered
                         val triggerSyncByLimitLoginCategoryForThisCategory = userRelatedData.preBlockSwitchPoints.let { switchPoints ->
                             if (switchPoints.isEmpty()) false else {
-                                val newSessionDuration = handling.remainingSessionDuration?.let { it - timeToSubtractForCategory }
+                                val oldSessionDuration = handling.remainingSessionDuration?.let { it - timeToSubtractForCategory }
 
-                                val limitLoginBySessionDuration = if (newSessionDuration != null) {
-                                    val oldSessionDuration = newSessionDuration + timeToSubtract
+                                val limitLoginBySessionDuration = if (oldSessionDuration != null) {
+                                    val newSessionDuration = oldSessionDuration - timeToSubtract
 
                                     switchPoints.find { switchPoint -> oldSessionDuration >= switchPoint && newSessionDuration < switchPoint } != null
                                 } else false
