@@ -1,3 +1,4 @@
-- Benachrichtigungen bei der Erledigung von Aufgaben hinzugefügt
-- falsche Darstellung von Nutzungsdauern bei den Zeitbegrenzungsregeln bei bestimmten Konfigurationen behoben
-- Sperren im voraus für Anmeldeverhinderungskategorien hinzugefügt
+- Option zum Sperren von Kategorien in bestimmten Netzwerken hinzugefügt
+- Option zum Verschieben von Apps in andere Kategorien hinzugefügt
+- besseres Sperren von Musikwiedergaben
+- Auslösung von Synchronisationen überarbeitet
