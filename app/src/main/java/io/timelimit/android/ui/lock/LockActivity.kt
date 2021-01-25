@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,10 +89,6 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
         val adapter = LockActivityAdapter(supportFragmentManager, this)
 
         setContentView(R.layout.lock_activity)
-
-        if (savedInstanceState == null) {
-            stopMediaPlayback()
-        }
 
         syncModel.statusText.observe(this) { supportActionBar?.subtitle = it }
 
@@ -196,11 +192,6 @@ class LockActivity : AppCompatActivity(), ActivityViewModelHolder {
                 platformIntegration.setSuspendedApps(listOf(blockedPackageName), false)
             }
         }
-    }
-
-    private fun stopMediaPlayback() {
-        val platformIntegration = DefaultAppLogic.with(this).platformIntegration
-        platformIntegration.muteAudioIfPossible(blockedPackageName)
     }
 
     override fun onBackPressed() {

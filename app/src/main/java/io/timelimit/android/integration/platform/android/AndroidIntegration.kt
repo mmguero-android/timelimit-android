@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
+import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.os.Build
@@ -52,6 +54,8 @@ import io.timelimit.android.ui.manipulation.AnnoyActivity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.system.exitProcess
 
 
@@ -84,6 +88,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     private val overlay = OverlayUtil(context as Application)
     private val battery = BatteryStatusUtil(context)
     private val connectedNetwork = ConnectedNetworkUtil(context)
+    private val muteAudioMutex = Mutex()
 
     init {
         AppsChangeListener.registerBroadcastReceiver(this.context, object : BroadcastReceiver() {
@@ -151,11 +156,7 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
                 val manager = context.getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
                 val sessions = manager.getActiveSessions(ComponentName(context, NotificationListener::class.java))
 
-                return sessions.find {
-                    it.playbackState?.state == PlaybackState.STATE_PLAYING ||
-                            it.playbackState?.state == PlaybackState.STATE_FAST_FORWARDING ||
-                            it.playbackState?.state == PlaybackState.STATE_REWINDING
-                }?.packageName
+                return sessions.find { isPlaying(it) }?.packageName
             }
         }
 
@@ -270,24 +271,89 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
         AnnoyActivity.start(context, annoyDuration)
     }
 
-    override fun muteAudioIfPossible(packageName: String) {
+    override suspend fun muteAudioIfPossible(packageName: String): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (getNotificationAccessPermissionStatus() == NewPermissionStatus.Granted) {
-                val manager = context.getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
-                val sessions = manager.getActiveSessions(ComponentName(context, NotificationListener::class.java))
-                val sessionsOfTheApp = sessions.filter { it.packageName == packageName }
-                sessionsOfTheApp.forEach { session ->
-                    session.dispatchMediaButtonEvent(KeyEvent(
-                            KeyEvent.ACTION_DOWN,
-                            KeyEvent.KEYCODE_MEDIA_STOP
-                    ))
-                    session.dispatchMediaButtonEvent(KeyEvent(
-                            KeyEvent.ACTION_UP,
-                            KeyEvent.KEYCODE_MEDIA_STOP
-                    ))
+                muteAudioMutex.withLock {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "muteAudioIfPossible($packageName)")
+                    }
+
+                    val manager = context.getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
+
+                    fun getAppSessions(): List<MediaController> {
+                        return manager.getActiveSessions(ComponentName(context, NotificationListener::class.java))
+                                .filter { it.packageName == packageName }
+                    }
+
+                    fun dispatchKey(sessions: List<MediaController>, key: Int) {
+                        sessions.forEach {
+                            it.dispatchMediaButtonEvent(KeyEvent(
+                                    KeyEvent.ACTION_DOWN,
+                                    key
+                            ))
+                            it.dispatchMediaButtonEvent(KeyEvent(
+                                    KeyEvent.ACTION_UP,
+                                    key
+                            ))
+                        }
+                    }
+
+                    kotlin.run {
+                        val sessions = getAppSessions()
+
+                        if (sessions.find { isPlaying(it) } == null) return true
+
+                        if (BuildConfig.DEBUG) { Log.d(LOG_TAG, "try KEYCODE_MEDIA_STOP") }
+                        dispatchKey(sessions, KeyEvent.KEYCODE_MEDIA_STOP)
+                    }
+
+                    delay(100)
+
+                    kotlin.run {
+                        val sessions = getAppSessions()
+
+                        if (sessions.find { isPlaying(it) } == null) return true
+
+                        if (BuildConfig.DEBUG) { Log.d(LOG_TAG, "try KEYCODE_HEADSETHOOK") }
+                        dispatchKey(sessions, KeyEvent.KEYCODE_HEADSETHOOK)
+                    }
+
+                    delay(500)
+
+                    kotlin.run {
+                        val sessions = getAppSessions()
+
+                        if (sessions.find { isPlaying(it) } == null) return true
+
+                        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+                        val listener = AudioManager.OnAudioFocusChangeListener {/* ignored */}
+
+                        if (BuildConfig.DEBUG) { Log.d(LOG_TAG, "try audio focus") }
+                        if (
+                                audioManager.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+                                == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+                        ) {
+                            if (BuildConfig.DEBUG) { Log.d(LOG_TAG, "got audio focus") }
+                            delay(100)
+
+                            audioManager.abandonAudioFocus(listener)
+                        }
+                    }
+
+                    kotlin.run {
+                        val sessions = getAppSessions()
+
+                        if (sessions.find { isPlaying(it) } == null) return true
+                    }
+
+                    if (BuildConfig.DEBUG) { Log.d(LOG_TAG, "playback still running") }
                 }
             }
         }
+
+        return false
     }
 
     override fun setShowBlockingOverlay(show: Boolean, blockedElement: String?) {
@@ -535,4 +601,10 @@ class AndroidIntegration(context: Context): PlatformIntegration(maximumProtectio
     }
 
     override fun getCurrentNetworkId(): NetworkId = connectedNetwork.getNetworkId()
+
+    private fun isPlaying(session: MediaController): Boolean {
+        return session.playbackState?.state == PlaybackState.STATE_PLAYING ||
+                session.playbackState?.state == PlaybackState.STATE_FAST_FORWARDING ||
+                session.playbackState?.state == PlaybackState.STATE_REWINDING
+    }
 }

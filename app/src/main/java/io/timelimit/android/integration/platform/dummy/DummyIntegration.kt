@@ -98,8 +98,8 @@ class DummyIntegration(
         // ignore
     }
 
-    override fun muteAudioIfPossible(packageName: String) {
-        // ignore
+    override suspend fun muteAudioIfPossible(packageName: String): Boolean {
+        return false
     }
 
     override fun setShowBlockingOverlay(show: Boolean, blockedElement: String?) {

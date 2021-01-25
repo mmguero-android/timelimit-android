@@ -216,6 +216,8 @@
     <string name="background_logic_paused_text">No limitations apply</string>
 
     <string name="background_logic_toast_sync_apps">TimeLimit: Failure while trying to update the app list</string>
+    <string name="background_logic_toast_block_audio">TimeLimit: Music playback stopped</string>
+    <string name="background_logic_toast_block_audio_failed">TimeLimit: Failed to stop music playback</string>
 
     <string name="blocked_time_areas">
         Blocked time areas

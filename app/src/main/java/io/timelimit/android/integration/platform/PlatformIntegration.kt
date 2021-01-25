@@ -45,7 +45,8 @@ abstract class PlatformIntegration(
 
     abstract fun showAppLockScreen(currentPackageName: String, currentActivityName: String?)
     abstract fun showAnnoyScreen(annoyDuration: Long)
-    abstract fun muteAudioIfPossible(packageName: String)
+    // true = success
+    abstract suspend fun muteAudioIfPossible(packageName: String): Boolean
     abstract fun setShowBlockingOverlay(show: Boolean, blockedElement: String? = null)
     // this should throw an SecurityException if the permission is missing
     abstract suspend fun getForegroundApps(queryInterval: Long, enableMultiAppDetection: Boolean): Set<ForegroundApp>

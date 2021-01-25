@@ -119,6 +119,7 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
     private val usedTimeUpdateHelper = UsedTimeUpdateHelper(appLogic)
     private var previousMainLogicExecutionTime = 0
     private var previousMainLoopEndTime = 0L
+    private var previousAudioPlaybackBlock: Pair<Long, String>? = null
     private val dayChangeTracker = DayChangeTracker(
             timeApi = appLogic.timeApi,
             longDuration = 1000 * 60 * 10 /* 10 minutes */
@@ -703,7 +704,31 @@ class BackgroundTaskLogic(val appLogic: AppLogic) {
                 }
 
                 if (blockAudioPlayback && audioPlaybackPackageName != null) {
-                    appLogic.platformIntegration.muteAudioIfPossible(audioPlaybackPackageName)
+                    val currentAudioBlockUptime = appLogic.timeApi.getCurrentUptimeInMillis()
+                    val oldAudioPlaybackBlock = previousAudioPlaybackBlock
+                    val skipAudioBlock = oldAudioPlaybackBlock != null &&
+                            oldAudioPlaybackBlock.second == audioPlaybackPackageName &&
+                            oldAudioPlaybackBlock.first >= currentAudioBlockUptime
+
+                    if (!skipAudioBlock) {
+                        val newAudioPlaybackBlock = currentAudioBlockUptime + 1000 * 10 /* block for 10 seconds */ to audioPlaybackPackageName
+
+                        previousAudioPlaybackBlock = newAudioPlaybackBlock
+
+                        runAsync {
+                            if (appLogic.platformIntegration.muteAudioIfPossible(audioPlaybackPackageName)) {
+                                appLogic.platformIntegration.showOverlayMessage(appLogic.context.getString(R.string.background_logic_toast_block_audio))
+
+                                // allow blocking again
+                                // no locking needed because everything happens on the main thread
+                                if (previousAudioPlaybackBlock === newAudioPlaybackBlock) {
+                                    previousAudioPlaybackBlock = appLogic.timeApi.getCurrentUptimeInMillis() + 1000 * 1 /* block for 1 more second */ to audioPlaybackPackageName
+                                }
+                            } else {
+                                appLogic.platformIntegration.showOverlayMessage(appLogic.context.getString(R.string.background_logic_toast_block_audio_failed))
+                            }
+                        }
+                    }
                 }
             } catch (ex: SecurityException) {
                 // this is handled by an other main loop (with a delay)
