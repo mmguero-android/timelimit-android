@@ -154,7 +154,7 @@ android {
 
 dependencies {
     def nav_version = "2.2.1"
-    def room_version = "2.2.5"
+    def room_version = "2.2.6"
     def work_version = '2.3.4'
     def paging_version = "2.1.2"
 
