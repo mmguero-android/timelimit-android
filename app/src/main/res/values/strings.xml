@@ -1128,6 +1128,7 @@
 
     <string name="notification_manipulation_title">Manipulation at %s</string>
     <string name="notification_update_title">Update missing at %s</string>
+    <string name="notification_update_text">This Update is missing at an other device</string>
     <string name="notification_generic_text">Tap to open TimeLimit</string>
     <string name="notification_premium_expires_title">The premium version will expire soon</string>
     <string name="notification_premium_expires_text">It will not renew automatically</string>

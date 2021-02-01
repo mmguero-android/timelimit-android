@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ object NotificationAreaSync {
                     NotificationCompat.Builder(context, NotificationChannels.UPDATE_NOTIFICATION)
                             .setSmallIcon(R.drawable.ic_stat_timelapse)
                             .setContentTitle(context.getString(R.string.notification_update_title, getDeviceName(notification.id)))
-                            .setContentText(context.getString(R.string.notification_generic_text))
+                            .setContentText(context.getString(R.string.notification_update_text))
                             .setContentIntent(openAppIntent)
                             .setDeleteIntent(markReadIntent)
                             .setWhen(0)

@@ -1082,6 +1082,7 @@
 
     <string name="notification_manipulation_title">Manipulation bei %s</string>
     <string name="notification_update_title">Fehlendes Update bei %s</string>
+    <string name="notification_update_text">Das Update fehlt auf einem anderen Gerät</string>
     <string name="notification_generic_text">Tippen, um TimeLimit zu öffnen</string>
     <string name="notification_premium_expires_title">Die Vollversion wird bald ablaufen</string>
     <string name="notification_premium_expires_text">Es erfolgt keine automatische Verlängerung</string>
