@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -164,11 +164,11 @@ class OverviewFragmentModel(application: Application): AndroidViewModel(applicat
                             }
 
                             add(OverviewFragmentHeaderUsers)
+                            userEntries.forEach { if (it.user.type != UserType.Parent) add(it) }
                             if (itemVisibility.showParentUsers) {
-                                addAll(userEntries)
+                                userEntries.forEach { if (it.user.type == UserType.Parent) add(it) }
                                 add(OverviewFragmentActionAddUser)
                             } else {
-                                userEntries.forEach { if (it.user.type != UserType.Parent) add(it) }
                                 add(ShowMoreOverviewFragmentItem.ShowAllUsers)
                             }
                         }.toList()
