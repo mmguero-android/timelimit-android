@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ class LockReasonFragment: Fragment() {
                     BlockingLevel.Activity -> "Activity"
                     BlockingLevel.App -> "App"
                 }
+                binding.appCategoryTitle = if (content is LockscreenContent.Blocked.BlockedCategory) content.appCategoryTitle else null
             }
         }
 
