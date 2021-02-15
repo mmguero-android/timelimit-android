@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ import androidx.navigation.Navigation
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentUninstallBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.backdoor.BackdoorDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModel
@@ -61,7 +62,7 @@ class UninstallFragment : Fragment(), FragmentWithCustomTitle {
 
         binding.uninstall.setOnClickListener {
             if (BuildConfig.storeCompilant || auth.requestAuthenticationOrReturnTrue()) {
-                DefaultAppLogic.with(context!!).appSetupLogic.resetAppCompletely()
+                DefaultAppLogic.with(requireContext()).appSetupLogic.resetAppCompletely()
             } else {
                 showBackdoorButton = true
                 binding.showBackdoorButton = true
@@ -89,7 +90,7 @@ class UninstallFragment : Fragment(), FragmentWithCustomTitle {
                 fragment = this,
                 shouldHighlight = activity.getActivityViewModel().shouldHighlightAuthenticationButton,
                 authenticatedUser = activity.getActivityViewModel().authenticatedUser,
-                doesSupportAuth = liveDataFromValue(!BuildConfig.storeCompilant)
+                doesSupportAuth = liveDataFromNonNullValue(!BuildConfig.storeCompilant)
         )
 
         fab.setOnClickListener { activity.showAuthenticationScreen() }
@@ -101,5 +102,5 @@ class UninstallFragment : Fragment(), FragmentWithCustomTitle {
         outState.putBoolean(STATUS_SHOW_BACKDOOR_BUTTON, showBackdoorButton)
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue(getString(R.string.uninstall_reset_title))
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue(getString(R.string.uninstall_reset_title))
 }

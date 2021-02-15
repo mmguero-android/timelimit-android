@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import io.timelimit.android.R
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.NetworkTime
 import io.timelimit.android.databinding.ManageDeviceFeaturesFragmentBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
@@ -71,9 +71,9 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
     }
 
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
     private val auth: ActivityViewModel by lazy { activity.getActivityViewModel() }
-    private val args: ManageDeviceFeaturesFragmentArgs by lazy { ManageDeviceFeaturesFragmentArgs.fromBundle(arguments!!) }
+    private val args: ManageDeviceFeaturesFragmentArgs by lazy { ManageDeviceFeaturesFragmentArgs.fromBundle(requireArguments()) }
     private val deviceEntry: LiveData<Device?> by lazy {
         logic.database.device().getDeviceById(args.deviceId)
     }
@@ -88,7 +88,7 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 shouldHighlight = auth.shouldHighlightAuthenticationButton,
                 authenticatedUser = auth.authenticatedUser,
                 fragment = this,
-                doesSupportAuth = liveDataFromValue(true)
+                doesSupportAuth = liveDataFromNonNullValue(true)
         )
 
         // handlers
@@ -144,7 +144,7 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 lifecycleOwner = this,
                 deviceEntry = deviceEntry,
                 auth = auth,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         // activity level blocking
@@ -153,7 +153,7 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 auth = auth,
                 deviceEntry = deviceEntry,
                 lifecycleOwner = this,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         // send connected
@@ -162,7 +162,7 @@ class ManageDeviceFeaturesFragment : Fragment(), FragmentWithCustomTitle {
                 deviceEntry = deviceEntry,
                 auth = auth,
                 lifecycleOwner = this,
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
 

@@ -46,7 +46,7 @@ class WebsocketClientLogic(
         if (enabled == true) {
             val okForCurrentUser = appLogic.deviceUserEntry.switchMap {
                 if (it?.type == UserType.Child) {
-                    liveDataFromValue(true)
+                    liveDataFromNonNullValue(true)
                 } else {
                     IsAppInForeground.isRunning
                 }
@@ -61,7 +61,7 @@ class WebsocketClientLogic(
 
             okForCurrentUser.and(okFromNetworkStatus).and(okFromScreenStatus)
         } else {
-            liveDataFromValue(false)
+            liveDataFromNonNullValue(false)
         }
     }
 
@@ -70,7 +70,7 @@ class WebsocketClientLogic(
         if (shouldConnect) {
             appLogic.database.config().getDeviceAuthTokenAsync()
         } else {
-            liveDataFromValue("")
+            liveDataFromNonNullValue("")
         }
     }
 

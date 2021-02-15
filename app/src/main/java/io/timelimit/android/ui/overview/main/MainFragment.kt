@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,7 @@ import io.timelimit.android.coroutines.executeAndWait
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.extensions.safeNavigate
-import io.timelimit.android.livedata.liveDataFromValue
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
-import io.timelimit.android.livedata.waitForNullableValue
+import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.fragment.SingleFragmentWrapper
@@ -44,7 +41,7 @@ import io.timelimit.android.ui.overview.overview.OverviewFragment
 import io.timelimit.android.ui.overview.overview.OverviewFragmentParentHandlers
 
 class MainFragment : SingleFragmentWrapper(), OverviewFragmentParentHandlers, AboutFragmentParentHandlers, FragmentWithCustomTitle {
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
     private var didRedirectToUserScreen = false
     override val showAuthButton: Boolean = true
 
@@ -63,7 +60,7 @@ class MainFragment : SingleFragmentWrapper(), OverviewFragmentParentHandlers, Ab
             if (isInitialized) {
                 logic.database.config().getOwnDeviceId().map { it == null }
             } else {
-                liveDataFromValue(false)
+                liveDataFromNonNullValue(false)
             }
         }.observe(viewLifecycleOwner, Observer { shouldShowSetup ->
             if (shouldShowSetup == true) {
@@ -101,7 +98,7 @@ class MainFragment : SingleFragmentWrapper(), OverviewFragmentParentHandlers, Ab
 
                         if (user != null) {
                             if (isAdded && !parentFragmentManager.isStateSaved) {
-                                ObsoleteDialogFragment.show(getActivity()!!, false)
+                                ObsoleteDialogFragment.show(requireActivity(), false)
                             }
                         }
                     }
@@ -172,7 +169,7 @@ class MainFragment : SingleFragmentWrapper(), OverviewFragmentParentHandlers, Ab
         )
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.main_tab_overview)} (${getString(R.string.app_name)})")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.main_tab_overview)} (${getString(R.string.app_name)})")
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)

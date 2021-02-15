@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import io.timelimit.android.R
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
@@ -43,7 +43,7 @@ class SyncStatusModel(application: Application): AndroidViewModel(application) {
 
                     isNormalSyncPending.switchMap { normalSyncPending ->
                         if (normalSyncPending) {
-                            liveDataFromValue(application.getString(R.string.sync_status_not_synced, base))
+                            liveDataFromNullableValue(application.getString(R.string.sync_status_not_synced, base))
                         } else {
                             isUnimportantSyncPending.map { unimportantSyncPending ->
                                 if (unimportantSyncPending) {
@@ -67,7 +67,7 @@ class SyncStatusModel(application: Application): AndroidViewModel(application) {
                 }
             } as LiveData<String?>
         } else {
-            liveDataFromValue(null as String?)
+            liveDataFromNullableValue(null as String?)
         }
     }
 

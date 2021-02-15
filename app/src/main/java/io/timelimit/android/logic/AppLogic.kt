@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class AppLogic(
 
     val deviceEntry = Transformations.switchMap<String?, Device?> (deviceId) {
         if (it == null) {
-            liveDataFromValue(null)
+            liveDataFromNullableValue(null)
         } else {
             database.device().getDeviceById(it)
         }
@@ -56,7 +56,7 @@ class AppLogic(
 
     val deviceEntryIfEnabled = enable.switchMap {
         if (it == null || it == false) {
-            liveDataFromValue(null as Device?)
+            liveDataFromNullableValue(null as Device?)
         } else {
             deviceEntry
         }
@@ -66,7 +66,7 @@ class AppLogic(
 
     val deviceUserEntry = deviceUserId.switchMap {
         if (it == "") {
-            liveDataFromValue(null as User?)
+            liveDataFromNullableValue(null as User?)
         } else {
             database.user().getUserByIdLive(it)
         }

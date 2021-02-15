@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,7 @@ package io.timelimit.android.logic
 import io.timelimit.android.data.model.Device
 import io.timelimit.android.data.model.derived.DeviceRelatedData
 import io.timelimit.android.data.model.derived.UserRelatedData
-import io.timelimit.android.livedata.liveDataFromValue
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
+import io.timelimit.android.livedata.*
 
 class CurrentDeviceLogic(private val appLogic: AppLogic) {
     companion object {
@@ -43,7 +41,7 @@ class CurrentDeviceLogic(private val appLogic: AppLogic) {
 
     private val userDeviceEntries = appLogic.deviceUserId.switchMap { deviceUserId ->
         if (deviceUserId == "") {
-            liveDataFromValue(emptyList())
+            liveDataFromNonNullValue(emptyList())
         } else {
             appLogic.database.device().getDevicesByUserId(deviceUserId)
         }
@@ -57,7 +55,7 @@ class CurrentDeviceLogic(private val appLogic: AppLogic) {
 
     val otherAssignedDevice = appLogic.deviceUserEntry.switchMap { userEntry ->
         if (userEntry?.currentDevice == null) {
-            liveDataFromValue(null as Device?)
+            liveDataFromNullableValue(null as Device?)
         } else {
             otherUserDeviceEntries.map { otherDeviceEntries ->
                 otherDeviceEntries.find { it.id == userEntry.currentDevice }

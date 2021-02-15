@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.User
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.AppLogic
@@ -75,7 +75,7 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
                 }
             }
         } else {
-            liveDataFromValue(null as User?)
+            liveDataFromNullableValue(null as User?)
         }
     }.ignoreUnchanged()
 
@@ -87,7 +87,7 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
 
     val authenticatedUserOrChild: LiveData<Pair<ApplyActionParentAuthentication, User>?> = userWhichIsKeptSignedIn.switchMap { signedInUser ->
         if (signedInUser != null) {
-            liveDataFromValue(
+            liveDataFromNullableValue(
                     (ApplyActionParentDeviceAuthentication to signedInUser)
                             as Pair<ApplyActionParentAuthentication, User>?
             )
@@ -102,7 +102,7 @@ class ActivityViewModel(application: Application): AndroidViewModel(application)
                         if (it == null || it.password != authenticatedUser.firstPasswordHash) {
                             authenticatedChild
                         } else {
-                            liveDataFromValue(
+                            liveDataFromNullableValue(
                                     (ApplyActionParentPasswordAuthentication(
                                             parentUserId = authenticatedUser.userId,
                                             secondPasswordHash = authenticatedUser.secondPasswordHash

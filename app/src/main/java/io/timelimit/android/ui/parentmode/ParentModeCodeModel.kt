@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import io.timelimit.android.barcode.DataMatrix
 import io.timelimit.android.crypto.Curve25519
 import io.timelimit.android.data.Database
 import io.timelimit.android.livedata.liveDataFromFunction
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import java.nio.ByteBuffer
@@ -55,7 +55,7 @@ class ParentModeCodeModel: ViewModel() {
 
         barcodeContent = parentKey.switchMap { parentKey ->
             if (parentKey == null) {
-                liveDataFromValue(null as BarcodeMask?)
+                liveDataFromNullableValue(null as BarcodeMask?)
             } else {
                 val privateKey = Curve25519.getPrivateKey(parentKey)
                 val publicKey = Curve25519.getPublicKey(parentKey)

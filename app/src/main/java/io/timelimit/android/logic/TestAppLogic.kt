@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import io.timelimit.android.data.RoomDatabase
 import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.dummy.DummyIntegration
 import io.timelimit.android.integration.time.DummyTimeApi
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.sync.network.api.DummyServerApi
 import io.timelimit.android.sync.websocket.DummyWebsocketClient
 import io.timelimit.android.sync.websocket.NetworkStatus
@@ -42,6 +42,6 @@ class TestAppLogic(maximumProtectionLevel: ProtectionLevel, context: Context) {
             networkStatus = object: NetworkStatusInterface { override val status = networkStatus; override fun forceRefresh() {} },
             websocketClientCreator = DummyWebsocketClient.creator,
             context = context,
-            isInitialized = liveDataFromValue(true)
+            isInitialized = liveDataFromNonNullValue(true)
     )
 }

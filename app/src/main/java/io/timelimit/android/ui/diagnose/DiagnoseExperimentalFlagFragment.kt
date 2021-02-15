@@ -31,7 +31,8 @@ import io.timelimit.android.data.model.ExperimentalFlags
 import io.timelimit.android.databinding.DiagnoseExperimentalFlagFragmentBinding
 import io.timelimit.android.databinding.DiagnoseExperimentalFlagItemBinding
 import io.timelimit.android.integration.platform.android.foregroundapp.LollipopForegroundAppHelper
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.homescreen.ConfigureHomescreenDelayDialogFragment
 import io.timelimit.android.ui.main.ActivityViewModelHolder
@@ -41,7 +42,7 @@ import io.timelimit.android.ui.main.FragmentWithCustomTitle
 class DiagnoseExperimentalFlagFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val activity: ActivityViewModelHolder = activity as ActivityViewModelHolder
-        val database = DefaultAppLogic.with(context!!).database
+        val database = DefaultAppLogic.with(requireContext()).database
         val auth = activity.getActivityViewModel()
 
         val binding = DiagnoseExperimentalFlagFragmentBinding.inflate(inflater, container, false)
@@ -50,7 +51,7 @@ class DiagnoseExperimentalFlagFragment : Fragment(), FragmentWithCustomTitle {
                 fab = binding.fab,
                 shouldHighlight = auth.shouldHighlightAuthenticationButton,
                 authenticatedUser = auth.authenticatedUser,
-                doesSupportAuth = liveDataFromValue(true),
+                doesSupportAuth = liveDataFromNonNullValue(true),
                 fragment = this
         )
 
@@ -102,7 +103,7 @@ class DiagnoseExperimentalFlagFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_exf_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.diagnose_exf_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }
 
 data class DiagnoseExperimentalFlagItem(

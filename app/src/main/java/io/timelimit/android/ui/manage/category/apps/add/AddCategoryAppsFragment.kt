@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,10 +39,7 @@ import io.timelimit.android.data.model.App
 import io.timelimit.android.data.model.UserType
 import io.timelimit.android.databinding.FragmentAddCategoryAppsBinding
 import io.timelimit.android.extensions.showSafe
-import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromValue
-import io.timelimit.android.livedata.map
-import io.timelimit.android.livedata.switchMap
+import io.timelimit.android.livedata.*
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.logic.DummyApps
 import io.timelimit.android.sync.actions.AddCategoryAppsAction
@@ -69,8 +66,8 @@ class AddCategoryAppsFragment : DialogFragment() {
         }
     }
 
-    private val database: Database by lazy { DefaultAppLogic.with(context!!).database }
-    private val auth: ActivityViewModel by lazy { getActivityViewModel(activity!!) }
+    private val database: Database by lazy { DefaultAppLogic.with(requireContext()).database }
+    private val auth: ActivityViewModel by lazy { getActivityViewModel(requireActivity()) }
     private val adapter = AddAppAdapter()
     private var didEducateAboutAddingAssignedApps = false
 
@@ -92,9 +89,9 @@ class AddCategoryAppsFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = FragmentAddCategoryAppsBinding.inflate(LayoutInflater.from(context))
-        val childId = arguments!!.getString(PARAM_CHILD_ID)!!
-        val categoryId = arguments!!.getString(PARAM_CATEGORY_ID)!!
-        val childAddLimitMode = arguments!!.getBoolean(PARAM_CHILD_ADD_LIMIT_MODE)
+        val childId = requireArguments().getString(PARAM_CHILD_ID)!!
+        val categoryId = requireArguments().getString(PARAM_CATEGORY_ID)!!
+        val childAddLimitMode = requireArguments().getBoolean(PARAM_CHILD_ADD_LIMIT_MODE)
 
         auth.authenticatedUserOrChild.observe(this, Observer {
             val parentAuthValid = it?.second?.type == UserType.Parent
@@ -113,7 +110,7 @@ class AddCategoryAppsFragment : DialogFragment() {
         }
         val realShowAppsFromAllDevices = isLocalMode.switchMap { localMode ->
             if (localMode) {
-                liveDataFromValue(true)
+                liveDataFromNonNullValue(true)
             } else {
                 showAppsFromOtherDevicesChecked
             }
@@ -196,7 +193,7 @@ class AddCategoryAppsFragment : DialogFragment() {
         }.switchMap { apps ->
             showAppsFromOtherCategories.switchMap { showOtherCategeories ->
                 if (showOtherCategeories) {
-                    liveDataFromValue(apps)
+                    liveDataFromNonNullValue(apps)
                 } else {
                     packageNamesAssignedToOtherCategories.map { packagesFromOtherCategories ->
                         apps.filterNot { packagesFromOtherCategories.contains(it.packageName) }
@@ -210,19 +207,19 @@ class AddCategoryAppsFragment : DialogFragment() {
         val emptyViewText: LiveData<String?> = listItems.switchMap { items ->
             if (items.isNotEmpty()) {
                 // list is not empty ...
-                liveDataFromValue(null as String?)
+                liveDataFromNullableValue(null as String?)
             } else /* items.isEmpty() */ {
                 shownApps.switchMap { shownApps ->
                     if (shownApps.isNotEmpty()) {
-                        liveDataFromValue(getString(R.string.category_apps_add_empty_due_to_filter) as String?)
+                        liveDataFromNullableValue(getString(R.string.category_apps_add_empty_due_to_filter) as String?)
                     } else /* if (shownApps.isEmpty()) */ {
                         installedApps.switchMap { installedApps ->
                             if (installedApps.isNotEmpty()) {
-                                liveDataFromValue(getString(R.string.category_apps_add_empty_due_to_child_mode) as String?)
+                                liveDataFromNullableValue(getString(R.string.category_apps_add_empty_due_to_child_mode) as String?)
                             } else /* if (installedApps.isEmpty()) */ {
                                 isLocalMode.switchMap { isLocalMode ->
                                     if (isLocalMode) {
-                                        liveDataFromValue(getString(R.string.category_apps_add_empty_local_mode) as String?)
+                                        liveDataFromNullableValue(getString(R.string.category_apps_add_empty_local_mode) as String?)
                                     } else {
                                         showAppsFromOtherDevicesChecked.switchMap { showAppsFromOtherDevicesChecked ->
                                             if (showAppsFromOtherDevicesChecked) {
@@ -349,7 +346,7 @@ class AddCategoryAppsFragment : DialogFragment() {
             }
         }
 
-        return AlertDialog.Builder(context!!, R.style.AppTheme)
+        return AlertDialog.Builder(requireContext(), R.style.AppTheme)
                 .setView(binding.root)
                 .create()
     }

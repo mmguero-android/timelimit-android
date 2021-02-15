@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import androidx.navigation.Navigation
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseMainBinding
 import io.timelimit.android.extensions.safeNavigate
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
@@ -34,7 +34,7 @@ class DiagnoseMainFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentDiagnoseMainBinding.inflate(inflater, container, false)
         val navigation = Navigation.findNavController(container!!)
-        val logic = DefaultAppLogic.with(context!!)
+        val logic = DefaultAppLogic.with(requireContext())
 
         binding.diagnoseClockButton.setOnClickListener {
             navigation.safeNavigate(
@@ -82,7 +82,7 @@ class DiagnoseMainFragment : Fragment(), FragmentWithCustomTitle {
             if (ex != null) {
                 binding.diagnoseBgTaskLoopExButton.isEnabled = true
                 binding.diagnoseBgTaskLoopExButton.setOnClickListener {
-                    DiagnoseExceptionDialogFragment.newInstance(ex).show(fragmentManager!!)
+                    DiagnoseExceptionDialogFragment.newInstance(ex).show(parentFragmentManager)
                 }
             } else {
                 binding.diagnoseBgTaskLoopExButton.isEnabled = false
@@ -92,5 +92,5 @@ class DiagnoseMainFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

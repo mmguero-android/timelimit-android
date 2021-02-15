@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class EditTaskModel(application: Application): AndroidViewModel(application) {
     private val isBusyInternal = MutableLiveData<Boolean>().apply { value = true }
     private val shouldCloseInternal = MutableLiveData<Boolean>().apply { value = false }
     private val isMissingTask = taskIdLive.switchMap { taskId ->
-        if (taskId == null) liveDataFromValue(false)
+        if (taskId == null) liveDataFromNonNullValue(false)
         else logic.database.childTasks().getTaskByTaskIdLive(taskId).map { it == null}
     }
     val categoryIdLive = MutableLiveData<String?>()
@@ -55,7 +55,7 @@ class EditTaskModel(application: Application): AndroidViewModel(application) {
             if (categoryId != null)
                 logic.database.category().getCategoryByChildIdAndId(childId = childId, categoryId = categoryId)
             else
-                liveDataFromValue(null)
+                liveDataFromNullableValue(null)
         }
     }
 

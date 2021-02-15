@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,15 @@ package io.timelimit.android.livedata
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 
-fun <T> liveDataFromValue(value: T): LiveData<T> {
+fun <T: Any> liveDataFromNonNullValue(value: T): LiveData<T> {
     val result = MediatorLiveData<T>()
+    result.value = value
+
+    return result
+}
+
+fun <T> liveDataFromNullableValue(value: T): LiveData<T?> {
+    val result = MediatorLiveData<T?>()
     result.value = value
 
     return result

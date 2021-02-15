@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import androidx.navigation.Navigation
 import com.jaredrummler.android.device.DeviceName
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentSetupParentModeBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
@@ -45,16 +45,16 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
             mailAuthToken ->
 
             if (mailAuthToken == null) {
-                liveDataFromValue(1)   // show login screen
+                liveDataFromNonNullValue(1)   // show login screen
             } else {
                 // show form or loading indicator or error screen
                 model.statusOfMailAddress.switchMap {
                     status ->
 
                     if (status == null) {
-                        liveDataFromValue(2)    // loading screen
+                        liveDataFromNonNullValue(2)    // loading screen
                     } else if (status.status == StatusOfMailAddress.MailAddressWithoutFamily && status.canCreateFamily == false) {
-                        liveDataFromValue(3)    // signup disabled screen
+                        liveDataFromNonNullValue(3)    // signup disabled screen
                     } else {
                         model.isDoingSetup.map {
                             if (it!!) {
@@ -85,10 +85,10 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
         // TODO: require that an device name and an parent name are set
         val isInputValid = model.statusOfMailAddress.switchMap {
             if (it == null) {
-                liveDataFromValue(false)
+                liveDataFromNonNullValue(false)
             } else {
                 when (it.status) {
-                    StatusOfMailAddress.MailAddressWithFamily -> liveDataFromValue(true)
+                    StatusOfMailAddress.MailAddressWithFamily -> liveDataFromNonNullValue(true)
                     StatusOfMailAddress.MailAddressWithoutFamily -> binding.password.passwordOk
                 }
             }
@@ -139,7 +139,7 @@ class SetupParentModeFragment : Fragment(), AuthenticateByMailFragmentListener {
         UpdateConsentCard.bind(
                 view = binding.update,
                 lifecycleOwner = viewLifecycleOwner,
-                database = DefaultAppLogic.with(context!!).database
+                database = DefaultAppLogic.with(requireContext()).database
         )
 
         return binding.root

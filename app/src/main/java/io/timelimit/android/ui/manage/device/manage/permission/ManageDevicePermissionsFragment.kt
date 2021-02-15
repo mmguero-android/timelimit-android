@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import io.timelimit.android.integration.platform.ProtectionLevel
 import io.timelimit.android.integration.platform.RuntimePermissionStatus
 import io.timelimit.android.integration.platform.android.AdminReceiver
 import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
@@ -84,9 +84,9 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
     }
 
     private val activity: ActivityViewModelHolder by lazy { getActivity() as ActivityViewModelHolder }
-    private val logic: AppLogic by lazy { DefaultAppLogic.with(context!!) }
+    private val logic: AppLogic by lazy { DefaultAppLogic.with(requireContext()) }
     private val auth: ActivityViewModel by lazy { activity.getActivityViewModel() }
-    private val args: ManageDevicePermissionsFragmentArgs by lazy { ManageDevicePermissionsFragmentArgs.fromBundle(arguments!!) }
+    private val args: ManageDevicePermissionsFragmentArgs by lazy { ManageDevicePermissionsFragmentArgs.fromBundle(requireArguments()) }
     private val deviceEntry: LiveData<Device?> by lazy {
         logic.database.device().getDeviceById(args.deviceId)
     }
@@ -101,7 +101,7 @@ class ManageDevicePermissionsFragment : Fragment(), FragmentWithCustomTitle {
                 shouldHighlight = auth.shouldHighlightAuthenticationButton,
                 authenticatedUser = auth.authenticatedUser,
                 fragment = this,
-                doesSupportAuth = liveDataFromValue(true)
+                doesSupportAuth = liveDataFromNonNullValue(true)
         )
 
         auth.authenticatedUser.map { it?.second?.type == UserType.Parent }.observe(this, Observer {

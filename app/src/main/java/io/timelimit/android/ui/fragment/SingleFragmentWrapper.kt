@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import io.timelimit.android.R
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.ui.main.ActivityViewModelHolder
 import io.timelimit.android.ui.main.AuthenticationFab
 import kotlinx.android.synthetic.main.single_fragment_wrapper.*
@@ -48,7 +48,7 @@ abstract class SingleFragmentWrapper: Fragment() {
                 fragment = this,
                 shouldHighlight = activity.getActivityViewModel().shouldHighlightAuthenticationButton,
                 authenticatedUser = activity.getActivityViewModel().authenticatedUser,
-                doesSupportAuth = liveDataFromValue(showAuthButton)
+                doesSupportAuth = liveDataFromNonNullValue(showAuthButton)
         )
 
         fab.setOnClickListener { activity.showAuthenticationScreen() }

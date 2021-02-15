@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,16 +43,16 @@ class AuthenticateByMailModel(application: Application): AndroidViewModel(applic
         if (userId != null) {
             logic.database.user().getParentUserByIdLive(userId)
         } else {
-            liveDataFromValue(null as User?)
+            liveDataFromNullableValue(null as User?)
         }
     }.map { it?.mail ?: "" }
     val screenToShow = isBusyInternal.switchMap { isBusy ->
         if (isBusy) {
-            liveDataFromValue(ScreenToShow.Working)
+            liveDataFromNonNullValue(ScreenToShow.Working)
         } else {
             mailAddressToWhichCodeWasSentInternal.switchMap { receiverMail ->
                 if (receiverMail != null) {
-                    liveDataFromValue(ScreenToShow.EnterReceivedCode)
+                    liveDataFromNonNullValue(ScreenToShow.EnterReceivedCode)
                 } else {
                     forcedMailAddress.map { forcedMailAddress ->
                         if (forcedMailAddress.isEmpty()) {

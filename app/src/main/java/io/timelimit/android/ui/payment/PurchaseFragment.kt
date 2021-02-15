@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentPurchaseBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
@@ -126,7 +126,7 @@ class PurchaseFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.about_full_version)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.about_full_version)} < ${getString(R.string.main_tab_overview)}")
 }
 
 interface PurchaseFragmentHandlers {

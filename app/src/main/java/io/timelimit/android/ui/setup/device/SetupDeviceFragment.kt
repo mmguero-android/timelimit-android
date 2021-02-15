@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,9 +70,7 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
         if (savedInstanceState != null) {
             val oldSelectedUser = savedInstanceState.getString(STATUS_SELECTED_USER)
 
-            if (oldSelectedUser != null) {
-                selectedUser.value = oldSelectedUser
-            }
+            oldSelectedUser?.let { selectedUser.value = it }
 
             selectedAppsToNotWhitelist.clear()
             selectedAppsToNotWhitelist.addAll(
@@ -93,7 +91,7 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentSetupDeviceBinding.inflate(inflater, container, false)
-        val logic = DefaultAppLogic.with(context!!)
+        val logic = DefaultAppLogic.with(requireContext())
         val activity = activity as ActivityViewModelHolder
         val model = ViewModelProviders.of(this).get(SetupDeviceModel::class.java)
         val navigation = Navigation.findNavController(container!!)
@@ -173,9 +171,9 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
         val isNewUser = selectedUser.map { NEW_USER.contains(it) }
         val isParentUser = selectedUser.switchMap {
             if (it == NEW_CHILD) {
-                liveDataFromValue(false)
+                liveDataFromNonNullValue(false)
             } else if (it == NEW_PARENT) {
-                liveDataFromValue(true)
+                liveDataFromNonNullValue(true)
             } else {
                 logic.database.user().getUserByIdLive(it).map {user ->
                     user?.type == UserType.Parent
@@ -188,7 +186,7 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
 
         val categoriesOfTheSelectedUser = selectedUser.switchMap { user ->
             if (NEW_USER.contains(user)) {
-                liveDataFromValue(emptyList())
+                liveDataFromNonNullValue(emptyList())
             } else {
                 logic.database.category().getCategoriesByChildId(user)
             }
@@ -249,7 +247,7 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
                 binding.areThereAnyCategories = true
 
                 val views = items.map { (id, label) ->
-                    AppCompatRadioButton(context!!).apply {
+                    AppCompatRadioButton(requireContext()).apply {
                         text = label
                         tag = id
                         setOnClickListener { allowedAppsCategory = id }
@@ -289,10 +287,10 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
 
         ManageDeviceBackgroundSync.bind(
                 view = binding.backgroundSync,
-                isThisDevice = liveDataFromValue(true),
+                isThisDevice = liveDataFromNonNullValue(true),
                 lifecycleOwner = this,
                 activityViewModel = activity.getActivityViewModel(),
-                fragmentManager = fragmentManager!!
+                fragmentManager = parentFragmentManager
         )
 
         binding.confirmBtn.setOnClickListener {
@@ -308,7 +306,7 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
             )
         }
 
-        SetupNetworkTimeVerification.prepareHelpButton(binding.networkTimeVerification, fragmentManager!!)
+        SetupNetworkTimeVerification.prepareHelpButton(binding.networkTimeVerification, parentFragmentManager)
 
         UpdateConsentCard.bind(
                 view = binding.update,
@@ -319,5 +317,5 @@ class SetupDeviceFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.overview_finish_setup_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.overview_finish_setup_title)} < ${getString(R.string.main_tab_overview)}")
 }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.DiagnoseForegroundAppFragmentBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.ActivityViewModelHolder
@@ -52,7 +53,7 @@ class DiagnoseForegroundAppFragment : Fragment(), FragmentWithCustomTitle {
         val activity: ActivityViewModelHolder = activity as ActivityViewModelHolder
         val binding = DiagnoseForegroundAppFragmentBinding.inflate(inflater, container, false)
         val auth = activity.getActivityViewModel()
-        val logic = DefaultAppLogic.with(context!!)
+        val logic = DefaultAppLogic.with(requireContext())
         val currentValue = logic.database.config().getForegroundAppQueryIntervalAsync()
         val currentId = currentValue.map {
             val res = buttonIntervals.indexOf(it.toInt())
@@ -67,22 +68,22 @@ class DiagnoseForegroundAppFragment : Fragment(), FragmentWithCustomTitle {
                 fab = binding.fab,
                 shouldHighlight = auth.shouldHighlightAuthenticationButton,
                 authenticatedUser = auth.authenticatedUser,
-                doesSupportAuth = liveDataFromValue(true),
+                doesSupportAuth = liveDataFromNonNullValue(true),
                 fragment = this
         )
 
         binding.fab.setOnClickListener { activity.showAuthenticationScreen() }
 
         val allButtons = buttonIntervals.mapIndexed { index, interval ->
-            RadioButton(context!!).apply {
+            RadioButton(requireContext()).apply {
                 id = index
 
                 if (interval == 0) {
                     setText(R.string.diagnose_fga_query_range_min)
                 } else if (interval < 60 * 1000) {
-                    text = TimeTextUtil.seconds(interval / 1000, context!!)
+                    text = TimeTextUtil.seconds(interval / 1000, requireContext())
                 } else {
-                    text = TimeTextUtil.time(interval, context!!)
+                    text = TimeTextUtil.time(interval, requireContext())
                 }
             }
         }
@@ -112,5 +113,5 @@ class DiagnoseForegroundAppFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_fga_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.diagnose_fga_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.databinding.DiagnoseBatteryFragmentBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
 class DiagnoseBatteryFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DiagnoseBatteryFragmentBinding.inflate(inflater, container, false)
-        val logic = DefaultAppLogic.with(context!!)
+        val logic = DefaultAppLogic.with(requireContext())
 
         logic.platformIntegration.getBatteryStatusLive().observe(this, Observer {
             binding.charging = it.charging
@@ -41,5 +41,5 @@ class DiagnoseBatteryFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_bat_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.diagnose_bat_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

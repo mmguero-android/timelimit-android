@@ -81,7 +81,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
         if (selectedUserId != null)
             logic.database.derivedDataDao().getUserLoginRelatedDataLive(selectedUserId)
         else
-            liveDataFromValue(null as CompleteUserLoginRelatedData?)
+            liveDataFromNullableValue(null as CompleteUserLoginRelatedData?)
     }
     private val isCheckingPassword = MutableLiveData<Boolean>().apply { value = false }
     private val wasPasswordWrong = MutableLiveData<Boolean>().apply { value = false }
@@ -92,7 +92,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
 
     val status: LiveData<LoginDialogStatus> = isLoginDone.switchMap { isLoginDone ->
         if (isLoginDone) {
-            liveDataFromValue(LoginDialogDone as LoginDialogStatus)
+            liveDataFromNonNullValue(LoginDialogDone as LoginDialogStatus)
         } else {
             selectedUser.switchMap { selectedUserInfo ->
                 val selectedUser = selectedUserInfo?.loginRelatedData?.user
@@ -119,9 +119,9 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                             } else if (
                                     (status is AllowUserLoginStatus.ForbidByCategory && status.blockingReason == BlockingReason.MissingNetworkTime)
                             ) {
-                                liveDataFromValue(ParentUserLoginMissingTrustedTime as LoginDialogStatus)
+                                liveDataFromNonNullValue(ParentUserLoginMissingTrustedTime as LoginDialogStatus)
                             } else if (status is AllowUserLoginStatus.ForbidByCategory) {
-                                liveDataFromValue(
+                                liveDataFromNonNullValue(
                                         ParentUserLoginBlockedByCategory(
                                                 categoryTitle = status.categoryTitle,
                                                 reason = status.blockingReason
@@ -138,7 +138,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                     }
                                 }
 
-                                liveDataFromValue(ParentUserLoginWaitingForSync as LoginDialogStatus)
+                                liveDataFromNonNullValue(ParentUserLoginWaitingForSync as LoginDialogStatus)
                             } else {
                                 loginScreen
                             }
@@ -149,12 +149,12 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
 
                         if (hasPremium) {
                             if (selectedUser.password.isEmpty()) {
-                                liveDataFromValue(CanNotSignInChildHasNoPassword(childName = selectedUser.name) as LoginDialogStatus)
+                                liveDataFromNonNullValue(CanNotSignInChildHasNoPassword(childName = selectedUser.name) as LoginDialogStatus)
                             } else {
                                 val isAlreadyCurrentUser = selectedUserInfo.deviceRelatedData.deviceEntry.currentUserId == selectedUser.id
 
                                 if (isAlreadyCurrentUser) {
-                                    liveDataFromValue(ChildAlreadyDeviceUser as LoginDialogStatus)
+                                    liveDataFromNonNullValue(ChildAlreadyDeviceUser as LoginDialogStatus)
                                 } else {
                                     isCheckingPassword.switchMap { isCheckingPassword ->
                                         wasPasswordWrong.map { wasPasswordWrong ->
@@ -167,7 +167,7 @@ class LoginDialogFragmentModel(application: Application): AndroidViewModel(appli
                                 }
                             }
                         } else {
-                            liveDataFromValue(ChildLoginRequiresPremiumStatus as LoginDialogStatus)
+                            liveDataFromNonNullValue(ChildLoginRequiresPremiumStatus as LoginDialogStatus)
                         }
                     }
                     null -> {

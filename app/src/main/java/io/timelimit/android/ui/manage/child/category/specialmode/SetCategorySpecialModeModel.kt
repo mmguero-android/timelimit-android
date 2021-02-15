@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.R
 import io.timelimit.android.livedata.liveDataFromFunction
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
@@ -53,15 +53,15 @@ class SetCategorySpecialModeModel(application: Application): AndroidViewModel(ap
     }
 
     private val selfLimitAddModeMinTimestamp = userRelatedData.switchMap { data ->
-        if (data == null) liveDataFromValue(Long.MAX_VALUE) else {
+        if (data == null) liveDataFromNonNullValue(Long.MAX_VALUE) else {
             val (userRelatedData, categoryId) = data
             val category = userRelatedData.categoryById.get(categoryId)
 
             if (category == null)
-                liveDataFromValue(Long.MAX_VALUE)
+                liveDataFromNonNullValue(Long.MAX_VALUE)
             else if (category.category.temporarilyBlocked) {
                 if (category.category.temporarilyBlockedEndTime == 0L)
-                    liveDataFromValue(Long.MAX_VALUE)
+                    liveDataFromNonNullValue(Long.MAX_VALUE)
                 else
                     nowLive.map { now -> now.coerceAtLeast(category.category.temporarilyBlockedEndTime) }
             } else nowLive

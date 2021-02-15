@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.R
 import io.timelimit.android.data.model.App
 import io.timelimit.android.livedata.ignoreUnchanged
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
@@ -39,7 +39,7 @@ class ChildAppsModel(application: Application): AndroidViewModel(application) {
     val isLocalMode = database.config().getDeviceAuthTokenAsync().map { it.isEmpty() }
     private val realShowAppsFromAllDevices = isLocalMode.switchMap { localMode ->
         if (localMode) {
-            liveDataFromValue(true)
+            liveDataFromNonNullValue(true)
         } else {
             showAppsFromOtherDevicesChecked
         }

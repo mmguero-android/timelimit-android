@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
 import io.timelimit.android.databinding.DiagnoseSyncFragmentBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.switchMap
 import io.timelimit.android.logic.DefaultAppLogic
@@ -39,11 +39,11 @@ import io.timelimit.android.ui.main.FragmentWithCustomTitle
 class DiagnoseSyncFragment : Fragment(), FragmentWithCustomTitle {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DiagnoseSyncFragmentBinding.inflate(inflater, container, false)
-        val logic = DefaultAppLogic.with(context!!)
+        val logic = DefaultAppLogic.with(requireContext())
         val adapter = PendingSyncActionAdapter()
         val sync = logic.syncUtil
 
-        binding.recycler.layoutManager = LinearLayoutManager(context!!)
+        binding.recycler.layoutManager = LinearLayoutManager(requireContext())
         binding.recycler.adapter = adapter
 
         LivePagedListBuilder(logic.database.pendingSyncAction().getAllPendingSyncActionsPaged(), 10)
@@ -58,13 +58,13 @@ class DiagnoseSyncFragment : Fragment(), FragmentWithCustomTitle {
                 UploadActionsUtil.deleteAllVersionNumbersSync(logic.database)
             }
 
-            Toast.makeText(context!!, R.string.diagnose_sync_btn_clear_cache_toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.diagnose_sync_btn_clear_cache_toast, Toast.LENGTH_SHORT).show()
         }
 
         binding.requestSyncBtn.setOnClickListener {
             sync.requestImportantSync(true)
 
-            Toast.makeText(context!!, R.string.diagnose_sync_btn_request_sync_toast, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.diagnose_sync_btn_request_sync_toast, Toast.LENGTH_SHORT).show()
         }
 
         sync.isSyncing.switchMap { a ->
@@ -83,12 +83,12 @@ class DiagnoseSyncFragment : Fragment(), FragmentWithCustomTitle {
 
         binding.showExceptionBtn.setOnClickListener {
             sync.lastSyncException.value?.let { ex ->
-                DiagnoseExceptionDialogFragment.newInstance(ex).show(fragmentManager!!)
+                DiagnoseExceptionDialogFragment.newInstance(ex).show(parentFragmentManager)
             }
         }
 
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_sync_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.diagnose_sync_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

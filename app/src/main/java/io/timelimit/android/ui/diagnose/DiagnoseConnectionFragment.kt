@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentDiagnoseConnectionBinding
 import io.timelimit.android.integration.platform.NetworkId
 import io.timelimit.android.livedata.liveDataFromFunction
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.websocket.NetworkStatus
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
@@ -90,5 +90,5 @@ class DiagnoseConnectionFragment : Fragment(), FragmentWithCustomTitle {
         return binding.root
     }
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue("${getString(R.string.diagnose_connection_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.diagnose_connection_title)} < ${getString(R.string.about_diagnose_title)} < ${getString(R.string.main_tab_overview)}")
 }

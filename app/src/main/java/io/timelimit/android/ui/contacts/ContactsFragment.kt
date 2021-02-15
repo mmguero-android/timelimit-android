@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,8 @@ import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.model.AllowedContact
 import io.timelimit.android.databinding.ContactsFragmentBinding
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
+import io.timelimit.android.livedata.liveDataFromNullableValue
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.main.ActivityViewModel
@@ -64,7 +65,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
     private val auth: ActivityViewModel by lazy { activityModelHolder.getActivityViewModel() }
     private var numberToCallWithPermission: String? = null
 
-    override fun getCustomTitle(): LiveData<String?> = liveDataFromValue(getString(R.string.contacts_title_long))
+    override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue(getString(R.string.contacts_title_long))
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = ContactsFragmentBinding.inflate(inflater, container, false)
@@ -75,7 +76,7 @@ class ContactsFragment : Fragment(), FragmentWithCustomTitle {
                 fragment = this,
                 shouldHighlight = activityModelHolder.getActivityViewModel().shouldHighlightAuthenticationButton,
                 authenticatedUser = activityModelHolder.getActivityViewModel().authenticatedUser,
-                doesSupportAuth = liveDataFromValue(true)
+                doesSupportAuth = liveDataFromNonNullValue(true)
         )
 
         binding.fab.setOnClickListener { activityModelHolder.showAuthenticationScreen() }

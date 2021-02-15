@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import io.timelimit.android.R
 import io.timelimit.android.data.model.User
 import io.timelimit.android.databinding.FragmentManageParentBinding
 import io.timelimit.android.extensions.safeNavigate
-import io.timelimit.android.livedata.liveDataFromValue
+import io.timelimit.android.livedata.liveDataFromNonNullValue
 import io.timelimit.android.livedata.map
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
@@ -56,7 +56,7 @@ class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
         AuthenticationFab.manageAuthenticationFab(
                 fab = binding.fab,
                 fragment = this,
-                doesSupportAuth = liveDataFromValue(true),
+                doesSupportAuth = liveDataFromNonNullValue(true),
                 authenticatedUser = activity.getActivityViewModel().authenticatedUser,
                 shouldHighlight = activity.getActivityViewModel().shouldHighlightAuthenticationButton
         )
@@ -112,7 +112,7 @@ class ManageParentFragment : Fragment(), FragmentWithCustomTitle {
                 view = binding.timezone,
                 userId = params.parentId,
                 lifecycleOwner = this,
-                fragmentManager = fragmentManager!!,
+                fragmentManager = parentFragmentManager,
                 auth = activity.getActivityViewModel(),
                 userEntry = parentUser
         )
