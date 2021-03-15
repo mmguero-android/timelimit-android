@@ -1,1 +1,6 @@
-- Anzeigen der blockierten Kategorie auf dem Sperrbildschirm hinzugefügt
+- Anpassung an neue In-App-API (nur in der Version im Play Store)
+- Fehlerbehebungen
+  - Abstürze beim Bearbeiten von Zeitbegrenzungsregeln
+  - Abstürze im Texteingabedialog
+  - Abstürze durch das Widget
+- Abhängigkeiten aktualisiert

@@ -1,1 +1,6 @@
-- added showing the title of the blocked category at the lockscreen
+- adjustments for new in app API (only in the play store builds)
+- bug fixes
+  - crashes in the time limit rule editor
+  - crashes in the text input dialog
+  - crashes in the widget
+- updated dependencies
