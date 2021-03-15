@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,24 +30,28 @@ import io.timelimit.android.databinding.EditTextBottomSheetDialogBinding
 
 abstract class EditTextBottomSheetDialog: DialogFragment() {
     private val inputMethodManager: InputMethodManager by lazy {
-        context!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     lateinit var binding: EditTextBottomSheetDialogBinding
 
-    override fun onCreateDialog(savedInstanceState: Bundle?) = BottomSheetDialog(context!!, theme).apply {
+    override fun onCreateDialog(savedInstanceState: Bundle?) = BottomSheetDialog(requireContext(), theme).apply {
         setOnShowListener {
             Threads.mainThreadHandler.post {
-                binding.editText.requestFocus()
-                inputMethodManager.showSoftInput(binding.editText, 0)
+                if (isAdded) {
+                    binding.editText.requestFocus()
+                    inputMethodManager.showSoftInput(binding.editText, 0)
+                }
             }
         }
     }
 
     fun didInitField() {
-        binding.editText.setSelection(binding.editText.text.length)
-        binding.editText.requestFocus()
-        inputMethodManager.showSoftInput(binding.editText, 0)
+        if (isAdded) {
+            binding.editText.setSelection(binding.editText.text.length)
+            binding.editText.requestFocus()
+            inputMethodManager.showSoftInput(binding.editText, 0)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
