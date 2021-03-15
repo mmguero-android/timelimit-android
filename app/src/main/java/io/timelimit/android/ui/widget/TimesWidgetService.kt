@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,10 @@ class TimesWidgetService: RemoteViewsService() {
         override fun getCount(): Int = categoriesCurrent.size
 
         override fun getViewAt(position: Int): RemoteViews {
+            if (position >= categoriesCurrent.size) {
+                return RemoteViews(packageName, R.layout.widget_times_item)
+            }
+
             val category = categoriesCurrent[position]
             val result = RemoteViews(packageName, R.layout.widget_times_item)
 
@@ -97,6 +101,10 @@ class TimesWidgetService: RemoteViewsService() {
         }
 
         override fun getItemId(position: Int): Long {
+            if (position >= categoriesCurrent.size) {
+                return -(position.toLong())
+            }
+
             return categoriesCurrent[position].hashCode().toLong()
         }
 
