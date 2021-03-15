@@ -20,9 +20,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
 import io.timelimit.android.databinding.StayAwesomeFragmentBinding
 import io.timelimit.android.databinding.StayAwesomeFragmentItemBinding
@@ -31,13 +31,11 @@ import io.timelimit.android.ui.MainActivity
 import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
 class StayAwesomeFragment : Fragment(), FragmentWithCustomTitle {
-    val model: StayAwesomeModel by lazy {
-        ViewModelProviders.of(this).get(StayAwesomeModel::class.java)
-    }
+    private val model: StayAwesomeModel by viewModels()
+    private val activityModel get() = (activity as MainActivity).purchaseModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = StayAwesomeFragmentBinding.inflate(inflater, container, false)
-        val activityModel = (activity as MainActivity).purchaseModel
 
         model.status.observe(viewLifecycleOwner, Observer { status ->
             when (status!!) {
@@ -62,7 +60,7 @@ class StayAwesomeFragment : Fragment(), FragmentWithCustomTitle {
 
                         if (!item.bought) {
                             view.card.setOnClickListener {
-                                activityModel.startPurchase(item.id, checkAtBackend = false)
+                                activityModel.startPurchase(item.id, checkAtBackend = false, requireActivity())
                             }
                         }
 
@@ -82,7 +80,7 @@ class StayAwesomeFragment : Fragment(), FragmentWithCustomTitle {
     override fun onResume() {
         super.onResume()
 
-        model.load()
+        model.load(activityModel)
     }
 
     override fun getCustomTitle(): LiveData<String?> = liveDataFromNullableValue("${getString(R.string.about_sal)} < ${getString(R.string.main_tab_overview)}")

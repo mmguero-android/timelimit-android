@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +20,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.extensions.getSkusAsync
-import io.timelimit.android.extensions.loadAsync
-import io.timelimit.android.extensions.startAsync
 import io.timelimit.android.livedata.castDown
-import org.solovyev.android.checkout.Checkout
-import org.solovyev.android.checkout.Inventory
-import org.solovyev.android.checkout.ProductTypes
 
 class StayAwesomeModel(application: Application): AndroidViewModel(application) {
-    private val application: io.timelimit.android.Application by lazy { application as io.timelimit.android.Application }
     private val statusInternal = MutableLiveData<StayAwesomeStatus>()
-
     val status = statusInternal.castDown()
 
-    fun load() {
+    fun load(activityPurchaseModel: ActivityPurchaseModel) {
         runAsync {
             statusInternal.value = LoadingStayAwesomeStatus
 
@@ -44,40 +36,26 @@ class StayAwesomeModel(application: Application): AndroidViewModel(application) 
                 return@runAsync
             }
 
-            val checkout = Checkout.forApplication(application.billing)
+            try {
+                val skus = activityPurchaseModel.querySkus(PurchaseIds.SAL_SKUS)
+                val purchases = activityPurchaseModel.queryPurchases()
 
-            checkout.startAsync().use {
-                if (!it.billingSupported) {
-                    statusInternal.value = NotSupportedByDeviceStayAwesomeStatus
-                } else {
-                    val skus = it.requests.getSkusAsync(
-                            ProductTypes.IN_APP,
-                            PurchaseIds.SLA_SKUS
-                    )
+                statusInternal.value = ReadyStayAwesomeStatus(
+                        PurchaseIds.SAL_SKUS.map { skuId ->
+                            val sku = skus.find { it.sku == skuId }
 
-                    val inventory = checkout.makeInventory()
-                    val products = inventory.loadAsync(Inventory.Request.create().loadAllPurchases())
-                    val purchasedSkus = products[ProductTypes.IN_APP].purchases.map { it.sku }.toSet()
-
-                    statusInternal.value = ReadyStayAwesomeStatus(
-                            PurchaseIds.SLA_SKUS.map { skuId ->
-                                val sku = skus.getSku(skuId)
-
-                                StayAwesomeItem(
-                                        id = skuId,
-                                        title = sku?.description ?: skuId,
-                                        price = sku?.price ?: "???",
-                                        bought = purchasedSkus.contains(skuId)
-                                )
-                            }
-                    )
-                }
+                            StayAwesomeItem(
+                                    id = skuId,
+                                    title = sku?.description ?: skuId,
+                                    price = sku?.price ?: "???",
+                                    bought = purchases.find { it.sku == skuId } != null
+                            )
+                        }
+                )
+            } catch (ex: Exception) {
+                statusInternal.value = NotSupportedByDeviceStayAwesomeStatus
             }
         }
-    }
-
-    init {
-        load()
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,5 +20,5 @@ object PurchaseIds {
     const val SKU_MONTH = "premium_month_2018"
 
     val BUY_SKUS = listOf(SKU_YEAR, SKU_MONTH)
-    val SLA_SKUS = listOf("sal100", "sal500", "sal1000", "sal2000")
+    val SAL_SKUS = listOf("sal100", "sal500", "sal1000", "sal2000")
 }

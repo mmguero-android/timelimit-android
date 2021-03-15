@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@ package io.timelimit.android
 
 import android.app.Application
 import com.jakewharton.threetenabp.AndroidThreeTen
-import org.solovyev.android.checkout.Billing
 
 class Application : Application() {
     override fun onCreate() {
@@ -25,8 +24,4 @@ class Application : Application() {
 
         AndroidThreeTen.init(this)
     }
-
-    val billing = Billing(this, object: Billing.DefaultConfiguration() {
-        override fun getPublicKey() = BuildConfig.googlePlayKey
-    })
 }

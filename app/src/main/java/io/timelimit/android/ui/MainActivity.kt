@@ -18,6 +18,7 @@ package io.timelimit.android.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -30,6 +31,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.timelimit.android.Application
 import io.timelimit.android.R
+import io.timelimit.android.coroutines.runAsync
 import io.timelimit.android.data.IdGenerator
 import io.timelimit.android.extensions.showSafe
 import io.timelimit.android.livedata.ignoreUnchanged
@@ -50,8 +52,6 @@ import io.timelimit.android.ui.payment.ActivityPurchaseModel
 import io.timelimit.android.ui.setup.SetupTermsFragment
 import io.timelimit.android.ui.setup.parent.SetupParentModeFragment
 import io.timelimit.android.ui.util.SyncStatusModel
-import org.solovyev.android.checkout.ActivityCheckout
-import org.solovyev.android.checkout.Checkout
 
 class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
     companion object {
@@ -62,15 +62,10 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
 
     private val currentNavigatorFragment = MutableLiveData<Fragment?>()
     private val application: Application by lazy { getApplication() as Application }
-    private val checkout: ActivityCheckout by lazy { Checkout.forActivity(this, application.billing) }
     private val syncModel: SyncStatusModel by lazy {
         ViewModelProviders.of(this).get(SyncStatusModel::class.java)
     }
-    val purchaseModel: ActivityPurchaseModel by lazy {
-        ViewModelProviders.of(this).get(ActivityPurchaseModel::class.java).apply {
-            setActivityCheckout(checkout)
-        }
-    }
+    val purchaseModel: ActivityPurchaseModel by viewModels()
     override var ignoreStop: Boolean = false
     override val showPasswordRecovery: Boolean = true
 
@@ -236,12 +231,6 @@ class MainActivity : AppCompatActivity(), ActivityViewModelHolder {
                         .intents
                         .first()
         )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        checkout.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun getActivityViewModel(): ActivityViewModel {

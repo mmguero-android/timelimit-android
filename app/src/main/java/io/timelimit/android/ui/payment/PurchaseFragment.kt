@@ -20,9 +20,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import io.timelimit.android.R
 import io.timelimit.android.databinding.FragmentPurchaseBinding
 import io.timelimit.android.livedata.liveDataFromNullableValue
@@ -32,9 +32,7 @@ import io.timelimit.android.ui.main.FragmentWithCustomTitle
 
 class PurchaseFragment : Fragment(), FragmentWithCustomTitle {
     private val activityModel: ActivityPurchaseModel by lazy { (activity as MainActivity).purchaseModel }
-    private val model: PurchaseModel by lazy {
-        ViewModelProviders.of(this).get(PurchaseModel::class.java)
-    }
+    private val model: PurchaseModel by viewModels()
 
     companion object {
         private const val PAGE_BUY = 0
@@ -49,37 +47,39 @@ class PurchaseFragment : Fragment(), FragmentWithCustomTitle {
         if (savedInstanceState == null) {
             activityModel.resetProcessPurchaseSuccess()
         }
+
+        model.retry(activityModel)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentPurchaseBinding.inflate(inflater, container, false)
         var processingPurchaseError = false
 
-        mergeLiveData(activityModel.status, model.status).observe(this, Observer {
+        mergeLiveData(activityModel.status, model.status).observe(viewLifecycleOwner, {
             status ->
 
             val (activityStatus, fragmentStatus) = status!!
 
-            if (activityStatus != ActivityPurchaseModelStatus.Idle) {
-                when (activityStatus) {
-                    null -> binding.flipper.displayedChild = PAGE_WAIT
-                    ActivityPurchaseModelStatus.Working -> binding.flipper.displayedChild = PAGE_WAIT
-                    ActivityPurchaseModelStatus.Idle -> throw IllegalStateException()
-                    ActivityPurchaseModelStatus.Error -> {
-                        binding.flipper.displayedChild = PAGE_ERROR
-
-                        binding.errorReason = getString(R.string.error_general)
-                        binding.showRetryButton = true
-                        processingPurchaseError = true
-                    }
-                    ActivityPurchaseModelStatus.Done -> binding.flipper.displayedChild = PAGE_DONE
-                }.let {  }
-            } else if (fragmentStatus != null) {
+            if (fragmentStatus != null) {
                 when (fragmentStatus) {
                     PurchaseFragmentPreparing -> binding.flipper.displayedChild = PAGE_WAIT
                     is PurchaseFragmentReady -> {
-                        binding.flipper.displayedChild = PAGE_BUY
-                        binding.priceData = fragmentStatus
+                        when (activityStatus) {
+                            null -> binding.flipper.displayedChild = PAGE_WAIT
+                            ActivityPurchaseModelStatus.Working -> binding.flipper.displayedChild = PAGE_WAIT
+                            ActivityPurchaseModelStatus.Idle -> {
+                                binding.flipper.displayedChild = PAGE_BUY
+                                binding.priceData = fragmentStatus
+                            }
+                            ActivityPurchaseModelStatus.Error -> {
+                                binding.flipper.displayedChild = PAGE_ERROR
+
+                                binding.errorReason = getString(R.string.error_general)
+                                binding.showRetryButton = true
+                                processingPurchaseError = true
+                            }
+                            ActivityPurchaseModelStatus.Done -> binding.flipper.displayedChild = PAGE_DONE
+                        }.let {  }
                     }
                     is PurchaseFragmentError -> {
                         binding.flipper.displayedChild = PAGE_ERROR
@@ -110,16 +110,16 @@ class PurchaseFragment : Fragment(), FragmentWithCustomTitle {
                 if (processingPurchaseError) {
                     activityModel.queryAndProcessPurchasesAsync()
                 } else {
-                    model.retry()
+                    model.retry(activityModel)
                 }
             }
 
             override fun buyForOneMonth() {
-                activityModel.startPurchase(PurchaseIds.SKU_MONTH, checkAtBackend = true)
+                activityModel.startPurchase(PurchaseIds.SKU_MONTH, checkAtBackend = true, activity = requireActivity())
             }
 
             override fun buyForOneYear() {
-                activityModel.startPurchase(PurchaseIds.SKU_YEAR, checkAtBackend = true)
+                activityModel.startPurchase(PurchaseIds.SKU_YEAR, checkAtBackend = true, activity = requireActivity())
             }
         }
 

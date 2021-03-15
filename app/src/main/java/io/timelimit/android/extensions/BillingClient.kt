@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,23 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package io.timelimit.android.extensions
 
-package org.solovyev.android.checkout
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingResult
+import java.lang.RuntimeException
 
-import android.content.Intent
-
-object ActivityCheckout: Checkout() {
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        // do nothing
+fun BillingResult.assertSuccess() {
+    if (this.responseCode != BillingClient.BillingResponseCode.OK) {
+        throw BillingClientException("error during processing billing request: ${this.debugMessage}")
     }
-
-    fun start() {
-        // do nothing
-    }
-
-    fun createPurchaseFlow(listener: RequestListener<Purchase>) {
-        // do nothing
-    }
-
-    val purchaseFlow = PurchaseFlow
 }
+
+open class BillingClientException(message: String): RuntimeException(message)
+class BillingNotSupportedException(): BillingClientException("billing not supported")

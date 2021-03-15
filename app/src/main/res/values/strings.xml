@@ -92,8 +92,8 @@
         (<a href="https://github.com/KeepSafe/TapTargetView/blob/master/LICENSE">Apache License, Version 2.0</a>
         \n<a href="https://github.com/google/flexbox-layout">Flexbox Layout</a>
         (<a href="https://github.com/google/flexbox-layout/blob/master/LICENSE">Apache License, Version 2.0</a>)
-        \n<a href="https://github.com/serso/android-checkout">Checkout</a>
-        (<a href="https://github.com/serso/android-checkout/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
+        \nGoogle Play Billing Library (only in builds in the Play Store)
+        (<a href="https://developer.android.com/google/play/billing/release-notes"> Android Software Development Kit License Agreement</a>)
         \n<a href="https://github.com/square/okhttp">OkHttp</a>
         (<a href="https://github.com/square/okhttp/blob/master/LICENSE.txt">Apache License, Version 2.0</a>)
         \n<a href="https://github.com/socketio/socket.io-client-java">Socket.io-Java-Client</a>

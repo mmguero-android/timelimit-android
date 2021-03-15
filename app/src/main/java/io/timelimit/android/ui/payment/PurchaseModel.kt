@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,36 +21,28 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.extensions.getSkusAsync
-import io.timelimit.android.extensions.startAsync
+import io.timelimit.android.extensions.BillingNotSupportedException
 import io.timelimit.android.livedata.castDown
 import io.timelimit.android.logic.AppLogic
 import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.network.CanDoPurchaseStatus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.solovyev.android.checkout.Checkout
-import org.solovyev.android.checkout.ProductTypes
 
 class PurchaseModel(application: Application): AndroidViewModel(application) {
     private val logic: AppLogic by lazy { DefaultAppLogic.with(application) }
-    private val application: io.timelimit.android.Application by lazy { application as io.timelimit.android.Application }
     private val statusInternal = MutableLiveData<PurchaseFragmentStatus>()
     private val lock = Mutex()
 
     val status = statusInternal.castDown()
 
-    init {
-        prepare()
-    }
-
-    fun retry() {
-        if (this.status.value is PurchaseFragmentRecoverableError) {
-            prepare()
+    fun retry(activityPurchaseModel: ActivityPurchaseModel) {
+        if (this.status.value is PurchaseFragmentRecoverableError || this.status.value == null) {
+            prepare(activityPurchaseModel)
         }
     }
 
-    private fun prepare() {
+    private fun prepare(activityPurchaseModel: ActivityPurchaseModel) {
         runAsync {
             lock.withLock {
                 try {
@@ -70,23 +62,12 @@ class PurchaseModel(application: Application): AndroidViewModel(application) {
                             if (canDoPurchase.publicKey?.contentEquals(Base64.decode(BuildConfig.googlePlayKey, 0)) == false) {
                                 statusInternal.value = PurchaseFragmentServerHasDifferentPublicKey
                             } else {
-                                val checkout = Checkout.forApplication(application.billing)
+                                val skus = activityPurchaseModel.querySkus(PurchaseIds.BUY_SKUS)
 
-                                checkout.startAsync().use {
-                                    if (!it.billingSupported) {
-                                        statusInternal.value = PurchaseFragmentErrorBillingNotSupportedByDevice
-                                    } else {
-                                        val skus = it.requests.getSkusAsync(
-                                                ProductTypes.IN_APP,
-                                                PurchaseIds.BUY_SKUS
-                                        )
-
-                                        statusInternal.value = PurchaseFragmentReady(
-                                                monthPrice = skus.getSku(PurchaseIds.SKU_MONTH)?.price.toString(),
-                                                yearPrice = skus.getSku(PurchaseIds.SKU_YEAR)?.price.toString()
-                                        )
-                                    }
-                                }
+                                statusInternal.value = PurchaseFragmentReady(
+                                        monthPrice = skus.find { it.sku == PurchaseIds.SKU_MONTH }?.price.toString(),
+                                        yearPrice = skus.find { it.sku == PurchaseIds.SKU_YEAR }?.price.toString()
+                                )
                             }
                         } else if (canDoPurchase == CanDoPurchaseStatus.NotDueToOldPurchase) {
                             statusInternal.value = PurchaseFragmentExistingPaymentError
@@ -94,6 +75,8 @@ class PurchaseModel(application: Application): AndroidViewModel(application) {
                             statusInternal.value = PurchaseFragmentServerRejectedError
                         }
                     }
+                } catch (ex: BillingNotSupportedException) {
+                    statusInternal.value = PurchaseFragmentErrorBillingNotSupportedByDevice
                 } catch (ex: Exception) {
                     statusInternal.value = PurchaseFragmentNetworkError
                 }

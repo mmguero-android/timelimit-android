@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,17 @@
  */
 package io.timelimit.android.ui.payment
 
+import android.app.Activity
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.android.billingclient.api.*
 import io.timelimit.android.BuildConfig
 import io.timelimit.android.R
 import io.timelimit.android.coroutines.runAsync
-import io.timelimit.android.extensions.consumeAsync
-import io.timelimit.android.extensions.startAsync
-import io.timelimit.android.extensions.waitUntilReady
-import io.timelimit.android.livedata.castDown
+import io.timelimit.android.extensions.*
 import io.timelimit.android.livedata.map
 import io.timelimit.android.livedata.mergeLiveData
 import io.timelimit.android.livedata.setTemporarily
@@ -34,25 +33,26 @@ import io.timelimit.android.logic.DefaultAppLogic
 import io.timelimit.android.sync.network.CanDoPurchaseStatus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.solovyev.android.checkout.*
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ActivityPurchaseModel(application: Application): AndroidViewModel(application) {
     companion object {
         private const val LOG_TAG = "ActivityPurchaseModel"
     }
 
-    private val billing = (application as io.timelimit.android.Application).billing
     private val logic = DefaultAppLogic.with(application)
-    private val lock = Mutex()
+    private val clientMutex = Mutex()
+    private val processMutex = Mutex()
+    private var _billingClient: BillingClient? = null
+
     private val isWorkingInternal = MutableLiveData<Boolean>().apply { value = false }
     private val hadErrorInternal = MutableLiveData<Boolean>().apply { value = false }
     private val processPurchaseSuccessInternal = MutableLiveData<Boolean>().apply { value = false }
 
-    val isWorking = isWorkingInternal.castDown()
-    val hadError = hadErrorInternal.castDown()
-    val processPurchaseSuccess = processPurchaseSuccessInternal.castDown()
-    val status = mergeLiveData(isWorking, hadError, processPurchaseSuccess).map {
+    val status = mergeLiveData(isWorkingInternal, hadErrorInternal, processPurchaseSuccessInternal).map {
         (working, error, success) ->
 
         if (success != null && success) {
@@ -70,157 +70,234 @@ class ActivityPurchaseModel(application: Application): AndroidViewModel(applicat
         processPurchaseSuccessInternal.value = false
     }
 
-    private var activityCheckout: ActivityCheckout? = null
-
-    fun setActivityCheckout(checkout: ActivityCheckout) {
-        checkout.start()
-
-        checkout.createPurchaseFlow(object: RequestListener<Purchase> {
-            override fun onError(response: Int, e: Exception) {
-                // ignored
+    private suspend fun <R> initAndUseClient(block: suspend (client: BillingClient) -> R): R {
+        clientMutex.withLock {
+            if (_billingClient == null) {
+                _billingClient = BillingClient.newBuilder(getApplication())
+                        .enablePendingPurchases()
+                        .setListener(purchaseUpdatedListener)
+                        .build()
             }
 
-            override fun onSuccess(result: Purchase) {
-                if (PurchaseIds.BUY_SKUS.contains(result.sku)) {
-                    runAsync {
-                        lock.withLock {
-                            isWorkingInternal.setTemporarily(true).use { _ ->
-                                handlePurchase(result)
+            val initBillingClient = _billingClient!!
+
+            suspendCoroutine<Unit?> { continuation ->
+                initBillingClient.startConnection(object : BillingClientStateListener {
+                    override fun onBillingSetupFinished(billingResult: BillingResult) {
+                        try {
+                            billingResult.assertSuccess()
+
+                            continuation.resume(null)
+                        } catch (ex: BillingClientException) {
+                            _billingClient = null
+
+                            if (BuildConfig.DEBUG) {
+                                Log.w(LOG_TAG, "error during connecting", ex)
+                            }
+
+                            continuation.resumeWithException(BillingNotSupportedException())
+                        }
+                    }
+
+                    override fun onBillingServiceDisconnected() {
+                        if (BuildConfig.DEBUG) {
+                            Log.d(LOG_TAG, "client disconnected")
+                        }
+
+                        runAsync {
+                            clientMutex.withLock {
+                                if (_billingClient === initBillingClient) { _billingClient = null }
+                            }
+                        }
+                    }
+                })
+            }
+
+            return block(initBillingClient)
+        }
+    }
+
+    suspend fun querySkus(skuIds: List<String>): List<SkuDetails> = initAndUseClient { client ->
+        val (billingResult, data) = client.querySkuDetails(
+                SkuDetailsParams.newBuilder()
+                        .setSkusList(skuIds)
+                        .setType(BillingClient.SkuType.INAPP)
+                        .build()
+        )
+
+        billingResult.assertSuccess()
+
+        data ?: throw BillingClientException("empty response")
+    }
+
+    suspend fun queryPurchases() = initAndUseClient { client ->
+        val response = client.queryPurchases(BillingClient.SkuType.INAPP)
+
+        response.billingResult.assertSuccess()
+
+        response.purchasesList!!.filter {
+            it.purchaseState == Purchase.PurchaseState.PURCHASED
+        }
+    }
+
+    private suspend fun queryAndProcessPurchases() {
+        processMutex.withLock {
+            isWorkingInternal.setTemporarily(true).use {
+                try {
+                    initAndUseClient { client ->
+                        val result = client.queryPurchases(BillingClient.SkuType.INAPP)
+
+                        result.billingResult.assertSuccess()
+
+                        for (purchase in result.purchasesList!!) {
+                            handlePurchase(purchase, client)
+                        }
+                    }
+                } catch (ex: Exception) {
+                    if (BuildConfig.DEBUG) {
+                        Log.w(LOG_TAG, "queryAndProcessPurchases() failed", ex)
+                    }
+
+                    hadErrorInternal.value = true
+                }
+            }
+        }
+    }
+
+    fun queryAndProcessPurchasesAsync() {
+        runAsync { queryAndProcessPurchases() }
+    }
+
+    private val purchaseUpdatedListener: PurchasesUpdatedListener = object: PurchasesUpdatedListener {
+        override fun onPurchasesUpdated(p0: BillingResult, p1: MutableList<Purchase>?) {
+            runAsync {
+                processMutex.withLock {
+                    isWorkingInternal.setTemporarily(true).use {
+                        initAndUseClient { client ->
+                            try {
+                                p0.assertSuccess()
+
+                                for (purchase in p1!!) {
+                                    handlePurchase(purchase, client)
+                                }
+                            } catch (ex: Exception) {
+                                if (BuildConfig.DEBUG) {
+                                    Log.w(LOG_TAG, "onPurchasesUpdated() failed", ex)
+                                }
+
+                                hadErrorInternal.value = true
                             }
                         }
                     }
                 }
             }
-        })
-
-        activityCheckout = checkout
+        }
     }
 
     fun forgetActivityCheckout() {
-        activityCheckout?.stop()
-        activityCheckout = null
-    }
-
-    fun queryAndProcessPurchasesAsync() {
         runAsync {
-            lock.withLock {
-                isWorkingInternal.setTemporarily(true).use { _ ->
-                    val checkout = activityCheckout
-
-                    if (checkout != null) {
-                        val inventory = checkout.makeInventory()
-
-                        inventory.load(
-                                Inventory.Request.create()
-                                        .loadAllPurchases(),
-                                object: Inventory.Callback {
-                                    override fun onLoaded(products: Inventory.Products) {
-                                        products[ProductTypes.IN_APP].purchases.forEach { purchase ->
-                                            if (PurchaseIds.BUY_SKUS.contains(purchase.sku)) {
-                                                runAsync {
-                                                    handlePurchase(purchase)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                        )
-                    }
-                }
+            clientMutex.withLock {
+                _billingClient?.endConnection()
+                _billingClient = null
             }
         }
     }
 
-    private suspend fun handlePurchase(purchase: Purchase) {
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "handlePurchase()")
+    private suspend fun handlePurchase(purchase: Purchase, billingClient: BillingClient) {
+        if (purchase.purchaseState != Purchase.PurchaseState.PURCHASED || purchase.isAcknowledged) {
+            // we are not interested in it
+            return
         }
 
-        try {
+        if (BuildConfig.DEBUG) {
+            Log.d(LOG_TAG, "handlePurchase($purchase)")
+        }
+
+        if (PurchaseIds.SAL_SKUS.contains(purchase.sku)) {
+            // just acknowledge
+
+            billingClient.acknowledgePurchase(
+                    AcknowledgePurchaseParams.newBuilder()
+                            .setPurchaseToken(purchase.purchaseToken)
+                            .build()
+            ).assertSuccess()
+        } else if (PurchaseIds.BUY_SKUS.contains(purchase.sku)) {
+            // send and consume
+
             val server = logic.serverLogic.getServerConfigCoroutine()
 
             if (server.hasAuthToken) {
                 server.api.finishPurchaseByGooglePlay(
-                        receipt = purchase.data,
+                        receipt = purchase.originalJson,
                         signature = purchase.signature,
                         deviceAuthToken = server.deviceAuthToken
                 )
+
+                billingClient.consumePurchase(
+                        ConsumeParams.newBuilder()
+                                .setPurchaseToken(purchase.purchaseToken)
+                                .build()
+                )
+
+                processPurchaseSuccessInternal.value = true
+            } else {
+                Log.w(LOG_TAG, "purchase for the premium version but no server available")
             }
-
-            processPurchaseSuccessInternal.value = true
-            consumePurchaseAsync(purchase)
-        } catch (ex: Exception) {
-            hadErrorInternal.value = true
-
+        } else {
             if (BuildConfig.DEBUG) {
-                Log.d(LOG_TAG, "server rejected purchase", ex)
+                Log.d(LOG_TAG, "don't know how to handle ${purchase.sku}")
             }
         }
     }
 
-    private fun consumePurchaseAsync(purchase: Purchase) {
-        if (BuildConfig.DEBUG) {
-            Log.d(LOG_TAG, "consumePurchaseAsync()")
-        }
-
+    fun startPurchase(sku: String, checkAtBackend: Boolean, activity: Activity) {
         runAsync {
-            lock.withLock {
-                try {
-                    Checkout.forApplication(billing).startAsync().use {
-                        it.requests.consumeAsync(purchase.token)
-                    }
-                } catch (ex: Exception) {
-                    if (BuildConfig.DEBUG) {
-                        Log.w(LOG_TAG, "consumePurchaseAsync() failed", ex)
-                    }
+            try {
+                val skuDetails = querySkus(listOf(sku)).single()
+
+                if (skuDetails.sku != sku) throw IllegalStateException()
+
+                startPurchase(skuDetails, checkAtBackend, activity)
+            } catch (ex: Exception) {
+                if (BuildConfig.DEBUG) {
+                    Log.d(LOG_TAG, "could not start purchase", ex)
                 }
+
+                Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    fun startPurchase(sku: String, checkAtBackend: Boolean) {
+    fun startPurchase(skuDetails: SkuDetails, checkAtBackend: Boolean, activity: Activity) {
         runAsync {
-            lock.withLock {
-                isWorkingInternal.setTemporarily(true).use {
-                    _ ->
+            initAndUseClient { client ->
+                try {
+                    if (checkAtBackend) {
+                        val server = logic.serverLogic.getServerConfigCoroutine()
 
-                    try {
-                        if (checkAtBackend) {
-                            val server = logic.serverLogic.getServerConfigCoroutine()
-
-                            if (!server.hasAuthToken) {
-                                Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
-
-                                return@runAsync
-                            }
-
-                            if (!(server.api.canDoPurchase(server.deviceAuthToken) is CanDoPurchaseStatus.Yes)) {
-                                throw IOException("can not do purchase right now")
-                            }
-                        }
-
-                        // start the purchase
-                        val activityCheckout = activityCheckout
-
-                        if (activityCheckout == null) {
+                        if (!server.hasAuthToken) {
                             Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
 
-                            return@runAsync
+                            return@initAndUseClient
                         }
 
-                        activityCheckout.waitUntilReady().requests.purchase(
-                                ProductTypes.IN_APP,
-                                sku,
-                                null,
-                                activityCheckout.purchaseFlow
-                        )
-                    } catch (ex: Exception) {
-                        if (BuildConfig.DEBUG) {
-                            Log.d(LOG_TAG, "could not start purchase", ex)
+                        if (!(server.api.canDoPurchase(server.deviceAuthToken) is CanDoPurchaseStatus.Yes)) {
+                            throw IOException("can not do purchase right now")
                         }
-
-                        Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
                     }
+
+                    client.launchBillingFlow(
+                            activity,
+                            BillingFlowParams.newBuilder()
+                                    .setSkuDetails(skuDetails)
+                                    .build()
+                    ).assertSuccess()
+                } catch (ex: Exception) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d(LOG_TAG, "could not start purchase", ex)
+                    }
+
+                    Toast.makeText(getApplication(), R.string.error_general, Toast.LENGTH_SHORT).show()
                 }
             }
         }
