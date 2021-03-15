@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import io.timelimit.android.R
 import io.timelimit.android.async.Threads
@@ -34,28 +34,37 @@ class DurationPickerDialogFragment: DialogFragment() {
     companion object {
         private const val DIALOG_TAG = "DurationPickerDialogFragment"
         private const val TITLE_RES = "titleRes"
-        private const val INDEX = "index"
+        private const val REQUEST_KEY = "requestKe"
         private const val START_TIME_IN_MILLIS = "startTimeInMillis"
 
-        fun newInstance(titleRes: Int, index: Int, target: Fragment, startTimeInMillis: Int) = DurationPickerDialogFragment().apply {
+        fun newInstance(titleRes: Int, requestKey: String, startTimeInMillis: Int) = DurationPickerDialogFragment().apply {
             arguments = Bundle().apply {
                 putInt(TITLE_RES, titleRes)
-                putInt(INDEX, index)
+                putString(REQUEST_KEY, requestKey)
                 putInt(START_TIME_IN_MILLIS, startTimeInMillis)
             }
+        }
+    }
 
-            setTargetFragment(target, 0)
+    data class Result (val durationInMillis: Int) {
+        companion object {
+            private const val DURATION_IN_MILLIS = "durationInMillis"
+
+            fun fromBundle(bundle: Bundle) = Result(durationInMillis = bundle.getInt(DURATION_IN_MILLIS))
+        }
+
+        val bundle: Bundle by lazy {
+            Bundle().apply { putInt(DURATION_IN_MILLIS, durationInMillis) }
         }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding = DurationPickerDialogFragmentBinding.inflate(LayoutInflater.from(context!!))
+        val binding = DurationPickerDialogFragmentBinding.inflate(LayoutInflater.from(requireContext()))
         val view = binding.duration
-        val target = targetFragment as DurationPickerDialogFragmentListener
-        val index = arguments!!.getInt(INDEX)
-        val titleRes = arguments!!.getInt(TITLE_RES)
-        val startTimeInMillis = arguments!!.getInt(START_TIME_IN_MILLIS)
-        val config = DefaultAppLogic.with(context!!).database.config()
+        val requestKey = requireArguments().getString(REQUEST_KEY)!!
+        val titleRes = requireArguments().getInt(TITLE_RES)
+        val startTimeInMillis = requireArguments().getInt(START_TIME_IN_MILLIS)
+        val config = DefaultAppLogic.with(requireContext()).database.config()
 
         if (savedInstanceState == null) {
             view.timeInMillis = startTimeInMillis.toLong()
@@ -75,19 +84,15 @@ class DurationPickerDialogFragment: DialogFragment() {
             }
         }
 
-        return AlertDialog.Builder(context!!, theme)
+        return AlertDialog.Builder(requireContext(), theme)
                 .setTitle(titleRes)
                 .setView(binding.root)
                 .setPositiveButton(R.string.generic_ok) { _, _ ->
-                    target.onDurationSelected(view.timeInMillis.toInt(), index)
+                    setFragmentResult(requestKey, Result(durationInMillis = view.timeInMillis.toInt()).bundle)
                 }
                 .setNegativeButton(R.string.generic_cancel, null)
                 .create()
     }
 
     fun show(fragmentManager: FragmentManager) = showSafe(fragmentManager, DIALOG_TAG)
-}
-
-interface DurationPickerDialogFragmentListener {
-    fun onDurationSelected(durationInMillis: Int, index: Int)
 }

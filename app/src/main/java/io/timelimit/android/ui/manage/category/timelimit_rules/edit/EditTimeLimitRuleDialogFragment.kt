@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,12 +47,16 @@ import java.nio.ByteBuffer
 import java.util.*
 
 
-class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPickerDialogFragmentListener {
+class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment() {
     companion object {
         private const val PARAM_EXISTING_RULE = "a"
         private const val PARAM_CATEGORY_ID = "b"
         private const val DIALOG_TAG = "t"
         private const val STATE_RULE = "c"
+        private const val REQUEST_START_TIME_OF_DAY = "editRule:startTimeOfDay"
+        private const val REQUEST_END_TIME_OF_DAY = "editRule:endTimeOfDay"
+        private const val REQUEST_EDIT_SESSION_LENGTH = "editRule:sessionLength"
+        private const val REQUEST_EDIT_SESSION_PAUSE = "editRule:sessionPause"
 
         fun newInstance(existingRule: TimeLimitRule, listener: Fragment) = EditTimeLimitRuleDialogFragment()
                 .apply {
@@ -204,18 +208,16 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
 
             override fun updateStartTime() {
                 TimePickerDialogFragment.newInstance(
-                        editTimeLimitRuleDialogFragment = this@EditTimeLimitRuleDialogFragment,
-                        index = 0,
+                        requestKey = REQUEST_START_TIME_OF_DAY,
                         startMinuteOfDay = newRule.startMinuteOfDay
-                ).show(parentFragmentManager)
+                ).show(childFragmentManager)
             }
 
             override fun updateEndTime() {
                 TimePickerDialogFragment.newInstance(
-                        editTimeLimitRuleDialogFragment = this@EditTimeLimitRuleDialogFragment,
-                        index = 1,
+                        requestKey = REQUEST_END_TIME_OF_DAY,
                         startMinuteOfDay = newRule.endMinuteOfDay
-                ).show(parentFragmentManager)
+                ).show(childFragmentManager)
             }
 
             override fun updateSessionDurationLimit(enable: Boolean) {
@@ -237,19 +239,17 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
             override fun updateSessionLength() {
                 DurationPickerDialogFragment.newInstance(
                         titleRes = R.string.category_time_limit_rules_session_limit_duration,
-                        index = 0,
-                        target = this@EditTimeLimitRuleDialogFragment,
+                        requestKey = REQUEST_EDIT_SESSION_LENGTH,
                         startTimeInMillis = newRule.sessionDurationMilliseconds
-                ).show(parentFragmentManager)
+                ).show(childFragmentManager)
             }
 
             override fun updateSessionBreak() {
                 DurationPickerDialogFragment.newInstance(
                         titleRes = R.string.category_time_limit_rules_session_limit_pause,
-                        index = 1,
-                        target = this@EditTimeLimitRuleDialogFragment,
+                        requestKey = REQUEST_EDIT_SESSION_PAUSE,
                         startTimeInMillis = newRule.sessionPauseMilliseconds
-                ).show(parentFragmentManager)
+                ).show(childFragmentManager)
             }
 
             override fun onSaveRule() {
@@ -349,6 +349,54 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
         return view.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        childFragmentManager.setFragmentResultListener(REQUEST_START_TIME_OF_DAY, viewLifecycleOwner) { _, bundle ->
+            val minuteOfDay = TimePickerDialogFragment.Result.fromBundle(bundle).minuteOfDay
+
+            if (!MinuteOfDay.isValid(minuteOfDay)) {
+                Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+
+                return@setFragmentResultListener
+            } else if (minuteOfDay > newRule.endMinuteOfDay) {
+                Toast.makeText(context, R.string.category_time_limit_rules_invalid_range, Toast.LENGTH_SHORT).show()
+            } else {
+                newRule = newRule.copy(startMinuteOfDay = minuteOfDay)
+                bindRule()
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(REQUEST_END_TIME_OF_DAY, viewLifecycleOwner) { _, bundle ->
+            val minuteOfDay = TimePickerDialogFragment.Result.fromBundle(bundle).minuteOfDay
+
+            if (!MinuteOfDay.isValid(minuteOfDay)) {
+                Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
+            } else if (minuteOfDay < newRule.startMinuteOfDay) {
+                Toast.makeText(context, R.string.category_time_limit_rules_invalid_range, Toast.LENGTH_SHORT).show()
+            } else {
+                newRule = newRule.copy(endMinuteOfDay = minuteOfDay)
+                bindRule()
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(REQUEST_EDIT_SESSION_LENGTH, viewLifecycleOwner) { _, bundle ->
+            newRule = newRule.copy(
+                    sessionDurationMilliseconds = DurationPickerDialogFragment.Result.fromBundle(bundle).durationInMillis
+            )
+
+            bindRule()
+        }
+
+        childFragmentManager.setFragmentResultListener(REQUEST_EDIT_SESSION_PAUSE, viewLifecycleOwner) { _, bundle ->
+            newRule = newRule.copy(
+                    sessionPauseMilliseconds = DurationPickerDialogFragment.Result.fromBundle(bundle).durationInMillis
+            )
+
+            bindRule()
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
 
@@ -379,54 +427,6 @@ class EditTimeLimitRuleDialogFragment : BottomSheetDialogFragment(), DurationPic
             if (existingRule != null) {
                 outState.putParcelable(PARAM_EXISTING_RULE, existingRule)
             }
-        }
-    }
-
-    fun handleTimePickerResult(index: Int, minuteOfDay: Int) {
-        if (!MinuteOfDay.isValid(minuteOfDay)) {
-            Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
-
-            return
-        }
-
-        if (index == 0) {
-            // start minute
-
-            if (minuteOfDay > newRule.endMinuteOfDay) {
-                Toast.makeText(context, R.string.category_time_limit_rules_invalid_range, Toast.LENGTH_SHORT).show()
-            } else {
-                newRule = newRule.copy(startMinuteOfDay = minuteOfDay)
-                bindRule()
-            }
-        } else if (index == 1) {
-            // end minute
-
-            if (minuteOfDay < newRule.startMinuteOfDay) {
-                Toast.makeText(context, R.string.category_time_limit_rules_invalid_range, Toast.LENGTH_SHORT).show()
-            } else {
-                newRule = newRule.copy(endMinuteOfDay = minuteOfDay)
-                bindRule()
-            }
-        } else {
-            Toast.makeText(context, R.string.error_general, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    override fun onDurationSelected(durationInMillis: Int, index: Int) {
-        if (index == 0) {
-            newRule = newRule.copy(
-                    sessionDurationMilliseconds = durationInMillis
-            )
-
-            bindRule()
-        } else if (index == 1) {
-            newRule = newRule.copy(
-                    sessionPauseMilliseconds = durationInMillis
-            )
-
-            bindRule()
-        } else {
-            throw IllegalArgumentException()
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * TimeLimit Copyright <C> 2019 - 2020 Jonas Lochmann
+ * TimeLimit Copyright <C> 2019 - 2021 Jonas Lochmann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,34 +20,44 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.setFragmentResult
 import io.timelimit.android.extensions.showSafe
 
 class TimePickerDialogFragment: DialogFragment() {
     companion object {
-        private const val INDEX = "index"
         private const val START_MINUTE_OF_DAY = "startMinuteOfDay"
+        private const val REQUEST_KEY = "requestKey"
         private const val DIALOG_TAG = "TimePickerDialogFragment"
 
         fun newInstance(
-                editTimeLimitRuleDialogFragment: EditTimeLimitRuleDialogFragment,
-                index: Int,
+                requestKey: String,
                 startMinuteOfDay: Int
         ) = TimePickerDialogFragment().apply {
-            setTargetFragment(editTimeLimitRuleDialogFragment, 0)
             arguments = Bundle().apply {
-                putInt(INDEX, index)
                 putInt(START_MINUTE_OF_DAY, startMinuteOfDay)
+                putString(REQUEST_KEY, requestKey)
             }
         }
     }
 
+    data class Result (val minuteOfDay: Int) {
+        companion object {
+            private const val MINUTE_OF_DAY = "minuteOfDay"
+
+            fun fromBundle(bundle: Bundle): Result = Result(minuteOfDay = bundle.getInt(MINUTE_OF_DAY))
+        }
+
+        val bundle: Bundle by lazy {
+            Bundle().apply { putInt(MINUTE_OF_DAY, minuteOfDay) }
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val fragment = targetFragment as EditTimeLimitRuleDialogFragment
-        val index = arguments!!.getInt(INDEX)
-        val startMinuteOfDay = arguments!!.getInt(START_MINUTE_OF_DAY)
+        val startMinuteOfDay = requireArguments().getInt(START_MINUTE_OF_DAY)
+        val requestKey = requireArguments().getString(REQUEST_KEY)!!
 
         return TimePickerDialog(context, theme, { _, hour, minute ->
-            fragment.handleTimePickerResult(index, hour * 60 + minute)
+            setFragmentResult(requestKey, Result(hour * 60 + minute).bundle)
         }, startMinuteOfDay / 60, startMinuteOfDay % 60, true)
     }
 
