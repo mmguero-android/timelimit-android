@@ -24,6 +24,11 @@ androidExtensions {
     experimental = true
 }
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     compileSdkVersion 30
     defaultConfig {
@@ -97,7 +102,10 @@ android {
 
     signingConfigs {
         release {
-            // empty
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
     }
 
@@ -122,6 +130,7 @@ android {
     lintOptions {
         disable 'GoogleAppIndexingWarning'
         baseline file("lint-baseline.xml")
+        checkReleaseBuilds false
     }
 
     dataBinding {

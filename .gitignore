@@ -10,3 +10,8 @@
 /captures
 .externalNativeBuild
 .idea
+
+# Signing
+keystore.properties
+release.keystore
+
